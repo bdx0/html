@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<meta name="theme-color" content="#08121d">
+<meta name="description" content="Khám phá NEXUS Residence 2045: mô hình biệt thự tương lai 3D có thể xoay 360°, xem ngày/đêm, tách tầng và khám phá công nghệ nhà thông minh.">
+<meta name="catalog:category" content="Kiến trúc & 3D">
+<meta name="catalog:tags" content="3D,Kiến trúc,Nhà tương lai,WebGL,Three.js,Smart Home">
+<meta name="catalog:icon" content="🏡">
+<title>NEXUS Residence 2045 — Ngôi nhà tương lai 3D</title>
+<style>
+:root{--ink:#e9f4ff;--dim:#9fb5c8;--line:rgba(181,218,244,.21);--pane:rgba(10,25,39,.82);--aqua:#8cf5de;--gold:#ffd3a0}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;overscroll-behavior:none;background:#091621;color:var(--ink);font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;-webkit-tap-highlight-color:transparent}
+button,a{font:inherit}button{cursor:pointer}button:focus-visible,a:focus-visible{outline:2px solid var(--aqua);outline-offset:3px}
+#app{position:fixed;inset:0;overflow:hidden;isolation:isolate}#sceneHost{position:absolute;inset:0;touch-action:none;background:linear-gradient(180deg,#bdd9e2,#dae5dd 70%,#7c998d)}#sceneHost canvas{display:block;width:100%;height:100%;outline:none;touch-action:none}
+.vignette{pointer-events:none;position:absolute;inset:0;background:linear-gradient(90deg,rgba(5,14,23,.4),transparent 45%,rgba(5,14,23,.05)),linear-gradient(0deg,rgba(5,13,22,.44),transparent 24%,transparent 80%,rgba(5,13,22,.19));z-index:1}
+.topbar{position:absolute;z-index:6;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:20px clamp(16px,3vw,48px);pointer-events:none}
+.topbar>*{pointer-events:auto}.brand{display:flex;align-items:center;gap:11px;text-decoration:none;color:white;font-size:16px;font-weight:850;letter-spacing:.16em;white-space:nowrap}.brand-mark{width:35px;height:35px;border:1px solid rgba(174,255,237,.65);border-radius:11px;display:grid;place-items:center;color:#a0fff0;background:rgba(0,58,66,.45);font-size:19px}.brand small{display:block;font-size:9px;letter-spacing:.25em;color:#c0d5e5;font-weight:600}
+.header-right{display:flex;align-items:center;gap:11px}.chip{border:1px solid var(--line);border-radius:99px;padding:8px 12px;color:#ecfbff;background:rgba(11,29,42,.62);backdrop-filter:blur(15px);font-size:11px;letter-spacing:.07em;font-weight:750}.chip i{display:inline-block;width:7px;height:7px;border-radius:50%;background:#73edc5;box-shadow:0 0 11px #73edc5;margin-right:6px}
+.iconbtn{display:inline-flex;align-items:center;justify-content:center;min-width:39px;height:39px;border-radius:11px;background:rgba(9,27,40,.73);color:#ecf8ff;border:1px solid var(--line);backdrop-filter:blur(14px);font-size:18px}.iconbtn:hover,.ctl:hover{background:rgba(38,72,83,.88)}
+.info{position:absolute;z-index:4;left:clamp(16px,3.4vw,52px);top:clamp(96px,18%,172px);width:min(342px,calc(100vw - 32px));pointer-events:none}.info>*{pointer-events:auto}
+.eyebrow{font-size:10px;font-weight:800;letter-spacing:.27em;color:#a8ffec;text-shadow:0 2px 20px #092229;margin-bottom:12px;text-transform:uppercase}.info h1{margin:0;color:#fff;font-weight:780;letter-spacing:-.065em;line-height:1.03;font-size:clamp(37px,4.8vw,67px);text-shadow:0 4px 28px #19334766}.info h1 span{font-weight:320;color:#d9f4f4}.subtitle{max-width:295px;font-size:13px;color:#e0f0f7;line-height:1.85;margin:18px 0 24px;text-shadow:0 1px 14px #06142077}
+.specs{display:flex;gap:10px;width:max-content;max-width:100%}.spec{padding:12px 14px;border:1px solid rgba(203,244,250,.22);background:rgba(8,24,38,.66);backdrop-filter:blur(20px);min-width:95px;border-radius:13px}.spec strong{display:block;font-size:17px;letter-spacing:-.02em;font-weight:800}.spec small{color:#b6ccdb;font-size:9px;text-transform:uppercase;letter-spacing:.12em}
+.sidepanel{position:absolute;z-index:4;right:clamp(16px,3vw,48px);top:clamp(106px,18%,172px);width:226px;background:rgba(8,23,37,.72);border:1px solid rgba(204,241,248,.19);border-radius:19px;padding:17px;backdrop-filter:blur(23px);box-shadow:0 12px 45px #06131c25}
+.panel-top{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:#a1c0ce;font-weight:800;margin-bottom:15px;display:flex;justify-content:space-between}.panel-top b{color:var(--aqua)}
+.feature{display:flex;align-items:flex-start;gap:10px;padding:11px 0;border-top:1px solid rgba(186,221,238,.12)}.feature .fi{width:31px;height:31px;flex:0 0 31px;display:grid;place-items:center;font-size:16px;border-radius:9px;background:rgba(78,170,168,.16)}.feature strong{font-size:12px;display:block;font-weight:650}.feature small{display:block;color:#95b0c1;font-size:10px;line-height:1.5;margin-top:2px}
+.hint{position:absolute;left:clamp(16px,3.4vw,52px);bottom:118px;z-index:4;color:#e3f3fa;font-size:11px;letter-spacing:.02em;text-shadow:0 1px 10px #02121a;pointer-events:none}.hint span{color:#a8ffed;font-weight:900}
+.controls-wrap{position:absolute;z-index:7;bottom:max(18px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);width:min(970px,calc(100% - 32px));pointer-events:auto}
+.dock{display:flex;align-items:center;justify-content:space-between;gap:12px;background:rgba(8,24,37,.86);border:1px solid rgba(190,232,241,.24);box-shadow:0 18px 70px #04121b70;backdrop-filter:blur(30px);border-radius:19px;padding:11px}
+.control-label{display:block;white-space:nowrap;margin:0 0 6px;font-size:9px;text-transform:uppercase;letter-spacing:.16em;color:#86aabb;font-weight:850}.control-block{padding:0 9px}.btnrow{display:flex;gap:5px}.ctl{white-space:nowrap;border:1px solid transparent;background:transparent;color:#bed2dd;border-radius:10px;padding:9px 12px;font-size:12px;font-weight:650;transition:background .18s,border .18s}.ctl[aria-pressed="true"]{color:#8bffe4;background:rgba(35,122,111,.28);border-color:rgba(115,250,208,.38)}.ctl.primary{color:#eafafe;background:rgba(69,115,125,.2);border:1px solid rgba(190,233,241,.2)}.dock-divider{width:1px;background:rgba(185,224,235,.2);height:41px;flex:0 0 1px}
+#toast{position:absolute;z-index:14;top:78px;left:50%;transform:translateX(-50%);background:rgba(6,29,40,.92);border:1px solid #76d4c7;border-radius:12px;color:#dafff5;padding:11px 18px;box-shadow:0 15px 30px #03111b55;font-size:12px;text-align:center;max-width:calc(100% - 28px);pointer-events:none;opacity:0;transition:opacity .25s}#toast.show{opacity:1}
+.hotspot{position:absolute;z-index:3;transform:translate(-50%,-50%);display:none;align-items:center;gap:7px;padding:6px 11px 6px 7px;border:1px solid rgba(213,255,251,.72);border-radius:30px;background:rgba(10,48,55,.79);box-shadow:0 3px 20px #03191d55;color:#eafff9;backdrop-filter:blur(9px);font-size:10px;font-weight:770;white-space:nowrap}.hotspot .dot{background:#a6ffe6;width:17px;height:17px;display:grid;place-items:center;border-radius:50%;color:#153d3c;font-size:10px}.hotspot:hover{background:#165d67;border-color:white}
+#detail{position:absolute;z-index:9;right:clamp(15px,3vw,45px);bottom:125px;width:min(300px,calc(100vw - 30px));background:rgba(8,27,39,.94);border:1px solid rgba(150,248,222,.48);backdrop-filter:blur(25px);border-radius:19px;padding:22px;box-shadow:0 22px 70px #03131eb5;display:none}#detail.show{display:block}#detail .overline{font-size:10px;letter-spacing:.18em;color:#80ebc9;font-weight:850}#detail h2{font-size:21px;letter-spacing:-.035em;margin:8px 26px 9px 0}#detail p{font-size:12px;line-height:1.8;color:#b8d0d9;margin:0}.close{position:absolute;top:11px;right:12px;border:0;color:#c3e8e9;background:transparent;font-size:23px}
+#debug{position:absolute;z-index:13;right:17px;bottom:114px;width:min(340px,calc(100vw - 34px));padding:16px;border:1px solid #3e8195;background:#08131eec;box-shadow:0 12px 40px #0008;color:#c7ecf5;border-radius:13px;display:none;font:11px/1.8 ui-monospace,SFMono-Regular,Consolas,monospace;white-space:pre-line}#debug.show{display:block}
+#loader{position:absolute;inset:0;z-index:20;background:#091823;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;gap:15px;padding:30px;transition:opacity .6s}.loader-logo{font-size:42px;letter-spacing:.2em;font-weight:850;color:#ccfff1}.spinner{width:34px;height:34px;border:2px solid #2c6672;border-top-color:#92f4dd;border-radius:50%;animation:spin 1s linear infinite}#loadStatus{color:#b0cfda;font-size:12px;max-width:480px}#retry{display:none;padding:9px 18px;border:1px solid #8ff0da;border-radius:10px;background:#15494b;color:white}#loader.hidden{opacity:0;pointer-events:none}@keyframes spin{to{transform:rotate(360deg)}}
+@media(max-width:900px){.sidepanel{display:none}.info{top:110px;width:280px}.info h1{font-size:45px}.subtitle{font-size:12px}.controls-wrap{width:calc(100% - 26px)}.dock{overflow-x:auto;justify-content:flex-start;scrollbar-width:none}.dock::-webkit-scrollbar{display:none}.control-block{flex:0 0 auto}.hint{bottom:132px}}
+@media(max-width:600px){.topbar{padding:12px 13px}.brand{font-size:12px;letter-spacing:.1em;gap:7px}.brand-mark{width:31px;height:31px;font-size:16px}.brand small{font-size:7px}.chip{font-size:9px;padding:7px 9px}.header-right{gap:6px}.iconbtn{min-width:33px;height:33px;font-size:15px}.info{top:81px;left:15px;width:245px}.eyebrow{font-size:8px;margin-bottom:6px}.info h1{font-size:37px}.subtitle{margin:10px 0 12px;font-size:10px;line-height:1.6;max-width:220px}.spec{padding:7px 8px;min-width:70px;border-radius:9px}.spec strong{font-size:13px}.spec small{font-size:8px}.specs{gap:5px}.dock{padding:8px;gap:7px;border-radius:14px}.control-block{padding:0 4px}.control-label{font-size:8px}.ctl{padding:8px 9px;font-size:11px}.dock-divider{height:36px}.hint{bottom:122px;font-size:10px;left:15px;max-width:180px}.hotspot{font-size:9px;padding:5px;gap:4px}.hotspot .dot{width:15px;height:15px}.hotspot span:last-child{display:none}#detail{bottom:112px;right:14px;width:min(285px,calc(100% - 28px))}#debug{bottom:108px}}
+@media(max-height:600px){.info{top:80px}.info h1{font-size:32px}.subtitle{display:none}.specs{margin-top:12px}.sidepanel{display:none}.hint{display:none}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div id="app">
+<div id="sceneHost" role="img" aria-label="Mô hình kiến trúc 3D căn nhà thông minh tương lai, tương tác xoay và thu phóng"></div>
+<div class="vignette" aria-hidden="true"></div>
+<header class="topbar">
+  <a class="brand" href="./" title="Về thư viện HTML bdx0"><span class="brand-mark">N</span><span>NEXUS <small>ARCHITECTURAL LAB / 2045</small></span></a>
+  <div class="header-right"><span class="chip"><i></i><span id="modeLabel">LIVE 3D</span></span><button class="iconbtn" id="debugBtn" type="button" title="Chẩn đoán 3D" aria-label="Chẩn đoán 3D">⌘</button><button class="iconbtn" id="fullBtn" type="button" title="Toàn màn hình" aria-label="Toàn màn hình">⛶</button></div>
+</header>
+<section class="info" aria-label="Giới thiệu ngôi nhà">
+  <div class="eyebrow">Concept home · Tương lai bền vững</div>
+  <h1>BEYOND<br><span>LIVING.</span></h1>
+  <p class="subtitle">Một không gian sống kết nối với thiên nhiên và công nghệ. Khám phá từng lớp kiến trúc của ngôi nhà năm 2045.</p>
+  <div class="specs"><div class="spec"><strong>02</strong><small>Tầng nổi</small></div><div class="spec"><strong>360°</strong><small>Góc nhìn</small></div><div class="spec"><strong>3D</strong><small>Tương tác</small></div></div>
+</section>
+<aside class="sidepanel" aria-label="Các hệ thống của ngôi nhà">
+<div class="panel-top"><span>HOME SYSTEMS</span><b>● CONCEPT</b></div>
+<div class="feature"><span class="fi">☀</span><div><strong>Solar smart roof</strong><small>Tấm quang điện tích hợp mái</small></div></div>
+<div class="feature"><span class="fi">◈</span><div><strong>Adaptive glazing</strong><small>Mặt dựng kính thông minh</small></div></div>
+<div class="feature"><span class="fi">♻</span><div><strong>Water circularity</strong><small>Thu hồi nước mưa & hồ cảnh</small></div></div>
+<div class="feature"><span class="fi">⌂</span><div><strong>Layered architecture</strong><small>Tách tầng để xem cấu trúc</small></div></div>
+</aside>
+<p class="hint"><span>↔</span> Kéo để xoay · <span>⌁</span> Chụm 2 ngón để zoom · Chạm vào điểm sáng</p>
+<button class="hotspot" data-hot="solar" type="button" aria-label="Tìm hiểu mái năng lượng mặt trời"><span class="dot">+</span><span>SMART SOLAR</span></button>
+<button class="hotspot" data-hot="glass" type="button" aria-label="Tìm hiểu mặt dựng kính"><span class="dot">+</span><span>ADAPTIVE GLASS</span></button>
+<button class="hotspot" data-hot="pool" type="button" aria-label="Tìm hiểu hệ thống nước"><span class="dot">+</span><span>WATER SYSTEM</span></button>
+<button class="hotspot" data-hot="garden" type="button" aria-label="Tìm hiểu khu vườn"><span class="dot">+</span><span>BIOPHILIC GARDEN</span></button>
+<div id="detail" role="dialog" aria-label="Thông tin kiến trúc" aria-modal="false"><button class="close" id="detailClose" type="button" aria-label="Đóng">×</button><div class="overline">NEXUS / HIGHLIGHT</div><h2 id="detailTitle"></h2><p id="detailCopy"></p></div>
+<div class="controls-wrap"><div class="dock">
+<div class="control-block"><span class="control-label">Góc nhìn</span><div class="btnrow">
+<button class="ctl" data-view="overview" aria-pressed="true" type="button">Tổng thể</button>
+<button class="ctl" data-view="front" aria-pressed="false" type="button">Mặt tiền</button>
+<button class="ctl" data-view="aerial" aria-pressed="false" type="button">Từ trên</button>
+<button class="ctl" data-view="interior" aria-pressed="false" type="button">Nội thất</button>
+</div></div><div class="dock-divider"></div>
+<div class="control-block"><span class="control-label">Khám phá</span><div class="btnrow">
+<button class="ctl primary" id="dayBtn" aria-pressed="false" type="button">☾ Ban đêm</button>
+<button class="ctl primary" id="explodeBtn" aria-pressed="false" type="button">▤ Tách tầng</button>
+<button class="ctl primary" id="xrayBtn" aria-pressed="false" type="button">◫ Xuyên tường</button>
+<button class="ctl primary" id="spinBtn" aria-pressed="false" type="button">↻ Tự xoay</button>
+<button class="ctl primary" id="resetBtn" type="button">↺ Đặt lại</button>
+</div></div>
+</div></div>
+<div id="detailBackdrop" hidden></div><div id="toast" role="status" aria-live="polite"></div>
+<div id="debug" role="status" aria-label="Thông tin WebGL"></div>
+<div id="loader"><div class="loader-logo">NEXUS</div><div class="spinner"></div><div id="loadStatus">Đang khởi tạo mô hình 3D…</div><button id="retry" type="button">Tải lại trang</button></div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
+<script>
+(function () {
+'use strict';
+var host=document.getElementById('sceneHost');
+var loader=document.getElementById('loader'),status=document.getElementById('loadStatus');
+var toastTimer=0, renderer,scene,camera,clock,water,roof,upper,roofSolar,nightLights=[],wallParts=[],ledParts=[],hotspots=[];
+var current={theta:.79,phi:.40,radius:30,targetY:3.3};
+var desired={theta:.79,phi:.40,radius:30,targetY:3.3};
+var settings={night:false,explode:false,xray:false,spin:false,debug:false};
+var moved=false,lastX=0,lastY=0,pinch=0,lastTouchId=null;
+var pointers=new Map(),lastFrame=0,frames=0,frameCount=0,fps=0,raf=0;
+var ui={};
+var activeView='overview';
+var mobile=window.innerWidth<720;
+function $(id){return document.getElementById(id);}
+function showToast(t){var el=$('toast');el.textContent=t;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(function(){el.classList.remove('show');},2100);}
+function fail(msg){status.textContent=msg+' Hãy thử mở bằng Chrome/Safari mới nhất và kiểm tra WebGL hoặc kết nối mạng.';$('retry').style.display='inline-block';document.querySelector('.spinner').style.display='none';}
+$('retry').onclick=function(){location.reload();};
+window.addEventListener('error',function(e){if(!renderer){fail('Lỗi khởi tạo: '+(e.message||'không rõ nguyên nhân')+'.');}});
+window.addEventListener('unhandledrejection',function(e){if(!renderer){fail('Lỗi tải mô hình: '+String(e.reason||'unknown')+'.');}});
+if(!window.THREE){fail('Không tải được thư viện Three.js.');return;}
+try{init();}catch(e){console.error(e);fail('Không thể hiển thị 3D: '+e.message);}
+function mat(color,rough,metal){return new THREE.MeshStandardMaterial({color:color,roughness:rough===undefined?.7:rough,metalness:metal||0});}
+function box(parent,x,y,z,w,h,d,material,cast){var o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),material);o.position.set(x,y,z);o.castShadow=cast!==false;o.receiveShadow=true;parent.add(o);return o;}
+function sphere(parent,x,y,z,r,material,segments){var o=new THREE.Mesh(new THREE.SphereGeometry(r,segments||10,8),material);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;parent.add(o);return o;}
+function cyl(parent,x,y,z,r1,r2,h,material,faces){var o=new THREE.Mesh(new THREE.CylinderGeometry(r1,r2,h,faces||10),material);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;parent.add(o);return o;}
+function plane(parent,x,y,z,w,d,material){var o=new THREE.Mesh(new THREE.PlaneGeometry(w,d),material);o.rotation.x=-Math.PI/2;o.position.set(x,y,z);o.receiveShadow=true;parent.add(o);return o;}
+function frontGlass(parent,x,y,z,w,h,count,glass,frame){var p=box(parent,x,y,z,w,h,.06,glass,false);wallParts.push(p);box(parent,x,y+h/2,z+.055,w,.07,.1,frame);box(parent,x,y-h/2,z+.055,w,.07,.1,frame);for(var i=0;i<=count;i++){box(parent,x-w/2+(w*i/count),y,z+.07,.064,h,.11,frame);}return p;}
+function sideGlass(parent,x,y,z,d,h,count,glass,frame){var p=box(parent,x,y,z,.06,h,d,glass,false);wallParts.push(p);box(parent,x+.055,y+h/2,z,.11,.07,d,frame);box(parent,x+.055,y-h/2,z,.11,.07,d,frame);for(var i=0;i<=count;i++){box(parent,x+.07,y,z-d/2+(d*i/count),.11,h,.065,frame);}return p;}
+function led(parent,x,y,z,w,h,d){var m=new THREE.MeshStandardMaterial({color:0x7af6de,emissive:0x5affda,emissiveIntensity:.6,roughness:.2});var o=box(parent,x,y,z,w,h,d,m,false);ledParts.push(o);return o;}
+var M={};
+function setupMaterials(){
+ M.plaster=mat(0xe8ece7,.84);M.cream=mat(0xdce6dd,.85);M.stone=mat(0x849590,.95);M.dark=mat(0x1e343a,.59,.19);M.metal=mat(0x46595d,.38,.64);M.wood=mat(0x92684a,.79);M.woodBright=mat(0xc29c6a,.74);M.deck=mat(0xb09068,.88);M.glass=new THREE.MeshStandardMaterial({color:0x5ca7b7,roughness:.09,metalness:.24,transparent:true,opacity:.29,side:THREE.DoubleSide,depthWrite:false});M.glassOpaque=mat(0x4e899a,.24,.42);M.water=new THREE.MeshStandardMaterial({color:0x2498ae,roughness:.16,metalness:.32,transparent:true,opacity:.9});M.plants=mat(0x416d58,.96);M.leaf=mat(0x5b8066,.96);M.leaf2=mat(0x7c9d6c,.96);M.grass=mat(0x74957d,1);M.soil=mat(0x4d6555,1);M.solar=mat(0x244b69,.27,.65);M.solarLines=mat(0x7695a8,.38,.38);M.outdoor=mat(0xcbc8b8,.87);M.fabric=mat(0xe5dcca,.99);M.poolRim=mat(0xcddcd7,.84);M.darkFabric=mat(0x456064,.95);M.sun=mat(0xf8e9ce,.9);
+}
+function createTree(parent,x,z,scale){
+ var g=new THREE.Group();g.position.set(x,.20,z);g.scale.setScalar(scale||1);parent.add(g);
+ cyl(g,0,1.25,0,.18,.28,2.5,M.wood,9);
+ sphere(g,0,3.0,0,1.18,M.leaf,12);
+ sphere(g,-.56,2.64,.2,.83,M.plants,10);sphere(g,.53,3.32,-.12,.76,M.leaf2,10);
+ sphere(g,.29,2.57,.61,.64,M.leaf,10);
+}
+function shrub(parent,x,z,r){sphere(parent,x,.38,z,r,M.plants,9);sphere(parent,x+.14,.52,z-.05,r*.67,M.leaf2,9);}
+function chair(parent,x,y,z,rot){
+ var g=new THREE.Group();g.position.set(x,y,z);g.rotation.y=rot||0;parent.add(g);
+ box(g,0,.42,0,.85,.15,.8,M.woodBright);box(g,0,.95,-.33,.85,.94,.12,M.fabric);
+ [-.32,.32].forEach(function(a){[-.28,.29].forEach(function(b){box(g,a,.19,b,.07,.39,.07,M.metal);});});
+}
+function buildHouse(){
+ var garden=new THREE.Group();scene.add(garden);
+ plane(garden,0,-.10,0,180,180,M.grass);
+ box(garden,0,.02,0,38,.28,31,M.stone);
+ plane(garden,0,.171,0,37.6,30.6,M.grass);
+ // site perimeter and paths
+ box(garden,-10.5,.23,7.8,9.4,.16,14,M.outdoor);
+ box(garden,-10.5,.33,7.8,8.5,.1,13.5,mat(0x9fa6a0,.95));
+ for(var i=0;i<8;i++){box(garden,-2.9,.25,5.4+i*.94,2.0,.11,.57,M.outdoor);}
+ box(garden,.15,.33,.15,18,.48,12,M.stone);
+ box(garden,.15,.62,.15,17.4,.17,11.4,M.outdoor);
+ box(garden,8.45,.24,8.0,10.35,.35,5.95,M.poolRim);
+ box(garden,8.45,.42,8.0,9.65,.15,5.23,M.dark);
+ water=plane(garden,8.45,.515,8.0,9.2,4.8,M.water);
+ for(var n=0;n<9;n++){box(garden,3.8+n*1.15,.53,5.36,.03,.03,.2,M.poolRim,false);}
+ // wood pool deck and lounge seating
+ box(garden,8.5,.35,12.6,10,.27,2.25,M.deck);
+ for(var q=0;q<11;q++){box(garden,3.7+q*.94,.52,12.58,.026,.01,2.16,M.wood,false);}
+ for(var j=0;j<2;j++){
+  box(garden,7.0+j*2.5,.63,12.4,1.25,.20,1.8,M.fabric);
+  box(garden,7.0+j*2.5,.93,11.68,1.25,.44,.2,M.fabric);
+ }
+ // ornamental trees and planting
+ [[-16,-10,1.3],[-13,-11,1.08],[14,-9,1.22],[16,-3,.95],[-16,2,1],[15,2,1.1],[16,13,1.15],[-15,13,.9]].forEach(function(v){createTree(garden,v[0],v[1],v[2]);});
+ for(var s=0;s<15;s++){var xx=-8.2+s*1.03;shrub(garden,xx,4.17,.38);}
+ for(var t=0;t<8;t++){shrub(garden,13.2,4.4+t*.85,.45);}
+ // raised planters
+ box(garden,-3.9,.39,-7.1,12,.58,1.35,M.stone);
+ for(var a=0;a<14;a++){shrub(garden,-9.1+a*.8,-7.1,.5);}
+ // concrete ground-floor body
+ var ground=new THREE.Group();scene.add(ground);ui.ground=ground;
+ box(ground,-4.65,2.06,-1.0,7.35,2.75,7.1,M.plaster);
+ box(ground,-4.65,3.54,-1.0,7.8,.28,7.5,M.cream);
+ // ground floor facade strips
+ box(ground,-4.52,2.55,2.6,6.75,1.15,.12,M.glassOpaque);
+ for(var x=-7.6;x<=-1.2;x+=1.08){box(ground,x,2.52,2.69,.06,1.18,.12,M.metal);}
+ box(ground,-4.52,1.94,2.72,6.8,.08,.18,M.woodBright);
+ // warm textured slats at entry
+ for(var z=0;z<6;z++){box(ground,-1.13,1.93,2.58-z*.42,.11,2.67,.14,M.wood);}
+ // right transparent pavilion and interior
+ box(ground,3.1,3.58,-.7,8.3,.24,8.7,M.cream);
+ box(ground,3.1,.81,-.7,8.3,.18,8.7,M.wood);
+ frontGlass(ground,3.05,2.17,3.67,8.1,2.65,5,M.glass,M.metal);
+ sideGlass(ground,7.21,2.17,-.65,8.5,2.65,5,M.glass,M.metal);
+ box(ground,3.1,2.08,-5.05,8.3,2.95,.20,M.cream);
+ box(ground,-1.06,2.08,-.65,.16,2.86,8.5,M.plaster);
+ // lounge, dining, kitchen
+ box(ground,3.7,1.28,-.2,2.6,.55,1.15,M.fabric);
+ box(ground,4.6,1.61,-.45,.24,.9,1.15,M.darkFabric);
+ box(ground,3.0,1.1,1.05,1.25,.27,.75,M.woodBright);
+ box(ground,2.55,1.95,-4.7,4,.82,.48,M.wood);
+ box(ground,5.7,1.58,-3.8,1.75,.10,.86,M.woodBright);
+ chair(ground,5.1,.86,-2.8,Math.PI);chair(ground,6.2,.86,-2.8,Math.PI);
+ cyl(ground,5.65,3.0,-2.85,.34,.34,.065,M.sun,24);
+ cyl(ground,3.6,3.0,.8,.25,.25,.06,M.sun,24);
+ // terrace canopy and deck
+ box(ground,7.9,.63,3.85,3.7,.17,3.4,M.deck);
+ for(var r=0;r<5;r++){box(ground,7.7+r*.65,3.13,4.0,.09,.10,3.5,M.woodBright);}
+ for(var y=0;y<2;y++){box(ground,6.4+y*2.95,1.95,5.65,.11,2.6,.1,M.metal);}
+ led(ground,3.0,3.47,3.66,8.25,.055,.12);
+ // levels grouping
+ upper=new THREE.Group();scene.add(upper);ui.upper=upper;
+ box(upper,-.4,3.85,-1.14,14.2,.34,9.5,M.cream);
+ box(upper,-5.47,5.08,-1.25,3.45,2.4,7.9,M.plaster);
+ box(upper,-3.5,5.22,-5.1,9.95,2.55,.23,M.cream);
+ frontGlass(upper,1.05,5.12,3.5,10.3,2.20,7,M.glass,M.metal);
+ sideGlass(upper,6.6,5.12,-.85,8.6,2.2,5,M.glass,M.metal);
+ // dramatic horizontal cantilever
+ box(upper,-.5,6.56,-.75,15.7,.38,10.6,M.cream);
+ box(upper,-.5,6.81,-.75,15.7,.1,10.6,M.stone);
+ // upper glass side frame, balcony
+ box(upper,1.0,3.98,4.42,9.5,.15,2.1,M.wood);
+ frontGlass(upper,1.0,4.65,5.46,9.45,1.16,6,M.glass,M.metal);
+ box(upper,1.0,3.88,5.55,9.45,.14,.16,M.metal);
+ box(upper,-4.2,4.48,3.57,3.5,.82,.11,M.wood);
+ // upstairs furnishings
+ box(upper,.85,4.38,-1.3,3.1,.48,2.3,M.fabric);
+ box(upper,.85,4.72,-2.25,3.15,.62,.23,M.darkFabric);
+ box(upper,-1.17,4.06,-1.15,.52,.45,.63,M.wood);
+ box(upper,3.5,4.38,1.8,1.6,.14,.82,M.woodBright);
+ chair(upper,3.5,3.98,1.1,Math.PI);
+ box(upper,-5.5,5.15,2.74,2.15,1.05,.09,M.wood);
+ // vertical facade shading fins
+ for(var f=0;f<9;f++){box(upper,-7.2+f*.39,5.24,2.81,.11,2.5,.53,M.wood);}
+ led(upper,-.5,6.35,4.39,15.55,.055,.16);
+ // upper sky balcony glass rail
+ box(upper,-.62,4.51,5.56,5.4,.9,.04,M.glass,false);
+ // rooftop and canopy
+ roof=new THREE.Group();scene.add(roof);ui.roof=roof;
+ box(roof,-.25,7.05,-.83,16.4,.26,11.2,M.plaster);
+ box(roof,-.25,7.25,-.83,15.5,.16,10.4,M.stone);
+ box(roof,-4.6,7.38,-.4,5,.18,6,M.soil);
+ for(var v=0;v<11;v++){shrubOnRoof(roof,-6.6+(v%4)*1.1,-2.5+Math.floor(v/4)*1.85);}
+ roofSolar=new THREE.Group();roof.add(roofSolar);ui.roofSolar=roofSolar;
+ for(var si=0;si<4;si++){for(var sj=0;sj<3;sj++){
+  var panel=box(roofSolar,-.5+si*1.9,7.52,-3.5+sj*1.88,1.7,.07,1.55,M.solar);
+  box(roofSolar,-.5+si*1.9,7.57,-3.5+sj*1.88,1.73,.02,.04,M.solarLines,false);
+  box(roofSolar,-.5+si*1.9,7.57,-3.5+sj*1.88,.035,.02,1.55,M.solarLines,false);
+  panel.castShadow=true;
+ }}
+ // roof rain collector and communications dish
+ cyl(roof,6.5,7.46,2.2,.42,.42,.42,M.metal,16);
+ cyl(roof,6.5,7.77,2.2,.67,.31,.12,M.dark,20);
+ // driveway EV silhouette
+ var car=new THREE.Group();car.position.set(-10.5,.44,8.0);garden.add(car);
+ box(car,0,.45,0,2.1,.57,4.25,M.dark);
+ box(car,0,.88,-.23,1.85,.52,2.25,M.glassOpaque);
+ for(var wi=0;wi<2;wi++){for(var wj=0;wj<2;wj++){var zc=wj===0?-1.38:1.38;var wc=cyl(car,wi===0?-1.08:1.08,.3,zc,.35,.35,.2,M.metal,18);wc.rotation.z=Math.PI/2;}}
+ led(car,-.6,.6,2.15,.6,.08,.03);led(car,.6,.6,2.15,.6,.08,.03);
+ // pathway and decorative small light posts
+ for(var k=0;k<6;k++){var px=-1.55+k*.92;box(garden,px,.52,10.5,.09,.46,.09,M.dark);led(garden,px,.79,10.5,.2,.08,.2);}
+}
+function shrubOnRoof(p,x,z){sphere(p,x,7.67,z,.62,M.leaf2,9);sphere(p,x+.35,7.58,z+.15,.48,M.plants,9);}
+function buildLights(){
+ var ambient=new THREE.HemisphereLight(0xdaf5ff,0x83917c,2.0);scene.add(ambient);ui.ambient=ambient;
+ var sun=new THREE.DirectionalLight(0xffedd9,3.0);sun.position.set(-14,28,19);sun.castShadow=true;sun.shadow.mapSize.set(mobile?1024:2048,mobile?1024:2048);sun.shadow.camera.left=-25;sun.shadow.camera.right=25;sun.shadow.camera.top=25;sun.shadow.camera.bottom=-25;sun.shadow.camera.near=.5;sun.shadow.camera.far=90;sun.shadow.bias=-.00025;sun.shadow.normalBias=.028;scene.add(sun);ui.sun=sun;
+ [[3,3.2,2.2],[-4.1,3.0,2.1],[3,5.5,1.6],[7.5,2.5,4]].forEach(function(p){var light=new THREE.PointLight(0xffd4a0,0,12,2);light.position.set(p[0],p[1],p[2]);scene.add(light);nightLights.push(light);});
+}
+function init(){
+ try{var canvas=document.createElement('canvas');if(!canvas.getContext('webgl2')&&!canvas.getContext('webgl')){fail('Thiết bị hoặc trình duyệt không hỗ trợ WebGL.');return;}}catch(e){fail('WebGL bị chặn.');return;}
+ mobile=window.innerWidth<720;
+ renderer=new THREE.WebGLRenderer({antialias:!mobile,alpha:false,powerPreference:'high-performance'});
+ renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,mobile?1.65:2));
+ renderer.setSize(host.clientWidth,host.clientHeight);
+ renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+ renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.3;
+ renderer.outputColorSpace=THREE.SRGBColorSpace;
+ host.appendChild(renderer.domElement);
+ scene=new THREE.Scene();scene.background=new THREE.Color(0xbcd5df);scene.fog=new THREE.Fog(0xbcd5df,36,115);
+ camera=new THREE.PerspectiveCamera(43,1,.1,190);
+ setupMaterials();buildHouse();buildLights();resize();clock=new THREE.Clock();
+ attachEvents();attachButtons();
+ var hData=[
+  {id:'solar',p:new THREE.Vector3(3.3,7.98,-2.7),title:'Mái quang điện tích hợp',body:'Mảng pin mặt trời đặt trên sân thượng. Ý tưởng là kết hợp phát điện, mái xanh và bộ điều khiển năng lượng gia đình. Đây là mô hình khái niệm, chưa phải thiết kế công suất kỹ thuật.'},
+  {id:'glass',p:new THREE.Vector3(4.8,4.8,3.64),title:'Mặt dựng kính thích ứng',body:'Hệ mặt dựng kính lớn, kết hợp các thanh che nắng để tạo ánh sáng tự nhiên. Trong một công trình thực, kính điện sắc hoặc rèm tự động có thể thay đổi mức xuyên sáng.'},
+  {id:'pool',p:new THREE.Vector3(9.2,.9,8.15),title:'Hồ cảnh và tuần hoàn nước',body:'Hồ bơi, sân gỗ và đường nước cảnh quan gợi ý hệ lọc tuần hoàn và khả năng tái sử dụng nước phù hợp tiêu chuẩn. Chưa mô phỏng thủy lực thực.'},
+  {id:'garden',p:new THREE.Vector3(-13.1,3.95,-11),title:'Cảnh quan sinh học',body:'Các mảng xanh, cây bóng mát, mái trồng cây và khoảng sân mở giúp ngôi nhà kết nối với thiên nhiên. Có thể mở rộng mô hình thành hệ thống tưới thông minh.'}
+ ];
+ hData.forEach(function(h){h.el=document.querySelector('[data-hot="'+h.id+'"]');h.el.addEventListener('click',function(){openDetail(h);});hotspots.push(h);});
+ loader.classList.add('hidden');setTimeout(function(){loader.style.display='none';},800);
+ document.getElementById('modeLabel').textContent='WEBGL READY';
+ document.addEventListener('visibilitychange',function(){if(document.hidden)clock.getDelta();});
+ raf=requestAnimationFrame(animate);
+}
+function attachEvents(){
+ var el=renderer.domElement;
+ el.addEventListener('pointerdown',function(e){if(e.button!==0&&e.pointerType==='mouse')return;e.preventDefault();el.setPointerCapture(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});lastX=e.clientX;lastY=e.clientY;moved=false;if(pointers.size===2){var pp=Array.from(pointers.values());pinch=Math.hypot(pp[0].x-pp[1].x,pp[0].y-pp[1].y);}settings.spin=false;updateButtons();});
+ el.addEventListener('pointermove',function(e){if(!pointers.has(e.pointerId))return;e.preventDefault();var old=pointers.get(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+ if(pointers.size===1){var dx=e.clientX-old.x,dy=e.clientY-old.y;if(Math.abs(dx)+Math.abs(dy)>0){desired.theta-=dx*.008;desired.phi=Math.max(.13,Math.min(1.47,desired.phi+dy*.006));moved=true;setViewNone();}}
+ else if(pointers.size===2){var pp=Array.from(pointers.values()),next=Math.hypot(pp[0].x-pp[1].x,pp[0].y-pp[1].y);if(pinch>0&&next>0){desired.radius=Math.max(9,Math.min(60,desired.radius*(pinch/next)));moved=true;setViewNone();}pinch=next;}
+ });
+ function onEnd(e){pointers.delete(e.pointerId);if(pointers.size===1){var p=Array.from(pointers.values())[0];lastX=p.x;lastY=p.y;}pinch=0;}
+ el.addEventListener('pointerup',onEnd);el.addEventListener('pointercancel',onEnd);el.addEventListener('lostpointercapture',onEnd);
+ el.addEventListener('wheel',function(e){e.preventDefault();settings.spin=false;desired.radius=Math.max(9,Math.min(60,desired.radius*Math.exp(e.deltaY*.00085)));setViewNone();updateButtons();},{passive:false});
+ el.addEventListener('contextmenu',function(e){e.preventDefault();});
+ window.addEventListener('resize',resize);
+ window.addEventListener('orientationchange',function(){setTimeout(resize,250);});
+ if(window.ResizeObserver){var ro=new ResizeObserver(resize);ro.observe(host);}
+}
+function setViewNone(){document.querySelectorAll('[data-view]').forEach(function(e){e.setAttribute('aria-pressed','false');});activeView='custom';}
+function resize(){if(!renderer||!camera)return;var w=Math.max(1,host.clientWidth),h=Math.max(1,host.clientHeight);camera.aspect=w/h;camera.fov=w<600?48:43;camera.updateProjectionMatrix();renderer.setSize(w,h,false);renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,w<720?1.65:2));}
+var views={
+ overview:{theta:.79,phi:.40,radius:30,targetY:3.3},
+ front:{theta:0.0,phi:.16,radius:28,targetY:3.65},
+ aerial:{theta:.62,phi:1.16,radius:32,targetY:2.2},
+ interior:{theta:.35,phi:.31,radius:12.0,targetY:3.55}
+};
+function updateButtons(){
+ $('dayBtn').setAttribute('aria-pressed',String(settings.night));$('dayBtn').textContent=settings.night?'☀ Ban ngày':'☾ Ban đêm';
+ $('explodeBtn').setAttribute('aria-pressed',String(settings.explode));$('xrayBtn').setAttribute('aria-pressed',String(settings.xray));$('spinBtn').setAttribute('aria-pressed',String(settings.spin));
+}
+function attachButtons(){
+ document.querySelectorAll('[data-view]').forEach(function(el){el.onclick=function(){var key=el.dataset.view;var p=views[key];desired.theta=p.theta;desired.phi=p.phi;desired.radius=p.radius;desired.targetY=p.targetY;activeView=key;settings.spin=false;document.querySelectorAll('[data-view]').forEach(function(b){b.setAttribute('aria-pressed',String(b===el));});updateButtons();showToast('Góc nhìn: '+el.textContent);};});
+ $('dayBtn').onclick=function(){settings.night=!settings.night;updateButtons();showToast(settings.night?'Đã bật ánh sáng ban đêm':'Đã bật ánh sáng ban ngày');};
+ $('explodeBtn').onclick=function(){settings.explode=!settings.explode;updateButtons();showToast(settings.explode?'Đã tách lớp các tầng':'Đã ghép tầng lại');};
+ $('xrayBtn').onclick=function(){settings.xray=!settings.xray;wallParts.forEach(function(m){m.visible=!settings.xray;});ui.roof.visible=!settings.xray;updateButtons();showToast(settings.xray?'Chế độ nhìn xuyên mặt dựng':'Hiện lại mặt dựng');};
+ $('spinBtn').onclick=function(){settings.spin=!settings.spin;updateButtons();};
+ $('resetBtn').onclick=function(){settings.night=false;settings.explode=false;settings.xray=false;settings.spin=false;wallParts.forEach(function(m){m.visible=true;});ui.roof.visible=true;desired.theta=views.overview.theta;desired.phi=views.overview.phi;desired.radius=views.overview.radius;desired.targetY=views.overview.targetY;document.querySelector('[data-view="overview"]').click();updateButtons();closeDetail();showToast('Đã đặt lại toàn bộ mô hình');};
+ $('debugBtn').onclick=function(){settings.debug=!settings.debug;$('debug').classList.toggle('show',settings.debug);};
+ $('fullBtn').onclick=function(){if(!document.fullscreenElement){if($('app').requestFullscreen){$('app').requestFullscreen().catch(function(){showToast('Trình duyệt không cho phép toàn màn hình.');});}else{showToast('Trình duyệt chưa hỗ trợ toàn màn hình.');}}else if(document.exitFullscreen){document.exitFullscreen();}};
+ $('detailClose').onclick=closeDetail;
+ window.addEventListener('keydown',function(e){if(e.key==='Escape')closeDetail();if(e.key==='r'||e.key==='R')$('resetBtn').click();});
+}
+function openDetail(h){$('detailTitle').textContent=h.title;$('detailCopy').textContent=h.body;$('detail').classList.add('show');}
+function closeDetail(){$('detail').classList.remove('show');}
+function updateHotspots(){
+ if(!camera)return;
+ for(var i=0;i<hotspots.length;i++){
+ var h=hotspots[i];if(settings.explode&&h.id==='solar'){h.p.y=11.8;}else if(h.id==='solar'){h.p.y=7.98;}
+ var pos=h.p.clone().project(camera);var visible=pos.z<1&&pos.z>-1&&Math.abs(pos.x)<.91&&Math.abs(pos.y)<.85&&desired.radius<46;
+ // Reduce clutter for small screens.
+ if(host.clientWidth<600&&(['garden','glass'].includes(h.id)))visible=false;
+ h.el.style.display=visible?'inline-flex':'none';
+ if(visible){h.el.style.left=((pos.x+1)*.5*host.clientWidth)+'px';h.el.style.top=((-pos.y+1)*.5*host.clientHeight)+'px';}
+ }
+}
+function animate(now){
+ raf=requestAnimationFrame(animate);
+ var dt=lastFrame?Math.min(64,now-lastFrame):16;lastFrame=now;
+ if(settings.spin&&pointers.size===0){desired.theta+=dt*.00023;}
+ var blend=1-Math.pow(.0009,dt/1000);
+ current.theta+=(desired.theta-current.theta)*blend;current.phi+=(desired.phi-current.phi)*blend;current.radius+=(desired.radius-current.radius)*blend;current.targetY+=(desired.targetY-current.targetY)*blend;
+ camera.position.set(Math.sin(current.theta)*Math.cos(current.phi)*current.radius,Math.sin(current.phi)*current.radius+current.targetY,Math.cos(current.theta)*Math.cos(current.phi)*current.radius);camera.lookAt(0,current.targetY,0);
+ var y=1-Math.pow(.004,dt/1000);
+ upper.position.y+=((settings.explode?2.7:0)-upper.position.y)*y;
+ roof.position.y+=((settings.explode?5.0:0)-roof.position.y)*y;
+ var night=settings.night;
+ scene.background.lerp(new THREE.Color(night?0x0b1626:0xbcd5df),Math.min(1,dt*.003));
+ scene.fog.color.copy(scene.background);
+ ui.ambient.intensity+=( (night?.55:2)-ui.ambient.intensity)*.035;
+ ui.sun.intensity+=((night?.24:3)-ui.sun.intensity)*.04;
+ renderer.toneMappingExposure+=((night?1.02:1.3)-renderer.toneMappingExposure)*.04;
+ nightLights.forEach(function(l){l.intensity+=((night?17:0)-l.intensity)*.05;});
+ ledParts.forEach(function(l){l.material.emissiveIntensity=night?2.1:.6;});
+ if(water){water.position.y=.515+.012*Math.sin(now*.0014);}
+ updateHotspots();
+ renderer.render(scene,camera);
+ frames++;frameCount+=dt;if(frameCount>=1000){fps=Math.round(frames*1000/frameCount);frames=0;frameCount=0;}
+ if(settings.debug&&frames%12===0){
+ var ctx=renderer.getContext();var glType=(ctx instanceof WebGL2RenderingContext)?'WebGL 2':'WebGL 1';
+ $('debug').textContent='NEXUS / DEBUG 3D\n'+glType+' | Three.js r'+THREE.REVISION+'\nFPS: '+fps+' (ước lượng)\nViewport: '+host.clientWidth+' × '+host.clientHeight+'\nDPR: '+renderer.getPixelRatio().toFixed(2)+'\nTriangles: '+renderer.info.render.triangles+'\nDraw calls: '+renderer.info.render.calls+'\nCamera radius: '+current.radius.toFixed(1)+'\nPhi: '+current.phi.toFixed(2)+'; theta: '+current.theta.toFixed(2)+'\nDay/night: '+(night?'night':'day')+'\nExplode: '+settings.explode+' / Xray: '+settings.xray+'\nAsset ngoài: chỉ Three.js CDN\nGeometry: tạo trực tiếp trong HTML';
+ }
+}
+})();
+</script>
+</body>
+</html>
