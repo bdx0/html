@@ -38,6 +38,29 @@ button,a{font:inherit}button{cursor:pointer}button:focus-visible,a:focus-visible
 @media(max-width:600px){.topbar{padding:12px 13px}.brand{font-size:12px;letter-spacing:.1em;gap:7px}.brand-mark{width:31px;height:31px;font-size:16px}.brand small{font-size:7px}.chip{font-size:9px;padding:7px 9px}.header-right{gap:6px}.iconbtn{min-width:33px;height:33px;font-size:15px}.info{top:81px;left:15px;width:245px}.eyebrow{font-size:8px;margin-bottom:6px}.info h1{font-size:37px}.subtitle{margin:10px 0 12px;font-size:10px;line-height:1.6;max-width:220px}.spec{padding:7px 8px;min-width:70px;border-radius:9px}.spec strong{font-size:13px}.spec small{font-size:8px}.specs{gap:5px}.dock{padding:8px;gap:7px;border-radius:14px}.control-block{padding:0 4px}.control-label{font-size:8px}.ctl{padding:8px 9px;font-size:11px}.dock-divider{height:36px}.hint{bottom:122px;font-size:10px;left:15px;max-width:180px}.hotspot{font-size:9px;padding:5px;gap:4px}.hotspot .dot{width:15px;height:15px}.hotspot span:last-child{display:none}#detail{bottom:112px;right:14px;width:min(285px,calc(100% - 28px))}#debug{bottom:108px}}
 @media(max-height:600px){.info{top:80px}.info h1{font-size:32px}.subtitle{display:none}.specs{margin-top:12px}.sidepanel{display:none}.hint{display:none}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{transition:none!important;animation:none!important}}
+
+/* Archviz cinema controls */
+.controls-wrap{width:min(1280px,calc(100% - 28px))}
+#tourBanner{position:absolute;z-index:6;top:94px;right:clamp(18px,4vw,55px);padding:17px 23px;border-left:2px solid #dabb7d;background:rgba(12,25,32,.78);border-radius:4px 15px 15px 4px;min-width:240px;box-shadow:0 10px 45px #05152350;backdrop-filter:blur(20px)}
+#tourBanner[hidden],#walkPad[hidden]{display:none}
+#tourBanner span{display:block;font-size:9px;font-weight:800;color:#d3b981;letter-spacing:.22em;margin-bottom:5px}
+#tourBanner strong{display:block;font-size:18px;font-weight:750;letter-spacing:-.02em}
+#tourBanner small{font-size:10px;color:#b2cdd1}
+#walkPad{position:absolute;z-index:6;bottom:136px;right:clamp(17px,4vw,60px);text-align:center;touch-action:none;user-select:none}
+#walkPad button{height:52px;width:52px;border:1px solid #b5ead7a1;color:#e8fff9;background:#0a3442bd;border-radius:15px;margin:2px;font-size:22px;touch-action:none;backdrop-filter:blur(12px)}
+#walkPad button:active{background:#277363d6}
+#walkPad>div{display:flex}
+.info.in-walk{opacity:.18;pointer-events:none}
+.dock .ctl[aria-pressed="true"]{border-color:#d9bc79a8;color:#fae2a5;background:#80633940}
+@media(max-width:600px){
+ #tourBanner{top:73px;right:13px;min-width:160px;padding:12px 15px;max-width:200px}
+ #tourBanner strong{font-size:12px}
+ #tourBanner small{display:none}
+ #walkPad{bottom:130px;right:13px}
+ #walkPad button{height:44px;width:44px;border-radius:11px}
+ .info.in-walk{opacity:0}
+ .ctl{font-size:11px}
+}
 </style>
 </head>
 <body>
@@ -49,9 +72,9 @@ button,a{font:inherit}button{cursor:pointer}button:focus-visible,a:focus-visible
   <div class="header-right"><span class="chip"><i></i><span id="modeLabel">LIVE 3D</span></span><button class="iconbtn" id="debugBtn" type="button" title="Chẩn đoán 3D" aria-label="Chẩn đoán 3D">⌘</button><button class="iconbtn" id="fullBtn" type="button" title="Toàn màn hình" aria-label="Toàn màn hình">⛶</button></div>
 </header>
 <section class="info" aria-label="Giới thiệu ngôi nhà">
-  <div class="eyebrow">Concept home · Tương lai bền vững</div>
+  <div class="eyebrow">ARCHVIZ EXPERIENCE / 2045 · V2.0</div>
   <h1>BEYOND<br><span>LIVING.</span></h1>
-  <p class="subtitle">Một không gian sống kết nối với thiên nhiên và công nghệ. Khám phá từng lớp kiến trúc của ngôi nhà năm 2045.</p>
+  <p class="subtitle">Khám phá căn biệt thự tương lai dưới ánh sáng kiến trúc, vật liệu PBR, nội thất chi tiết và tour điện ảnh tương tác.</p>
   <div class="specs"><div class="spec"><strong>02</strong><small>Tầng nổi</small></div><div class="spec"><strong>360°</strong><small>Góc nhìn</small></div><div class="spec"><strong>3D</strong><small>Tương tác</small></div></div>
 </section>
 <aside class="sidepanel" aria-label="Các hệ thống của ngôi nhà">
@@ -61,7 +84,7 @@ button,a{font:inherit}button{cursor:pointer}button:focus-visible,a:focus-visible
 <div class="feature"><span class="fi">♻</span><div><strong>Water circularity</strong><small>Thu hồi nước mưa & hồ cảnh</small></div></div>
 <div class="feature"><span class="fi">⌂</span><div><strong>Layered architecture</strong><small>Tách tầng để xem cấu trúc</small></div></div>
 </aside>
-<p class="hint"><span>↔</span> Kéo để xoay · <span>⌁</span> Chụm 2 ngón để zoom · Chạm vào điểm sáng</p>
+<p class="hint" id="hint"><span>↔</span> Kéo xoay · <span>⌁</span> Zoom · <span>▶</span> Tour · <span>WASD</span> Đi bộ</p>
 <button class="hotspot" data-hot="solar" type="button" aria-label="Tìm hiểu mái năng lượng mặt trời"><span class="dot">+</span><span>SMART SOLAR</span></button>
 <button class="hotspot" data-hot="glass" type="button" aria-label="Tìm hiểu mặt dựng kính"><span class="dot">+</span><span>ADAPTIVE GLASS</span></button>
 <button class="hotspot" data-hot="pool" type="button" aria-label="Tìm hiểu hệ thống nước"><span class="dot">+</span><span>WATER SYSTEM</span></button>
@@ -74,6 +97,7 @@ button,a{font:inherit}button{cursor:pointer}button:focus-visible,a:focus-visible
 <button class="ctl" data-view="aerial" aria-pressed="false" type="button">Từ trên</button>
 <button class="ctl" data-view="interior" aria-pressed="false" type="button">Nội thất</button>
 </div></div><div class="dock-divider"></div>
+<div class="control-block"><span class="control-label">Trải nghiệm Archviz</span><div class="btnrow"><button class="ctl primary" id="tourBtn" aria-pressed="false" type="button">▶ Cinematic tour</button><button class="ctl primary" id="walkBtn" aria-pressed="false" type="button">🚶 Đi bộ</button><button class="ctl primary" id="shotBtn" type="button">▣ Chụp ảnh</button></div></div><div class="dock-divider"></div>
 <div class="control-block"><span class="control-label">Khám phá</span><div class="btnrow">
 <button class="ctl primary" id="dayBtn" aria-pressed="false" type="button">☾ Ban đêm</button>
 <button class="ctl primary" id="explodeBtn" aria-pressed="false" type="button">▤ Tách tầng</button>
@@ -82,11 +106,12 @@ button,a{font:inherit}button{cursor:pointer}button:focus-visible,a:focus-visible
 <button class="ctl primary" id="resetBtn" type="button">↺ Đặt lại</button>
 </div></div>
 </div></div>
-<div id="detailBackdrop" hidden></div><div id="toast" role="status" aria-live="polite"></div>
+<div id="tourBanner" aria-live="polite" hidden><span>ARCHVIZ / CINEMATIC TOUR</span><strong id="tourChapter">Ngoại thất</strong><small>Điều khiển bằng chuột hoặc chạm để dừng tour</small></div><div id="walkPad" hidden aria-label="Điều khiển di chuyển"><button data-move="forward" aria-label="Đi tới">↑</button><div><button data-move="left" aria-label="Qua trái">←</button><button data-move="back" aria-label="Lùi">↓</button><button data-move="right" aria-label="Qua phải">→</button></div></div><div id="detailBackdrop" hidden></div><div id="toast" role="status" aria-live="polite"></div>
 <div id="debug" role="status" aria-label="Thông tin WebGL"></div>
 <div id="loader"><div class="loader-logo">NEXUS</div><div class="spinner"></div><div id="loadStatus">Đang khởi tạo mô hình 3D…</div><button id="retry" type="button">Tải lại trang</button></div>
 </div>
 <script src="./assets/three.min.js" onerror="window.__threeLoadError=true"></script>
+<script src="./assets/nexus-archviz.js" onerror="window.__archvizLoadError=true"></script>
 <script>
 (function () {
 'use strict';
@@ -95,7 +120,9 @@ var loader=document.getElementById('loader'),status=document.getElementById('loa
 var toastTimer=0, renderer,scene,camera,clock,water,roof,upper,roofSolar,nightLights=[],wallParts=[],ledParts=[],hotspots=[];
 var current={theta:.79,phi:.40,radius:window.innerWidth<600?49:30,targetY:3.3};
 var desired={theta:.79,phi:.40,radius:window.innerWidth<600?49:30,targetY:3.3};
-var settings={night:false,explode:false,xray:false,spin:false,debug:false};
+var settings={night:false,explode:false,xray:false,spin:false,debug:false,tour:false,walk:false};
+var archviz=null,tourStart=0,chapter=-1;
+var walk={x:3.05,y:2.32,z:2.65,yaw:0,pitch:0,keys:Object.create(null),touch:{forward:0,strafe:0}};
 var moved=false,lastX=0,lastY=0,pinch=0,lastTouchId=null;
 var pointers=new Map(),lastFrame=0,frames=0,frameCount=0,fps=0,raf=0;
 var ui={};
@@ -135,7 +162,7 @@ function chair(parent,x,y,z,rot){
  [-.32,.32].forEach(function(a){[-.28,.29].forEach(function(b){box(g,a,.19,b,.07,.39,.07,M.metal);});});
 }
 function buildHouse(){
- var garden=new THREE.Group();scene.add(garden);
+ var garden=new THREE.Group();scene.add(garden);ui.garden=garden;
  plane(garden,0,-.10,0,180,180,M.grass);
  box(garden,0,.02,0,38,.28,31,M.stone);
  plane(garden,0,.171,0,37.6,30.6,M.grass);
@@ -264,7 +291,7 @@ function init(){
  host.appendChild(renderer.domElement);
  scene=new THREE.Scene();scene.background=new THREE.Color(0xbcd5df);scene.fog=new THREE.Fog(0xbcd5df,36,115);
  camera=new THREE.PerspectiveCamera(43,1,.1,190);
- setupMaterials();buildHouse();buildLights();resize();clock=new THREE.Clock();
+ setupMaterials();buildHouse();if(window.NEXUS_ARCHVIZ){archviz=window.NEXUS_ARCHVIZ({THREE:THREE,scene:scene,M:M,ui:ui,box:box,cyl:cyl,sphere:sphere,plane:plane,renderer:renderer,water:water,mobile:mobile});}buildLights();resize();clock=new THREE.Clock();
  attachEvents();attachButtons();
  var hData=[
   {id:'solar',p:new THREE.Vector3(3.3,7.98,-2.7),title:'Mái quang điện tích hợp',body:'Mảng pin mặt trời đặt trên sân thượng. Ý tưởng là kết hợp phát điện, mái xanh và bộ điều khiển năng lượng gia đình. Đây là mô hình khái niệm, chưa phải thiết kế công suất kỹ thuật.'},
@@ -274,20 +301,20 @@ function init(){
  ];
  hData.forEach(function(h){h.el=document.querySelector('[data-hot="'+h.id+'"]');h.el.addEventListener('click',function(){openDetail(h);});hotspots.push(h);});
  loader.classList.add('hidden');setTimeout(function(){loader.style.display='none';},800);
- document.getElementById('modeLabel').textContent='WEBGL READY';
+ document.getElementById('modeLabel').textContent=archviz?'ARCHVIZ 2.0':'WEBGL READY';
  document.addEventListener('visibilitychange',function(){if(document.hidden)clock.getDelta();});
  raf=requestAnimationFrame(animate);
 }
 function attachEvents(){
  var el=renderer.domElement;
- el.addEventListener('pointerdown',function(e){if(e.button!==0&&e.pointerType==='mouse')return;e.preventDefault();el.setPointerCapture(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});lastX=e.clientX;lastY=e.clientY;moved=false;if(pointers.size===2){var pp=Array.from(pointers.values());pinch=Math.hypot(pp[0].x-pp[1].x,pp[0].y-pp[1].y);}settings.spin=false;updateButtons();});
+ el.addEventListener('pointerdown',function(e){if(e.button!==0&&e.pointerType==='mouse')return;e.preventDefault();el.setPointerCapture(e.pointerId);if(settings.tour)stopTour();pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});lastX=e.clientX;lastY=e.clientY;moved=false;if(pointers.size===2){var pp=Array.from(pointers.values());pinch=Math.hypot(pp[0].x-pp[1].x,pp[0].y-pp[1].y);}settings.spin=false;updateButtons();});
  el.addEventListener('pointermove',function(e){if(!pointers.has(e.pointerId))return;e.preventDefault();var old=pointers.get(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
- if(pointers.size===1){var dx=e.clientX-old.x,dy=e.clientY-old.y;if(Math.abs(dx)+Math.abs(dy)>0){desired.theta-=dx*.008;desired.phi=Math.max(.13,Math.min(1.47,desired.phi+dy*.006));moved=true;setViewNone();}}
+ if(pointers.size===1){var dx=e.clientX-old.x,dy=e.clientY-old.y;if(settings.walk){walk.yaw-=dx*.0035;walk.pitch=Math.max(-.9,Math.min(.9,walk.pitch-dy*.0035));return;}if(Math.abs(dx)+Math.abs(dy)>0){desired.theta-=dx*.008;desired.phi=Math.max(.13,Math.min(1.47,desired.phi+dy*.006));moved=true;setViewNone();}}
  else if(pointers.size===2){var pp=Array.from(pointers.values()),next=Math.hypot(pp[0].x-pp[1].x,pp[0].y-pp[1].y);if(pinch>0&&next>0){desired.radius=Math.max(9,Math.min(60,desired.radius*(pinch/next)));moved=true;setViewNone();}pinch=next;}
  });
  function onEnd(e){pointers.delete(e.pointerId);if(pointers.size===1){var p=Array.from(pointers.values())[0];lastX=p.x;lastY=p.y;}pinch=0;}
  el.addEventListener('pointerup',onEnd);el.addEventListener('pointercancel',onEnd);el.addEventListener('lostpointercapture',onEnd);
- el.addEventListener('wheel',function(e){e.preventDefault();settings.spin=false;desired.radius=Math.max(9,Math.min(60,desired.radius*Math.exp(e.deltaY*.00085)));setViewNone();updateButtons();},{passive:false});
+ el.addEventListener('wheel',function(e){e.preventDefault();if(settings.walk)return;if(settings.tour)stopTour();settings.spin=false;desired.radius=Math.max(9,Math.min(60,desired.radius*Math.exp(e.deltaY*.00085)));setViewNone();updateButtons();},{passive:false});
  el.addEventListener('contextmenu',function(e){e.preventDefault();});
  window.addEventListener('resize',resize);
  window.addEventListener('orientationchange',function(){setTimeout(resize,250);});
@@ -303,21 +330,71 @@ var views={
 };
 function updateButtons(){
  $('dayBtn').setAttribute('aria-pressed',String(settings.night));$('dayBtn').textContent=settings.night?'☀ Ban ngày':'☾ Ban đêm';
- $('explodeBtn').setAttribute('aria-pressed',String(settings.explode));$('xrayBtn').setAttribute('aria-pressed',String(settings.xray));$('spinBtn').setAttribute('aria-pressed',String(settings.spin));
+ $('explodeBtn').setAttribute('aria-pressed',String(settings.explode));$('xrayBtn').setAttribute('aria-pressed',String(settings.xray));$('spinBtn').setAttribute('aria-pressed',String(settings.spin));$('tourBtn').setAttribute('aria-pressed',String(settings.tour));$('walkBtn').setAttribute('aria-pressed',String(settings.walk));
 }
 function attachButtons(){
- document.querySelectorAll('[data-view]').forEach(function(el){el.onclick=function(){var key=el.dataset.view;var p=views[key];desired.theta=p.theta;desired.phi=p.phi;desired.radius=p.radius;desired.targetY=p.targetY;activeView=key;settings.spin=false;document.querySelectorAll('[data-view]').forEach(function(b){b.setAttribute('aria-pressed',String(b===el));});updateButtons();showToast('Góc nhìn: '+el.textContent);};});
+ document.querySelectorAll('[data-view]').forEach(function(el){el.onclick=function(){stopTour();setWalk(false);var key=el.dataset.view;var p=views[key];desired.theta=p.theta;desired.phi=p.phi;desired.radius=p.radius;desired.targetY=p.targetY;activeView=key;settings.spin=false;document.querySelectorAll('[data-view]').forEach(function(b){b.setAttribute('aria-pressed',String(b===el));});updateButtons();showToast('Góc nhìn: '+el.textContent);};});
  $('dayBtn').onclick=function(){settings.night=!settings.night;updateButtons();showToast(settings.night?'Đã bật ánh sáng ban đêm':'Đã bật ánh sáng ban ngày');};
  $('explodeBtn').onclick=function(){settings.explode=!settings.explode;updateButtons();showToast(settings.explode?'Đã tách lớp các tầng':'Đã ghép tầng lại');};
  $('xrayBtn').onclick=function(){settings.xray=!settings.xray;wallParts.forEach(function(m){m.visible=!settings.xray;});ui.roof.visible=!settings.xray;updateButtons();showToast(settings.xray?'Chế độ nhìn xuyên mặt dựng':'Hiện lại mặt dựng');};
- $('spinBtn').onclick=function(){settings.spin=!settings.spin;updateButtons();};
- $('resetBtn').onclick=function(){settings.night=false;settings.explode=false;settings.xray=false;settings.spin=false;wallParts.forEach(function(m){m.visible=true;});ui.roof.visible=true;desired.theta=views.overview.theta;desired.phi=views.overview.phi;desired.radius=views.overview.radius;desired.targetY=views.overview.targetY;document.querySelector('[data-view="overview"]').click();updateButtons();closeDetail();showToast('Đã đặt lại toàn bộ mô hình');};
+ $('spinBtn').onclick=function(){stopTour();setWalk(false);settings.spin=!settings.spin;updateButtons();};
+ $('resetBtn').onclick=function(){stopTour();setWalk(false);settings.night=false;settings.explode=false;settings.xray=false;settings.spin=false;wallParts.forEach(function(m){m.visible=true;});ui.roof.visible=true;desired.theta=views.overview.theta;desired.phi=views.overview.phi;desired.radius=views.overview.radius;desired.targetY=views.overview.targetY;document.querySelector('[data-view="overview"]').click();updateButtons();closeDetail();showToast('Đã đặt lại toàn bộ mô hình');};
  $('debugBtn').onclick=function(){settings.debug=!settings.debug;$('debug').classList.toggle('show',settings.debug);};
  $('fullBtn').onclick=function(){if(!document.fullscreenElement){if($('app').requestFullscreen){$('app').requestFullscreen().catch(function(){showToast('Trình duyệt không cho phép toàn màn hình.');});}else{showToast('Trình duyệt chưa hỗ trợ toàn màn hình.');}}else if(document.exitFullscreen){document.exitFullscreen();}};
  $('detailClose').onclick=closeDetail;
- window.addEventListener('keydown',function(e){if(e.key==='Escape')closeDetail();if(e.key==='r'||e.key==='R')$('resetBtn').click();});
+ $('tourBtn').onclick=function(){if(settings.tour){stopTour();showToast('Đã dừng tour');}else{setWalk(false);settings.spin=false;settings.tour=true;tourStart=performance.now();chapter=-1;$('tourBanner').hidden=false;showToast('Đang trình diễn tour điện ảnh');}updateButtons();};
+ $('walkBtn').onclick=function(){stopTour();setWalk(!settings.walk);showToast(settings.walk?'Đi bộ: WASD hoặc phím mũi tên · kéo để nhìn quanh':'Trở về góc nhìn toàn cảnh');};
+ $('shotBtn').onclick=function(){try{renderer.render(scene,camera);var url=renderer.domElement.toDataURL('image/png');var a=document.createElement('a');a.href=url;a.download='nexus-2045-archviz.png';document.body.appendChild(a);a.click();a.remove();showToast('Đã tạo ảnh PNG');}catch(e){showToast('Không thể xuất ảnh trên thiết bị này');console.error(e);}};
+ document.querySelectorAll('#walkPad [data-move]').forEach(function(el){
+  var direction=el.dataset.move;
+  function set(active){var n=active?1:0;if(direction==='forward')walk.touch.forward=n;else if(direction==='back')walk.touch.forward=-n;else if(direction==='left')walk.touch.strafe=-n;else walk.touch.strafe=n;}
+  el.addEventListener('pointerdown',function(e){e.preventDefault();el.setPointerCapture(e.pointerId);set(true);});
+  ['pointerup','pointercancel','lostpointercapture'].forEach(function(name){el.addEventListener(name,function(){set(false);});});
+ });
+ window.addEventListener('keydown',function(e){
+  if(e.key==='Escape'){closeDetail();if(settings.walk)setWalk(false);if(settings.tour)stopTour();}
+  if(e.key==='r'||e.key==='R')$('resetBtn').click();
+  if(settings.walk&&['w','a','s','d','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)){walk.keys[e.key.toLowerCase()]=true;e.preventDefault();}
+ });
+ window.addEventListener('keyup',function(e){walk.keys[e.key.toLowerCase()]=false;});
+ window.addEventListener('blur',function(){walk.keys=Object.create(null);walk.touch.forward=walk.touch.strafe=0;});
 }
-function openDetail(h){$('detailTitle').textContent=h.title;$('detailCopy').textContent=h.body;$('detail').classList.add('show');}
+var tourFrames=[
+  {theta:.79,phi:.33,radius:34,targetY:3.5,name:'01 / Phối cảnh toàn khu'},
+  {theta:-.12,phi:.19,radius:27,targetY:3.2,name:'02 / Mặt đứng chính'},
+  {theta:1.18,phi:.27,radius:22,targetY:3.4,name:'03 / Hồ bơi & sân vườn'},
+  {theta:.32,phi:.85,radius:23,targetY:3.1,name:'04 / Sân thượng & solar roof'},
+  {theta:.14,phi:.18,radius:14,targetY:3.4,name:'05 / Không gian bên trong'},
+  {theta:.83,phi:.28,radius:29,targetY:3.4,name:'06 / Kiến trúc hoàng hôn'}
+ ];
+ function stopTour(){settings.tour=false;$('tourBanner').hidden=true;updateButtons();}
+ function setWalk(on){
+  settings.walk=!!on;
+  settings.spin=false;
+  if(on){settings.explode=false;settings.xray=false;ui.roof.visible=true;wallParts.forEach(function(m){m.visible=true;});walk.x=3.05;walk.y=2.35;walk.z=2.75;walk.yaw=0;walk.pitch=0;setViewNone();}
+  $('walkPad').hidden=!on;
+  $('hint').innerHTML=on?'<span>WASD</span> Đi · <span>↔</span> Kéo xoay hướng nhìn · Thoát bằng nút Đi bộ':'<span>↔</span> Kéo xoay · <span>⌁</span> Zoom · <span>▶</span> Tour · <span>WASD</span> Đi bộ';
+  document.querySelector('.info').classList.toggle('in-walk',!!on);
+  updateButtons();
+ }
+ function updateTour(now){
+  var elapsed=((now-tourStart)*.001)/7.8,idx=Math.floor(elapsed)%tourFrames.length,k=elapsed%1;
+  if(chapter!==idx){chapter=idx;$('tourChapter').textContent=tourFrames[idx].name;}
+  var a=tourFrames[idx],b=tourFrames[(idx+1)%tourFrames.length],smooth=k*k*(3-2*k);
+  ['theta','phi','radius','targetY'].forEach(function(key){desired[key]=a[key]+(b[key]-a[key])*smooth;});
+ }
+ function updateWalk(dt){
+  var key=walk.keys;
+  var fw=(key.w||key.arrowup?1:0)-(key.s||key.arrowdown?1:0)+walk.touch.forward;
+  var str=(key.d||key.arrowright?1:0)-(key.a||key.arrowleft?1:0)+walk.touch.strafe;
+  var norm=Math.max(1,Math.hypot(fw,str)),speed=Math.min(.055,dt*.0031);
+  walk.x+=((Math.sin(walk.yaw)*fw+Math.cos(walk.yaw)*str)/norm)*speed;
+  walk.z+=((-Math.cos(walk.yaw)*fw+Math.sin(walk.yaw)*str)/norm)*speed;
+  walk.x=Math.max(-.84,Math.min(6.92,walk.x));walk.z=Math.max(-4.68,Math.min(3.40,walk.z));
+  camera.position.set(walk.x,walk.y,walk.z);
+  camera.lookAt(walk.x+Math.sin(walk.yaw)*10,walk.y+Math.tan(walk.pitch)*10,walk.z-Math.cos(walk.yaw)*10);
+ }
+ function openDetail(h){$('detailTitle').textContent=h.title;$('detailCopy').textContent=h.body;$('detail').classList.add('show');}
 function closeDetail(){$('detail').classList.remove('show');}
 function updateHotspots(){
  if(!camera)return;
@@ -333,10 +410,10 @@ function updateHotspots(){
 function animate(now){
  raf=requestAnimationFrame(animate);
  var dt=lastFrame?Math.min(64,now-lastFrame):16;lastFrame=now;
- if(settings.spin&&pointers.size===0){desired.theta+=dt*.00023;}
+ if(settings.tour)updateTour(now);if(settings.spin&&pointers.size===0){desired.theta+=dt*.00023;}
  var blend=1-Math.pow(.0009,dt/1000);
  current.theta+=(desired.theta-current.theta)*blend;current.phi+=(desired.phi-current.phi)*blend;current.radius+=(desired.radius-current.radius)*blend;current.targetY+=(desired.targetY-current.targetY)*blend;
- camera.position.set(Math.sin(current.theta)*Math.cos(current.phi)*current.radius,Math.sin(current.phi)*current.radius+current.targetY,Math.cos(current.theta)*Math.cos(current.phi)*current.radius);camera.lookAt(0,current.targetY,0);
+ if(settings.walk){updateWalk(dt);}else{camera.position.set(Math.sin(current.theta)*Math.cos(current.phi)*current.radius,Math.sin(current.phi)*current.radius+current.targetY,Math.cos(current.theta)*Math.cos(current.phi)*current.radius);camera.lookAt(0,current.targetY,0);}
  var y=1-Math.pow(.004,dt/1000);
  upper.position.y+=((settings.explode?2.7:0)-upper.position.y)*y;
  roof.position.y+=((settings.explode?5.0:0)-roof.position.y)*y;
@@ -348,8 +425,8 @@ function animate(now){
  renderer.toneMappingExposure+=((night?1.02:1.3)-renderer.toneMappingExposure)*.04;
  nightLights.forEach(function(l){l.intensity+=((night?17:0)-l.intensity)*.05;});
  ledParts.forEach(function(l){l.material.emissiveIntensity=night?2.1:.6;});
- if(water){water.position.y=.515+.012*Math.sin(now*.0014);}
- updateHotspots();
+ if(water){water.position.y=.515+.006*Math.sin(now*.0014);}if(archviz)archviz.update(now,night);
+ if(!settings.walk&&!settings.tour)updateHotspots();else hotspots.forEach(function(h){h.el.style.display='none';});
  renderer.render(scene,camera);
  frames++;frameCount+=dt;if(frameCount>=1000){fps=Math.round(frames*1000/frameCount);frames=0;frameCount=0;}
  if(settings.debug&&frames%12===0){
