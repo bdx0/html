@@ -19,15 +19,23 @@ try{
   const before=await page.evaluate(()=>{
    const canvas=document.querySelector('#sceneHost canvas'),loader=document.querySelector('#loader'),status=document.querySelector('#loadStatus');
    const gl=canvas?.getContext('webgl2')||canvas?.getContext('webgl');
-   return {title:document.title,hasThree:!!window.THREE,version:window.THREE?.REVISION,canvas:!!canvas,canvasSize:canvas?[canvas.width,canvas.height]:null,webgl:!!gl,loader:loader?.className,loaderMessage:status?.textContent,viewport:[innerWidth,innerHeight]};
+   return {title:document.title,hasThree:!!window.THREE,archvizAddon:typeof window.NEXUS_ARCHVIZ==='function',version:window.THREE?.REVISION,canvas:!!canvas,canvasSize:canvas?[canvas.width,canvas.height]:null,webgl:!!gl,loader:loader?.className,loaderMessage:status?.textContent,viewport:[innerWidth,innerHeight]};
   });
   try{await page.locator('#debugBtn').click();await sleep(800);}catch(e){issues.push('DEBUG BTN: '+String(e));}
   const debug=await page.locator('#debug').textContent().catch(e=>'Could not read debug: '+String(e));
   try{await page.locator('#dayBtn').click();await page.locator('#explodeBtn').click();await page.locator('#xrayBtn').click();await sleep(500);}catch(e){issues.push('BUTTON: '+String(e));}
   const after=await page.evaluate(()=>({night:document.querySelector('#dayBtn')?.getAttribute('aria-pressed'),explode:document.querySelector('#explodeBtn')?.getAttribute('aria-pressed'),xray:document.querySelector('#xrayBtn')?.getAttribute('aria-pressed')}));
+  await page.locator('#tourBtn').click();await sleep(300);
+  const tour=await page.locator('#tourBtn').getAttribute('aria-pressed');
+  await page.locator('#walkBtn').click();await sleep(300);
+  const walk=await page.locator('#walkBtn').getAttribute('aria-pressed');
+  const tourStopped=await page.locator('#tourBtn').getAttribute('aria-pressed');
+  await page.keyboard.down('w');await sleep(200);await page.keyboard.up('w');
+  await page.screenshot({path:'nexus-'+mode.name+'-walkthrough.png',fullPage:true});
+  await page.locator('#walkBtn').click();await sleep(200);
   await page.screenshot({path:'nexus-'+mode.name+'.png',fullPage:true});
-  const pass=before.hasThree&&before.canvas&&before.webgl&&before.loader==='hidden'&&/Triangles:\s*[1-9]/.test(debug||'')&&after.night==='true'&&after.explode==='true'&&after.xray==='true'&&issues.filter(i=>i.startsWith('PAGE ERROR')).length===0;
-  report.push('## '+mode.name+' — '+(pass?'PASS':'FAIL'),'','- Navigation: '+nav,'- Readiness: '+JSON.stringify(before),'- Controls: '+JSON.stringify(after),'- Debug:\n~~~text\n'+String(debug).slice(0,3000)+'\n~~~','- Browser errors:\n~~~text\n'+(issues.join('\n').slice(0,4000)||'none')+'\n~~~','- Network errors:\n~~~text\n'+(network.join('\n').slice(0,2000)||'none')+'\n~~~','');
+  const pass=before.hasThree&&before.archvizAddon&&before.canvas&&before.webgl&&before.loader==='hidden'&&/Triangles:\s*[1-9]/.test(debug||'')&&after.night==='true'&&after.explode==='true'&&after.xray==='true'&&tour==='true'&&walk==='true'&&tourStopped==='false'&&issues.filter(i=>i.startsWith('PAGE ERROR')).length===0;
+  report.push('## '+mode.name+' — '+(pass?'PASS':'FAIL'),'','- Navigation: '+nav,'- Readiness: '+JSON.stringify(before),'- Controls: '+JSON.stringify(after),'- Tour: '+tour+'; Walk: '+walk+'; Tour stopped on walk: '+tourStopped,'- Debug:\n~~~text\n'+String(debug).slice(0,3000)+'\n~~~','- Browser errors:\n~~~text\n'+(issues.join('\n').slice(0,4000)||'none')+'\n~~~','- Network errors:\n~~~text\n'+(network.join('\n').slice(0,2000)||'none')+'\n~~~','');
   records.push({mode:mode.name,pass});await context.close();
  }
 }catch(e){report.push('Fatal test harness error:\n~~~\n'+String(e.stack||e)+'\n~~~');records.push({mode:'fatal',pass:false});}
