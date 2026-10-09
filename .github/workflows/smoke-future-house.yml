@@ -5,6 +5,7 @@ on:
     paths:
       - future-house-3d.html
       - assets/three.min.js
+      - assets/nexus-archviz.js
       - scripts/test_future_house.mjs
       - .github/workflows/smoke-future-house.yml
   workflow_dispatch:
