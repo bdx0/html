@@ -428,6 +428,7 @@ function animate(now){
  if(water){water.position.y=.515+.006*Math.sin(now*.0014);}if(archviz)archviz.update(now,night);
  if(!settings.walk&&!settings.tour)updateHotspots();else hotspots.forEach(function(h){h.el.style.display='none';});
  renderer.render(scene,camera);
+ window.__nexusRenderStatus={triangles:renderer.info.render.triangles,drawCalls:renderer.info.render.calls,ready:true,archviz:!!archviz,walk:!!settings.walk,tour:!!settings.tour};
  frames++;frameCount+=dt;if(frameCount>=1000){fps=Math.round(frames*1000/frameCount);frames=0;frameCount=0;}
  if(settings.debug){
  var ctx=renderer.getContext();var glType=(typeof WebGL2RenderingContext!=='undefined'&&ctx instanceof WebGL2RenderingContext)?'WebGL 2':'WebGL 1';
