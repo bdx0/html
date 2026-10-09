@@ -1,0 +1,18 @@
+{
+  "wifi-csi-24ghz.html": {
+    "title": "Wi-Fi CSI 2,4 GHz",
+    "description": "Phòng thí nghiệm tương tác về OFDM, multipath và Channel State Information. Thử di chuyển người, đổi kênh Wi-Fi và quan sát biên độ, pha, heatmap CSI.",
+    "category": "Mô phỏng khoa học",
+    "tags": [
+      "Wi-Fi",
+      "ESP32",
+      "CSI",
+      "OFDM",
+      "RF"
+    ],
+    "icon": "📡",
+    "theme": "cyan",
+    "featured": true,
+    "order": 1
+  }
+}
