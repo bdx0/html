@@ -120,7 +120,7 @@ window.NEXUS_ARCHVIZ = function (o) {
     sky.frustumCulled=false;scene.add(sky);
     scene.fog.near=69;scene.fog.far=149;
     // Distant trees break the hard horizon on large screens.
-    if(!mobile){var horizon=new T.Group();scene.add(horizon);for(var i=0;i<38;i++){var a=i/38*Math.PI*2,dist=45+rnd()*10;modernTree(horizon,Math.sin(a)*dist,Math.cos(a)*dist,.65+rnd()*.6);}}
+    if(!mobile){var horizon=new T.Group();scene.add(horizon);for(var i=0;i<13;i++){var a=i/13*Math.PI*2,dist=45+rnd()*10;modernTree(horizon,Math.sin(a)*dist,Math.cos(a)*dist,.65+rnd()*.6);}}
   }
   function letterTexture(){
     var c=document.createElement('canvas');c.width=512;c.height=256;var ctx=c.getContext('2d');
@@ -175,7 +175,7 @@ window.NEXUS_ARCHVIZ = function (o) {
     var pebbleMat=m(0x9c9d91,.95);
     var pebbles=new T.InstancedMesh(new T.DodecahedronGeometry(.10,0),pebbleMat,mobile?50:150);
     var dummy=new T.Object3D(),total=pebbles.count;
-    for(var p=0;p<total;p++){var along=p/total;dummy.position.set(-10+along*20,.32,-7.0+(rnd()-.5)*1.1);dummy.scale.set(.55+rnd(),.5+rnd()*.4,.6+rnd());dummy.rotation.set(rnd(),rnd()*3,rnd());dummy.updateMatrix();pebbles.setMatrixAt(p,dummy.matrix);}g.add(pebbles);
+    for(var p=0;p<total;p++){var along=p/total;dummy.position.set(-10+along*20,.32,-7.0+(rnd()-.5)*1.1);dummy.scale.set(.55+rnd(),.5+rnd()*.4,.6+rnd());dummy.rotation.set(rnd(),rnd()*3,rnd());dummy.updateMatrix();pebbles.setMatrixAt(p,dummy.matrix);}pebbles.castShadow=false;g.add(pebbles);
     // Distinct conifer and small flowering accents.
     [[-17,9,.72],[-17,12,.88],[16,11,.65],[16,-9,1.15],[-14,-6,.85]].forEach(v=>modernTree(g,v[0],v[1],v[2]));
     for(var l=0;l<7;l++)plant(g,-8+l*2.1,.3,-8.1,.7);
