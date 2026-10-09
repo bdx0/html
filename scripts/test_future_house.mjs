@@ -15,7 +15,8 @@ try{
   page.on('console',m=>{if(m.type()==='error'||m.type()==='warning')issues.push('CONSOLE '+m.type()+': '+m.text().slice(0,900));});
   page.on('requestfailed',r=>network.push(r.url()+' => '+r.failure()?.errorText));
   try{const response=await page.goto('http://127.0.0.1:8765/future-house-3d.html',{waitUntil:'load',timeout:20000});nav='HTTP '+response.status();}catch(e){issues.push('NAV '+String(e));}
-  await sleep(3000);
+  await page.waitForFunction(()=>window.__nexusRenderStatus?.triangles>5000,null,{timeout:30000}).catch(e=>issues.push('RENDER TIMEOUT: '+String(e)));
+  const renderState=await page.evaluate(()=>window.__nexusRenderStatus||null);
   const before=await page.evaluate(()=>{
    const canvas=document.querySelector('#sceneHost canvas'),loader=document.querySelector('#loader'),status=document.querySelector('#loadStatus');
    const gl=canvas?.getContext('webgl2')||canvas?.getContext('webgl');
@@ -34,8 +35,8 @@ try{
   await page.screenshot({path:'nexus-'+mode.name+'-walkthrough.png',fullPage:true});
   await page.locator('#walkBtn').click();await sleep(200);
   await page.screenshot({path:'nexus-'+mode.name+'.png',fullPage:true});
-  const pass=before.hasThree&&before.archvizAddon&&before.canvas&&before.webgl&&before.loader==='hidden'&&/Triangles:\s*[1-9]/.test(debug||'')&&after.night==='true'&&after.explode==='true'&&after.xray==='true'&&tour==='true'&&walk==='true'&&tourStopped==='false'&&issues.filter(i=>i.startsWith('PAGE ERROR')).length===0;
-  report.push('## '+mode.name+' — '+(pass?'PASS':'FAIL'),'','- Navigation: '+nav,'- Readiness: '+JSON.stringify(before),'- Controls: '+JSON.stringify(after),'- Tour: '+tour+'; Walk: '+walk+'; Tour stopped on walk: '+tourStopped,'- Debug:\n~~~text\n'+String(debug).slice(0,3000)+'\n~~~','- Browser errors:\n~~~text\n'+(issues.join('\n').slice(0,4000)||'none')+'\n~~~','- Network errors:\n~~~text\n'+(network.join('\n').slice(0,2000)||'none')+'\n~~~','');
+  const pass=before.hasThree&&before.archvizAddon&&before.canvas&&before.webgl&&before.loader==='hidden'&&renderState?.triangles>5000&&after.night==='true'&&after.explode==='true'&&after.xray==='true'&&tour==='true'&&walk==='true'&&tourStopped==='false'&&issues.filter(i=>i.startsWith('PAGE ERROR')).length===0;
+  report.push('## '+mode.name+' — '+(pass?'PASS':'FAIL'),'','- Navigation: '+nav,'- Readiness: '+JSON.stringify(before),'- GPU render: '+JSON.stringify(renderState),'- Controls: '+JSON.stringify(after),'- Tour: '+tour+'; Walk: '+walk+'; Tour stopped on walk: '+tourStopped,'- Debug:\n~~~text\n'+String(debug).slice(0,3000)+'\n~~~','- Browser errors:\n~~~text\n'+(issues.join('\n').slice(0,4000)||'none')+'\n~~~','- Network errors:\n~~~text\n'+(network.join('\n').slice(0,2000)||'none')+'\n~~~','');
   records.push({mode:mode.name,pass});await context.close();
  }
 }catch(e){report.push('Fatal test harness error:\n~~~\n'+String(e.stack||e)+'\n~~~');records.push({mode:'fatal',pass:false});}
