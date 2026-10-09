@@ -86,15 +86,15 @@ button,a{font:inherit}button{cursor:pointer}button:focus-visible,a:focus-visible
 <div id="debug" role="status" aria-label="Thông tin WebGL"></div>
 <div id="loader"><div class="loader-logo">NEXUS</div><div class="spinner"></div><div id="loadStatus">Đang khởi tạo mô hình 3D…</div><button id="retry" type="button">Tải lại trang</button></div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.158.0/three.min.js"></script>
 <script>
 (function () {
 'use strict';
 var host=document.getElementById('sceneHost');
 var loader=document.getElementById('loader'),status=document.getElementById('loadStatus');
 var toastTimer=0, renderer,scene,camera,clock,water,roof,upper,roofSolar,nightLights=[],wallParts=[],ledParts=[],hotspots=[];
-var current={theta:.79,phi:.40,radius:30,targetY:3.3};
-var desired={theta:.79,phi:.40,radius:30,targetY:3.3};
+var current={theta:.79,phi:.40,radius:window.innerWidth<600?49:30,targetY:3.3};
+var desired={theta:.79,phi:.40,radius:window.innerWidth<600?49:30,targetY:3.3};
 var settings={night:false,explode:false,xray:false,spin:false,debug:false};
 var moved=false,lastX=0,lastY=0,pinch=0,lastTouchId=null;
 var pointers=new Map(),lastFrame=0,frames=0,frameCount=0,fps=0,raf=0;
@@ -296,9 +296,9 @@ function attachEvents(){
 function setViewNone(){document.querySelectorAll('[data-view]').forEach(function(e){e.setAttribute('aria-pressed','false');});activeView='custom';}
 function resize(){if(!renderer||!camera)return;var w=Math.max(1,host.clientWidth),h=Math.max(1,host.clientHeight);camera.aspect=w/h;camera.fov=w<600?48:43;camera.updateProjectionMatrix();renderer.setSize(w,h,false);renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,w<720?1.65:2));}
 var views={
- overview:{theta:.79,phi:.40,radius:30,targetY:3.3},
- front:{theta:0.0,phi:.16,radius:28,targetY:3.65},
- aerial:{theta:.62,phi:1.16,radius:32,targetY:2.2},
+ overview:{theta:.79,phi:.40,radius:window.innerWidth<600?49:30,targetY:3.3},
+ front:{theta:0.0,phi:.16,radius:window.innerWidth<600?43:28,targetY:3.65},
+ aerial:{theta:.62,phi:1.16,radius:window.innerWidth<600?47:32,targetY:2.2},
  interior:{theta:.35,phi:.31,radius:12.0,targetY:3.55}
 };
 function updateButtons(){
@@ -353,7 +353,7 @@ function animate(now){
  renderer.render(scene,camera);
  frames++;frameCount+=dt;if(frameCount>=1000){fps=Math.round(frames*1000/frameCount);frames=0;frameCount=0;}
  if(settings.debug&&frames%12===0){
- var ctx=renderer.getContext();var glType=(ctx instanceof WebGL2RenderingContext)?'WebGL 2':'WebGL 1';
+ var ctx=renderer.getContext();var glType=(typeof WebGL2RenderingContext!=='undefined'&&ctx instanceof WebGL2RenderingContext)?'WebGL 2':'WebGL 1';
  $('debug').textContent='NEXUS / DEBUG 3D\n'+glType+' | Three.js r'+THREE.REVISION+'\nFPS: '+fps+' (ước lượng)\nViewport: '+host.clientWidth+' × '+host.clientHeight+'\nDPR: '+renderer.getPixelRatio().toFixed(2)+'\nTriangles: '+renderer.info.render.triangles+'\nDraw calls: '+renderer.info.render.calls+'\nCamera radius: '+current.radius.toFixed(1)+'\nPhi: '+current.phi.toFixed(2)+'; theta: '+current.theta.toFixed(2)+'\nDay/night: '+(night?'night':'day')+'\nExplode: '+settings.explode+' / Xray: '+settings.xray+'\nAsset ngoài: chỉ Three.js CDN\nGeometry: tạo trực tiếp trong HTML';
  }
 }
