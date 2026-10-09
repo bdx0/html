@@ -429,7 +429,7 @@ function animate(now){
  if(!settings.walk&&!settings.tour)updateHotspots();else hotspots.forEach(function(h){h.el.style.display='none';});
  renderer.render(scene,camera);
  frames++;frameCount+=dt;if(frameCount>=1000){fps=Math.round(frames*1000/frameCount);frames=0;frameCount=0;}
- if(settings.debug&&frames%12===0){
+ if(settings.debug){
  var ctx=renderer.getContext();var glType=(typeof WebGL2RenderingContext!=='undefined'&&ctx instanceof WebGL2RenderingContext)?'WebGL 2':'WebGL 1';
  $('debug').textContent='NEXUS / DEBUG 3D\n'+glType+' | Three.js r'+THREE.REVISION+'\nFPS: '+fps+' (ước lượng)\nViewport: '+host.clientWidth+' × '+host.clientHeight+'\nDPR: '+renderer.getPixelRatio().toFixed(2)+'\nTriangles: '+renderer.info.render.triangles+'\nDraw calls: '+renderer.info.render.calls+'\nCamera radius: '+current.radius.toFixed(1)+'\nPhi: '+current.phi.toFixed(2)+'; theta: '+current.theta.toFixed(2)+'\nDay/night: '+(night?'night':'day')+'\nExplode: '+settings.explode+' / Xray: '+settings.xray+'\nThree.js: tải từ assets/three.min.js\nGeometry: tạo trực tiếp trong HTML';
  }
