@@ -1,162 +1,395 @@
 <!doctype html>
 <html lang="vi">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Phòng thí nghiệm Wi-Fi 2,4 GHz — OFDM & CSI</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b1120">
+<meta name="description" content="bdx0 HTML Lab — thư viện các mô phỏng, thử nghiệm và công cụ tương tác chạy trực tiếp trên trình duyệt.">
+<title>HTML Lab — bdx0</title>
 <style>
-:root{--bg:#08111d;--panel:#101e30;--panel2:#132339;--stroke:#29415b;--muted:#9db0c5;--txt:#eaf4ff;--cyan:#67e7ec;--amber:#ffc478;--pink:#ff82a5;--purple:#aa9afd;--green:#82e4b0}
-*{box-sizing:border-box}html{color-scheme:dark}body{margin:0;background:radial-gradient(ellipse at 12% 0%,#16324d 0,transparent 37%),radial-gradient(ellipse at 100% 0,#191c3b 0,transparent 34%),var(--bg);color:var(--txt);font:15px/1.5 ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input{font:inherit}button{cursor:pointer}button:focus-visible,input:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}main{max-width:1410px;margin:auto;padding:30px 22px 56px}.eyebrow{text-transform:uppercase;letter-spacing:.22em;color:var(--cyan);font-size:11px;font-weight:800}.hero{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:22px;flex-wrap:wrap}h1{font-size:clamp(26px,3.5vw,43px);line-height:1.1;letter-spacing:-.035em;margin:8px 0}h1 b{color:var(--cyan)}.lead{max-width:830px;color:#c2d2e3;margin:9px 0 0;font-size:14px}.bar{display:flex;gap:8px;flex-wrap:wrap}.btn{border:1px solid #3d5871;border-radius:11px;background:#1b3046;color:var(--txt);padding:9px 13px;transition:.18s}.btn:hover{border-color:var(--cyan);background:#25425a}.btn.active{background:#14525d;color:#dcffff;border-color:#388f9d}.btn.primary{background:var(--cyan);border-color:var(--cyan);color:#0d2430;font-weight:800}.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}.metric{padding:15px 17px;border:1px solid var(--stroke);background:linear-gradient(125deg,#122338,#101c2c);border-radius:16px}.metric span{display:block;font-size:11px;color:var(--muted);font-weight:700;letter-spacing:.08em;text-transform:uppercase}.metric strong{display:block;font-size:clamp(19px,2.6vw,28px);letter-spacing:-.02em;line-height:1.2;margin-top:4px}.metric small{display:block;color:#adc1d6;margin-top:5px;font-size:11px}.layout{display:grid;grid-template-columns:minmax(0,1.32fr) minmax(335px,.86fr);gap:16px}.panel{border:1px solid var(--stroke);background:linear-gradient(150deg,rgba(19,36,56,.97),rgba(12,24,40,.97));border-radius:18px;overflow:hidden;box-shadow:0 12px 32px #02081224}.panel-head{padding:17px 19px 10px;display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap}.panel-head h2{font-size:17px;line-height:1.25;letter-spacing:-.01em;margin:0}.panel-head p{color:var(--muted);font-size:12px;margin:4px 0 0}.legend{display:flex;gap:12px;align-items:center;flex-wrap:wrap;font-size:11px;color:var(--muted)}.legend i{width:8px;height:8px;display:inline-block;border-radius:50%;margin-right:4px}.sceneWrap{padding:4px 15px 12px}.scene{width:100%;aspect-ratio:1.92;display:block;border:1px solid #2c4662;border-radius:12px;background:#0b1625;touch-action:none;cursor:default}.scene.grab{cursor:grabbing}.callout{font-size:12px;color:#c3d7e6;background:#0b2334;border-top:1px solid #234052;padding:10px 18px}.controls{padding:16px 19px 19px;display:grid;grid-template-columns:1fr 1fr;gap:16px 20px;border-top:1px solid var(--stroke)}.ctrl label{display:flex;justify-content:space-between;gap:6px;color:#c5d6e8;font-size:12px;margin-bottom:7px}.ctrl label output{color:var(--cyan);font-weight:800}input[type=range]{width:100%;accent-color:var(--cyan)}.ctrl.full{grid-column:1/-1}.switches{display:flex;gap:7px;flex-wrap:wrap}.switches .btn{font-size:12px;padding:7px 10px}.graphBlock{padding:2px 17px 12px}.graph{width:100%;height:205px;display:block;cursor:crosshair}.graph.tall{height:225px}.graph.heat{height:245px;cursor:default}.graph.small{height:178px;cursor:default}.mini{display:flex;justify-content:space-between;gap:10px;color:var(--muted);font-size:11px;margin:2px 1px 0;flex-wrap:wrap}.line{border-top:1px solid var(--stroke);margin:0 17px}.wide{grid-column:1/-1}.rowGraphs{display:grid;grid-template-columns:1fr 1fr;gap:16px}.equation{padding:12px 18px 18px}.eq-flow{display:flex;gap:7px;align-items:center;flex-wrap:wrap}.eq-item{background:#0a1e2d;border:1px solid #25445e;border-radius:12px;padding:11px 12px;flex:1;min-width:140px}.eq-item span{display:block;color:var(--muted);font-size:11px}.eq-item strong{font-size:17px;display:block;white-space:nowrap;margin:4px 0;color:var(--cyan)}.eq-item small{font-size:11px;color:#b0c2d3}.arrow{color:var(--amber);font-size:25px;flex:0}.notes{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px}.note{padding:16px;border:1px solid var(--stroke);border-radius:14px;background:#0c1b2a}.note h3{margin:0 0 7px;font-size:14px}.note p{margin:0;color:#b7cbdd;font-size:12px}.foot{font-size:12px;color:#93abc2;margin-top:16px}kbd{font-size:11px;border:1px solid #39576e;border-radius:5px;padding:2px 5px;background:#152738}.pulse{display:inline-block;width:7px;height:7px;background:var(--green);border-radius:50%;box-shadow:0 0 9px var(--green);margin-right:5px}.tag{font-size:11px;padding:4px 8px;border:1px solid #2c5662;color:#b6eae9;border-radius:20px;background:#103642}.subrow{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:3px 19px 14px}.tiny{font-size:11px;color:var(--muted)}
-@media(max-width:990px){.layout{grid-template-columns:1fr}.rowGraphs{grid-template-columns:1fr 1fr}.metrics{grid-template-columns:repeat(4,1fr)}}
-@media(max-width:640px){main{padding:19px 12px 34px}.metrics{grid-template-columns:repeat(2,1fr);gap:8px}.metric{padding:12px}.controls{grid-template-columns:1fr 1fr;padding:15px 13px;gap:13px}.rowGraphs{grid-template-columns:1fr}.notes{grid-template-columns:1fr}.sceneWrap{padding:3px 9px 12px}.scene{aspect-ratio:1.34}.panel-head{padding:14px 13px 10px}.graphBlock{padding:0 9px 10px}.graph{height:176px}.graph.tall{height:215px}.graph.heat{height:210px}.graph.small{height:166px}.line{margin:0 10px}.subrow{padding:3px 12px 13px}.eq-item{min-width:112px}.arrow{display:none}.equation{padding:12px}h1{margin:7px 0}.lead{font-size:13px}}
-
-/* Mobile viewer compatibility and graceful no-JS fallback */
-html,body{overscroll-behavior-y:auto}button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
-#runtimeBar{display:flex;align-items:center;gap:10px;justify-content:space-between;flex-wrap:wrap;margin:0 0 14px;padding:11px 14px;background:#13283d;border:1px solid #3f6279;border-radius:12px;color:#c7d9ec;font-size:12px}
-#runtimeStatus{font-weight:700}#runtimeStatus.ready{color:#82e4b0}#runtimeStatus.error{color:#ff9c9c}
-#noJsScene{position:absolute;inset:4px 15px 12px;background:#081525;border:1px solid #314c69;border-radius:12px;display:flex;align-items:center;justify-content:center;overflow:hidden}
-#noJsScene svg{display:block;width:100%;height:100%}body.sim-running #noJsScene{display:none}
-#debugPanel{display:none;margin:12px 0;padding:14px;border:1px solid #4e7d93;background:#0c2133;border-radius:12px;color:#e0f1ff;font:12px/1.5 ui-monospace,Consolas,monospace;white-space:pre-wrap;overflow-wrap:anywhere}
-#debugPanel.open{display:block}#debugPanel textarea{width:100%;min-height:120px;background:#091a2d;color:#d9efff;border:1px solid #48647e;border-radius:8px;padding:10px;font:12px/1.5 ui-monospace,monospace}
-@media(max-width:640px){#noJsScene{inset:3px 9px 12px}#runtimeBar{margin-bottom:11px}}
+:root{color-scheme:dark;--bg:#090f1c;--panel:#111b2c;--panel2:#172337;--border:#2b3b51;--text:#edf5ff;--muted:#96a8bd;--subtle:#708399;--accent:#75e7d1;--accent2:#8e9eff;--radius:22px}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.55 ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse 700px 470px at 75% -9%,rgba(69,94,184,.19),transparent 75%),radial-gradient(ellipse 470px 480px at -20% 35%,rgba(42,168,168,.11),transparent 75%);z-index:-1}
+a{color:inherit;text-decoration:none}
+button,input,select{font:inherit}
+button{cursor:pointer}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--accent);outline-offset:4px}
+.wrap{width:min(1200px,calc(100% - 48px));margin:auto}
+header{border-bottom:1px solid rgba(123,157,199,.11);background:rgba(9,15,28,.68);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.header-inner{min-height:80px;display:flex;align-items:center;justify-content:space-between;gap:18px}
+.brand{display:inline-flex;align-items:center;gap:13px;font-weight:760;letter-spacing:-.04em;font-size:21px;white-space:nowrap}
+.brand-mark{height:40px;width:40px;border-radius:13px;background:linear-gradient(145deg,#77efda,#8496ff);color:#081220;display:grid;place-items:center;font-size:20px;font-weight:900;box-shadow:0 6px 25px rgba(117,231,209,.17)}
+.brand small{display:block;font-size:10px;letter-spacing:.21em;line-height:1.1;color:var(--muted);font-weight:700}
+nav{display:flex;gap:7px;align-items:center}
+nav a{font-size:13px;padding:10px 14px;color:#bac9d9;border-radius:10px}
+nav a:hover{color:white;background:#18253a}
+nav .source{border:1px solid #36465e;color:#e9f1fd;display:flex;align-items:center;gap:8px}
+.eyebrow{display:inline-flex;align-items:center;gap:9px;color:#91ecda;letter-spacing:.18em;text-transform:uppercase;font-weight:800;font-size:11px}
+.live-dot{width:8px;height:8px;border-radius:50%;background:#77ecd3;box-shadow:0 0 0 5px rgba(117,231,209,.1)}
+.hero{padding:72px 0 60px;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(290px,.8fr);align-items:center;gap:52px}
+.hero h1{font-size:clamp(44px,5.1vw,76px);line-height:1.055;margin:20px 0 24px;max-width:820px;font-weight:790;letter-spacing:-.067em}
+.hero h1 em{font-style:normal;background:linear-gradient(105deg,#7ff3dc 12%,#83e8ee 51%,#9db2ff 100%);color:transparent;background-clip:text;-webkit-background-clip:text}
+.hero p{font-size:16px;line-height:1.8;color:#b0c2d5;max-width:570px;margin:0}
+.hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
+.cta{background:#7de6d2;color:#092327;font-weight:800;padding:13px 20px;border-radius:12px;display:inline-flex;align-items:center;gap:10px}
+.cta:hover{background:#a4f9e9;transform:translateY(-1px)}
+.cta.ghost{background:#182336;color:#dceafa;border:1px solid #32425a}
+.cta.ghost:hover{background:#22334a}
+.hero-panel{border:1px solid #2d435a;background:linear-gradient(140deg,rgba(22,43,64,.87),rgba(14,24,40,.98));border-radius:28px;min-height:318px;position:relative;overflow:hidden;padding:25px;box-shadow:0 24px 100px #01060d22}
+.hero-panel::before{content:"";position:absolute;inset:0;background-image:linear-gradient(to right,#47718b18 1px,transparent 1px),linear-gradient(to bottom,#47718b18 1px,transparent 1px);background-size:30px 30px;mask-image:linear-gradient(180deg,black,transparent);-webkit-mask-image:linear-gradient(180deg,black,transparent)}
+.panel-top{display:flex;justify-content:space-between;align-items:center;position:relative;z-index:1;gap:10px}
+.panel-top small{letter-spacing:.14em;color:#b0c4da;text-transform:uppercase;font-weight:760;font-size:10px}
+.panel-pill{color:#84ead7;border:1px solid #3b756e;background:#1c3c3a;padding:5px 11px;border-radius:50px;font-size:11px;font-weight:730}
+.orb{height:185px;display:grid;place-items:center;position:relative;margin-top:8px}
+.orb svg{width:260px;max-width:100%;height:auto;overflow:visible}
+.ring{fill:none;stroke:#70c7c0;stroke-width:1.1;opacity:.42}
+.orb-core{fill:#6be4cf}
+.wave-path{fill:none;stroke:#a2b6ff;stroke-width:1.5;stroke-linecap:round}
+.panel-bottom{border-top:1px solid #2a4057;position:relative;display:flex;align-items:flex-end;justify-content:space-between;gap:10px;padding-top:15px}
+.panel-bottom .value{font-size:39px;font-weight:790;line-height:1;letter-spacing:-.06em}
+.panel-bottom .label{display:block;color:#adc1d7;font-size:12px;margin-top:6px}
+.panel-bottom .status{font-size:11px;color:#75e5d0;letter-spacing:.09em;text-transform:uppercase;font-weight:720}
+.separator{height:1px;background:linear-gradient(90deg,transparent,#34475a 8%,#34475a 92%,transparent)}
+.section{padding:50px 0 90px;scroll-margin-top:20px}
+.section-heading{display:flex;align-items:end;justify-content:space-between;gap:20px;margin-bottom:26px}
+.section-heading .overline{color:var(--accent);font-size:11px;font-weight:780;letter-spacing:.2em;text-transform:uppercase}
+.section-heading h2{font-size:clamp(29px,3.6vw,42px);letter-spacing:-.045em;line-height:1.15;margin:8px 0 0;font-weight:760}
+.result-count{color:#9bb0c5;font-size:13px;padding-bottom:4px}
+.toolbar{display:flex;align-items:center;gap:13px;flex-wrap:wrap;margin-bottom:19px}
+.search{position:relative;flex:1;min-width:210px}
+.search svg{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:#93aac1;pointer-events:none}
+.search input{width:100%;background:#111c2e;border:1px solid #2c415a;color:white;border-radius:13px;height:49px;padding:0 44px 0 48px;outline:none}
+.search input:focus{border-color:#6cdccf;box-shadow:0 0 0 3px #66e4d01a}
+.search input::placeholder{color:#869db4}
+.clear{position:absolute;right:8px;top:8px;height:32px;width:32px;border:0;border-radius:8px;background:#263c52;color:#dce8f5}
+.clear[hidden]{display:none}
+.sort{background:#111c2e;border:1px solid #2c415a;color:#d9e7f6;border-radius:12px;height:49px;padding:0 14px;min-width:157px}
+.filters{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:28px}
+.filter{border:1px solid #304158;border-radius:999px;padding:9px 15px;background:#111b2b;color:#b2c3d8;font-size:13px;transition:background .15s,border .15s}
+.filter:hover{color:#f0ffff;border-color:#6d9eaa}
+.filter.active{border-color:#4c9f9b;background:#183e46;color:#b6fff0}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;align-items:stretch}
+.card{background:linear-gradient(150deg,#152238,#101b2e);border:1px solid #2b3d56;border-radius:23px;overflow:hidden;display:flex;flex-direction:column;min-width:0;transition:transform .2s,border-color .2s,box-shadow .2s}
+.card:hover{transform:translateY(-4px);border-color:#6598b0;box-shadow:0 20px 48px #02091566}
+.art{height:214px;background:radial-gradient(ellipse at 65% 35%,#26536c 0%,#152b45 46%,#101e33 100%);position:relative;overflow:hidden;display:grid;place-items:center}
+.art::after{content:"";position:absolute;inset:0;background-image:linear-gradient(#77b0c815 1px,transparent 1px),linear-gradient(90deg,#77b0c815 1px,transparent 1px);background-size:27px 27px;mask-image:linear-gradient(90deg,transparent,#000b,transparent);-webkit-mask-image:linear-gradient(90deg,transparent,#000b,transparent)}
+.art.violet{background:radial-gradient(ellipse at 60% 30%,#473b78,#22213f 55%,#191a34)}
+.art.emerald{background:radial-gradient(ellipse at 60% 30%,#24634f,#142b32 55%,#0d2327)}
+.art.amber{background:radial-gradient(ellipse at 60% 30%,#67502d,#302638 55%,#242133)}
+.art.rose{background:radial-gradient(ellipse at 60% 30%,#6a3552,#321f38 55%,#25192d)}
+.card-top{position:absolute;top:17px;left:18px;right:18px;display:flex;justify-content:space-between;align-items:center;gap:10px;z-index:1}
+.type{border:1px solid #70b8b057;color:#bdfcf0;background:#0d243c9e;backdrop-filter:blur(10px);padding:5px 10px;border-radius:8px;font-size:11px;font-weight:720}
+.open-icon{background:#ffffff19;border:1px solid #ffffff29;border-radius:50%;width:31px;height:31px;display:grid;place-items:center;font-size:18px}
+.center-art{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:12px}
+.symbol{width:89px;height:89px;border-radius:28px;border:1px solid #73c6d177;background:linear-gradient(135deg,#1b6c7a66,#2f457777);box-shadow:0 20px 70px #63becb24;display:grid;place-items:center;font-size:41px;transform:rotate(-5deg);position:relative}
+.symbol::after{content:"";position:absolute;inset:-26px;border:1px solid #65d8d632;border-radius:50%;pointer-events:none}
+.art-label{font-size:11px;letter-spacing:.18em;font-weight:750;color:#add4ea;text-transform:uppercase}
+.card-main{padding:25px 26px 27px;display:flex;flex-direction:column;flex:1}
+.card-title{font-size:24px;line-height:1.23;margin:0 0 11px;letter-spacing:-.035em;font-weight:765}
+.card-desc{color:#adc0d5;font-size:13.5px;line-height:1.75;margin:0;max-width:620px}
+.tags{display:flex;flex-wrap:wrap;gap:7px;margin-top:22px}
+.tags span{border:1px solid #334a5e;background:#1a2b3d;color:#c4d4e5;font-size:11px;border-radius:7px;padding:4px 8px}
+.card-foot{margin-top:auto;padding-top:24px;display:flex;align-items:center;justify-content:space-between;color:#7deed7;font-weight:760;font-size:12px}
+.card-foot small{color:#849cb4;letter-spacing:.03em;font-size:11px;font-weight:550}
+.placeholder{border:1px dashed #455267;border-radius:23px;display:flex;align-items:center;justify-content:center;text-align:center;flex-direction:column;gap:15px;min-height:390px;padding:28px;background:linear-gradient(145deg,#131e2e66,#111a2866)}
+.placeholder-icon{width:65px;height:65px;border:1px solid #43566a;border-radius:20px;display:grid;place-items:center;font-size:33px;color:#8ea6bc}
+.placeholder h3{font-size:20px;letter-spacing:-.03em;margin:0}
+.placeholder p{color:#95aabe;max-width:290px;font-size:13px;margin:0}
+.placeholder code{color:#a9f3df;background:#1d383c;border-radius:6px;padding:2px 6px;font-size:12px}
+.placeholder a{color:#a6efff;font-size:12px;text-decoration:underline;text-underline-offset:3px}
+.empty{border:1px dashed #415167;border-radius:18px;padding:58px 25px;text-align:center;color:#b1c5d8}
+.empty h3{color:#ecf6ff;margin:0 0 7px}
+.empty p{margin:0}
+.empty[hidden]{display:none}
+footer{border-top:1px solid #26344a;padding:28px 0 36px;color:#849bb2;font-size:12px}
+.footer-inner{display:flex;justify-content:space-between;gap:15px;align-items:center;flex-wrap:wrap}
+footer a{color:#cde8ed}
+footer a:hover{text-decoration:underline}
+@media(max-width:800px){
+ .hero{grid-template-columns:1fr;gap:35px;padding:52px 0 42px}
+ .hero-panel{max-width:560px;width:100%;min-height:285px}
+ .grid{grid-template-columns:1fr}
+ .section{padding:38px 0 66px}
+ .placeholder{min-height:250px}
+}
+@media(max-width:520px){
+ .wrap{width:min(100% - 32px,1200px)}
+ .header-inner{min-height:71px}
+ .brand{font-size:19px}
+ .brand-mark{width:37px;height:37px}
+ nav a{padding:8px 9px}
+ nav a:first-child{display:none}
+ .hero h1{font-size:clamp(39px,11vw,56px)}
+ .hero p{font-size:14px}
+ .hero-panel{min-height:275px;padding:19px}
+ .orb{height:158px}
+ .orb svg{width:215px}
+ .section-heading{align-items:start;flex-direction:column;gap:8px}
+ .toolbar{gap:9px}
+ .search{flex-basis:100%}
+ .sort{flex:1}
+ .art{height:190px}
+ .card-main{padding:21px 20px 24px}
+ .card-title{font-size:22px}
+ .cta{padding:12px 15px;font-size:13px}
+}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
 </style>
 </head>
-<body><main>
-<header class="hero"><div><div class="eyebrow">RF / PHY / ESP32 · Mô phỏng vật lý tương tác</div><h1>Wi‑Fi <b>2,4 GHz</b> → CSI</h1><p class="lead">Một gói Wi‑Fi phát nhiều subcarrier đồng thời; môi trường làm thay đổi chúng và ESP32 ở phía nhận ước lượng CSI. Kéo người trong phòng để quan sát trực tiếp.</p></div><div class="bar"><button class="btn primary" id="pause">⏸ Tạm dừng</button><button class="btn" id="reset">↺ Đặt lại</button></div></header>
-<div id="runtimeBar"><span id="runtimeStatus" role="status">⚠️ Chưa xác nhận chạy JavaScript. Nếu mở bằng ChatGPT Preview, script có thể bị chặn.</span><button class="btn" id="debugBtn" type="button">🛠 Debug</button></div>
-<div id="debugPanel"><div style="font-weight:800;margin-bottom:8px">Chẩn đoán trình duyệt</div><textarea id="debugOutput" readonly>JavaScript chưa khởi động. Hãy tải file và mở bằng Chrome hoặc Safari bên ngoài ChatGPT.</textarea><button class="btn" id="copyDebug" type="button" style="margin-top:8px">Sao chép chẩn đoán</button></div>
-<section class="metrics"><div class="metric"><span>Kênh Wi‑Fi</span><strong id="mhz">2,437 GHz</strong><small id="channelDesc">Kênh 6 · băng 2,4 GHz</small></div><div class="metric"><span>Độ rộng kênh</span><strong>20 MHz</strong><small>HT20 · FFT 64 điểm</small></div><div class="metric"><span>Subcarrier hoạt động</span><strong>56</strong><small>52 data + 4 pilot</small></div><div class="metric"><span>Khoảng cách subcarrier</span><strong>312,5 kHz</strong><small>1 OFDM data symbol ≈ 4 μs</small></div></section>
-<div class="layout">
-<section class="panel"><div class="panel-head"><div><h2>01 — Tín hiệu truyền qua căn phòng</h2><p>TX: router · RX: ESP32-C3 · kéo biểu tượng người để thay đổi đường phản xạ</p></div><div class="legend"><span><i style="background:var(--cyan)"></i>Trực tiếp</span><span><i style="background:var(--amber)"></i>Tường</span><span><i style="background:var(--pink)"></i>Người</span></div></div><div class="sceneWrap"><canvas id="scene" class="scene" aria-label="Sơ đồ tín hiệu Wi-Fi truyền qua căn phòng, kéo biểu tượng người để thay đổi vị trí"></canvas><div id="noJsScene" aria-label="Hình minh họa tĩnh nếu JavaScript bị chặn"><svg viewBox="0 0 360 230" xmlns="http://www.w3.org/2000/svg"><rect width="360" height="230" fill="#0c1b2e"/><path d="M34 20H326V210H34Z" fill="none" stroke="#587f99" stroke-width="3"/><path d="M60 167L300 167" stroke="#66dce5" stroke-width="3"/><path d="M60 167L175 27L300 167" fill="none" stroke="#ffc478" stroke-width="2" stroke-dasharray="6 4"/><path d="M60 167L190 110L300 167" fill="none" stroke="#ff82a5" stroke-width="2" stroke-dasharray="6 4"/><circle cx="60" cy="167" r="16" fill="#103b4c" stroke="#67e7ec" stroke-width="2"/><circle cx="300" cy="167" r="16" fill="#124234" stroke="#82e4b0" stroke-width="2"/><circle cx="190" cy="110" r="11" fill="#ff82a5"/><text x="60" y="172" font-family="sans-serif" fill="white" text-anchor="middle" font-size="12">TX</text><text x="300" y="172" font-family="sans-serif" fill="white" text-anchor="middle" font-size="12">RX</text><text x="180" y="14" font-family="sans-serif" fill="#ffcb7c" text-anchor="middle" font-size="10">Tường</text><text x="190" y="90" font-family="sans-serif" fill="#ffc7d5" text-anchor="middle" font-size="11">Người</text><text x="180" y="201" font-family="sans-serif" fill="#e8f2ff" text-anchor="middle" font-size="10">Hình tĩnh · JavaScript chưa chạy</text></svg></div></div><div class="callout">Các cung tròn là <b>sóng minh họa</b> (đã làm chậm cực lớn), không phải 56 tia riêng. Mỗi subcarrier đều có thể đi qua nhiều đường phản xạ.</div>
-<div class="controls"><div class="ctrl full"><label>Kênh trung tâm</label><div class="switches" id="channels"><button class="btn" data-ch="1">CH 1 · 2412 MHz</button><button class="btn active" data-ch="6">CH 6 · 2437 MHz</button><button class="btn" data-ch="11">CH 11 · 2462 MHz</button></div></div><div class="ctrl full"><label>Tình huống mô phỏng</label><div class="switches"><button class="btn active" id="personToggle">● Có người</button><button class="btn active" id="modeBreathe">Đứng yên + thở</button><button class="btn" id="modeWalk">Đi lại</button></div></div><div class="ctrl"><label>Nhịp thở <output id="breathOut">15 lần/phút</output></label><input type="range" id="breath" min="8" max="26" step="1" value="15"></div><div class="ctrl"><label>Biên độ lồng ngực <output id="mmOut">6 mm</output></label><input type="range" id="mm" min="0" max="12" step="1" value="6"></div><div class="ctrl"><label>Phản xạ tường <output id="wallOut">50%</output></label><input type="range" id="wall" min="0" max="90" step="1" value="50"></div><div class="ctrl"><label>Nhiễu phép đo <output id="noiseOut">1,5%</output></label><input type="range" id="noise" min="0" max="8" step="0.5" value="1.5"></div></div></section>
-<section class="panel"><div class="panel-head"><div><h2>02 — Phổ OFDM và CSI</h2><p>56 tần số con được sử dụng <b>đồng thời</b> trong kênh 20 MHz</p></div><span class="tag">HT20 · 802.11n</span></div><div class="subrow"><span class="tiny">Chọn subcarrier bằng cách nhấn vào đồ thị</span><span class="tag" id="selectedChip">k = +7 · pilot</span></div><div class="graphBlock"><canvas id="spectrum" class="graph tall" aria-label="Biểu đồ biên độ CSI theo các subcarrier OFDM"></canvas><div class="mini"><span><span style="color:#67e7ec">━━</span> CSI hiện tại</span><span><span style="color:#7e90a5">━━</span> Phòng trống (tham chiếu)</span><span><span style="color:#ffc478">●</span> Pilot</span></div></div><hr class="line"><div class="panel-head"><div><h2>03 — Pha CSI theo tần số</h2><p>Mỗi subcarrier có một góc pha khác nhau, từ −π đến +π</p></div></div><div class="graphBlock"><canvas id="phase" class="graph small" aria-label="Biểu đồ pha CSI"></canvas></div><div class="callout">Biên độ + pha được tính cho <b>mỗi subcarrier</b>. Đây là đáp ứng tổng hợp của mọi đường truyền; không thể đọc trực tiếp “người ở đâu” từ một CSI.</div></section>
-<section class="panel wide"><div class="panel-head"><div><h2>04 — CSI biến đổi qua thời gian</h2><p>Mỗi cột là một lần ước lượng CSI; mỗi hàng là một subcarrier. Màu thể hiện Δ biên độ (dB) so với phòng trống.</p></div><span class="tag" id="countTag">0 bản đo</span></div><div class="graphBlock"><canvas id="heatmap" class="graph heat" aria-label="Bản đồ nhiệt CSI theo thời gian và subcarrier"></canvas><div class="mini"><span><span style="color:#f5a66e">■</span> mạnh hơn tham chiếu</span><span><span style="color:#72d4f1">■</span> yếu hơn tham chiếu</span><span>Giữa: gần như không đổi</span></div></div></section>
-<div class="rowGraphs wide"><section class="panel"><div class="panel-head"><div><h2>05 — Một subcarrier theo thời gian</h2><p>Biên độ tại subcarrier đang chọn, so với phòng trống</p></div><span class="tag" id="traceLabel">k = +7</span></div><div class="graphBlock"><canvas id="trace" class="graph" aria-label="Đồ thị biến thiên CSI theo thời gian"></canvas><div class="mini"><span>Thời gian khoảng 12 giây gần nhất</span><span>Biên độ tương đối, dB</span></div></div></section><section class="panel"><div class="panel-head"><div><h2>06 — TX gửi X, RX đo Y</h2><p>LTF mô phỏng: RX biết trước giá trị X rồi ước lượng H = Y / X</p></div></div><div class="equation"><div class="eq-flow"><div class="eq-item"><span>TX · LTF đã biết</span><strong id="xValue">X = +1</strong><small>BPSK mẫu minh họa</small></div><span class="arrow">→</span><div class="eq-item"><span>RX · nhận sau multipath</span><strong id="yValue">Y = …</strong><small>Số phức: I + jQ</small></div><span class="arrow">→</span><div class="eq-item"><span>Ước lượng CSI</span><strong id="hValue">H = …</strong><small>Biên độ & pha</small></div></div><div style="margin-top:12px;font-size:12px;color:#c4d6e5" id="insight"></div></div></section></div>
-</div>
-<section class="notes"><div class="note"><h3>① Bao nhiêu sóng?</h3><p>56 <em>subcarrier tần số</em> đang hoạt động của một OFDM symbol HT20. Chúng cùng đi qua không gian; không phải 56 chùm tia riêng biệt. Một packet thường gồm nhiều symbol.</p></div><div class="note"><h3>② Một lần CSI là gì?</h3><p>RX sử dụng đoạn training/LTF đã biết, so sánh tín hiệu phát và nhận, ước lượng số phức <b>H[k]</b> ở từng subcarrier. Mô phỏng lấy 1 mẫu khoảng mỗi 67 ms.</p></div><div class="note"><h3>③ Vì sao cảm nhận được người?</h3><p>Người thay đổi đường truyền TX → người → RX. Thay đổi vài milimét có thể làm pha của thành phần phản xạ thay đổi; tác động lên tổng CSI theo thời gian.</p></div></section>
-<p class="foot"><b>Lưu ý về độ trung thực:</b> Đây là mô phỏng baseband theo mô hình multipath đơn giản (đường trực tiếp + tường + vật tĩnh + người + nhiễu), dùng training BPSK giả lập, <b>không phải</b> waveform LTF đúng bit theo IEEE 802.11 và không đọc Wi‑Fi thật. Hoạt ảnh không chạy ở 2,4 tỷ chu kỳ/giây; số liệu chỉ minh họa nguyên lý. Có thể mở file trực tiếp, không cần Internet hoặc thư viện ngoài.</p>
+<body>
+<header>
+  <div class="wrap header-inner">
+    <a class="brand" href="./" aria-label="bdx0 HTML Lab - Trang chủ">
+      <span class="brand-mark">b.</span>
+      <span>bdx0<span style="color:#73e5d0">/</span>lab<small>HTML COLLECTION</small></span>
+    </a>
+    <nav aria-label="Điều hướng chính">
+      <a href="#thu-vien">Thư viện</a>
+      <a href="https://github.com/bdx0/html" class="source" target="_blank" rel="noopener noreferrer">GitHub <span aria-hidden="true">↗</span></a>
+    </nav>
+  </div>
+</header>
+<main class="wrap">
+  <section class="hero" aria-labelledby="hero-title">
+    <div>
+      <div class="eyebrow"><span class="live-dot"></span> Khám phá · Thử nghiệm · Học hỏi</div>
+      <h1 id="hero-title">Ý tưởng thú vị.<br><em>Trải nghiệm trực tiếp.</em></h1>
+      <p>Một không gian lưu trữ những mô phỏng, công cụ và thí nghiệm nhỏ chạy ngay trên trình duyệt. Mỗi trang là một thế giới để bạn khám phá và tương tác.</p>
+      <div class="hero-actions">
+        <a class="cta" href="#thu-vien">Khám phá thư viện <span aria-hidden="true">↓</span></a>
+        <a class="cta ghost" href="https://github.com/bdx0/html" target="_blank" rel="noopener noreferrer">Xem mã nguồn <span aria-hidden="true">↗</span></a>
+      </div>
+    </div>
+    <aside class="hero-panel" aria-label="Tổng quan thư viện">
+      <div class="panel-top"><small>Interactive archive / v1</small><span class="panel-pill">● Online</span></div>
+      <div class="orb" aria-hidden="true">
+        <svg viewBox="0 0 280 195" role="presentation">
+          <circle class="ring" cx="140" cy="97" r="80"/><circle class="ring" cx="140" cy="97" r="57"/><circle class="ring" cx="140" cy="97" r="34"/>
+          <path class="ring" d="M22 97h236M140 7v180"/>
+          <path class="wave-path" d="M35 115C53 115 58 69 74 69s20 76 37 76 21-103 36-103 25 117 40 117 22-77 38-77 19 23 22 23"/>
+          <circle class="orb-core" cx="140" cy="97" r="7"/><circle cx="140" cy="97" r="15" fill="#69e7d0" opacity=".13"/>
+          <circle cx="92" cy="47" r="4" fill="#f1be81"/><circle cx="203" cy="141" r="4" fill="#a8aaff"/>
+        </svg>
+      </div>
+      <div class="panel-bottom">
+        <div><span class="value" id="heroCount">01</span><span class="label">Trang HTML trong thư viện</span></div>
+        <span class="status">● Github Pages</span>
+      </div>
+    </aside>
+  </section>
+  <div class="separator"></div>
+  <section id="thu-vien" class="section" aria-labelledby="library-title">
+    <div class="section-heading">
+      <div><div class="overline">01 / Thư viện trải nghiệm</div><h2 id="library-title">Tất cả dự án</h2></div>
+      <div class="result-count" id="count" aria-live="polite">Đang tải danh mục…</div>
+    </div>
+    <div class="toolbar">
+      <div class="search">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m16 16 5 5"/></svg>
+        <input type="search" id="search" aria-label="Tìm trang HTML" placeholder="Tìm theo tên, chủ đề, công nghệ..." autocomplete="off">
+        <button id="clear" class="clear" type="button" hidden aria-label="Xóa tìm kiếm">×</button>
+      </div>
+      <select id="sort" class="sort" aria-label="Sắp xếp">
+        <option value="featured">Nổi bật trước</option>
+        <option value="title">Tên A → Z</option>
+      </select>
+    </div>
+    <div id="filters" class="filters" aria-label="Lọc theo chủ đề"></div>
+    <div id="cards" class="grid" aria-live="polite"></div>
+    <div class="empty" id="empty" hidden>
+      <h3>Không tìm thấy trang phù hợp</h3>
+      <p>Thử đổi từ khóa hoặc chọn “Tất cả”.</p>
+    </div>
+  </section>
 </main>
+<footer>
+  <div class="wrap footer-inner">
+    <span>© <span id="year">2026</span> bdx0 · Crafted for curiosity.</span>
+    <span>HTML thuần · Không cần cài đặt · <a href="https://github.com/bdx0/html" target="_blank" rel="noopener noreferrer">Đóng góp trên GitHub ↗</a></span>
+  </div>
+</footer>
+
+<template id="page-card">
+  <a class="card" href="#">
+    <div class="art">
+      <div class="card-top"><span class="type" data-type>Trải nghiệm</span><span class="open-icon" aria-hidden="true">↗</span></div>
+      <div class="center-art"><span class="symbol" data-icon aria-hidden="true">✦</span><span class="art-label">HTML INTERACTIVE</span></div>
+    </div>
+    <div class="card-main">
+      <h3 class="card-title" data-title></h3>
+      <p class="card-desc" data-desc></p>
+      <div class="tags" data-tags></div>
+      <div class="card-foot"><span>Mở trải nghiệm <span aria-hidden="true">↗</span></span><small data-path></small></div>
+    </div>
+  </a>
+</template>
+
 <script>
-var csiErrors=[];
-function setRuntime(msg,ok){var s=document.getElementById('runtimeStatus');if(!s)return;s.textContent=msg;s.className=ok?'ready':'error';}
-function makeReport(){
- var c=document.getElementById('scene'),txt=(c?'canvas '+c.width+'×'+c.height:'canvas missing');
- return ['WiFi CSI Mobile Debug','time='+new Date().toISOString(),'url='+location.href,'userAgent='+navigator.userAgent,'js=enabled','requestAnimationFrame='+!!window.requestAnimationFrame,'canvas2d='+!!(c&&c.getContext&&c.getContext('2d')),'simulation='+!!window.__csi_running,txt,'errors='+JSON.stringify(csiErrors.slice(-10))].join('\n');
-}
-function updateDebug(){var e=document.getElementById('debugOutput');if(e)e.value=makeReport();}
-window.addEventListener('error',function(e){csiErrors.push((e.message||'error')+' at '+e.filename+':'+e.lineno);setRuntime('❌ JavaScript lỗi: '+e.message,false);updateDebug();});
-window.addEventListener('unhandledrejection',function(e){csiErrors.push('Promise: '+String(e.reason));setRuntime('❌ JavaScript lỗi Promise',false);updateDebug();});
-document.getElementById('debugBtn').addEventListener('click',function(){var d=document.getElementById('debugPanel');d.classList.toggle('open');updateDebug();});
-document.getElementById('copyDebug').addEventListener('click',function(){var e=document.getElementById('debugOutput');e.select();try{document.execCommand('copy')}catch(err){}});
-(() => { 'use strict';
-const C=299792458, spacing=312500, K=Array.from({length:57},(_,i)=>i-28).filter(k=>k!==0), pilot=new Set([-21,-7,7,21]);
-const defaults={ch:6,person:true,mode:'breathe',bpm:15,mm:6,wall:50,noise:1.5,k:7,paused:false,px:4.20,py:2.50,t:0};
-const s={...defaults};const $=id=>document.getElementById(id);
-const canvases=['scene','spectrum','phase','trace','heatmap'];
-const ctx={};for(const id of canvases) ctx[id]=$(id).getContext('2d');
-let snapshots=[],count=0,latest=null,last=performance.now(),lastSample=-1,lastDraw=0;
-const tx={x:.9,y:3.65},rx={x:7.1,y:3.55},box={x:6.2,y:.92},room={w:8,h:5};
-const freq=()=> (2407+5*s.ch)*1e6;
-const fmt=(x,dec=2)=>x.toFixed(dec).replace('.',',');
-const mod=(a,n)=>((a%n)+n)%n;
-const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
-const personPos=()=>({x:s.px+(s.mode==='walk' ? .72*Math.sin(s.t*.85):0),y:s.py+(.001*s.mm)*Math.sin(Math.PI*2*(s.bpm/60)*s.t)+(s.mode==='walk'?.06*Math.sin(s.t*1.7):0)});
-const wallPath=()=>{
-  const mirror={x:tx.x,y:-tx.y};const alpha=tx.y/(tx.y+rx.y);
-  return {x:tx.x+(rx.x-tx.x)*alpha,y:0};
-};
-const P=wallPath();
-function coeffs(present=s.person) {
- const human=personPos(), d=dist(tx,rx), wLen=dist(tx,P)+dist(P,rx), bLen=dist(tx,box)+dist(box,rx), hLen=dist(tx,human)+dist(human,rx);
- const humanStrength=Math.min(.52, .42* d*d/(Math.max(1.5,dist(tx,human))*Math.max(1.5,dist(human,rx)))*.70);
- return [{len:d,amp:1},{len:wLen,amp:s.wall/100*.80},{len:bLen,amp:.26},...(present?[{len:hLen,amp:humanStrength}]:[])];
-}
-function complexH(k,paths){let re=0,im=0;const f=freq()+k*spacing;for(const p of paths){const ang=mod(f*p.len/C,1)*2*Math.PI;re+=p.amp*Math.cos(ang);im-=p.amp*Math.sin(ang)}return {re,im};}
-const amp=z=>Math.hypot(z.re,z.im);
-const db=z=>20*Math.log10(Math.max(amp(z),1e-6));
-const phase=z=>Math.atan2(z.im,z.re);
-function getSample(){const pathways=coeffs(), empty=coeffs(false),cur=[],base=[];
- const noise=s.noise/100;
- for(let j=0;j<K.length;j++){
-  const k=K[j],h=complexH(k,pathways), e=complexH(k,empty);
-  const noisy={re:h.re+(Math.random()-.5)*noise*2,im:h.im+(Math.random()-.5)*noise*2};
-  cur.push(noisy);base.push(e);
- }
- return {t:s.t,cur,base,delta:cur.map((h,i)=> Math.max(-12,Math.min(12,db(h)-db(base[i]))))};
-}
-function addSample(){latest=getSample(); snapshots.push(latest);if(snapshots.length>180)snapshots.shift(); count++}
-function measureText(){const f=freq(),lambda=C/f*100;$('mhz').textContent=fmt(f/1e9,3)+' GHz';$('channelDesc').textContent=`Kênh ${s.ch} · λ ≈ ${fmt(lambda,2)} cm`;
- $('selectedChip').textContent=`k = ${s.k>0?'+':''}${s.k} · ${pilot.has(s.k)?'pilot':'data'}`;
- $('traceLabel').textContent=`k = ${s.k>0?'+':''}${s.k}`;
- $('countTag').textContent=count+' bản đo';
- if(!latest)return;
- const j=K.indexOf(s.k),h=latest.cur[j],x=(mod(s.k*17,13)>6)?-1:1,y={re:x*h.re,im:x*h.im};
- $('xValue').textContent='X = '+(x>0?'+1':'−1');$('yValue').textContent=`Y = ${fmt(y.re)} ${y.im>=0?'+':'−'} j${fmt(Math.abs(y.im))}`;
- $('hValue').textContent=`H = ${fmt(h.re)} ${h.im>=0?'+':'−'} j${fmt(Math.abs(h.im))}`;
- $('insight').innerHTML=`Tại <b>k=${s.k}</b>: tần số <b>${fmt((f+s.k*spacing)/1e6,4)} MHz</b>, biên độ <b>${fmt(amp(h),3)}</b>, pha <b>${fmt(phase(h)*180/Math.PI,1)}°</b>. Khi người dịch chuyển, đường phản xạ làm <b>H</b> đổi dù X vẫn giữ nguyên.`;
-}
-function resize(id){const c=$(id),r=c.getBoundingClientRect(),d=Math.min(devicePixelRatio||1,2);if(c.width!==Math.round(r.width*d)||c.height!==Math.round(r.height*d)){c.width=Math.round(r.width*d);c.height=Math.round(r.height*d)}const g=ctx[id];g.setTransform(d,0,0,d,0,0);return {g,w:r.width,h:r.height}}
-function round(g,x,y,w,h,r=10){g.beginPath();if(typeof g.roundRect==='function'){g.roundRect(x,y,w,h,r);return;}r=Math.min(r,w/2,h/2);g.moveTo(x+r,y);g.lineTo(x+w-r,y);g.quadraticCurveTo(x+w,y,x+w,y+r);g.lineTo(x+w,y+h-r);g.quadraticCurveTo(x+w,y+h,x+w-r,y+h);g.lineTo(x+r,y+h);g.quadraticCurveTo(x,y+h,x,y+h-r);g.lineTo(x,y+r);g.quadraticCurveTo(x,y,x+r,y);g.closePath()}
-function text(g,txt,x,y,size=12,color='#c8d7e7',align='left',bold=false){g.fillStyle=color;g.font=`${bold?'700 ':'500 '}${size}px ui-sans-serif,system-ui,-apple-system`;g.textAlign=align;g.fillText(txt,x,y)}
-function mapRoom(w,h){let padX=30,padY=24,aw=w-2*padX,ah=h-2*padY;const z=Math.min(aw/8,ah/5);return {ox:(w-8*z)/2,oy:(h-5*z)/2,z,p:o=>({x:(o.x*z)+(w-8*z)/2,y:(o.y*z)+(h-5*z)/2})}}
-function drawScene(){const{g,w,h}=resize('scene');g.clearRect(0,0,w,h);const m=mapRoom(w,h),p=m.p;g.fillStyle='#0c1b2e';g.fillRect(0,0,w,h);
- for(let i=0;i<=8;i++){const x=p({x:i,y:0}).x;g.strokeStyle='#20394c';g.lineWidth=.8;g.beginPath();g.moveTo(x,p({x:0,y:0}).y);g.lineTo(x,p({x:0,y:5}).y);g.stroke()}
- for(let j=0;j<=5;j++){const y=p({x:0,y:j}).y;g.strokeStyle='#20394c';g.beginPath();g.moveTo(p({x:0,y:0}).x,y);g.lineTo(p({x:8,y:0}).x,y);g.stroke()}
- const tl=p({x:0,y:0}),br=p({x:8,y:5});g.strokeStyle='#63899f';g.lineWidth=3;g.strokeRect(tl.x,tl.y,br.x-tl.x,br.y-tl.y);
- const b=p(box);g.fillStyle='#3c4251';round(g,b.x-18,b.y-11,38,23,4);g.fill();text(g,'Tủ',b.x,b.y+27,10,'#97aabd','center');
- const T=p(tx),R=p(rx),W=p(P),hp=personPos(),H=p(hp);
- // Conceptual ripple animations (not actual 2.4 GHz cycles)
- const t=s.t*1.6;
- g.save();g.beginPath();g.rect(tl.x,tl.y,br.x-tl.x,br.y-tl.y);g.clip();
- for(let n=0;n<7;n++){const r=mod(t+n*.85,6)*m.z;g.strokeStyle=`rgba(103,231,236,${(1-r/(6*m.z))*.13})`;g.lineWidth=1.5;g.beginPath();g.arc(T.x,T.y,r,0,Math.PI*2);g.stroke()}
- g.restore();
- function path(a,b,color,alpha=1,dash=[]){g.strokeStyle=color;g.globalAlpha=alpha;g.lineWidth=2.4;g.setLineDash(dash);g.beginPath();g.moveTo(a.x,a.y);g.lineTo(b.x,b.y);g.stroke();g.setLineDash([]);g.globalAlpha=1}
- path(T,R,'#67e7ec',.78);path(T,W,'#ffc478',.85,[7,5]);path(W,R,'#ffc478',.85,[7,5]);path(T,b,'#aa9afd',.45,[3,7]);path(b,R,'#aa9afd',.45,[3,7]);if(s.person){path(T,H,'#ff82a5',.85,[6,4]);path(H,R,'#ff82a5',.85,[6,4])}
- function movingDot(nodes,col,speed=1){for(let i=0;i<nodes.length-1;i++){const a=nodes[i],b=nodes[i+1],u=mod(s.t*speed+i*.5,1);g.beginPath();g.arc(a.x+(b.x-a.x)*u,a.y+(b.y-a.y)*u,2.7,0,Math.PI*2);g.fillStyle=col;g.fill()}}
- movingDot([T,R],'#67e7ec',.42);movingDot([T,W,R],'#ffc478',.40);if(s.person)movingDot([T,H,R],'#ff82a5',.45);
- // TX node
- g.shadowColor='#67e7ec';g.shadowBlur=14;g.fillStyle='#193f51';round(g,T.x-18,T.y-15,36,29,7);g.fill();g.shadowBlur=0;g.strokeStyle='#67e7ec';g.stroke();text(g,'TX',T.x,T.y+5,14,'#dffeff','center',true);text(g,'Router',T.x,T.y+32,11,'#99eff1','center');
- // RX node
- g.shadowColor='#82e4b0';g.shadowBlur=12;g.fillStyle='#23433e';round(g,R.x-18,R.y-15,36,29,7);g.fill();g.shadowBlur=0;g.strokeStyle='#82e4b0';g.stroke();text(g,'RX',R.x,R.y+5,14,'#d7ffe8','center',true);text(g,'ESP32',R.x,R.y+32,11,'#adf1cb','center');
- if(s.person){g.fillStyle='#ff82a5';g.strokeStyle='#ffb1c6';g.lineWidth=3;g.beginPath();g.arc(H.x,H.y-7,8,0,Math.PI*2);g.fill();g.beginPath();g.moveTo(H.x,H.y+3);g.lineTo(H.x,H.y+26);g.moveTo(H.x-13,H.y+11);g.lineTo(H.x+13,H.y+11);g.moveTo(H.x,H.y+26);g.lineTo(H.x-11,H.y+39);g.moveTo(H.x,H.y+26);g.lineTo(H.x+11,H.y+39);g.stroke();text(g,'Kéo tôi',H.x,H.y-25,11,'#ffb2c8','center')}
- text(g,'Tường phản xạ',W.x,W.y+17,10,'#ffc478','center');
-}
-function frame(g,w,h,min,max,grid=true){g.fillStyle='#0a192a';g.fillRect(0,0,w,h);const L=43,R=14,T=14,B=28,x=L,y=T,pw=w-L-R,ph=h-T-B;
- if(grid){g.strokeStyle='#264057';g.lineWidth=.7;for(let i=0;i<=4;i++){const py=y+ph*i/4;g.beginPath();g.moveTo(x,py);g.lineTo(x+pw,py);g.stroke();text(g,fmt(max+(min-max)*i/4,1),x-6,py+3,10,'#83a0b6','right')} }
- return {x,y,pw,ph,toY:v=>y+(max-v)/(max-min)*ph};}
-function drawSpectrum(){const{g,w,h}=resize('spectrum');const entries=latest?latest.cur:K.map(k=>complexH(k,coeffs())), base=latest?latest.base:K.map(k=>complexH(k,coeffs(false)));const values=entries.map(db), refs=base.map(db);const min=Math.min(-15,...values,...refs)-1,max=Math.max(10,...values,...refs)+1;const a=frame(g,w,h,min,max);const bw=a.pw/57;
- for(let i=0;i<56;i++){const k=K[i],xi=a.x+(k+28)*bw,v=values[i];g.fillStyle=pilot.has(k)?'#cca66c':'#29667a';g.globalAlpha=.5;g.fillRect(xi+1,Math.min(a.toY(v),a.toY(min)),Math.max(1,bw-2),Math.abs(a.toY(min)-a.toY(v)));g.globalAlpha=1}
- function drawline(arr,color,width){g.beginPath();for(let i=0;i<K.length;i++){const xi=a.x+(K[i]+28.5)*bw,yy=a.toY(arr[i]);if(i===0)g.moveTo(xi,yy);else g.lineTo(xi,yy)}g.strokeStyle=color;g.lineWidth=width;g.stroke()}
- drawline(refs,'#7e90a5',1.35);drawline(values,'#67e7ec',2);
- let xi=a.x+(s.k+28.5)*bw;g.strokeStyle='#ffc478';g.lineWidth=1.3;g.setLineDash([4,5]);g.beginPath();g.moveTo(xi,a.y);g.lineTo(xi,a.y+a.ph);g.stroke();g.setLineDash([]);g.beginPath();g.arc(xi,a.toY(values[K.indexOf(s.k)]),4,0,Math.PI*2);g.fillStyle='#ffc478';g.fill();
- for(const k of [-28,-21,-14,-7,0,7,14,21,28]){const px=a.x+(k+28.5)*bw;text(g,String(k),px,h-9,10,k===s.k?'#ffc478':'#97aec1','center')}
- text(g,'dB',5,16,10,'#9db2c6');text(g,'k →',w-7,h-9,10,'#abc5d6','right')}
-function drawPhase(){const {g,w,h}=resize('phase');const a=frame(g,w,h,-180,180),bw=a.pw/57,entries=latest?latest.cur:K.map(k=>complexH(k,coeffs()));for(let i=0;i<K.length;i++){const k=K[i],v=phase(entries[i])*180/Math.PI,xi=a.x+(k+28.5)*bw;g.strokeStyle=pilot.has(k)?'#ffc478':'#a69dff';g.lineWidth=Math.max(2,bw*.64);g.beginPath();g.moveTo(xi,a.toY(0));g.lineTo(xi,a.toY(v));g.stroke()}const xx=a.x+(s.k+28.5)*bw;g.setLineDash([4,4]);g.strokeStyle='#67e7ec';g.beginPath();g.moveTo(xx,a.y);g.lineTo(xx,a.y+a.ph);g.stroke();g.setLineDash([]);for(const k of [-28,-14,0,14,28])text(g,String(k),a.x+(k+28.5)*bw,h-9,10,'#97aec1','center');text(g,'°',8,17,11,'#a8c1d7')}
-function heatColor(value){const a=Math.min(1,Math.abs(value)/5.5);if(value>=0){return `rgb(${Math.round(15+220*a)},${Math.round(37+111*a)},${Math.round(54+70*a)})`}return `rgb(${Math.round(14+77*a)},${Math.round(36+157*a)},${Math.round(55+176*a)})`}
-function drawHeatmap(){const{g,w,h}=resize('heatmap');g.fillStyle='#0b1929';g.fillRect(0,0,w,h);const L=44,R=14,T=11,B=30,pw=w-L-R,ph=h-T-B;g.fillStyle='#11283c';g.fillRect(L,T,pw,ph);const n=180,cw=pw/n,rh=ph/56;for(let col=0;col<snapshots.length;col++){const item=snapshots[col],x=L+pw-(snapshots.length-col)*cw;for(let j=0;j<56;j++){g.fillStyle=heatColor(item.delta[j]);g.fillRect(x,T+(55-j)*rh,Math.max(1.02,cw+.25),Math.max(1.02,rh+.2))}}
- const row=55-K.indexOf(s.k);g.strokeStyle='#ffc478';g.lineWidth=1.4;g.strokeRect(L,T+row*rh,pw,rh);
- for(const k of [-28,-14,0,14,28])if(k!==0){const j=K.indexOf(k);text(g,String(k),L-8,T+(55-j+.55)*rh,10,'#9eb8ca','right')}
- for(let i=0;i<=4;i++){text(g,i===4?'0 s':`−${12-3*i} s`,L+pw*i/4,h-8,10,'#91abc0',i===0?'left':i===4?'right':'center')}
- text(g,'k',10,16,11,'#a0b8ce')}
-function drawTrace2(){const{g,w,h}=resize('trace'),a=frame(g,w,h,-9,9),j=K.indexOf(s.k),data=snapshots;if(data.length){const end=data[data.length-1].t;g.beginPath();let began=false;for(const item of data){if(item.t<end-12)continue;const x=a.x+a.pw*(item.t-(end-12))/12,y=a.toY(Math.max(-9,Math.min(9,item.delta[j])));if(!began){g.moveTo(x,y);began=true}else g.lineTo(x,y)}g.lineWidth=2;g.strokeStyle='#67e7ec';g.stroke()}
- g.beginPath();g.setLineDash([4,4]);g.moveTo(a.x,a.toY(0));g.lineTo(a.x+a.pw,a.toY(0));g.strokeStyle='#d8bc8c';g.lineWidth=1;g.stroke();g.setLineDash([]);for(let i=0;i<=4;i++)text(g,`−${12-i*3}s`,a.x+a.pw*i/4,h-9,10,'#99b6cb',i===0?'left':i===4?'right':'center');text(g,'dB',7,16,10,'#a0b8ce')}
-function draw(){drawScene();drawSpectrum();drawPhase();drawHeatmap();drawTrace2();measureText()}
-let runtimeLast=0;
-function loop(now){if(now-lastDraw<45){requestAnimationFrame(loop);return;}lastDraw=now;if(!document.hidden && (now-runtimeLast>1500)){runtimeLast=now;updateDebug();}const dt=Math.min(.075,(now-last)/1000);last=now;if(!s.paused){s.t+=dt;if(s.t-lastSample>=1/15){lastSample=s.t;addSample()} }draw();requestAnimationFrame(loop)}
-function setActive(el,active){el.classList.toggle('active',active);el.setAttribute('aria-pressed',String(active))}
-function wire(){for(const b of $('channels').querySelectorAll('button')){b.onclick=()=>{s.ch=+b.dataset.ch;for(const x of $('channels').querySelectorAll('button'))setActive(x,x===b);snapshots=[];count=0;addSample()}}
- $('personToggle').onclick=()=>{s.person=!s.person;setActive($('personToggle'),s.person);$('personToggle').textContent=s.person?'● Có người':'○ Không có người'};
- $('modeBreathe').onclick=()=>{s.mode='breathe';setActive($('modeBreathe'),true);setActive($('modeWalk'),false)};
- $('modeWalk').onclick=()=>{s.mode='walk';setActive($('modeBreathe'),false);setActive($('modeWalk'),true)};
- const binds=[['breath','bpm','breathOut',v=>v+' lần/phút'],['mm','mm','mmOut',v=>v+' mm'],['wall','wall','wallOut',v=>v+'%'],['noise','noise','noiseOut',v=>fmt(v,1)+'%']];
- for(const [id,key,out,fn] of binds)$(id).oninput=e=>{s[key]=+e.target.value;$(out).textContent=fn(s[key])};
- $('pause').onclick=()=>{s.paused=!s.paused;$('pause').textContent=s.paused?'▶ Tiếp tục':'⏸ Tạm dừng'};
- $('reset').onclick=()=>{Object.assign(s,defaults);snapshots=[];count=0;lastSample=-1;for(const [id,key,out,fn] of binds){$(id).value=s[key];$(out).textContent=fn(s[key])}for(const b of $('channels').querySelectorAll('button'))setActive(b,+b.dataset.ch===6);setActive($('personToggle'),true);$('personToggle').textContent='● Có người';setActive($('modeBreathe'),true);setActive($('modeWalk'),false);$('pause').textContent='⏸ Tạm dừng';addSample()};
- $('spectrum').addEventListener('pointerdown',e=>{const rect=$('spectrum').getBoundingClientRect(),x=e.clientX-rect.left,pw=rect.width-43-14;const ki=Math.round((x-43)/pw*57-28.5);s.k=K.reduce((a,b)=>Math.abs(b-ki)<Math.abs(a-ki)?b:a,7)});
- const scene=$('scene');let dragging=false;scene.addEventListener('pointerdown',e=>{if(!s.person)return;const r=scene.getBoundingClientRect(),m=mapRoom(r.width,r.height),pp=m.p(personPos()),mx=e.clientX-r.left,my=e.clientY-r.top;if(Math.hypot(mx-pp.x,my-pp.y)<55){dragging=true;scene.classList.add('grab');scene.setPointerCapture(e.pointerId)}});
- scene.addEventListener('pointermove',e=>{if(!dragging)return;const r=scene.getBoundingClientRect(),m=mapRoom(r.width,r.height),x=(e.clientX-r.left-m.ox)/m.z,y=(e.clientY-r.top-m.oy)/m.z;s.px=Math.max(1.4,Math.min(6.55,x));s.py=Math.max(.75,Math.min(3.95,y));});
- const end=()=>{dragging=false;scene.classList.remove('grab')};scene.addEventListener('pointerup',end);scene.addEventListener('pointercancel',end);
- }
- wire();addSample();document.body.classList.add('sim-running');window.__csi_running=true;setRuntime('✅ Đang mô phỏng — canvas + JavaScript hoạt động',true);updateDebug();requestAnimationFrame(loop);
+(function () {
+  "use strict";
+
+  // This fallback also works when index.html is opened as a local file.
+  // On GitHub Pages, catalog.json is generated automatically from all HTML files.
+  var fallback = [{
+    path: "wifi-csi-24ghz.html",
+    title: "Wi-Fi CSI 2,4 GHz",
+    description: "Phòng thí nghiệm tương tác về OFDM, multipath và Channel State Information. Di chuyển người, thay đổi kênh Wi-Fi và quan sát CSI.",
+    category: "Mô phỏng khoa học",
+    tags: ["Wi-Fi", "ESP32", "CSI", "OFDM", "RF"],
+    icon: "📡",
+    theme: "cyan",
+    featured: true,
+    order: 1
+  }];
+
+  var pages = fallback;
+  var category = "Tất cả";
+  var searchEl = document.getElementById("search");
+  var clearEl = document.getElementById("clear");
+  var sortEl = document.getElementById("sort");
+  var filtersEl = document.getElementById("filters");
+  var cardsEl = document.getElementById("cards");
+  var emptyEl = document.getElementById("empty");
+  var countEl = document.getElementById("count");
+  var heroCount = document.getElementById("heroCount");
+
+  document.getElementById("year").textContent = String(new Date().getFullYear());
+
+  function fold(v) {
+    return String(v || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").replace(/Đ/g, "D").toLowerCase();
+  }
+
+  // Page links must remain local relative .html paths; never trust arbitrary URLs in a JSON catalog.
+  function validPath(p) {
+    return typeof p === "string" &&
+      /^[a-z0-9][a-z0-9_.\/-]*\.html$/i.test(p) &&
+      p.split("/").every(function (s) { return s !== "." && s !== ".." && s.length > 0; });
+  }
+
+  function normalizePages(rows) {
+    if (!Array.isArray(rows)) return fallback;
+    var seen = new Set();
+    return rows.filter(function (p) {
+      if (!p || !validPath(p.path) || seen.has(p.path)) return false;
+      seen.add(p.path);
+      return true;
+    }).map(function (p) {
+      return {
+        path: p.path,
+        title: String(p.title || p.path).slice(0, 140),
+        description: String(p.description || "Khám phá ứng dụng HTML tương tác.").slice(0, 500),
+        category: String(p.category || "Khác").slice(0, 55),
+        tags: Array.isArray(p.tags) ? p.tags.slice(0, 8).map(function (t) { return String(t).slice(0, 35); }) : [],
+        icon: String(p.icon || "✦").slice(0, 8),
+        theme: ["cyan","violet","emerald","amber","rose"].includes(p.theme) ? p.theme : "cyan",
+        featured: !!p.featured,
+        order: Number.isFinite(Number(p.order)) ? Number(p.order) : 999
+      };
+    });
+  }
+
+  function button(name) {
+    var el = document.createElement("button");
+    el.type = "button";
+    el.className = "filter" + (name === category ? " active" : "");
+    el.textContent = name;
+    el.setAttribute("aria-pressed", String(name === category));
+    el.addEventListener("click", function () {
+      category = name;
+      renderFilters();
+      render();
+    });
+    return el;
+  }
+
+  function renderFilters() {
+    var names = ["Tất cả"];
+    pages.forEach(function (p) {
+      if (!names.includes(p.category)) names.push(p.category);
+    });
+    if (!names.includes(category)) category = "Tất cả";
+    filtersEl.replaceChildren();
+    names.forEach(function (n) { filtersEl.appendChild(button(n)); });
+  }
+
+  function createCard(p) {
+    var node = document.getElementById("page-card").content.firstElementChild.cloneNode(true);
+    node.href = "./" + p.path.split("/").map(encodeURIComponent).join("/");
+    node.setAttribute("aria-label", "Mở trang " + p.title);
+    node.querySelector("[data-title]").textContent = p.title;
+    node.querySelector("[data-desc]").textContent = p.description;
+    node.querySelector("[data-icon]").textContent = p.icon;
+    node.querySelector("[data-type]").textContent = p.category;
+    node.querySelector("[data-path]").textContent = p.path;
+    node.querySelector(".art").classList.add(p.theme);
+    var tags = node.querySelector("[data-tags]");
+    p.tags.forEach(function (t) {
+      var tag = document.createElement("span");
+      tag.textContent = t;
+      tags.appendChild(tag);
+    });
+    return node;
+  }
+
+  function createPlaceholder() {
+    var node = document.createElement("div");
+    node.className = "placeholder";
+    node.innerHTML = '<div class="placeholder-icon" aria-hidden="true">＋</div><h3>Không gian cho ý tưởng tiếp theo</h3><p>Mỗi khi thêm một file <code>.html</code> vào repo, hệ thống sẽ tự nhận diện và hiển thị ở đây.</p><a href="https://github.com/bdx0/html" target="_blank" rel="noopener noreferrer">Khám phá repository ↗</a>';
+    return node;
+  }
+
+  function render() {
+    var q = fold(searchEl.value.trim());
+    clearEl.hidden = !searchEl.value;
+    var visible = pages.filter(function (p) {
+      if (category !== "Tất cả" && category !== p.category) return false;
+      var haystack = fold([p.title, p.description, p.category].concat(p.tags).join(" "));
+      return !q || haystack.includes(q);
+    });
+    visible.sort(function (a, b) {
+      if (sortEl.value === "title") return a.title.localeCompare(b.title, "vi");
+      return Number(b.featured) - Number(a.featured) || a.order - b.order || a.title.localeCompare(b.title, "vi");
+    });
+    cardsEl.replaceChildren();
+    visible.forEach(function (p) { cardsEl.appendChild(createCard(p)); });
+    if (!q && category === "Tất cả") cardsEl.appendChild(createPlaceholder());
+    emptyEl.hidden = visible.length !== 0;
+    countEl.textContent = "Hiển thị " + visible.length + " / " + pages.length + " trang";
+    heroCount.textContent = String(pages.length).padStart(2,"0");
+  }
+
+  searchEl.addEventListener("input", render);
+  searchEl.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") {
+      searchEl.value = "";
+      render();
+      searchEl.blur();
+    }
+  });
+  clearEl.addEventListener("click", function () { searchEl.value = ""; searchEl.focus(); render(); });
+  sortEl.addEventListener("change", render);
+
+  renderFilters();
+  render();
+  if (typeof fetch === "function") {
+    fetch("./catalog.json", {cache:"no-store"}).then(function (r) {
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      return r.json();
+    }).then(function (data) {
+      if (!data || !Array.isArray(data.pages)) throw new Error("Invalid catalog");
+      pages = normalizePages(data.pages);
+      renderFilters();
+      render();
+    }).catch(function (err) {
+      console.info("Catalog not available; using built-in demo listing:", err.message);
+    });
+  }
 })();
 </script>
-</body></html>
+<noscript>
+  <p style="margin:20px auto;max-width:1000px;padding:12px;color:#e8f9ff">JavaScript đang tắt. Bạn vẫn có thể <a href="./wifi-csi-24ghz.html" style="text-decoration:underline">mở mô phỏng Wi-Fi CSI 2,4 GHz</a>.</p>
+</noscript>
+</body>
+</html>
