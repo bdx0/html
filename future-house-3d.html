@@ -108,7 +108,7 @@ $('retry').onclick=function(){location.reload();};
 window.addEventListener('error',function(e){console.error('NEXUS runtime error',e.error||e.message);if(!renderer){fail('Lỗi khởi tạo: '+(e.message||'không rõ nguyên nhân')+'.');}else{status.textContent='Đã gặp lỗi: '+String(e.message||'unknown');$('debug').textContent='Runtime error: '+String(e.message||'unknown');$('debug').classList.add('show');}});
 window.addEventListener('unhandledrejection',function(e){if(!renderer){fail('Lỗi tải mô hình: '+String(e.reason||'unknown')+'.');}});
 if(!window.THREE){fail('Không tải được Three.js nội bộ (./assets/three.min.js). Vui lòng tải lại sau khi GitHub Pages hoàn thành triển khai.');return;}
-try{init();}catch(e){console.error(e);fail('Không thể hiển thị 3D: '+e.message);}
+// Initialize only after all configuration objects have been assigned.
 function mat(color,rough,metal){return new THREE.MeshStandardMaterial({color:color,roughness:rough===undefined?.7:rough,metalness:metal||0});}
 function box(parent,x,y,z,w,h,d,material,cast){var o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),material);o.position.set(x,y,z);o.castShadow=cast!==false;o.receiveShadow=true;parent.add(o);return o;}
 function sphere(parent,x,y,z,r,material,segments){var o=new THREE.Mesh(new THREE.SphereGeometry(r,segments||10,8),material);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;parent.add(o);return o;}
@@ -354,9 +354,10 @@ function animate(now){
  frames++;frameCount+=dt;if(frameCount>=1000){fps=Math.round(frames*1000/frameCount);frames=0;frameCount=0;}
  if(settings.debug&&frames%12===0){
  var ctx=renderer.getContext();var glType=(typeof WebGL2RenderingContext!=='undefined'&&ctx instanceof WebGL2RenderingContext)?'WebGL 2':'WebGL 1';
- $('debug').textContent='NEXUS / DEBUG 3D\n'+glType+' | Three.js r'+THREE.REVISION+'\nFPS: '+fps+' (ước lượng)\nViewport: '+host.clientWidth+' × '+host.clientHeight+'\nDPR: '+renderer.getPixelRatio().toFixed(2)+'\nTriangles: '+renderer.info.render.triangles+'\nDraw calls: '+renderer.info.render.calls+'\nCamera radius: '+current.radius.toFixed(1)+'\nPhi: '+current.phi.toFixed(2)+'; theta: '+current.theta.toFixed(2)+'\nDay/night: '+(night?'night':'day')+'\nExplode: '+settings.explode+' / Xray: '+settings.xray+'\nAsset ngoài: chỉ Three.js CDN\nGeometry: tạo trực tiếp trong HTML';
+ $('debug').textContent='NEXUS / DEBUG 3D\n'+glType+' | Three.js r'+THREE.REVISION+'\nFPS: '+fps+' (ước lượng)\nViewport: '+host.clientWidth+' × '+host.clientHeight+'\nDPR: '+renderer.getPixelRatio().toFixed(2)+'\nTriangles: '+renderer.info.render.triangles+'\nDraw calls: '+renderer.info.render.calls+'\nCamera radius: '+current.radius.toFixed(1)+'\nPhi: '+current.phi.toFixed(2)+'; theta: '+current.theta.toFixed(2)+'\nDay/night: '+(night?'night':'day')+'\nExplode: '+settings.explode+' / Xray: '+settings.xray+'\nThree.js: tải từ assets/three.min.js\nGeometry: tạo trực tiếp trong HTML';
  }
 }
+try{init();}catch(e){console.error(e);fail('Không thể hiển thị 3D: '+e.message);}
 })();
 </script>
 </body>
