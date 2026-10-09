@@ -1,4 +1,4 @@
-name: Deploy Wi-Fi CSI to GitHub Pages
+name: Deploy HTML Lab to GitHub Pages
 
 on:
   push:
@@ -27,11 +27,15 @@ jobs:
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
 
-      - name: Prepare static HTML
+      - name: Prepare static website and page catalog
         run: |
+          set -euo pipefail
           mkdir -p _site
-          cp index.html wifi-csi-24ghz.html _site/
+          rsync -a --exclude='.git/' --exclude='.github/' --exclude='_site/' --exclude='scripts/' --exclude='_catalog.json' --exclude='README.md' ./ _site/
+          python3 scripts/build_catalog.py --root . --output _site/catalog.json
           touch _site/.nojekyll
+          test -s _site/index.html
+          test -s _site/catalog.json
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
