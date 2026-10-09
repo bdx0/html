@@ -1,0 +1,597 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"><title>WareTrack — Logistics World v4</title>
+<style>
+:root{--blue:#286aff;--blue2:#3779e9;--ink:#15243d;--muted:#8b98ad;--line:#e9edf5;--green:#2eac70}*{box-sizing:border-box}body{margin:0;color:var(--ink);background:#eaf0ff;font:11px/1.3 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Arial,sans-serif}button,input,select{font:inherit}button{cursor:pointer}button:focus-visible,select:focus-visible{outline:2px solid #2b76ff;outline-offset:2px}.app{min-height:100vh;position:relative;overflow:hidden}.bar{height:49px;background:#fff;border-bottom:1px solid #e8ecf3;display:flex;align-items:center;padding:0 32px;gap:28px;position:relative;z-index:20;box-shadow:0 1px 12px #60739b10}.brand{display:flex;align-items:center;gap:10px;width:126px;flex-shrink:0;font-size:18px;font-weight:850;letter-spacing:-.8px}.hexicon{width:25px;height:26px;border-radius:7px;color:#fff;background:linear-gradient(145deg,#7da8ff,#2053dc);display:grid;place-items:center;box-shadow:0 4px 9px #2d65df30;font-size:16px}.search{height:32px;width:min(280px,33vw);display:flex;align-items:center;gap:8px;border:1px solid #e3e8f1;background:#fafbff;color:#9eabbc;border-radius:7px;padding:0 12px;margin-left:auto}.search input{width:100%;background:transparent;border:0;outline:0;color:#4c5e78;font-size:10px}.slash{border:1px solid #e1e5ee;padding:1px 4px;border-radius:4px;color:#b0bac9}.site-select{min-width:168px;display:flex;align-items:center;gap:9px;border:1px solid #e6ebf2;border-radius:7px;background:#fff;height:34px;padding:3px 10px 3px 4px}.site-sticker{display:flex;align-items:center;justify-content:center;background:#327afa;color:#fff;font-size:8px;font-weight:850;width:30px;height:25px;border-radius:5px}.site-select strong{display:block;font-size:10px;white-space:nowrap}.site-select small{color:#9ba8b8;display:block;font-size:9px}.site-select .chev{margin-left:auto;color:#8a99ac}.livestatus{border-radius:14px;padding:7px 10px;white-space:nowrap;background:#e8f9f1;color:#208b61;font-weight:700}.dot{display:inline-block;background:#22c57b;width:6px;height:6px;border-radius:50%;margin-right:5px;box-shadow:0 0 0 3px #c3efdb}.bell{border:0;background:none;font-size:17px;color:#657890;position:relative}.bell:after{content:'';height:6px;width:6px;position:absolute;top:3px;right:3px;background:#f44e61;border:1px solid white;border-radius:50%}.profile{height:33px;display:flex;align-items:center;gap:10px}.face{width:31px;height:31px;display:grid;place-items:center;border-radius:50%;background:#e5eaf5;font-size:18px;overflow:hidden}.profile strong{display:block;font-size:10px}.profile small{display:block;font-size:9px;color:#9ba7ba}.profile .chev{margin-left:7px;color:#97a4b4}
+.stage{height:calc(100vh - 49px);min-height:515px;position:relative;background:linear-gradient(#eaf0fe,#d9e4fa)}.scene-wrap{position:absolute;inset:0;overflow:hidden;cursor:grab}.scene-wrap.drag{cursor:grabbing}.scene-wrap canvas{display:block;position:absolute;inset:0;width:100%;height:100%;touch-action:none}#scene{z-index:2}#glscene{z-index:1;pointer-events:none}.fade-bottom{position:absolute;inset:auto 0 0 0;height:55px;pointer-events:none;background:linear-gradient(transparent,#d6e1f82b)}.floating{position:absolute;z-index:4}.kpis{top:7px;left:13px;display:flex;gap:10px}.kpi{background:#ffffffed;box-shadow:0 9px 23px #7e96c036,0 1px 3px #a2afd026;border:1px solid #eef2fb;border-radius:12px;min-width:156px;height:50px;padding:8px 10px;display:flex;align-items:center;gap:10px;backdrop-filter:blur(5px)}.kpi-icon{height:30px;width:30px;display:grid;place-items:center;border-radius:9px;background:#e7eeff;color:#2870fa;font-size:18px;box-shadow:inset 0 0 0 1px #cbdcff}.kpi-label{font-size:9px;font-weight:650;color:#687a93;white-space:nowrap}.kpi-value{font-size:19px;font-weight:850;letter-spacing:-.5px;color:#132741;line-height:1.07}.kpi-value em{font-size:10px;font-style:normal;color:#24b476;font-weight:750;margin-left:5px;letter-spacing:0}.kpi-small{font-size:8px;color:#97a3b7}.tools{top:11px;right:264px;display:flex;flex-direction:column;overflow:hidden;border-radius:9px;border:1px solid #e5eaf6;background:#fff;box-shadow:0 7px 24px #8296bd40}.tools button{height:30px;width:28px;color:#53667d;background:#fff;border:0;border-bottom:1px solid #edf0f6;font-size:19px;line-height:1}.tools button:last-child{border:0}.tools button:hover{background:#eff5ff;color:var(--blue)}
+.panel{background:#ffffffed;border:1px solid #e8edf5;box-shadow:0 13px 34px #6d8cb82e,0 2px 5px #667c9e12;backdrop-filter:blur(8px);border-radius:11px}.inspect{top:7px;right:14px;width:237px;padding:12px 12px 10px}.inspect-top{display:flex;gap:9px;align-items:center;border-bottom:1px solid #edf1f7;padding-bottom:9px}.warehouse-icon{background:#e9efff;border-radius:8px;width:34px;height:34px;display:grid;place-items:center;font-size:20px}.inspect-over{font-size:8px;color:#4278e9;letter-spacing:.4px;font-weight:850}.inspect-name{font-weight:850;font-size:12px;line-height:1.25}.inspect-place{font-size:9px;color:#8e9cae}.target{margin-left:auto;border-radius:50%;width:22px;height:22px;background:#f6f9ff;border:1px solid #e8edf8;color:#7c90ad;font-size:14px}.operating{display:flex;gap:4px;align-items:center;margin:10px 0 9px;font-size:9px;color:#7d8fa6}.operating span{font-size:9px;padding:4px 8px;background:#d7f9e5;color:#239a61;border-radius:5px;font-weight:750}.smallmetrics{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:8px}.metric-box{padding:8px 9px;background:#f3f6fb;border:1px solid #edf0f7;border-radius:6px}.metric-box label{display:block;font-size:8px;color:#8899b0}.metric-box strong{font-size:13px}.progress{margin-top:4px;height:4px;border-radius:8px;background:#d9e1ef;overflow:hidden}.progress b{display:block;height:100%;background:#2cb978}.sect{font-size:9px;font-weight:850;margin:10px 0 5px}.inventory-row{display:flex;gap:8px;align-items:center;border-bottom:1px solid #ecf0f5;height:25px;font-size:9px}.inventory-row:last-of-type{border-bottom:0}.inventory-row .ico{font-size:14px;width:17px}.inventory-row .item{flex:1;min-width:0;color:#5a6880;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.inventory-row b{font-size:10px}.status{font-size:8px;border-radius:5px;padding:3px 5px;background:#dcf8e5;color:#298c54;margin-left:4px;white-space:nowrap}.status.warn{background:#fff0d3;color:#b97a1f}.fleet{margin-top:10px}.fleet-label{display:flex;justify-content:space-between;align-items:center;font-size:9px}.fleet-label small{color:#8594aa}.forklift-line{display:flex;align-items:center;gap:8px;margin-top:6px;font-size:9px;color:#596c87}.forklift-line .progress{width:60px;margin-left:auto;height:4px}
+.ship{left:12px;bottom:15px;width:610px;height:83px;display:flex;align-items:stretch;padding:10px 13px;gap:12px}.ship-main{width:403px;min-width:0}.ship-title{display:flex;justify-content:space-between;align-items:center;font-weight:850;font-size:11px}.ship-title small{color:#8da0b8;font-size:8px;font-weight:600}.timeline{display:flex;align-items:center;justify-content:space-between;margin-top:8px;position:relative}.timeline:before{content:'';position:absolute;left:22px;right:24px;top:10px;height:3px;background:linear-gradient(90deg,#2f78fc 52%,#dee5f1 52%);z-index:0}.step{min-width:53px;display:flex;flex-direction:column;align-items:center;z-index:1;font-size:8px;color:#50617b;text-align:center;gap:3px}.step i{font-style:normal;font-size:11px;display:grid;place-items:center;width:23px;height:23px;border-radius:50%;background:#e4e8ee;color:#98a3ae;box-shadow:0 0 0 4px #ffffffbd}.step.done i{background:#2e77ff;color:#fff}.step strong{font-size:8px;white-space:nowrap}.step small{color:#a5afbd;font-size:7px}.ship-detail{margin-left:auto;min-width:164px;border-radius:8px;padding:10px 9px;background:linear-gradient(135deg,#eef5ff,#f8fbff);display:flex;gap:7px;align-items:center}.truck-glyph{font-size:29px}.ship-detail strong{font-size:10px}.ship-detail small{display:block;color:#9ba8b9;font-size:8px}.ship-detail em{font-size:9px;font-style:normal;color:#19975a;background:#d9f5e4;border-radius:5px;padding:3px 5px}.ship-detail .arrival{display:block;color:#596f97;margin-top:3px;font-size:8px}.dockpanel{right:14px;bottom:15px;width:300px;height:101px;padding:9px 13px 8px}.tabs{display:flex;gap:3px;background:#edf2fb;border-radius:7px;padding:3px;align-items:center}.tabs button{border:0;background:transparent;color:#647893;font-size:9px;padding:5px 7px;border-radius:5px}.tabs button.active{background:#fff;box-shadow:0 1px 4px #8090ab24;color:#2b66e5;font-weight:750}.docksite{margin-left:auto;font-size:9px;color:#778a9e}.dockrow{display:grid;grid-template-columns:40px 1fr 60px 28px;align-items:center;gap:4px;height:25px;border-bottom:1px solid #eaf0f6;color:#556981;font-size:9px}.dockrow:last-child{border:0}.dockrow b{font-size:9px}.dockrow small{display:block;color:#98a9bf;font-size:7px}.dockrow .action{background:#dff6e6;color:#23995c;padding:3px 4px;text-align:center;border-radius:4px;font-size:8px}.dockrow .action.wait{background:#f1f3f8;color:#8291a1}.dockrow .action.move{background:#e7f0ff;color:#3374db}.dockrow .right{font-size:8px;color:#8b9ab0;text-align:right}
+.legend{left:16px;bottom:110px;background:#ffffffe8;border:1px solid #e8eaf2;box-shadow:0 5px 15px #798ab42c;padding:6px 9px;border-radius:8px;color:#667892;font-size:9px}.legend span{color:#276cf0;font-weight:800}.toast{left:50%;top:68px;transform:translateX(-50%);background:#ffffffea;padding:8px 13px;border-radius:8px;box-shadow:0 6px 18px #8194b329;display:none;color:#4c6287}
+@media(max-width:950px){.search{width:min(210px,30vw)}.bar{padding:0 12px;gap:12px}.profile small,.profile .chev{display:none}.kpis{gap:6px}.kpi{min-width:128px;padding:6px}.kpi-value{font-size:16px}.ship{width:55%}.ship-detail{display:none}.ship-main{width:100%}.inspect{right:9px}.dockpanel{right:9px;width:275px}.tools{right:257px}}
+@media(max-width:680px){.bar{height:53px;gap:8px}.brand{font-size:16px;width:auto}.search,.profile strong,.profile small,.bell,.livestatus{display:none}.site-select{margin-left:auto;min-width:160px}.stage{height:100vh;min-height:790px}.kpis{top:9px;left:8px;right:8px;gap:6px}.kpi{min-width:0;flex:1;height:54px;gap:5px;padding:5px}.kpi-icon{width:22px;height:22px;font-size:14px}.kpi-label{font-size:7px}.kpi-value{font-size:15px}.kpi-value em{font-size:7px;margin-left:1px}.kpi-small{font-size:7px}.inspect{top:73px;right:8px;width:192px;padding:8px}.smallmetrics{gap:4px}.metric-box{padding:5px}.inventory-row{height:23px}.tools{right:auto;left:8px;top:79px}.legend{bottom:340px;left:8px}.ship{bottom:141px;left:8px;right:8px;width:auto;height:103px}.ship-main{width:100%}.dockpanel{bottom:23px;left:8px;right:8px;width:auto;height:108px}.inspect-over{font-size:7px}.inspect-name{font-size:11px}.ship-title{font-size:11px}}
+
+@media(min-width:1200px){.kpis{left:24px;top:18px;gap:13px}.kpi{min-width:175px;height:58px}.inspect{width:282px;right:20px;top:18px;padding:16px}.tools{right:314px;top:20px}.ship{left:23px;bottom:19px;width:650px;height:92px}.dockpanel{right:20px;bottom:19px;width:332px;height:110px}.legend{left:23px;bottom:123px}}
+@media(max-width:680px){.legend{bottom:188px;left:8px;font-size:8px}.scene-wrap{touch-action:none}.kpis{top:8px}.inspect{top:73px}.tools{top:75px}.ship{bottom:83px}.dockpanel{bottom:4px}}
+
+/* On phones the operational dashboard becomes a scrollable layout, keeping the 3D scene unobstructed. */
+@media(max-width:680px){
+.stage{height:1125px;min-height:1125px;overflow:visible}
+.scene-wrap{top:64px;bottom:auto;height:452px;overflow:hidden;background:#e6eefd}
+.kpis{top:8px;left:8px;right:8px}
+.tools{top:83px;left:9px}
+.legend{top:490px;bottom:auto;left:9px;right:auto;max-width:calc(100% - 18px)}
+.inspect{top:534px;left:9px;right:9px;width:auto;max-height:285px;overflow:auto;padding:12px}
+.inspect-top{padding-bottom:9px}.smallmetrics{grid-template-columns:repeat(4,1fr)}
+.metric-box{padding:7px 5px}.metric-box label{font-size:7px}.metric-box strong{font-size:11px}
+.inventory-row{height:23px}.fleet{margin-top:6px}
+.ship{top:836px;bottom:auto;left:9px;right:9px;height:107px;padding:9px 12px}
+.dockpanel{top:955px;bottom:auto;left:9px;right:9px;height:113px}
+}
+
+/* Independent always-available 3D diagnostics. */
+#wt-debug-button{position:fixed;z-index:10003;bottom:17px;left:17px;background:#192b4b;color:#fff;border:1px solid #77a4fa;box-shadow:0 8px 26px #233b6680;border-radius:12px;padding:10px 14px;font:700 12px system-ui;letter-spacing:.1px;display:flex;gap:7px;align-items:center;cursor:pointer}
+#wt-debug-button.has-error{background:#963241;border-color:#ff9da8}
+#wt-debug-button .pulse{width:8px;height:8px;border-radius:50%;background:#53dfa9;box-shadow:0 0 0 3px #45d2a533}
+#wt-debug-button.has-error .pulse{background:#ffe08c}
+#wt-debug-panel{position:fixed;z-index:10004;left:15px;bottom:66px;width:min(460px,calc(100vw - 30px));max-height:min(710px,calc(100dvh - 86px));overflow:hidden;display:none;flex-direction:column;background:#101c32;color:#ecf4ff;border:1px solid #40587f;border-radius:14px;box-shadow:0 20px 70px #10214099;font:12px/1.48 ui-monospace,Consolas,Monaco,monospace;letter-spacing:0}
+#wt-debug-panel.open{display:flex}
+#wt-debug-panel *{box-sizing:border-box}
+#wt-debug-panel button{font:600 11px system-ui;min-height:30px;cursor:pointer;border:1px solid #51698e;border-radius:7px;color:#e4efff;background:#263955;padding:6px 8px}
+#wt-debug-panel button:hover{background:#3a5274}
+.wt-head{display:flex;align-items:center;gap:8px;padding:12px 14px;background:#1a2c49;border-bottom:1px solid #304766}
+.wt-head strong{font:800 14px system-ui;color:#f3f8ff}
+.wt-head small{font:10px system-ui;color:#b0c1d9}
+.wt-head .wt-close{margin-left:auto;font-size:18px;line-height:16px;min-width:28px;padding:2px}
+.wt-body{padding:12px 14px 14px;overflow:auto;overscroll-behavior:contain}
+.wt-intro{color:#bbcce4;margin:0 0 8px;font:11px/1.5 system-ui}
+.wt-status{padding:9px 11px;background:#253c58;border-left:3px solid #51d5a2;border-radius:6px;white-space:normal;margin-bottom:10px;font:600 11px/1.5 system-ui}
+.wt-status.err{border-color:#fb9b72;background:#543342}
+.wt-grid{display:grid;grid-template-columns:123px 1fr;gap:0;font-size:11px;border:1px solid #314765;border-radius:8px;overflow:hidden}
+.wt-grid > div{padding:5px 8px;border-bottom:1px solid #304663;min-width:0;overflow-wrap:anywhere}
+.wt-grid >div:nth-child(odd){background:#192b46;color:#91a9cd}
+.wt-grid >div:nth-child(even){background:#12213a;color:#f0f7ff}
+.wt-grid >div:nth-last-child(-n + 2){border-bottom:0}
+.wt-section{font:800 11px system-ui;color:#dbe9ff;margin:14px 0 7px}
+.wt-actions{display:grid;grid-template-columns:repeat(2,1fr);gap:7px}
+#wt-debug-panel .wt-pri{background:#3377e5;border-color:#5593ff}
+.wt-log{white-space:pre-wrap;overflow-wrap:anywhere;padding:9px;background:#09182a;color:#c6d8ef;border:1px solid #304663;border-radius:7px;min-height:68px;max-height:120px;overflow:auto;font:10px/1.5 ui-monospace,monospace}
+.wt-foot{color:#92adc9;font:10px/1.5 system-ui;margin:9px 0 0}
+@media(max-width:680px){#wt-debug-button{bottom:8px;left:8px;padding:8px 10px}#wt-debug-panel{left:8px;bottom:51px;width:calc(100vw - 16px);max-height:74dvh}.wt-grid{grid-template-columns:105px 1fr}}
+
+/* ==================== SPA / TOUCH FIX v2 ==================== */
+html,body{width:100%;height:100%;height:100dvh;margin:0;overflow:hidden;overscroll-behavior:none}
+body{position:fixed;inset:0;-webkit-text-size-adjust:100%}
+.app{height:100%;height:100dvh;min-height:0;display:flex;flex-direction:column;overflow:hidden}
+.bar{flex:0 0 49px;min-height:0}
+.stage{flex:1 1 auto;height:auto;min-height:0;overflow:hidden}
+.scene-wrap,.scene-wrap canvas{touch-action:none;overscroll-behavior:none;-webkit-user-select:none;user-select:none}
+button,summary,input,select{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+/* A native HTML details/summary pair opens diagnostics even when JS fails. */
+#wt-debug-toggle{position:fixed;bottom:calc(15px + env(safe-area-inset-bottom,0px));left:16px;z-index:10003;display:block;margin:0;padding:0;max-width:calc(100vw - 20px)}
+#wt-debug-button{position:relative;left:auto;bottom:auto;display:flex;list-style:none;touch-action:manipulation;align-items:center;min-height:42px;user-select:none;-webkit-user-select:none}
+#wt-debug-button::-webkit-details-marker{display:none}
+#wt-debug-button::marker{content:''}
+#wt-debug-panel{position:absolute;left:0;bottom:calc(100% + 9px);width:min(460px,calc(100vw - 28px));max-height:min(710px,calc(100dvh - 110px));overscroll-behavior:contain}
+#wt-debug-toggle[open] #wt-debug-panel{display:flex}
+#wt-debug-panel .wt-body{touch-action:pan-y;overflow-y:auto;-webkit-overflow-scrolling:touch}
+#wt-debug-toggle[open] #wt-debug-button{background:#234d8b}
+#wt-debug-manual-report{display:none;width:100%;margin-top:8px;min-height:115px;padding:9px;background:#061528;color:#daecff;border:1px solid #61789a;border-radius:7px;font:10px/1.5 monospace;touch-action:pan-y;user-select:text;-webkit-user-select:text}
+.mobile-nav{display:none}
+@media(max-width:680px){
+ .bar{flex-basis:53px}
+ .stage{height:auto;min-height:0;overflow:hidden}
+ .scene-wrap{position:absolute;inset:0;top:0;bottom:0;height:100%;background:#e6eefd;touch-action:none}
+ .kpis{top:8px;left:7px;right:7px;gap:5px}
+ .kpi{min-width:0;height:51px;padding:5px;flex:1}
+ .tools{top:73px;left:8px;right:auto}
+ .legend{top:auto;bottom:calc(66px + env(safe-area-inset-bottom,0px));left:auto;right:8px;max-width:calc(100% - 136px);font-size:8px}
+ .inspect,.ship,.dockpanel{display:none;position:absolute;top:auto;bottom:calc(59px + env(safe-area-inset-bottom,0px));left:8px;right:8px;width:auto;z-index:15;max-height:min(53dvh,435px);overflow:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;background:#fffffffa;box-shadow:0 10px 35px #1a3e7a47}
+ .inspect.mobile-open,.ship.mobile-open,.dockpanel.mobile-open{display:block}
+ .inspect.mobile-open{padding:11px;max-height:min(57dvh,465px)}
+ .ship.mobile-open{height:115px;padding:11px;display:flex}
+ .ship-main{width:100%}
+ .dockpanel.mobile-open{height:143px;padding:11px}
+ .smallmetrics{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .mobile-nav{position:absolute;left:0;right:0;bottom:0;z-index:16;display:flex;height:calc(56px + env(safe-area-inset-bottom,0px));padding:5px 8px calc(5px + env(safe-area-inset-bottom,0px));gap:7px;background:#fffffff5;border-top:1px solid #d6dfef;box-shadow:0 -7px 24px #53678828}
+ .mobile-nav button{flex:1;min-width:0;padding:6px 3px;border:1px solid #e5eafa;background:#f4f7fe;color:#61718d;border-radius:9px;font-weight:750;font-size:11px}
+ .mobile-nav button.active{background:#2e70f0;border-color:#2e70f0;color:white}
+ #wt-debug-toggle{left:8px;bottom:calc(69px + env(safe-area-inset-bottom,0px))}
+ #wt-debug-button{min-height:38px;padding:8px 11px}
+ #wt-debug-panel{left:0;bottom:calc(100% + 9px);width:calc(100vw - 16px);max-height:calc(100dvh - 160px)}
+ #wt-debug-panel .wt-grid{grid-template-columns:108px 1fr}
+}
+
+/* Logistics World v4: interactive interiors, rack locations, bounded zoom, diagnostic map */
+.worldbar{position:absolute;z-index:14;top:91px;left:20px;display:flex;gap:7px;flex-wrap:wrap;max-width:calc(100% - 350px);pointer-events:auto}
+.worldbar button{border:1px solid #d8e4f5;background:#ffffffea;color:#315478;font-weight:750;border-radius:9px;padding:7px 10px;box-shadow:0 5px 16px #56709a1c;cursor:pointer}
+.worldbar button.active{color:#fff;background:#326ff0;border-color:#326ff0}
+.worldbar .world-caption{display:flex;align-items:center;gap:7px;border:1px solid #d4e0f4;background:#ffffffda;color:#536982;font-weight:700;border-radius:9px;padding:7px 10px}
+.worldbar .world-caption b{color:#2874e9}.worldbar .world-caption em{font-size:9px;color:#a4afbf;font-style:normal}
+.worldbar button:hover{border-color:#76a6ef}
+.world-minimap{position:absolute;right:20px;bottom:148px;z-index:14;width:232px;padding:10px 11px 8px;background:#fffffff0;border:1px solid #dbe6f6;border-radius:13px;box-shadow:0 8px 30px #526c992c;backdrop-filter:blur(9px)}
+.world-mini-head{display:flex;justify-content:space-between;color:#476080;font-size:10px;font-weight:850;margin-bottom:6px}.world-mini-head span{color:#7f92ae;font-size:9px}
+#worldMap{width:100%;height:112px;display:block;background:#eaf1fb;border:1px solid #e0e8f3;border-radius:7px;touch-action:none;cursor:crosshair}
+.world-mini-foot{display:flex;justify-content:space-between;margin-top:6px;color:#738ba9;font-size:9px}
+.world-stat{position:absolute;bottom:148px;left:22px;z-index:13;display:flex;align-items:center;gap:7px;color:#667da1;font-size:10px;font-weight:750;border-radius:8px;background:#fffffff0;padding:7px 10px;border:1px solid #e2e9f5;box-shadow:0 5px 20px #6d87ac1c}
+.world-stat i{display:inline-block;width:7px;height:7px;background:#25b879;border-radius:50%;box-shadow:0 0 0 3px #25b87920}
+.world-event{position:absolute;left:22px;bottom:191px;z-index:13;max-width:265px;background:#ffffffdb;border-radius:10px;border:1px solid #e0eafa;box-shadow:0 6px 20px #61789e1a;padding:8px 11px;color:#7d8fa8;font-size:9px;pointer-events:none}
+.world-event b{display:block;font-size:10px;color:#263c60;margin-bottom:2px}
+@media(max-width:1199px){.worldbar{top:84px;max-width:calc(100% - 290px)}.world-minimap{width:180px;bottom:151px;right:9px}#worldMap{height:94px}.world-stat{bottom:121px}.world-event{display:none}}
+@media(max-width:820px){.worldbar{top:69px;left:9px;right:9px;max-width:none;gap:5px}.worldbar button{font-size:10px;padding:7px 8px}.worldbar .world-caption{display:none}.world-minimap{bottom:calc(71px + env(safe-area-inset-bottom,0px));right:9px;width:138px;padding:6px}.world-mini-head{font-size:9px;margin-bottom:3px}.world-mini-head span,.world-mini-foot{display:none}#worldMap{height:82px}.world-stat{bottom:calc(73px + env(safe-area-inset-bottom,0px));left:9px;max-width:calc(100% - 160px);font-size:9px;padding:5px 7px}.world-event{display:none}}
+@media(max-width:680px){.worldbar{top:70px;left:9px;right:auto;width:calc(100% - 18px)}.worldbar button{border-radius:7px;font-size:9px;padding:6px 7px}.tools{top:112px}.world-stat{left:10px;bottom:calc(116px + env(safe-area-inset-bottom,0px))}.world-minimap{bottom:calc(116px + env(safe-area-inset-bottom,0px))}.legend{display:none}.scene-wrap{touch-action:none}.site-select{min-width:139px}.site-select strong{font-size:10px}}
+@media(max-width:380px){.worldbar button{font-size:8px;padding:6px 5px}.world-minimap{width:120px}#worldMap{height:68px}}
+
+
+.world-detail{padding:7px 9px;margin:9px 0 8px;background:#f1f6ff;border:1px solid #e0eaff;border-radius:9px;color:#405a7b;font-size:10px;line-height:1.6}.world-detail-head{font-size:10px;font-weight:850;color:#194995;display:flex;align-items:center;justify-content:space-between}.world-detail-head small{font-size:8px;color:#91a4bc;font-weight:600}.world-detail-data{display:grid;grid-template-columns:1fr 1fr;gap:3px 9px;margin-top:5px}.world-detail-data div{min-width:0}.world-detail-data label{display:block;font-size:9px;color:#879bb4}.world-detail-data b{font-size:10px;color:#284c79}.world-detail footer{margin-top:5px;color:#8fa0b7;font-size:8px;border-top:1px solid #e0eafd;padding-top:4px}.inspect{max-height:calc(100% - 110px);overflow-y:auto}.inspect::-webkit-scrollbar{width:4px}.inspect::-webkit-scrollbar-thumb{background:#d1def1;border-radius:8px}
+/* v4 warehouse explorer */
+.bin-panel{position:absolute;z-index:24;top:151px;left:18px;width:310px;max-height:min(64dvh,560px);display:flex;flex-direction:column;background:#fffffff5;border:1px solid #d6e5fa;border-radius:14px;box-shadow:0 18px 45px #32518845;color:#264466;overflow:hidden;backdrop-filter:blur(12px)}
+.bin-panel[hidden]{display:none}.bin-head{padding:11px 12px 8px;border-bottom:1px solid #e0eafa;display:flex;justify-content:space-between;align-items:flex-start;gap:8px}.bin-head strong{font-size:13px}.bin-head p{margin:4px 0 0;color:#7085a1;font-size:10px}.bin-head button{border:1px solid #dbe5f4;border-radius:8px;background:#fff;padding:6px 9px;font-size:13px}.bin-toolbar{display:flex;gap:7px;align-items:center;padding:9px 12px;border-bottom:1px solid #e8eff7}.bin-toolbar select{padding:7px;border-radius:7px;border:1px solid #cbd9ee;background:#fff;color:#2d4b70;min-width:0;flex:1}.bin-toolbar span{font-size:10px;color:#72869f;white-space:nowrap}.bin-scroll{overflow:auto;padding:9px 10px 12px;overscroll-behavior:contain;touch-action:pan-y}.bin-section{font-weight:800;color:#496586;font-size:10px;padding:6px 3px}.bin-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}.bin-cell{font-size:9px!important;line-height:1.4;text-align:left;border:1px solid #cdddf1;background:#e9f4ff;color:#29527d;border-radius:7px;padding:7px 6px;min-width:0;touch-action:manipulation}.bin-cell b{font-size:9px;display:block}.bin-cell small{font-size:8px;color:#758da8}.bin-cell.empty{background:#f4f6fa;border-color:#e1e5ee;color:#8ba0b5}.bin-cell.low{background:#fff4dd;border-color:#f3d39e}.bin-cell.selected{outline:2px solid #286aff;outline-offset:1px}.bin-key{display:flex;gap:10px;padding:8px 11px;border-top:1px solid #e3ecf7;color:#73859e;font-size:9px}.bin-key b{color:#2355a5}.camera-toast{position:absolute;z-index:18;top:142px;right:265px;max-width:250px;border-radius:8px;background:#ffffffdc;border:1px solid #dfebfb;color:#48698d;padding:7px 10px;pointer-events:none;font-size:10px;transition:opacity .25s}
+@media(max-width:820px){.bin-panel{top:159px;left:8px;width:min(306px,calc(100vw - 16px));max-height:calc(100dvh - 265px)}.camera-toast{top:auto;bottom:203px;right:8px;max-width:190px}}
+@media(max-width:680px){.bin-panel{top:158px;left:8px;width:min(295px,calc(100vw - 16px));max-height:calc(100dvh - 295px)}.bin-grid{gap:4px}.camera-toast{display:none}}
+</style></head><body><div class="app">
+<header class="bar"><div class="brand"><span class="hexicon">⬡</span>WareTrack</div><label class="search">⌕ <input aria-label="Search" placeholder="Search sites, trucks, forklifts, pallets, shipments..." id="search"><span class="slash">/</span></label><button class="site-select" id="siteSwitch"><span class="site-sticker">WH-01</span><span><strong id="siteLabel">Riverside Hub</strong><small>78% full · 1/2 docked</small></span><span class="chev">⌄</span></button><span class="livestatus"><span class="dot"></span>Simulated world&nbsp; <span id="clock">09:40</span></span><button class="bell" title="Notifications">♧</button><div class="profile"><span class="face">👨🏻‍💼</span><div><strong>Alex Chen</strong><small>Operations Manager</small></div><span class="chev">⌄</span></div></header>
+<main class="stage" id="stage"><div class="scene-wrap" id="canvasHolder"><canvas id="glscene" aria-hidden="true"></canvas><canvas id="scene" aria-label="Interactive 3D warehouse scene"></canvas><div class="fade-bottom"></div></div>
+<div class="kpis floating"><div class="kpi"><span class="kpi-icon">⬡</span><div><div class="kpi-label">Stock on hand</div><div class="kpi-value" id="stockVal">1,412 <em>✦ +15</em></div><div class="kpi-small">pallets · WH-01</div></div></div><div class="kpi"><span class="kpi-icon">🚚</span><div><div class="kpi-label">Trucks on site</div><div class="kpi-value">1 <em>✦ +1</em></div><div class="kpi-small">1 inbound · WH-01</div></div></div><div class="kpi"><span class="kpi-icon">◷</span><div><div class="kpi-label">On-time delivery</div><div class="kpi-value">96.6% <em>✦ +0.4%</em></div><div class="kpi-small">last 30 days · WH-01</div></div></div></div>
+<div class="tools floating" aria-label="Map controls"><button id="zoomIn" title="Zoom in">+</button><button id="zoomOut" title="Zoom out">−</button><button id="rotateL" title="Rotate left">↶</button><button id="rotateR" title="Rotate right">↷</button><button id="reset" title="Reset camera">⌂</button></div>
+
+<section class="worldbar" aria-label="World controls">
+ <span class="world-caption">🌐 <b>WORLD / CAMPUS</b> <em>· simulation</em></span>
+ <button id="worldOverview" class="active" type="button">◎ Toàn cảnh</button>
+ <button id="worldWest" type="button">A · Riverside</button>
+ <button id="worldCenter" type="button">B · Northgate</button>
+ <button id="worldEast" type="button">C · Eastport</button>
+ <button id="worldPause" type="button" aria-pressed="false">Ⅱ Tạm dừng</button>
+ <button id="worldSpeed" type="button">1× tốc độ</button>
+ <button id="worldLabels" type="button" class="active">◆ Nhãn</button>
+ <button id="worldFilter" type="button">👁 Tất cả</button>
+ <button id="worldInside" type="button">🏭 Vào kho</button>
+ <button id="worldRoof" type="button" title="Ẩn hoặc hiện mái nhà kho">◫ Mái: Tự động</button>
+</section>
+<section class="bin-panel" id="binPanel" aria-label="Sơ đồ kệ và ô hàng" hidden>
+ <div class="bin-head"><div><strong>📦 Warehouse Explorer</strong><p id="binSubtitle">Dãy kệ · tầng · ô chứa hàng</p></div><button type="button" id="binClose" aria-label="Đóng sơ đồ kệ">✕</button></div>
+ <div class="bin-toolbar"><select id="binWarehouse" aria-label="Chọn nhà kho"><option value="warehouse">WH-01 · Riverside</option><option value="WH-03">WH-03 · Northgate</option><option value="WH-06">WH-06 · Picking</option></select><span id="binSummary">Đang tải…</span></div>
+ <div class="bin-scroll" id="binList"></div>
+ <div class="bin-key"><span>🔵 Có hàng</span><span>⚪ Trống</span><span>🟡 Sắp hết</span><b>DEMO</b></div>
+</section>
+<div id="cameraToast" class="camera-toast" aria-live="polite">Cuộn để zoom đến con trỏ · chạm 2 ngón để di chuyển</div>
+<section class="world-minimap" aria-label="World minimap"><div class="world-mini-head">WORLD MAP <span>click để di chuyển</span></div><canvas id="worldMap" width="420" height="220" role="img" aria-label="Sơ đồ khu logistics"></canvas><div class="world-mini-foot"><span>WEST ← → EAST</span><span>3 cụm · 9 kho · 240 ô</span></div></section>
+<div class="world-stat" id="worldStat"><i></i> 9 kho · 6 xe tải · 8 xe nâng · 240 ô chứa</div>
+<div class="world-event" id="worldEvent"><b>TRK-2051 · đang bốc dỡ</b>Chọn nhà kho hoặc phương tiện để xem trạng thái.</div>
+
+<aside class="inspect panel floating" aria-label="Warehouse or selected object status"><div class="inspect-top"><span class="warehouse-icon">🏭</span><div><div class="inspect-over" id="type">DEPOT · WH-01</div><div class="inspect-name" id="name">Riverside Hub</div><div class="inspect-place" id="place">12 Riverside Dr, Newark NJ</div></div><button class="target" id="focus" title="Focus selected">⌖</button></div><div class="operating"><span id="operation">Operational</span><div id="activity">1 docked · 1 arriving · 3 staged</div></div><div id="worldDetails" class="world-detail" aria-live="polite"></div><div class="smallmetrics"><div class="metric-box"><label>Stock on hand</label><strong id="stockDetail">1,412 / 1,800</strong><div class="progress"><b style="width:78%"></b></div></div><div class="metric-box"><label>Truck bays</label><strong>2 <small>/ 2 busy</small></strong><div class="progress"><b style="width:100%"></b></div></div><div class="metric-box"><label>Outbound today</label><strong>23 <small>trucks</small></strong></div><div class="metric-box"><label>Put-aways today</label><strong>15 <small>pallets</small></strong></div></div><div class="sect">Inventory <span style="float:right;color:#a2afc0;font-weight:500">units</span></div><div class="inventory-row"><span class="ico">📦</span><span class="item">Cardboard Box (M)</span><b>1,906</b><span class="status">In Stock</span></div><div class="inventory-row"><span class="ico">🧊</span><span class="item">Plastic Container</span><b>297</b><span class="status">In Stock</span></div><div class="inventory-row"><span class="ico">🪖</span><span class="item">Safety Helmet</span><b>212</b><span class="status warn">Low Stock</span></div><div class="inventory-row"><span class="ico">🧻</span><span class="item">Packing Tape</span><b>4,448</b><span class="status">In Stock</span></div><div class="fleet"><div class="fleet-label"><strong>Forklift fleet</strong><small>1/2 working</small></div><div class="forklift-line"><b id="forkName">FL-01</b> <span id="forkStatus">Loading TRK-2051 at Bay 1</span><div class="progress"><b style="width:75%"></b></div><span>75%</span></div></div></aside>
+<div class="ship panel floating"><div class="ship-main"><div class="ship-title"><span>🚚&nbsp; Shipment Tracking</span><small>TRK-2051 · WareTrack</small></div><div class="timeline"><div class="step done"><i>▣</i><strong>Order Confirmed</strong><small>06:49</small></div><div class="step done"><i>✓</i><strong>Picked</strong><small>08:19</small></div><div class="step done"><i>▣</i><strong>Loading 2/6</strong><small>ETA 09:53</small></div><div class="step"><i>↗</i><strong>In Transit</strong><small>ETA 10:01</small></div><div class="step"><i>✓</i><strong>Delivered</strong><small>ETA 10:33</small></div></div></div><div class="ship-detail"><span class="truck-glyph">🚛</span><div><strong>#SHP-78442</strong><small>To: Philadelphia, PA</small><em>Loading</em><span class="arrival">WH-01 · Bay 1 · 13 min left</span></div><span style="margin-left:auto">›</span></div></div>
+<div class="dockpanel panel floating"><div class="tabs"><button class="active" data-tab="docks">▣ &nbsp; Docks 2/2</button><button data-tab="forklifts">Forklifts 1/2</button><button data-tab="trucks">Trucks 2</button><span class="docksite" id="dockSite">Riverside Hub</span></div><div id="dockRows"><div class="dockrow"><div><b>Bay 1</b><small>WH-01</small></div><div>🔵 TRK-2051 · WareTrack</div><span class="action">Loading</span><span class="right">2/6 ›</span></div><div class="dockrow"><div><b>Bay 2</b><small>WH-01</small></div><div>No truck assigned</div><span class="action wait">Available</span><span class="right">›</span></div><div class="dockrow"><div><b>Inbound</b><small>WH-01</small></div><div>🔵 TRK-2287 · Bluepeak</div><span class="action move">En route</span><span class="right">3 min ›</span></div></div></div>
+<nav id="mobileNav" class="mobile-nav" aria-label="Bảng điều khiển mobile"><button type="button" data-mobile-panel="inspect" aria-expanded="false">🏭 Kho hàng</button><button type="button" data-mobile-panel="ship" aria-expanded="false">🚚 Giao hàng</button><button type="button" data-mobile-panel="dockpanel" aria-expanded="false">📦 Bến bãi</button></nav><div class="legend floating">◉ <span id="renderMode">Starting 3D…</span> · Drag to orbit · Scroll to zoom · Click objects</div><div class="toast floating" id="toast"></div></main></div>
+
+<details id="wt-debug-toggle"><summary id="wt-debug-button" aria-controls="wt-debug-panel"><span class="pulse"></span> 🐞 Debug 3D · v4</summary>
+<section id="wt-debug-panel" aria-label="3D Diagnostic Panel">
+  <div class="wt-head"><div><strong>🐞 WareTrack Diagnostics</strong><br><small>Offline • no data is sent anywhere</small></div><button type="button" id="wt-debug-close" class="wt-close" title="Đóng panel">×</button></div>
+  <div class="wt-body">
+    <p class="wt-intro">Kiểm tra lý do 3D không hiển thị. Nhấn <b>Sao chép báo cáo</b> rồi dán vào cuộc trò chuyện.</p>
+    <div id="wt-debug-status" class="wt-status">Panel HTML hoạt động. Nếu phần chẩn đoán không xuất hiện, JavaScript có thể đã bị chặn.</div>
+    <div class="wt-grid" id="wt-debug-grid"></div>
+    <div class="wt-section">Hành động kiểm tra</div>
+    <div class="wt-actions">
+      <button type="button" id="wt-debug-probe">🧪 Kiểm tra GPU</button>
+      <button type="button" id="wt-debug-recheck">↻ Quét lại</button>
+      <button type="button" id="wt-debug-2d">▦ Buộc render 2D</button>
+      <button type="button" id="wt-debug-3d">⬡ Thử lại WebGL</button>
+      <button type="button" id="wt-debug-reset">⌖ Đặt lại camera</button>
+      <button type="button" id="wt-debug-copy" class="wt-pri">📋 Sao chép báo cáo</button>
+      <button type="button" id="wt-debug-download">⇩ Tải báo cáo .txt</button>
+      <button type="button" id="wt-debug-clear">Xóa log</button>
+    </div>
+    <div class="wt-section">Nhật ký lỗi gần nhất</div>
+    <div class="wt-log" id="wt-debug-log">Không có lỗi được ghi nhận.</div>
+    <p class="wt-foot" id="wt-debug-result">Panel chạy độc lập với renderer, ngay cả khi script 3D gặp lỗi.</p><textarea id="wt-debug-manual-report" readonly aria-label="Báo cáo để sao chép thủ công"></textarea>
+  </div>
+</section></details>
+<script>
+/* Debug bootstrap is independent and executes before the application renderer. */
+// Prevent iOS page-level pinch zoom; 3D canvas owns its touch interactions.
+['gesturestart','gesturechange','gestureend'].forEach(function(type){document.addEventListener(type,function(e){if(e.cancelable)e.preventDefault()},{passive:false})});
+(function(){'use strict';
+var D={version:'waretrack-world-v4-2026-10-09',started:Date.now(),mainStarted:false,frames:0,engine:'Chưa chạy',shader:'Chưa chạy',program:'Chưa chạy',drawCalls:0,gpuTriangles:0,sceneTriangles:0,meshes:0,context:'Chưa kiểm tra',glError:'Chưa kiểm tra',pixels:'Chưa kiểm tra',probe:'Chưa chạy',request:'Tự động',notes:[],errors:[],recentFrame:0,gl:null};
+var $=function(id){return document.getElementById(id)};
+var safe=function(fn){try{return fn()}catch(e){return 'ERR: '+String(e.message||e)}};
+var str=function(v){return v===undefined||v===null?'—':String(v)};
+function note(level,message){var s=new Date().toLocaleTimeString('vi-VN',{hour12:false})+' ['+level+'] '+str(message).slice(0,800);D.notes.push(s);if(D.notes.length>45)D.notes.shift();if(level==='ERROR'){D.errors.push(s);if(D.errors.length>25)D.errors.shift();var b=$('wt-debug-button');if(b)b.classList.add('has-error')}refresh()}
+function set(k,v){D[k]=v;refresh()}
+window.WTDebug={D:D,set:set,note:note,error:function(label,e){note('ERROR',label+': '+str(e&& (e.stack||e.message)||e))},tick:function(engine,calls,tri){D.frames++;D.recentFrame=Date.now();D.engine=engine;D.drawCalls=calls||0;D.gpuTriangles=tri||0},gl:function(g){D.gl=g;D.context=g?'WebGL1':'Không có WebGL'},open:function(){panel(true)},refresh:refresh};
+window.addEventListener('error',function(e){note('ERROR',(e.message||'Unknown JS error')+' @ '+(e.filename?e.filename.split('/').pop():'inline')+':'+(e.lineno||'?')+':'+(e.colno||'?'))});
+window.addEventListener('unhandledrejection',function(e){note('ERROR','Promise rejection: '+str(e.reason&&e.reason.stack||e.reason))});
+window.addEventListener('securitypolicyviolation',function(e){note('ERROR','CSP: '+e.violatedDirective)});
+function panel(show){var d=$('wt-debug-toggle'),b=$('wt-debug-button');if(!d||!b)return;d.open=Boolean(show);b.setAttribute('aria-expanded',show?'true':'false');if(show)refresh()}
+function readPixel(g,x,y){var buf=new Uint8Array(4);g.readPixels(x,y,1,1,g.RGBA,g.UNSIGNED_BYTE,buf);return Array.from(buf).join(',')}
+function snapshot(){
+ var c=$('scene'),g=$('glscene'),h=$('canvasHolder'),r=h&&h.getBoundingClientRect();var data={
+  Version:D.version,
+  'Thời gian':new Date().toISOString(),
+  'Trình duyệt':navigator.userAgent,
+  'Hệ điều hành / Platform':navigator.platform||'unknown',
+  'Mở bằng':location.protocol==='file:'?'file:// (mở trực tiếp) ':location.protocol,
+  'WebGL':D.context,
+  'Render mode':str(($('renderMode')||{}).textContent)||D.engine,
+  'Request mode':D.request,
+  'Shader compile':D.shader,
+  'Program link':D.program,
+  'Main JS':D.mainStarted?'Đã chạy':'CHƯA chạy',
+  'Frames':D.frames,
+  'Frames active':D.recentFrame?(Date.now()-D.recentFrame<2000?'Có':'KHÔNG, ngừng cập nhật'):'CHƯA có frame',
+  'Last frame age':D.recentFrame?((Date.now()-D.recentFrame)/1000).toFixed(1)+'s':'—',
+  'Triangles in scene':D.sceneTriangles,
+  'Model objects':D.meshes,
+  'Draw calls':D.drawCalls,
+  'GPU triangles':D.gpuTriangles,
+  'Main canvas':c?c.width+'x'+c.height+' css '+Math.round(c.getBoundingClientRect().width)+'x'+Math.round(c.getBoundingClientRect().height):'KHÔNG tồn tại',
+  'WebGL canvas':g?g.width+'x'+g.height+' visible '+getComputedStyle(g).display:'KHÔNG tồn tại',
+  'Holder geometry':r?Math.round(r.width)+'x'+Math.round(r.height)+' at '+Math.round(r.left)+','+Math.round(r.top):'none',
+  'Viewport':innerWidth+'x'+innerHeight+' dpr '+(devicePixelRatio||1),
+  'Zoom / scroll': 'scale '+(visualViewport?visualViewport.scale:'?')+', scroll '+scrollX+','+scrollY,
+  'Camera':window.WT_WORLD&&window.WT_WORLD.getCamera?JSON.stringify(window.WT_WORLD.getCamera()):'Unavailable',
+  'Roof mode':window.WT_WORLD?.getInterior?.().roof||'Unknown',
+  'Bins':window.WT_WORLD?.getInterior?.().bins||0,
+  'WebGL vendor/renderer':D.vendor||'—',
+  'Max texture size':D.maxTexture||'—',
+  'WebGL error':D.glError,
+  'Scene pixel samples':D.pixels,
+  'Independent GPU test':D.probe,
+  'Offscreen 2D':safe(function(){var t=document.createElement('canvas').getContext('2d');return t?'Available':'Unavailable'}),
+  'Offscreen WebGL':D.probe==='Chưa chạy'?'Click Kiểm tra GPU':D.probe,
+  'JS Errors':D.errors.length?D.errors.join(' | '):'None',
+ };
+ return data;
+}
+function fullReport(){var s=snapshot();return 'WARETRACK 3D DIAGNOSTIC REPORT\n'+'='.repeat(36)+'\n'+Object.keys(s).map(function(k){return k+': '+s[k]}).join('\n')+'\n\nLOGS:\n'+(D.notes.join('\n')||'(none)')+'\n';}
+function refresh(){var grid=$('wt-debug-grid'),st=$('wt-debug-status'),log=$('wt-debug-log');if(!grid)return;var s=snapshot();grid.replaceChildren();var keys=['Mở bằng','Trình duyệt','WebGL','Render mode','Request mode','Main JS','Frames','Frames active','Triangles in scene','Model objects','Draw calls','Shader compile','Program link','Main canvas','WebGL canvas','Viewport','WebGL vendor/renderer','WebGL error','Scene pixel samples','Independent GPU test'];keys.forEach(function(k){var a=document.createElement('div'),b=document.createElement('div');a.textContent=k;b.textContent=str(s[k]);grid.append(a,b)});
+ var flag=!D.mainStarted&&Date.now()-D.started>2500?'JavaScript chính chưa chạy – kiểm tra lỗi bên dưới':D.errors.length?'Có lỗi JavaScript / WebGL – xem nhật ký':!D.frames&&Date.now()-D.started>3000?'Không có frame render – kiểm tra canvas và kích thước':D.engine==='Canvas 2D'?'Hiển thị bằng Canvas 2D dự phòng; WebGL không được sử dụng':D.pixels.includes('uniform')?'WebGL có frame nhưng ảnh gần như đồng màu':'Đang chạy • '+str(s['Render mode']);st.textContent=flag;st.classList.toggle('err',!D.mainStarted&&Date.now()-D.started>2500||D.errors.length>0||D.frames===0&&Date.now()-D.started>3000);
+ log.textContent=D.notes.length?D.notes.slice(-12).join('\n'):'Không có lỗi được ghi nhận.';
+}
+function gpuProbe(){
+ var canvas=document.createElement('canvas');canvas.width=64;canvas.height=64;var g=canvas.getContext('webgl',{preserveDrawingBuffer:true,alpha:false})||canvas.getContext('experimental-webgl',{preserveDrawingBuffer:true});
+ if(!g){set('probe','FAIL: WebGL context = null');note('WARN','GPU độc lập: không tạo được WebGL');return}
+ var VS='attribute vec2 p;void main(){gl_Position=vec4(p,0.0,1.0);}';var FS='precision mediump float;void main(){gl_FragColor=vec4(1.0,0.2,0.1,1.0);}';
+ function shader(type,s){var x=g.createShader(type);g.shaderSource(x,s);g.compileShader(x);if(!g.getShaderParameter(x,g.COMPILE_STATUS))throw Error(g.getShaderInfoLog(x));return x}
+ try{var pr=g.createProgram();g.attachShader(pr,shader(g.VERTEX_SHADER,VS));g.attachShader(pr,shader(g.FRAGMENT_SHADER,FS));g.linkProgram(pr);if(!g.getProgramParameter(pr,g.LINK_STATUS))throw Error('Link: '+g.getProgramInfoLog(pr));g.useProgram(pr);var b=g.createBuffer();g.bindBuffer(g.ARRAY_BUFFER,b);g.bufferData(g.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,0,1]),g.STATIC_DRAW);var i=g.getAttribLocation(pr,'p');g.enableVertexAttribArray(i);g.vertexAttribPointer(i,2,g.FLOAT,false,0,0);g.viewport(0,0,64,64);g.clearColor(0,0,0,1);g.clear(g.COLOR_BUFFER_BIT);g.drawArrays(g.TRIANGLES,0,3);g.finish();var col=readPixel(g,32,32);var pass=Number(col.split(',')[0])>150;set('probe',(pass?'PASS':'FAIL')+' – shader, triangle, center RGBA='+col+', glError='+g.getError());note(pass?'INFO':'ERROR','GPU triangle test: '+D.probe)}catch(e){set('probe','FAIL: '+e.message);note('ERROR','GPU probe: '+e.message)}
+ }
+function bind(){
+ $('wt-debug-toggle').addEventListener('toggle',function(){var on=this.open;$('wt-debug-button').setAttribute('aria-expanded',String(on));if(on)refresh()});$('wt-debug-close').onclick=function(){panel(false)};
+ $('wt-debug-recheck').onclick=function(){if(window.WT_APP&&window.WT_APP.sample)window.WT_APP.sample();refresh();$('wt-debug-result').textContent='Đã cập nhật chỉ số.'};
+ $('wt-debug-probe').onclick=gpuProbe;
+ $('wt-debug-2d').onclick=function(){if(window.WT_APP){window.WT_APP.setMode('2d');note('INFO','User selected 2D fallback')}else note('ERROR','Ứng dụng 3D chưa khởi tạo nên không thể đổi chế độ')};
+ $('wt-debug-3d').onclick=function(){if(window.WT_APP){window.WT_APP.setMode('webgl');note('INFO','User selected WebGL')}else note('ERROR','Ứng dụng 3D chưa khởi tạo nên không thể đổi chế độ')};
+ $('wt-debug-reset').onclick=function(){if(window.WT_APP){window.WT_APP.resetCamera();note('INFO','Reset camera')}else note('WARN','App not ready')};
+ $('wt-debug-copy').onclick=function(){var s=fullReport(),out=$('wt-debug-result');if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(s).then(function(){out.textContent='✅ Đã sao chép! Dán (Ctrl+V) vào ChatGPT.'}).catch(function(){fallbackCopy(s)})}else fallbackCopy(s)};
+ function fallbackCopy(s){var ta=$('wt-debug-manual-report');ta.style.display='block';ta.value=s;ta.focus();ta.select();var ok=safe(function(){return document.execCommand('copy')});$('wt-debug-result').textContent=ok===true?'✅ Đã sao chép báo cáo.':'Nếu không sao chép được, hãy chọn nội dung trong ô bên dưới hoặc bấm Tải báo cáo .txt.'}
+ $('wt-debug-download').onclick=function(){var url=URL.createObjectURL(new Blob([fullReport()],{type:'text/plain;charset=utf-8'}));var a=document.createElement('a');a.href=url;a.download='waretrack_debug_report.txt';a.click();setTimeout(function(){URL.revokeObjectURL(url)},1000);$('wt-debug-result').textContent='Đã xuất waretrack_debug_report.txt.'};
+ $('wt-debug-clear').onclick=function(){D.notes=[];D.errors=[];$('wt-debug-button').classList.remove('has-error');refresh()};
+  var mobileButtons=document.querySelectorAll('[data-mobile-panel]');
+  function setMobilePanel(id){mobileButtons.forEach(function(b){var on=b.dataset.mobilePanel===id;b.classList.toggle('active',on);b.setAttribute('aria-expanded',String(on))});['inspect','ship','dockpanel'].forEach(function(cls){var el=document.querySelector('.'+cls);if(el)el.classList.toggle('mobile-open',cls===id)})}
+  mobileButtons.forEach(function(b){b.addEventListener('click',function(){var id=b.dataset.mobilePanel;setMobilePanel(b.classList.contains('active')?null:id)})});
+  window.WTMobile={open:setMobilePanel};
+ refresh();setInterval(function(){refresh();if(Date.now()-D.started>4500&&!D.frames&&!$('wt-debug-toggle').open)panel(true)},1100);
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind);else bind();
+})();
+</script>
+
+<script>
+(()=>{'use strict';
+const $=s=>document.getElementById(s),canvas=$('scene'),glCanvas=$('glscene'),holder=$('canvasHolder'),ctx=canvas.getContext('2d',{alpha:true});let W,H,dpr=1,mouse=null,elapsed=0,selected='warehouse',frameT=0,sceneChanged=true,site=0;
+const diag=window.WTDebug;diag.set('mainStarted',true);diag.note('INFO','Application script running');let forceSoftware=false;
+const st={yaw:.70,elev:.88,zoom:.37,centerX:66,centerZ:38,paused:false};
+const cameraBounds={xmin:-18,xmax:148,zmin:-19,zmax:104};
+const roofMeshes=new Set(['warehouse','WH-03','WH-06']);let roofMode='auto', interiorBuilding='warehouse';
+let binLocations=[];const binById=new Map();const indoorBounds={warehouse:{x:10.7,z:9.2,w:17.2,d:9.6},'WH-03':{x:46,z:2,w:17,d:10},'WH-06':{x:10,z:65,w:18,d:11}};
+function boundCamera(){st.centerX=clamp(st.centerX,cameraBounds.xmin,cameraBounds.xmax);st.centerZ=clamp(st.centerZ,cameraBounds.zmin,cameraBounds.zmax);st.zoom=clamp(st.zoom,.19,3.45);if(![st.centerX,st.centerZ,st.zoom,st.yaw,st.elev].every(Number.isFinite)){st.centerX=67;st.centerZ=40;st.zoom=.36;st.yaw=.70;st.elev=.90;diag.note('WARN','Recovered camera from invalid transform')}}
+function roofVisible(id){if(!roofMeshes.has(id))return true;if(roofMode==='open')return false;if(roofMode==='closed')return true;const b=indoorBounds[id];if(!b)return true;const proximity=st.centerX>=b.x-3&&st.centerX<=b.x+b.w+3&&st.centerZ>=b.z-3&&st.centerZ<=b.z+b.d+3;return !(proximity&&st.zoom>1.04)}
+function worldAtScreen(px,py,zoom=st.zoom,cx=st.centerX,cz=st.centerZ){const scale=Math.max(.01,Math.min(W/55,H/32)*zoom*(W<690?1.20:1.04)),originX=W*(W<690?.48:.36),originY=H*(W<690?.46:.435);const h=(px-originX)/scale,b=(py-originY)/scale/Math.max(.20,Math.sin(st.elev)),co=Math.cos(st.yaw),si=Math.sin(st.yaw);return {x:cx+h*co+b*si,z:cz-h*si+b*co}}
+function ensureSceneInView(){if(st.zoom<.75)return;let visible=false,nearest=null,best=Infinity;for(const [id,m] of Object.entries(worldEntities)){if(m.cat==='bin'&&roofVisible(binById.get(id)?.warehouse))continue;if(!['warehouse','racking','bin','truck','forklift'].includes(m.cat))continue;const p=project(m.x,m.y,m.z);if(p.x>10&&p.x<W-10&&p.y>65&&p.y<H-22){visible=true;break}const dist=Math.hypot(m.x-st.centerX,m.z-st.centerZ);if(dist<best){best=dist;nearest=m}}if(!visible&&nearest){st.centerX=nearest.x;st.centerZ=nearest.z;boundCamera();diag.note('INFO','Camera safe-center: returned to nearest world object');cameraFeedback('Đã đưa camera về đối tượng gần nhất để không mất thế giới 3D')}}
+function zoomAt(x,y,factor){if(!Number.isFinite(factor)||factor<=0)return;const prev=worldAtScreen(x,y),target=clamp(st.zoom*factor,.19,3.45);st.zoom=target;const after=worldAtScreen(x,y);st.centerX+=prev.x-after.x;st.centerZ+=prev.z-after.z;boundCamera();ensureSceneInView()}
+function setCamera(x,z,zoom,elev=st.elev){st.centerX=x;st.centerZ=z;st.zoom=zoom;st.elev=elev;boundCamera()}
+function cameraFeedback(message){const el=document.getElementById('cameraToast');if(el)el.textContent=message}
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+function resize(){let r=holder.getBoundingClientRect();W=r.width;H=r.height;dpr=Math.min(devicePixelRatio||1,1.6);canvas.width=Math.round(W*dpr);canvas.height=Math.round(H*dpr);glCanvas.width=Math.round(W*dpr);glCanvas.height=Math.round(H*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);sceneChanged=true}if(window.ResizeObserver){new ResizeObserver(resize).observe(holder)}else{window.addEventListener('resize',resize);diag.note('WARN','ResizeObserver unavailable; resize event fallback')} 
+// Real 3D triangle meshes are defined in this file; no remote dependencies or image assets.
+class Mesh{constructor(){this.t=[]}tri(a,b,c,col){let u=b.map((v,i)=>v-a[i]),v=c.map((w,i)=>w-a[i]);let n=[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]],l=Math.hypot(...n)||1;this.t.push({p:[a,b,c],col,n:n.map(v=>v/l)})}quad(a,b,c,d,col){this.tri(a,b,c,col);this.tri(a,c,d,col)}box(x,y,z,w,h,d,col){let A=[x,y,z],B=[x+w,y,z],C=[x+w,y,z+d],D=[x,y,z+d],E=[x,y+h,z],F=[x+w,y+h,z],G=[x+w,y+h,z+d],H=[x,y+h,z+d];let q=typeof col==='string'?{top:col,front:col,back:col,left:col,right:col}:col;this.quad(D,C,G,H,q.front);this.quad(B,A,E,F,q.back);this.quad(A,D,H,E,q.left);this.quad(C,B,F,G,q.right);this.quad(E,H,G,F,q.top);this.quad(A,B,C,D,q.bottom||'#a7b9d5')}cyl(x,y,z,r,h,col,N=8){for(let i=0;i<N;i++){let a=i*2*Math.PI/N,b=(i+1)*2*Math.PI/N,pa=[x+Math.cos(a)*r,y,z+Math.sin(a)*r],pb=[x+Math.cos(b)*r,y,z+Math.sin(b)*r],pc=[pb[0],y+h,pb[2]],pd=[pa[0],y+h,pa[2]];this.quad(pa,pb,pc,pd,col);this.tri([x,y+h,z],pd,pc,col)}}sphere(x,y,z,r,col){const U=9,V=4;for(let j=0;j<V;j++){let a=j*Math.PI/V,b=(j+1)*Math.PI/V;for(let i=0;i<U;i++){let c=i*2*Math.PI/U,d=(i+1)*2*Math.PI/U,P=(a,t)=>[x+r*Math.sin(a)*Math.cos(t),y+r*Math.cos(a),z+r*Math.sin(a)*Math.sin(t)];this.quad(P(a,c),P(a,d),P(b,d),P(b,c),col)}}}roof(x,y,z,w,d,peak,col){this.quad([x,y,z],[x+w,y,z],[x+w,y+peak,z+d/2],[x,y+peak,z+d/2],col);this.quad([x,y+peak,z+d/2],[x+w,y+peak,z+d/2],[x+w,y,z+d],[x,y,z+d],col)}}
+// Wheel geometry is placed on a true axle (Z axis), not as a flat ground-facing disc.
+Mesh.prototype.wheel=function(x,y,z,r,depth=.18){let n=14;for(let i=0;i<n;i++){let a=i*Math.PI*2/n,b=(i+1)*Math.PI*2/n;let q=(rad,ang,zz)=>[x+Math.cos(ang)*rad,y+Math.sin(ang)*rad,zz];this.quad(q(r,a,z),q(r,b,z),q(r,b,z+depth),q(r,a,z+depth),'#1c293c');this.tri([x,y,z+depth],q(r,a,z+depth),q(r,b,z+depth),'#26364b');this.tri([x,y,z+depth+.009],q(r*.52,b,z+depth+.009),q(r*.52,a,z+depth+.009),'#9fb4cb');this.tri([x,y,z+depth+.012],q(r*.30,a,z+depth+.012),q(r*.30,b,z+depth+.012),'#dce8f7')}};
+const objects=[];const staticMesh=new Mesh();function add(id,mesh,x=0,y=0,z=0,rot=0){objects.push({id,mesh,x,y,z,rot});return mesh}function B(...a){staticMesh.box(...a)}
+// White road network and warehouse campus.
+B(-12,-.28,-13,79,.28,67,{top:'#e9effc',front:'#c8d7f0',left:'#b5c9e8',right:'#cbd9ee',back:'#d1dff3'});
+B(-10,.012,20,76,.015,12,'#e8eefb');B(34,.011,-8,13,.017,60,'#e3ecf9');B(-11,.012,43,72,.02,8,'#d6e1f3');
+B(-10,.029,17.4,55,.02,.13,'#f8fbff');B(-10,.029,32.4,55,.02,.15,'#f8fbff');
+for(let x=-7;x<52;x+=4.4){B(x,.038,26.1,2,.016,.08,'#f8fbff');B(x,.038,47,2,.016,.075,'#fafcff')}
+for(let z=-8;z<42;z+=4)B(40,.035,z,.065,.018,1.8,'#fcfdff');
+// Dock ground markings and loading guides.
+for(let x of [10.5,15,19.5,24]){B(x,.035,20.0,.07,.016,4.5,'#f1c77e');B(x,.039,23.7,3.3,.014,.075,'#f1c77e')}
+for(let i=0;i<7;i++)B(9+i*.92,.04,23.25,.45,.016,.09,'#f8fbff');
+// Perimeter decorative low walls at rear/right.
+for(let x=-10;x<52;x+=5){B(x,0,-10,4.8,2.8,.37,{top:'#f8fbff',front:'#d6e4fa',left:'#cfdef5',right:'#d1dff4',back:'#e8effc'});B(x+.9,1.2,-9.58,1.3,.8,.03,'#adc8f3')}
+for(let z=2;z<35;z+=5){B(51,0,z,.45,4.2,4.6,{top:'#f2f7ff',front:'#c3d6f2',left:'#dde8f9',right:'#c1d3eb',back:'#d8e4f7'});B(50.96,2,z+.9,.045,1,1.6,'#adc7ec')}
+// Modern cobalt blue warehouses with ribbed roofs and white roll-up loading doors.
+function warehouse(x,z,w,d,h,id,main=true){let m=new Mesh(),roof=new Mesh(),cutaway=roofMeshes.has(id);let blue=main?'#1558e8':'#2467ee';if(cutaway){m.box(0,0,0,w,.10,d,'#deeafb');m.box(0,0,0,.14,h,d,'#2369f0');m.box(w-.14,0,0,.14,h,d,'#2369f0');m.box(0,0,0,w,h,.14,'#215cda');m.box(0,0,d-.14,.7,h,.14,'#2369f0');m.box(w-.7,0,d-.14,.7,h,.14,'#2369f0');}
+ else m.box(0,0,0,w,h,d,{top:'#2f75f5',front:'#2369f0',left:'#1451ce',right:'#1d5fe5',back:'#2368e9'});
+ roof.roof(-.25,h,-.25,w+.5,d+.5,1.1,main?'#337aff':'#3478f3');
+  for(let xx=0;xx<w;xx+=.46){roof.box(xx,h+.28,.24,.045,.025,d*.45,main?'#4d91ff':'#5c97ff');roof.box(xx,h+.3,d*.54,.045,.025,d*.43,'#5d96fb')}
+  roof.box(-.16,h+.95,d/2-.09,w+.32,.12,.18,'#1255d9');
+  for(let xx=1;xx<w-1;xx+=2.8){m.box(xx,0,d+.018,2.15,h-.43,.075,'#f4f8ff');m.box(xx+.12,.12,d+.11,1.91,h-1.04,.055,'#aecbf1');m.box(xx+.13,.17,d+.18,1.88,h-1.44,.035,'#e8f2ff');m.box(xx-.14,0,d+.20,.18,h-.05,.16,'#1b58d7');m.box(xx+2.16,0,d+.20,.16,h-.05,.16,'#1b58d7');m.box(xx-.12,h-.39,d+.18,2.44,.18,.18,'#1251cb');
+   for(let yy=.26;yy<h-1.35;yy+=.36)m.box(xx+.17,yy,d+.21,1.82,.02,.04,'#d0e3ff');
+   m.box(xx+.16,0,d+.23,1.81,.11,.61,'#83a0cd');m.box(xx+.15,.1,d+.83,1.83,.045,.09,'#ffd17a');
+  }
+  for(let zz=1;zz<d-1;zz+=2.2){m.box(-.03,1.25,zz,.035,.68,1.1,'#c6e3ff');m.box(w-.02,1.25,zz,.035,.68,1.1,'#b0d2ff')}
+  // Security plaque, roof panel, and ridge vents.
+  roof.box(w*.34,h+1.05,d*.37,2,.065,1,'#d9eaff');roof.box(w*.39,h+1.12,d*.44,1.5,.04,.37,'#6ea0f8');
+  add(id,m,x,0,z);add(id+'-roof',roof,x,0,z)
+}
+warehouse(2.3,2.0,15.0,8.0,4.35,'rearWarehouse',true);warehouse(10.7,9.2,17.2,9.6,4.25,'warehouse',true);
+// Warehouse yard containers.
+function container(x,z,col='#357dfa',stack=1){let m=new Mesh();for(let h=0;h<stack;h++){let y=h*1.36;m.box(0,y,0,2.45,1.27,1.28,{top:'#5b9dfb',front:col,left:'#1b5ad8',right:'#246fe7',back:col});for(let i=.19;i<2.3;i+=.32)m.box(i,y+.05,1.29,.038,1.16,.04,'#73abff');m.box(.08,y+1.25,.03,2.29,.035,1.16,'#85b8ff')}add('container',m,x,0,z)}
+for(let [x,z,s] of [[2,-2,1],[4.9,-2,2],[8,-2,1],[28,3.4,2],[30.5,3.2,1],[32.8,3.6,1],[26,15.4,2],[30,15,2]])container(x,z,'#3177ed',s);
+// pallets are detailed separate 3D objects, no sprite / external model.
+function pallet(x,z,count=2){let m=new Mesh();m.box(-.12,.02,-.10,1.82,.20,1.3,'#ad7d4b');for(let k=0;k<3;k++)m.box(-.07+k*.68,0,-.13,.23,.23,1.37,'#896641');for(let layer=0;layer<count;layer++)for(let xx=0;xx<2;xx++)for(let zz=0;zz<2;zz++){let x0=xx*.86,y=.26+layer*.69,z0=zz*.6;m.box(x0,y,z0,.83,.65,.58,{top:'#f4d7a8',front:'#d4ac7b',left:'#c69967',right:'#bb9162',back:'#d9b88e'});m.box(x0+.38,y,z0-.016,.08,.65,.03,'#f9e8c7');m.box(x0,y+.36,z0-.02,.82,.06,.035,'#e5c699')}add('pallet',m,x,0,z)}
+for(let [x,z,n] of [[4.2,18,1],[7,19,2],[9,21,2],[1.2,24,1],[-1.6,19,2],[-3.9,26,1],[11,23,2],[19,23,2],[26,23,2],[32.8,21,2],[34,17,2],[31,11,2]])pallet(x,z,n);
+// tiny outdoor trees / landscape.
+function tree(x,z,s=1){let m=new Mesh();m.cyl(0,0,0,.18*s,2*s,'#8f9f98');m.sphere(-.10*s,2.25*s,0,.83*s,'#4db97d');m.sphere(.32*s,2.44*s,.03,.62*s,'#6ed094');m.sphere(-.3*s,2.18*s,.31*s,.57*s,'#79d89d');add('tree',m,x,0,z)}
+for(let [x,z,s] of [[-5,7,1],[0,-5,1.15],[11,-7,.91],[23,-4,1.16],[33,0,1.04],[35,9,.94],[45,7,1],[46,18,.8],[48,27,.9],[-8,17,.9],[-4,35,1]])tree(x,z,s);
+// steel blue/white articulated delivery trucks.
+function truck(x,z,blue=false,angle=0,id='truck'){let m=new Mesh();let cab=blue?'#2458d9':'#f5f9ff';m.box(-2.25,.49,-.72,4.25,.17,1.43,'#243956');m.box(-2.25,.64,-.70,2.9,1.55,1.4,{top:'#f9fbff',front:'#eff5ff',left:'#d5e3fc',right:'#ebf3ff',back:'#eff4fd'});m.box(-2.28,2.17,-.7,2.99,.07,1.4,'#bbd9ff');m.box(.75,.47,-.68,1.32,1.43,1.37,{top:blue?'#477ef0':'#f6f9ff',front:blue?'#1c53cb':'#e4edfc',left:blue?'#2864da':'#f1f7ff',right:blue?'#336bd9':'#f0f5fd',back:'#f9fcff'});m.box(1.24,1.24,-.705,.6,.4,1.44,'#1a3762');m.box(2.03,.58,-.65,.12,.22,1.3,'#364e77');for(let xx of [-1.4,-.55,1.38])for(let zz of [-.84,.7]){m.wheel(xx,.44,zz,.36,.14)}m.box(-.9,1.1,.715,1.08,.33,.035,blue?'#2b69db':'#9cbae9');m.box(-1.77,.71,.725,.11,1.2,.025,'#c7d9ef');add(id,m,x,0,z,angle)}
+truck(14,30,true,.23,'truck1');truck(31.0,32,false,.14,'truck2');truck(38,13,false,.5,'truck3');
+// forklifts detailed forks, mast, wheels, seat.
+function forklift(x,z,angle=0,id='forklift'){let m=new Mesh();m.box(-.65,.25,-.56,1.18,.57,1.12,{top:'#f4b11f',front:'#ec9e11',left:'#dda31a',right:'#e8a71d',back:'#e6a21a'});m.box(-.45,.77,-.50,.68,.16,1,'#202e44');for(let xx of [-.42,.35])for(let zz of [-.45,.4])m.box(xx,.9,zz,.065,1.05,.07,'#1d2938');m.box(-.46,1.98,-.49,.9,.09,1.05,'#28384d');m.box(.55,.20,-.54,.12,2.3,.12,'#334865');m.box(.55,.20,.42,.12,2.3,.12,'#334865');m.box(.65,.24,-.54,.11,.12,1.03,'#74879d');for(let zz of [-.47,.35])m.box(.66,.1,zz,.79,.1,.15,'#546778');m.box(-.30,.82,-.26,.29,.30,.50,'#29364b');for(let xx of [-.39,.28])for(let zz of [-.72,.53])m.wheel(xx,.34,zz,.28,.14);add(id,m,x,0,z,angle)}
+forklift(1,14,.45,'forklift1');forklift(-5,16,.15,'forklift2');forklift(31,18,-.6,'forklift3');
+
+/* ================== CAMPUS WORLD MODEL v3 (entirely embedded) ================== */
+const worldEntities={
+ warehouse:{title:'Kho chính WH-01',kind:'DEPOT · WH-01',x:19,y:3,z:14,desc:'Riverside Hub · Khu tiếp nhận',state:'Đang hoạt động',activity:'4 cửa nhập/xuất · 78% công suất',cat:'warehouse'},
+ rearWarehouse:{title:'Kho WH-02 · Storage A',kind:'DEPOT · WH-02',x:9,y:3,z:7,desc:'Riverside Hub · Kho lưu trữ',state:'Đang hoạt động',activity:'Lưu trữ hàng tổng hợp · 1.412 pallet',cat:'warehouse'},
+ truck1:{title:'TRK-2051 · WareTrack',kind:'TRUCK · TRK-2051',x:14,y:1.6,z:30,desc:'Cổng nhận hàng · Bay 1',state:'Đang bốc hàng',activity:'4/6 pallet · ETA 12 phút',cat:'truck'},
+ truck2:{title:'TRK-2287 · Bluepeak',kind:'TRUCK · TRK-2287',x:31,y:1.6,z:32,desc:'Tuyến nội bộ phía Tây',state:'Đang vận chuyển',activity:'ETA 8 phút · lộ trình mô phỏng',cat:'truck'},
+ truck3:{title:'TRK-2162 · Southline',kind:'TRUCK · TRK-2162',x:38,y:1.6,z:13,desc:'Khu bốc dỡ',state:'Chờ bến',activity:'Sắp vào dock 03',cat:'truck'},
+ forklift1:{title:'FL-01 · xe nâng',kind:'FORKLIFT · FL-01',x:1,y:1,z:14,desc:'Riverside · Bay A',state:'Đang hoạt động',activity:'Pin 75% · tải 2,5 tấn',cat:'forklift'},
+ forklift2:{title:'FL-02 · xe nâng',kind:'FORKLIFT · FL-02',x:-5,y:1,z:16,desc:'Riverside · Staging',state:'Đang hoạt động',activity:'Pin 91% · đang phân loại',cat:'forklift'},
+ forklift3:{title:'FL-03 · xe nâng',kind:'FORKLIFT · FL-03',x:31,y:1,z:18,desc:'Riverside · Bay 2',state:'Chờ lệnh',activity:'Pin 65% · không có tác vụ',cat:'forklift'}
+};
+const worldZones=[{x:17,z:18,name:'Riverside Hub',label:'A · Riverside',stock:1412},{x:77,z:33,name:'Northgate DC',label:'B · Northgate',stock:1865},{x:116,z:54,name:'Eastport Cold Chain',label:'C · Eastport',stock:1269}];
+function entity(id,title,kind,x,z,desc,activity,cat='warehouse',y=1.8){worldEntities[id]={title,kind,x,y,z,desc,state:cat==='truck'?'Đang vận chuyển':cat==='forklift'?'Đang làm việc':'Đang hoạt động',activity,cat}}
+// The campus has real connected roads and areas, NOT a scaled-up single box.
+B(-18,-.38,-20,170,.38,125,{top:'#e7eef9',front:'#b7cae5',left:'#bacce6',right:'#bbceed',back:'#d1dded'});
+for(let [x,z,w,d] of [[-14,20,161,15],[-14,49,161,15],[-14,83,161,10],[35,-17,12,118],[67,-17,12,118],[99,-17,12,118],[129,-17,10,118]]){B(x,.027,z,w,.034,d,'#d4e0ef');B(x,.070,z,w,.008,.12,'#edf5ff');B(x,.07,z+d-.12,w,.008,.12,'#edf5ff')}
+for(let xx=-10;xx<145;xx+=6.5){for(let zz of [27.3,56.5,87.3])B(xx,.082,zz,2.55,.015,.10,'#ffffff')}
+for(let zz=-9;zz<95;zz+=7.2){for(let xx of [40.5,72,104.5,134])B(xx,.081,zz,.12,.014,3.2,'#f8fbff')}
+// zone perimeter plots and gardens
+for(let [x,z,w,d] of [[-10,-12,40,34],[43,-12,52,34],[104,-12,43,34],[-8,60,43,22],[43,65,55,18],[104,65,43,18]]){B(x,.055,z,w,.020,d,'#f3f7fd');B(x,.078,z,w,.006,.18,'#d4deeb')}
+// Additional warehouses: multiple scales/specializations.
+for(let [id,x,z,w,d,h,label] of [
+ ['WH-03',46,2,17,10,4.5,'Northgate · Inbound A'],['WH-04',79,2,17,10,5.0,'Northgate · Outbound B'],
+ ['WH-05',110,2,17,10,4.75,'Eastport · Cold chain'],['WH-06',10,65,18,11,4.7,'Riverside · Picking'],
+ ['WH-07',48,69,18,11,4.5,'Northgate · Cross-dock'],['WH-08',83,69,18,11,4.5,'Northgate · Bulk stock'],
+ ['WH-09',113,69,18,11,4.7,'Eastport · Dispatch']
+]){warehouse(x,z,w,d,h,id,false);entity(id,id+' · '+label,'WAREHOUSE · '+id,x+w*.5,z+d*.55,label,'Dock sẵn sàng · tồn kho đồng bộ mô phỏng','warehouse',h+1)}
+// Open-sided racking mezzanine gives a glimpse into actual warehouse storage.
+function rackZone(id,x,z){let m=new Mesh();m.box(0,0,0,12,.22,12,'#d2dde9');for(let a=0;a<4;a++)for(let b=0;b<3;b++){
+ let rx=.65+a*2.9,rz=.9+b*3.75;for(let h=0;h<4;h++){m.box(rx,.08+h*.94,rz,2.3,.08,1.27,'#527ca6');if(h<3){for(let sx of [0,1])m.box(rx+.16+sx*1.06,.19+h*.94,rz+.13,1.03,.73,1.0,h%2?'#c9d5e5':'#e8c9a1')}}
+ for(let dx of [0,2.23])for(let dz of [0,1.2])m.box(rx+dx,0,rz+dz,.08,3.0,.08,'#486586');
+ }add(id,m,x,.1,z);entity(id,'Khu kệ hàng · '+id,'RACKING · AISLE',x+6,z+6,'Storage · có thể quan sát bên trong','12 giá kệ · pallet theo tầng','racking',1.6)}
+rackZone('RACK-A',-1,65);rackZone('RACK-B',68,69);
+
+// Individual 3D warehouse bin locations. Structures use one combined GPU mesh per warehouse
+// while each storage bin has an independent inventory record and selectable world coordinates.
+function buildInterior(warehouseId,rows,cols=8,levels=3){
+ const b=indoorBounds[warehouseId],m=new Mesh(),pitchX=(b.w-1.3)/cols,pitchZ=(b.d-1.4)/rows;
+ const codes=['BX-M','COLD-02','PART-16','TEXT-04','TOOLS-09','HELM-03'];
+ for(let row=0;row<rows;row++){const aisle=String.fromCharCode(65+row),z=.65+row*pitchZ;
+  // A floor aisle stripe and numbered racking zones, visible with the roof removed.
+  m.box(.35,.11,z+.01,b.w-.7,.018,.035,row%2?'#ffe1a4':'#f6c56a');
+  for(let col=0;col<cols;col++){
+   const x=.55+col*pitchX;
+   for(let h=0;h<levels;h++){
+    const lev=h+1,y=.20+h*1.03,seed=(row*71+col*19+h*13+(warehouseId==='WH-06'?4:2));
+    // Four uprights / long shelves, with individually simulated pallet loads.
+    if(h===0){for(const xx of [0,pitchX-.16])for(const zz of [0,pitchZ*.60])m.box(x+xx,.06,z+zz,.065,3.32,.065,'#577799')}
+    m.box(x,y,z,pitchX-.08,.065,pitchZ*.60+.065,'#5d829e');
+    const qty=seed%9===0?0:seed%7===0?5:12+(seed*7)%39;
+    const sku=codes[seed%codes.length];
+    if(qty){m.box(x+.11,y+.08,z+.07,pitchX-.31,.68,pitchZ*.60-.13,{top:'#f5ddb1',front:seed%3?'#cca980':'#a2cbd8',left:'#bc976a',right:'#c59d71',back:'#d5b285'});m.box(x+.13,y+.4,z+.048,pitchX-.36,.045,.03,'#eff4f7')}
+    const id='BIN-'+warehouseId+'-'+aisle+String(col+1).padStart(2,'0')+'-L'+lev;
+    const meta={id,warehouse:warehouseId,aisle,bay:col+1,level:lev,sku,qty,capacity:48,lot:'LOT-'+(2300+seed*17),x:b.x+x+pitchX*.5,y:y+.4,z:b.z+z+pitchZ*.32};
+    binLocations.push(meta);binById.set(id,meta);
+    entity(id,'Ô '+aisle+'-'+String(col+1).padStart(2,'0')+' · tầng '+lev,'BIN · '+id,meta.x,meta.z,warehouseId+' · '+aisle+' / '+meta.bay+'/'+lev,qty+' / 48 · SKU '+sku,'bin',meta.y);
+   }
+  }
+ }
+ add('INTERIOR-'+warehouseId,m,b.x,0,b.z);
+}
+buildInterior('warehouse',3);
+buildInterior('WH-03',3);
+buildInterior('WH-06',4);
+
+// container yard: stacked and separated by freight category
+for(let a=0;a<5;a++)for(let b=0;b<3;b++){let x=78+a*4.6,z=38+b*3.2;container(x,z,['#3278e9','#2c8d9c','#e6a85b'][b],1+(a+b)%2);}
+entity('YARD-01','Container Yard','YARD · CONTAINERS',92,43,'Northgate · bãi container','22 container đang chờ xuất','yard',2);
+// pallets and inventory staging near receiving docks
+for(let a=0;a<7;a++)for(let b=0;b<3;b++){
+ let x=44+a*12.4,z=17+b*2.2; if(a===4)continue;
+ pallet(x,z,1+(a+b)%2);
+}
+// Service yard: maintenance, charging, guardhouse, traffic cones.
+function service(id,x,z){let m=new Mesh();m.box(0,0,0,7,2.6,5,{top:'#eef6ff',front:'#afcbe7',left:'#93bce0',right:'#bed6ee',back:'#bdd3ec'});m.box(-.15,2.6,-.18,7.3,.25,5.35,'#2477c8');for(let a=0;a<2;a++){m.box(.8+a*3.1,.2,5.05,2.2,1.9,.09,'#b3d9f2');m.box(.98+a*3.1,.3,5.16,1.85,1.5,.05,'#e8f8ff')};add(id,m,x,0,z);entity(id,id==='GATE'?'Cổng an ninh':'Trạm sạc và bảo dưỡng',id==='GATE'?'SECURITY':'SERVICE',x+3.5,z+2.5,'Facility · phòng kỹ thuật','Camera · điện cấp · 2 nhân viên','facility',2)}
+service('SERVICE',-11,69);service('GATE',136,82);
+for(let a=0;a<5;a++){let xx=-9+a*2.9;B(xx,.12,62,.22,1.9,.22,'#ffc257');B(xx,.12,64,.22,1.9,.22,'#ffc257');B(xx-.3,2.06,62,.82,.12,2.2,'#35455d')}
+entity('CHARGING','Trạm sạc xe nâng','ENERGY · CHARGING',-4,63,'Riverside · service area','3/5 vị trí sạc · công suất 65%','facility',2);
+for(let a=0;a<8;a++)for(let b=0;b<2;b++){let x=110+a*3.9,z=37+b*6.3;B(x,.082,z,.12,.01,4.1,'#ffffff');B(x,.082,z,2.65,.01,.10,'#ffffff')}
+// Parking trucks along logistics loop, plus active fleets moving on paths.
+for(let [id,x,z,angle,label] of [['TRK-4001',55,34,0,'Northgate Express'],['TRK-4002',97,56,Math.PI,'SupplyLine'],['TRK-4003',128,89,0,'Eastport Cargo']]){
+ truck(x,z,(x|0)%2===0,angle,id);entity(id,id+' · '+label,'FLEET · TRUCK',x,z,label+' · logistics route','Tốc độ mô phỏng · GPS giả lập','truck',1.5)
+}
+for(let [id,x,z,angle] of [['FL-04',47,17,.4],['FL-05',83,17,-.4],['FL-06',109,18,.25],['FL-07',55,82,-.6],['FL-08',116,81,.8]]){
+ forklift(x,z,angle,id);entity(id,'Xe nâng '+id,'FLEET · FORKLIFT',x,z,'Warehouse handling · '+id,'Pin 82% · đang di chuyển','forklift',1.3)
+}
+// Light poles along the main roads, delicate small tree groups to establish scale.
+function light(x,z){let m=new Mesh();m.box(0,0,0,.16,4,.16,'#889fbb');m.box(-.52,4,-.20,1.2,.20,.45,'#e8f0fb');m.box(-.42,3.9,-.14,.9,.05,.27,'#ffe6a0');add('lamp-'+x+'-'+z,m,x,0,z)}
+for(let x=4;x<138;x+=20){light(x,23);light(x,61)}
+for(let x=5;x<145;x+=13){tree(x,97,.8)}
+for(let z=3;z<88;z+=17){tree(145,z,.85)}
+// Iconic control tower and directional gantry.
+function tower(){let m=new Mesh();m.box(0,0,0,6,4.5,6,{top:'#e8f4ff',front:'#b5cce2',left:'#8bb0ce',right:'#b6d2e9',back:'#c2d9ec'});m.box(-.3,4.5,-.4,6.6,.32,6.8,'#3a7ddf');for(let i=0;i<3;i++)m.box(0.5+i*1.65,2.6,6,.98,1.45,.07,'#78c5ee');m.box(1.1,4.9,2,3.8,.3,1.6,'#2e5b98');add('TOWER',m,130,0,61);entity('TOWER','Điều hành khu vận tải','CONTROL · TOWER',133,64,'Eastport · Logistics HQ','Tổng số xe hoạt động: 11','facility',4)}tower();
+const movingPaths=[
+{id:'truck2',p:[[27,32],[38,32],[43,34],[64,34],[90,34],[128,34]],dur:66,offset:8},
+{id:'TRK-4001',p:[[49,34],[66,34],[91,34],[130,34],[130,56],[96,56]],dur:85,offset:27},
+{id:'TRK-4002',p:[[96,56],[114,56],[128,56],[130,80],[106,87],[65,87]],dur:100,offset:40},
+{id:'forklift1',p:[[1,14],[7,20],[8,22],[13,21],[7,20],[1,14]],dur:20,offset:6},
+{id:'FL-04',p:[[47,18],[53,18],[57,22],[51,22],[47,18]],dur:27,offset:13},
+{id:'FL-05',p:[[83,16],[89,18],[91,22],[86,20],[83,16]],dur:26,offset:7},
+{id:'FL-06',p:[[109,18],[115,20],[124,22],[115,21],[109,18]],dur:35,offset:11},
+{id:'FL-07',p:[[55,82],[61,83],[68,87],[61,84],[55,82]],dur:32,offset:0},
+{id:'FL-08',p:[[116,81],[124,82],[130,87],[124,83],[116,81]],dur:28,offset:13}
+];
+let worldSpeed=1,worldClock=0,worldShowLabels=true;
+
+let worldFilter='all';
+const worldFilterModes=['all','fleet','inventory'];
+const worldFilterTitles={'all':'👁 Tất cả','fleet':'🚚 Đội xe','inventory':'📦 Tồn kho'};
+function worldAllows(o){if(o.id.endsWith('-roof'))return roofVisible(o.id.slice(0,-5));if(worldFilter==='all')return true;let id=o.id,m=worldEntities[id];if(m?.cat==='warehouse'||m?.cat==='racking'||m?.cat==='facility')return true;if(worldFilter==='fleet')return /^(TRK-|FL-|truck|forklift)/i.test(id)||m?.cat==='truck'||m?.cat==='forklift';return !(/^(TRK-|FL-|truck|forklift|lamp-)/i.test(id)||m?.cat==='truck'||m?.cat==='forklift')}
+const filterBtn=document.getElementById('worldFilter');filterBtn.onclick=()=>{worldFilter=worldFilterModes[(worldFilterModes.indexOf(worldFilter)+1)%worldFilterModes.length];filterBtn.textContent=worldFilterTitles[worldFilter];filterBtn.classList.toggle('active',worldFilter!=='all')};
+function detailFor(id){const m=worldEntities[id];if(!m)return;let fields=[];if(m.cat==='bin'){const b=binById.get(id);if(!b)return;fields=[['Vị trí',b.aisle+' / '+String(b.bay).padStart(2,'0')+' / L'+b.level],['SKU',b.sku],['Số lượng',b.qty+' / '+b.capacity],['Lot',b.lot],['Kho',b.warehouse==='warehouse'?'WH-01':b.warehouse],['Tình trạng',b.qty===0?'Trống':b.qty<10?'Sắp hết':'Còn hàng']]}else if(m.cat==='warehouse')fields=[['Công suất',id==='WH-05'?'71%':'78%'],['Cửa dock',id==='WH-05'?'4':'6'],['Hàng tồn','1.412 pallet'],['Nhiệt độ',id==='WH-05'?'4 °C':'24 °C']];else if(m.cat==='truck')fields=[['Trạng thái','Trên tuyến'],['Mã chuyến','SHP-'+(id.match(/\d+/)||['78442'])[0]],['Tải hàng','6/12 pallet'],['Dự kiến tới','~12 phút']];else if(m.cat==='forklift')fields=[['Pin còn','82%'],['Tải định mức','2,5 tấn'],['Nhiệm vụ','Điều chuyển pallet'],['Bảo trì','Đã kiểm tra']];else if(m.cat==='racking')fields=[['Dãy kệ','12'],['Tầng kệ','4'],['Loại hàng','Thùng pallet'],['Sử dụng','72%']];else if(m.cat==='yard')fields=[['Container','22'],['Đang chờ','7'],['Đã xếp','15'],['Hiệu suất','89%']];else fields=[['Trạng thái','Đang vận hành'],['Khu','Logistics'],['Thiết bị','Ổn định'],['Cảnh báo','Không có']];let box=document.getElementById('worldDetails');box.innerHTML='<div class="world-detail-head"><span>◉ '+(m.cat==='truck'?'Theo dõi phương tiện':m.cat==='forklift'?'Thiết bị & tác vụ':m.cat==='warehouse'?'Hoạt động nhà kho':m.cat==='bin'?'Ô hàng & kiểm kê':'Dữ liệu khu vực')+'</span><small>DEMO</small></div><div class="world-detail-data">'+fields.map(f=>'<div><label>'+f[0]+'</label><b>'+f[1]+'</b></div>').join('')+'</div><footer>Dữ liệu ví dụ · chưa kết nối WMS/ERP/GPS</footer>';if(m.cat==='truck'){let head=document.querySelector('.ship-title small');if(head)head.textContent=id+' · WareTrack';let ship=document.querySelector('.ship-detail strong');if(ship)ship.textContent='#SHP-'+(id.match(/\d+/)||['78442'])[0]}}
+function worldDockRows(mode){let rows=mode==='forklifts'?['FL-01','FL-04','FL-05','FL-07'].map((id,i)=>[id,['Đang chuyển pallet','Đang xếp hàng','Đang phân loại','Điều chuyển kho'][i],i===2?'Standby':'Active',String(74+i*5)+'%']):mode==='trucks'?['truck1','TRK-4001','TRK-4002','TRK-4003'].map((id,i)=>[id.toUpperCase(),['Đang bốc hàng','Outbound','Inbound','Lên lịch'][i],i?'En route':'Loading',i?'~12m':'4/6']):['WH-01 · Bay 1','WH-03 · Bay 2','WH-05 · Bay 3','WH-07 · Bay 4'].map((id,i)=>[id,['TRK-2051 · Loading','TRK-4001 · Arriving','Đang nhận hàng','Bay trống'][i],i===3?'Available':i===1?'En route':'Loading',i===3?'—':'2/6']);document.getElementById('dockRows').innerHTML=rows.map(r=>'<div class="dockrow"><div><b>'+r[0]+'</b><small>WORLD</small></div><div>'+r[1]+'</div><span class="action '+(r[2]==='En route'?'move':r[2]==='Available'?'wait':'')+'">'+r[2]+'</span><span class="right">'+r[3]+'</span></div>').join('')}
+
+function stepWorld(dt){if(st.paused)return;worldClock+=dt*worldSpeed;for(let m of movingPaths){let o=objects.find(q=>q.id===m.id);if(!o)continue;let t=((worldClock+m.offset)%m.dur)/m.dur*(m.p.length-1),ix=Math.min(m.p.length-2,Math.floor(t)),u=t-ix;let a=m.p[ix],b=m.p[ix+1];o.x=a[0]+(b[0]-a[0])*u;o.z=a[1]+(b[1]-a[1])*u;o.rot=Math.atan2(b[1]-a[1],b[0]-a[0]);if(worldEntities[m.id]){worldEntities[m.id].x=o.x;worldEntities[m.id].z=o.z}}}
+function overview(){setCamera(67,40,W<690?.43:.36,.90);st.yaw=.70;cameraFeedback('Đang xem toàn cảnh · zoom trỏ chuột/chạm, ấn ⌂ để khôi phục')}
+function focusZone(index){const z=worldZones[index];setCamera(z.x,z.z,W<690?.89:.92,.86);st.yaw=.70;st.elev=.86;site=index;document.getElementById('siteLabel').textContent=z.name;document.getElementById('dockSite').textContent=z.name;document.querySelector('.site-sticker').textContent=['WH-01','WH-03','WH-05'][index];document.getElementById('stockVal').innerHTML=z.stock.toLocaleString('en-US')+' <em>✦ +15</em>';document.getElementById('stockDetail').textContent=z.stock.toLocaleString('en-US')+' / 2,200';worldButtons.forEach((b,i)=>b.classList.toggle('active',i===index+1))}
+const worldButtons=['worldOverview','worldWest','worldCenter','worldEast'].map(id=>document.getElementById(id));
+worldButtons[0].onclick=()=>{overview();worldButtons.forEach((b,i)=>b.classList.toggle('active',i===0))};
+for(let i=0;i<3;i++)worldButtons[i+1].onclick=()=>focusZone(i);
+document.getElementById('worldPause').onclick=()=>{st.paused=!st.paused;let b=document.getElementById('worldPause');b.textContent=st.paused?'▶ Tiếp tục':'Ⅱ Tạm dừng';b.setAttribute('aria-pressed',String(st.paused));b.classList.toggle('active',st.paused)};
+document.getElementById('worldSpeed').onclick=()=>{worldSpeed=worldSpeed===1?2:worldSpeed===2?4:.5;document.getElementById('worldSpeed').textContent=worldSpeed+'× tốc độ'};
+document.getElementById('worldLabels').onclick=()=>{worldShowLabels=!worldShowLabels;document.getElementById('worldLabels').classList.toggle('active',worldShowLabels)};
+function worldMarker(ctx,x,z,label,icon){let p=project(x,3.6,z);if(p.x<-60||p.x>W+60||p.y<135||p.y>H-95)return;ctx.save();ctx.translate(p.x,p.y);ctx.fillStyle='#ffffffed';ctx.strokeStyle='#bdd2ee';ctx.lineWidth=1;let size=Math.min(106,38+label.length*4.25);ctx.beginPath();ctx.roundRect(-size/2,-24,size,21,6);ctx.fill();ctx.stroke();ctx.fillStyle='#2860b9';ctx.font='bold 10px system-ui';ctx.textAlign='center';ctx.fillText(icon+' '+label,0,-10);ctx.restore()}
+function worldOverlay(){if(!worldShowLabels)return;for(let [id,m] of Object.entries(worldEntities)){if(!m.cat||m.cat==='truck'||m.cat==='forklift'||m.cat==='racking'||m.cat==='bin')continue;let short=id.startsWith('WH-')?id:(id==='warehouse'?'WH-01':id==='rearWarehouse'?'WH-02':id);worldMarker(ctx,m.x,m.z,short,m.cat==='warehouse'?'▣':'◆')}const active=worldEntities[selected];if(active)worldMarker(ctx,active.x,active.z,'● '+(selected.length>9?selected.slice(0,9):selected),'⌖')}
+function mapRender(){const c=document.getElementById('worldMap');if(!c)return;const g=c.getContext('2d'),w=c.width,h=c.height,px=x=>(x+20)/174*w,pz=z=>(z+20)/128*h;g.clearRect(0,0,w,h);g.fillStyle='#e8f1fb';g.fillRect(0,0,w,h);g.strokeStyle='#cad9e8';g.lineWidth=7;for(let z of [28,56,87]){g.beginPath();g.moveTo(0,pz(z));g.lineTo(w,pz(z));g.stroke()}for(let x of [41,73,105,134]){g.beginPath();g.moveTo(px(x),0);g.lineTo(px(x),h);g.stroke()}for(let [id,m] of Object.entries(worldEntities)){if(m.cat!=='warehouse')continue;g.fillStyle=id===selected?'#ffb846':'#4d8bec';g.fillRect(px(m.x)-10,pz(m.z)-6,20,12)}for(let [id,m] of Object.entries(worldEntities)){if(m.cat!=='truck'&&m.cat!=='forklift')continue;g.fillStyle=m.cat==='truck'?'#334c78':'#f1b93e';g.beginPath();g.arc(px(m.x),pz(m.z),m.cat==='truck'?3:2,0,Math.PI*2);g.fill()}g.strokeStyle='#204e9e';g.lineWidth=2;g.strokeRect(px(st.centerX)-13,pz(st.centerZ)-11,26,22);g.fillStyle='#1847a7';g.font='bold 16px system-ui';g.fillText('A',px(12),pz(44));g.fillText('B',px(73),pz(44));g.fillText('C',px(122),pz(44))}
+// Warehouse Explorer UX, inventory bins and roof cutaway.
+const binPanel=document.getElementById('binPanel'),binSel=document.getElementById('binWarehouse');
+const binStats={count:binLocations.length,filled:binLocations.filter(b=>b.qty>0).length};
+function updateRoofButton(){const el=document.getElementById('worldRoof');el.textContent=roofMode==='open'?'◫ Mái: Đang ẩn':roofMode==='closed'?'▣ Mái: Đang hiện':'◫ Mái: Tự động';el.classList.toggle('active',roofMode==='open')}
+function openBinExplorer(wh='warehouse',moveCamera=true){interiorBuilding=wh;binSel.value=wh;binPanel.hidden=false;roofMode='open';updateRoofButton();const b=indoorBounds[wh];if(moveCamera){setCamera(b.x+b.w*.51,b.z+b.d*.50,W<690?2.5:2.0,1.14);st.yaw=.56}renderBinList();cameraFeedback('Đang quan sát '+(wh==='warehouse'?'WH-01':wh)+' · mái ẩn · chọn ô chứa trên 3D hoặc danh sách')}
+function renderBinList(){const bs=binLocations.filter(b=>b.warehouse===interiorBuilding),filled=bs.filter(b=>b.qty).length;document.getElementById('binSummary').textContent=filled+'/'+bs.length+' ô có hàng';document.getElementById('binSubtitle').textContent='Có '+bs.length+' ô · '+(bs.length-filled)+' ô trống · click ô để xem SKU/lot';const rows=[...new Set(bs.map(b=>b.aisle))];document.getElementById('binList').innerHTML=rows.map(a=>'<div class="bin-section">Dãy '+a+' · lối đi '+a+'</div><div class="bin-grid">'+bs.filter(b=>b.aisle===a).map(b=>'<button type="button" class="bin-cell '+(b.qty===0?'empty':b.qty<10?'low':'')+(selected===b.id?' selected':'')+'" data-bin="'+b.id+'"><b>'+a+String(b.bay).padStart(2,'0')+' · L'+b.level+'</b><small>'+b.qty+'/48 · '+b.sku+'</small></button>').join('')+'</div>').join('')}
+document.getElementById('worldInside').onclick=()=>openBinExplorer(interiorBuilding);
+document.getElementById('worldRoof').onclick=()=>{roofMode=roofMode==='auto'?'open':roofMode==='open'?'closed':'auto';updateRoofButton();cameraFeedback('Hiển thị mái: '+roofMode)};
+document.getElementById('binClose').onclick=()=>{binPanel.hidden=true;roofMode='auto';updateRoofButton()};
+binSel.onchange=e=>openBinExplorer(e.target.value);
+document.getElementById('binList').onclick=e=>{const b=e.target.closest('[data-bin]');if(!b)return;show(b.dataset.bin);focus();renderBinList();if(window.WTMobile&&W<690)window.WTMobile.open('inspect')};
+
+const worldMap=document.getElementById('worldMap');worldMap.addEventListener('pointerdown',e=>{const r=worldMap.getBoundingClientRect();st.centerX=clamp((e.clientX-r.left)/r.width*174-20,-12,142);st.centerZ=clamp((e.clientY-r.top)/r.height*128-20,-12,100);st.zoom=Math.max(st.zoom,.65)});
+window.WT_WORLD={entities:worldEntities,overview,focusZone,stepWorld,getCamera:()=>({...st}),getState:()=>({paused:st.paused,speed:worldSpeed,time:worldClock,entities:Object.keys(worldEntities).length}),getInterior:()=>({bins:binLocations.length,roof:roofMode,warehouse:interiorBuilding}),zoomAt};
+
+// REAL GPU 3D RENDERER. Vertex buffers hold the same procedural meshes used by the 2D fallback.
+// Perspective-free orthographic camera, with hardware depth testing, per-face Lambert lighting,
+ // pixel-ratio aware antialiasing, and separate real geometry for every truck/pallet/forklift.
+diag.set('meshes',objects.length+1);diag.set('sceneTriangles',staticMesh.t.length+objects.reduce((sum,o)=>sum+o.mesh.t.length,0));diag.note('INFO',objects.length+' model objects embedded; '+diag.D.sceneTriangles+' mesh triangles');
+let gl=null, glReady=false,program=null,gpuStatic=null,gpuObjects=[],gpuShadows=[];
+const gpuState={};
+function makeShader(gl,type,source){let o=gl.createShader(type);gl.shaderSource(o,source);gl.compileShader(o);if(!gl.getShaderParameter(o,gl.COMPILE_STATUS)){let msg=gl.getShaderInfoLog(o)||'Unknown shader failure';diag.set('shader','FAILED: '+msg);throw Error(msg)}diag.set('shader','OK · vertex + fragment shaders');return o}
+function createGL(){
+ try{
+ gl=glCanvas.getContext('webgl',{antialias:true,alpha:false,depth:true,preserveDrawingBuffer:true,powerPreference:'high-performance'}) || glCanvas.getContext('experimental-webgl',{antialias:true,alpha:false,depth:true});
+ if(!gl)throw Error('WebGL unavailable (getContext returned null)');diag.gl(gl);diag.set('context','WebGL '+gl.getParameter(gl.VERSION));diag.set('vendor',gl.getParameter(gl.VENDOR)+' / '+gl.getParameter(gl.RENDERER));diag.set('maxTexture',gl.getParameter(gl.MAX_TEXTURE_SIZE));
+ const vert=`attribute vec3 aPosition;attribute vec3 aNormal;attribute vec3 aColor;
+ uniform vec2 uResolution;uniform vec2 uOrigin;uniform vec2 uYaw;uniform vec2 uElev;uniform vec2 uCenter;uniform float uScale;uniform vec4 uObject;uniform vec3 uSize;
+ varying vec3 vColor;varying vec3 vNormal;varying float vHeight;
+ void main(){
+ vec3 v=aPosition*uSize;
+ vec2 xz=vec2(v.x*cos(uObject.w)-v.z*sin(uObject.w),v.x*sin(uObject.w)+v.z*cos(uObject.w));
+ vec3 p=vec3(xz.x+uObject.x,v.y+uObject.y,xz.y+uObject.z);
+ vec2 rel=p.xz-uCenter;
+ float horizontal=rel.x*uYaw.x-rel.y*uYaw.y;
+ float back=rel.x*uYaw.y+rel.y*uYaw.x;
+ float py=back*uElev.y-p.y*uElev.x;
+ float depth=back*uElev.x+p.y*uElev.y;
+ vec2 pixel=uOrigin+vec2(horizontal,py)*uScale;
+ gl_Position=vec4(pixel.x/uResolution.x*2.0-1.0,1.0-pixel.y/uResolution.y*2.0,-depth/140.0,1.0);
+ vec3 n=aNormal;
+ vNormal=normalize(vec3(n.x*cos(uObject.w)-n.z*sin(uObject.w),n.y,n.x*sin(uObject.w)+n.z*cos(uObject.w)));
+ vColor=aColor;vHeight=p.y;
+ }`;
+ const frag=`precision mediump float;varying vec3 vColor;varying vec3 vNormal;varying float vHeight;uniform float uOpacity;
+ void main(){
+ vec3 light=normalize(vec3(-0.55,1.00,0.65));
+ float diffuse=max(dot(normalize(vNormal),light),0.0);
+ float shade=0.78+0.23*diffuse;
+ vec3 col=vColor*shade;
+ col=mix(col,vec3(0.78,0.86,0.98),0.015);
+ gl_FragColor=vec4(col,uOpacity);
+ }`;
+ program=gl.createProgram();gl.attachShader(program,makeShader(gl,gl.VERTEX_SHADER,vert));gl.attachShader(program,makeShader(gl,gl.FRAGMENT_SHADER,frag));gl.linkProgram(program);
+ if(!gl.getProgramParameter(program,gl.LINK_STATUS)){diag.set('program','FAILED: '+gl.getProgramInfoLog(program));throw Error(gl.getProgramInfoLog(program))}diag.set('program','OK · attributes + uniforms');gl.useProgram(program);
+ for(let name of ['Resolution','Origin','Yaw','Elev','Center','Scale','Object','Size','Opacity'])gpuState[name]=gl.getUniformLocation(program,'u'+name);
+ for(let name of ['Position','Normal','Color'])gpuState[name]=gl.getAttribLocation(program,'a'+name);
+ const makeBuffer=m=>{let v=[];for(let t of m.t){let c=t.col.match(/[a-f\d]{2}/gi).map(h=>parseInt(h,16)/255);for(let p of t.p)v.push(...p,...t.n,...c)}let b=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(v),gl.STATIC_DRAW);return {buffer:b,count:v.length/9}};
+ gpuStatic=makeBuffer(staticMesh);gpuObjects=objects.map(o=>({obj:o,buf:makeBuffer(o.mesh)}));
+ // Soft contact shadows are GPU-rendered transparent ellipses slightly above the ground.
+ let shadowCircle=new Mesh();let N=30;for(let j=0;j<N;j++){let a=j*2*Math.PI/N,b=(j+1)*2*Math.PI/N;shadowCircle.tri([0,.054,0],[Math.cos(a),.054,Math.sin(a)],[Math.cos(b),.054,Math.sin(b)],'#607899')}
+ const shadowBuffer=makeBuffer(shadowCircle);
+ gpuShadows=objects.filter(o=>!/tree|pallet|roof|INTERIOR/.test(o.id)).map(o=>{let isWarehouse=/warehouse/i.test(o.id),isTruck=/truck/i.test(o.id);return {obj:o,buf:shadowBuffer,sx:isWarehouse?11:isTruck?3.2:1.1,sz:isWarehouse?7:isTruck?1.65:1.2,opacity:isWarehouse?.075:.13}});
+ gl.enable(gl.DEPTH_TEST);gl.depthFunc(gl.LEQUAL);gl.disable(gl.CULL_FACE);gl.clearColor(.888,.932,.996,1);
+ glReady=true;glCanvas.style.display=forceSoftware?'none':'block';document.getElementById('renderMode').textContent=forceSoftware?'Software 3D · forced':'WebGL 3D · live';diag.note('INFO','WebGL mesh buffers uploaded; objects='+gpuObjects.length);
+ glCanvas.addEventListener('webglcontextlost',e=>{e.preventDefault();glReady=false;glCanvas.style.display='none';document.getElementById('renderMode').textContent='Software 3D';diag.note('ERROR','WebGL context LOST');});glCanvas.addEventListener('webglcontextrestored',()=>{diag.note('INFO','WebGL context RESTORED; reload or click Try WebGL to reinitialize');glReady=false});
+ return true;
+ }catch(error){diag.note('WARN','WebGL init fallback: '+(error.stack||error));console.warn('WebGL fallback:',error);glReady=false;glCanvas.style.display='none';document.getElementById('renderMode').textContent='Software 3D';diag.set('context','WebGL init failed');return false}
+}
+function drawGPU(){
+ if(!glReady)return;
+ let gpuDrawCalls=0,gpuTriangleCount=0;gl.viewport(0,0,glCanvas.width,glCanvas.height);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.useProgram(program);
+ gl.uniform2f(gpuState.Resolution,W,H);gl.uniform2f(gpuState.Origin,W*(W<690?.48:.36),H*(W<690?.46:.435));
+ gl.uniform2f(gpuState.Yaw,Math.cos(st.yaw),Math.sin(st.yaw));gl.uniform2f(gpuState.Elev,Math.cos(st.elev),Math.sin(st.elev));gl.uniform2f(gpuState.Center,st.centerX,st.centerZ);
+ gl.uniform1f(gpuState.Scale,Math.min(W/55,H/32)*st.zoom*(W<690?1.20:1.04));
+ const draw=(gpu,x=0,y=0,z=0,rotation=0,sx=1,sy=1,sz=1,alpha=1)=>{
+ gl.bindBuffer(gl.ARRAY_BUFFER,gpu.buffer);
+ const stride=36;for(let [n,ofs] of [['Position',0],['Normal',12],['Color',24]]){let loc=gpuState[n];gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,3,gl.FLOAT,false,stride,ofs)}
+ gl.uniform4f(gpuState.Object,x,y,z,rotation);gl.uniform3f(gpuState.Size,sx,sy,sz);gl.uniform1f(gpuState.Opacity,alpha);gl.drawArrays(gl.TRIANGLES,0,gpu.count);gpuDrawCalls++;gpuTriangleCount+=gpu.count/3
+ };
+ draw(gpuStatic);
+ gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);gl.depthMask(false);
+ for(let shadow of gpuShadows){let o=shadow.obj;let isWarehouse=/warehouse/i.test(o.id);draw(shadow.buf,o.x+(isWarehouse?8.5:0),0,o.z+(isWarehouse?4.6:0),0,shadow.sx,1,shadow.sz,shadow.opacity)}
+ gl.depthMask(true);gl.disable(gl.BLEND);
+ for(let r of gpuObjects){let o=r.obj;if(worldAllows(o))draw(r.buf,o.x,o.y,o.z,o.rot)}
+ diag.D.drawCalls=gpuDrawCalls;diag.D.gpuTriangles=gpuTriangleCount;
+ if(diag.D.frames%45===0)sampleScene();
+}
+createGL();
+function sampleScene(){
+ try{
+  if(glReady&&!forceSoftware){let c=glCanvas,pts=[[.36,.45],[.42,.40],[.28,.55],[.50,.58],[.36,.68],[.64,.4],[.2,.28],[.55,.2]],out=[];for(let p of pts){let b=new Uint8Array(4);let xx=Math.max(0,Math.min(c.width-1,Math.floor(c.width*p[0])));let yy=Math.max(0,Math.min(c.height-1,Math.floor(c.height*(1-p[1]))));gl.readPixels(xx,yy,1,1,gl.RGBA,gl.UNSIGNED_BYTE,b);out.push(b[0]+'-'+b[1]+'-'+b[2]);}let n=new Set(out).size;diag.D.pixels=n+' distinct colors at '+pts.length+' points'+(n<=1?' (uniform / scene may be blank)':' (scene varies)')+'; '+out.join(' | ');diag.D.glError='0x'+gl.getError().toString(16)}
+  else{let px=ctx.getImageData(Math.max(0,Math.floor(canvas.width*.36)),Math.max(0,Math.floor(canvas.height*.5)),1,1).data;diag.D.pixels='Canvas 2D: '+Array.from(px).join(',');diag.D.glError='not using WebGL'}
+ }catch(e){diag.D.pixels='readPixels error: '+e.message;diag.note('WARN','Scene sampling: '+e.message)}
+}
+function setMode(mode){forceSoftware=mode==='2d';diag.set('request',mode);if(!forceSoftware&&!glReady)createGL();glCanvas.style.display=(glReady&&!forceSoftware)?'block':'none';document.getElementById('renderMode').textContent=glReady&&!forceSoftware?'WebGL 3D · live':'Software 3D'+(forceSoftware?' · forced':' · fallback');if(glReady&&!forceSoftware)drawGPU();else drawScene();sampleScene()}
+window.WT_APP={setMode:setMode,sample:sampleScene,resetCamera:function(){overview();drawScene()}};
+// mesh triangulation projected with orthographic orbit camera; depth-sorted faces.
+function project(x,y,z){let a=st.yaw,co=Math.cos(a),si=Math.sin(a),dx=x-st.centerX,dz=z-st.centerZ;let horizontal=dx*co-dz*si,back=dx*si+dz*co;let e=st.elev,vertical=back*Math.sin(e)-y*Math.cos(e),depth=back*Math.cos(e)+y*Math.sin(e);let sz=Math.min(W/55,H/32)*st.zoom*(W<690?1.20:1.04);return {x:W*(W<690?.48:.36)+horizontal*sz,y:H*(W<690?.46:.435)+vertical*sz,depth}}
+let hits=[],triangles=[],markers=[];
+function buildTriangle(t,o){let co=Math.cos(o.rot),si=Math.sin(o.rot),ps=t.p.map(p=>{let xx=o.x+p[0]*co-p[2]*si,z=o.z+p[0]*si+p[2]*co;return project(xx,o.y+p[1],z)});if(ps.every(p=>p.x< -100)||ps.every(p=>p.x>W+100)||ps.every(p=>p.y< -100)||ps.every(p=>p.y>H+100))return;let n=t.n,shade=.93+(Math.max(-.1,n[0]*-.36+n[1]*.86+n[2]*.35))*.12;let c=t.col.match(/\w\w/g).map(a=>parseInt(a,16));let color=`rgb(${c.map(v=>Math.min(255,Math.round(v*shade))).join(',')})`;triangles.push({ps,depth:ps.reduce((a,p)=>a+p.depth,0)/3,col:color})}
+const still={id:null,mesh:staticMesh,x:0,y:0,z:0,rot:0};
+function pin(x,y,z){const a=project(x,y,z);markers.push(a)}
+function drawPins(){for(let p of markers){if(p.x<0||p.x>W||p.y<60||p.y>H-115)continue;ctx.save();ctx.shadowColor='#437ded70';ctx.shadowBlur=9;ctx.shadowOffsetY=3;ctx.fillStyle='#3778f0';ctx.beginPath();ctx.arc(p.x,p.y-9,9,Math.PI,Math.PI*2);ctx.bezierCurveTo(p.x+9,p.y-1,p.x,p.y+11,p.x,p.y+11);ctx.bezierCurveTo(p.x,p.y+11,p.x-9,p.y-1,p.x-9,p.y-9);ctx.fill();ctx.shadowBlur=0;ctx.fillStyle='#e7f1ff';ctx.beginPath();ctx.arc(p.x,p.y-9,3,0,Math.PI*2);ctx.fill();ctx.restore()}}
+function drawScene(){if(!W||!H)return;ctx.setTransform(dpr,0,0,dpr,0,0);if(glReady&&!forceSoftware){drawGPU();diag.tick('WebGL',diag.D.drawCalls,diag.D.gpuTriangles);ctx.clearRect(0,0,W,H);markers=[];for(let [x,z] of [[6,19],[21,23],[12,28],[30,23],[7,25]])pin(x,1.45,z);drawPins();drawTruckMark('truck1','WareTrack');drawTruckMark('truck2','Bluepeak');worldOverlay();mapRender();return;}let sky=ctx.createLinearGradient(0,0,0,H);sky.addColorStop(0,'#e7efff');sky.addColorStop(1,'#d9e5fb');ctx.fillStyle=sky;ctx.fillRect(0,0,W,H);triangles=[];hits=[];markers=[];for(let t of staticMesh.t)buildTriangle(t,still);triangles.sort((a,b)=>a.depth-b.depth);for(let t of triangles){let p=t.ps;ctx.beginPath();ctx.moveTo(p[0].x,p[0].y);ctx.lineTo(p[1].x,p[1].y);ctx.lineTo(p[2].x,p[2].y);ctx.closePath();ctx.fillStyle=t.col;ctx.fill()}triangles=[];for(let o of objects){if(!worldAllows(o))continue;if(st.zoom<.85&&/^(lamp-|tree$|pallet$|container$)/.test(o.id))continue;for(let t of o.mesh.t)buildTriangle(t,o)}triangles.sort((a,b)=>a.depth-b.depth);for(let t of triangles){let p=t.ps;ctx.beginPath();ctx.moveTo(p[0].x,p[0].y);ctx.lineTo(p[1].x,p[1].y);ctx.lineTo(p[2].x,p[2].y);ctx.closePath();ctx.fillStyle=t.col;ctx.fill()}
+ for(let [x,z] of [[6,19],[21,23],[12,28],[30,23],[7,25]])pin(x,1.45,z);drawPins();drawTruckMark('truck1','WareTrack');drawTruckMark('truck2','Bluepeak');worldOverlay();mapRender();diag.tick('Canvas 2D',objects.length+1,diag.D.sceneTriangles);if(diag.D.frames%50===0)sampleScene()}
+function drawTruckMark(id,text){let o=objects.find(a=>a.id===id);if(!o)return;let p=project(o.x-1.1,1.30,o.z+.83);ctx.save();ctx.translate(p.x,p.y);ctx.rotate(.34);ctx.fillStyle='#2869cb';ctx.font='bold 8px Inter,system-ui';ctx.fillText('◆ '+text,-11,0);ctx.restore()}
+function clickPick(cx,cy){const r=canvas.getBoundingClientRect(),x=cx-r.left,y=cy-r.top;let closest=null,distance=1e9;for(let [id,m] of Object.entries(worldEntities)){if(m.cat==='bin'&&(st.zoom<1.20||roofVisible(binById.get(id)?.warehouse)))continue;let p=project(m.x,m.y,m.z),d=Math.hypot(p.x-x,p.y-y);if(d<distance){distance=d;closest=id}}return distance<Math.max(28,Math.min(78,27*st.zoom+34))?closest:null}
+const details={warehouse:['DEPOT · WH-01','Riverside Hub','12 Riverside Dr, Newark NJ','Operational','1 docked · 1 arriving · 3 staged'],rearWarehouse:['BUILDING · WH-A2','Storage Building A','Riverside Hub · Zone A','Operational','Bulk goods · 78% occupied'],truck1:['TRUCK · TRK-2051','WareTrack Truck','Bay 1 · Riverside Hub','Loading','2 of 6 pallets loaded'],truck2:['TRUCK · TRK-2287','Bluepeak Delivery','Outbound Lane','En route','ETA 3 minutes'],forklift1:['FORKLIFT · FL-01','Forklift FL-01','Riverside Hub · Loading Bay','Loading','Battery 75% · 2.5 t rated'],pallet:['INVENTORY · P-142','Cardboard Boxes','Zone B · Bay 2','In Stock','Stacked · 48 units']};
+function show(id){let e=worldEntities[id];if(!e&&!details[id])return;selected=id;let d=e?[e.kind,e.title,e.desc,e.state,e.activity]:details[id];['type','name','place','operation','activity'].forEach((key,i)=>$(key).textContent=d[i]);$('forkName').textContent=id==='forklift1'?'FL-01':'FL-01';$('forkStatus').textContent=id==='forklift1'?'Active at Bay 1':'Loading TRK-2051 at Bay 1';detailFor(id);if(!binPanel.hidden)renderBinList()}
+function focus(){let m=worldEntities[selected];if(m){setCamera(m.x,m.z,m.cat==='bin'?2.6:1.25,m.cat==='bin'?1.20:st.elev);if(m.cat==='bin'){interiorBuilding=binById.get(selected).warehouse;roofMode='open';updateRoofButton();openBinExplorer(interiorBuilding,false)}}else{setCamera(19,15,1.25)}}
+
+canvas.addEventListener('touchmove',e=>{if(e.cancelable)e.preventDefault()},{passive:false});
+let pointers=new Map(),gesture=null;
+function midPoints(){const a=[...pointers.values()];return {x:(a[0].x+a[1].x)/2,y:(a[0].y+a[1].y)/2,d:Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y)}}
+canvas.addEventListener('pointerdown',e=>{e.preventDefault();pointers.set(e.pointerId,{x:e.clientX,y:e.clientY,startX:e.clientX,startY:e.clientY});try{canvas.setPointerCapture(e.pointerId)}catch(_){}holder.classList.add('drag');if(pointers.size===1){gesture={x:e.clientX,y:e.clientY,yaw:st.yaw,elev:st.elev,centerX:st.centerX,centerZ:st.centerZ,moved:false}}else if(pointers.size===2){const p=midPoints(),anchor=worldAtScreen(p.x-holder.getBoundingClientRect().left,p.y-holder.getBoundingClientRect().top);gesture={pinch:true,d:Math.max(5,p.d),zoom:st.zoom,world:anchor,moved:true}}});
+canvas.addEventListener('pointermove',e=>{const p=pointers.get(e.pointerId);if(!p||!gesture)return;p.x=e.clientX;p.y=e.clientY;if(pointers.size===2&&gesture.pinch){const m=midPoints(),r=holder.getBoundingClientRect();st.zoom=clamp(gesture.zoom*m.d/gesture.d,.19,3.45);const at=worldAtScreen(m.x-r.left,m.y-r.top);st.centerX+=gesture.world.x-at.x;st.centerZ+=gesture.world.z-at.z;boundCamera();return}if(pointers.size===1&&!gesture.pinch){const dx=e.clientX-gesture.x,dy=e.clientY-gesture.y;if(Math.hypot(dx,dy)>6)gesture.moved=true;if(e.shiftKey){let a=worldAtScreen(gesture.x-holder.getBoundingClientRect().left,gesture.y-holder.getBoundingClientRect().top,st.zoom,gesture.centerX,gesture.centerZ),b=worldAtScreen(e.clientX-holder.getBoundingClientRect().left,e.clientY-holder.getBoundingClientRect().top,st.zoom,gesture.centerX,gesture.centerZ);st.centerX=gesture.centerX+a.x-b.x;st.centerZ=gesture.centerZ+a.z-b.z;boundCamera()}else{st.yaw=gesture.yaw+dx*.0075;st.elev=clamp(gesture.elev+dy*.004,.30,1.47)}}});
+canvas.addEventListener('pointerup',e=>{if(pointers.size===1&&gesture&&!gesture.moved&&!gesture.pinch){let id=clickPick(e.clientX,e.clientY);if(id){show(id);if(window.matchMedia('(max-width:680px)').matches&&window.WTMobile)window.WTMobile.open('inspect')}}pointers.delete(e.pointerId);if(pointers.size===0){gesture=null;holder.classList.remove('drag')}else{const p=[...pointers.values()][0];gesture={x:p.x,y:p.y,yaw:st.yaw,elev:st.elev,centerX:st.centerX,centerZ:st.centerZ,moved:true}}});
+canvas.addEventListener('pointercancel',e=>{pointers.delete(e.pointerId);gesture=null;holder.classList.remove('drag')});
+canvas.addEventListener('wheel',e=>{e.preventDefault();const r=holder.getBoundingClientRect();zoomAt(e.clientX-r.left,e.clientY-r.top,Math.exp(-clamp(e.deltaY,-180,180)*.0018));cameraFeedback('Zoom '+st.zoom.toFixed(2)+'× · tâm '+st.centerX.toFixed(1)+', '+st.centerZ.toFixed(1))},{passive:false});
+$('zoomIn').onclick=()=>zoomAt(W*(W<690?.48:.36),H*(W<690?.46:.435),1.18);
+$('zoomOut').onclick=()=>zoomAt(W*(W<690?.48:.36),H*(W<690?.46:.435),1/1.18);
+$('rotateL').onclick=()=>st.yaw-=Math.PI/8;$('rotateR').onclick=()=>st.yaw+=Math.PI/8;$('reset').onclick=()=>{overview();roofMode='auto';updateRoofButton();binPanel.hidden=true};$('focus').onclick=focus;
+$('siteSwitch').onclick=()=>focusZone((site+1)%3);
+document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-tab]').forEach(n=>n.classList.toggle('active',n===b));let mode=b.dataset.tab;let data=mode==='docks'?[['Bay 1','TRK-2051 · WareTrack','Loading','2/6'],['Bay 2','No truck assigned','Available',''],['Inbound','TRK-2287 · Bluepeak','En route','3 min']]:mode==='forklifts'?[['FL-01','Loading at Bay 1','Active','75%'],['FL-02','Charging station','Standby','92%']]:[['TRK-2051','WareTrack · Bay 1','Loading','2/6'],['TRK-2287','Bluepeak · Inbound','En route','3 min']];$('dockRows').innerHTML=data.map((r,i)=>`<div class="dockrow"><div><b>${r[0]}</b><small>WH-01</small></div><div>${r[1]}</div><span class="action ${r[2]==='Loading'||r[2]==='Active'?'':r[2]==='En route'?'move':'wait'}">${r[2]}</span><span class="right">${r[3]} ›</span></div>`).join('')}));
+document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>worldDockRows(b.dataset.tab)));worldDockRows('docks');
+$('search').addEventListener('keydown',e=>{if(e.key==='Enter'){let txt=e.target.value.trim().toLowerCase();let id=Object.keys(worldEntities).find(id=>[id,worldEntities[id].title,worldEntities[id].desc].some(t=>t.toLowerCase().includes(txt)));if(id){show(id);focus();if(window.WTMobile&&W<690)window.WTMobile.open('inspect')}else diag.note('INFO','Search not found: '+txt);e.target.blur()}});
+function animation(ts){if(ts-frameT>(glReady&&!forceSoftware?70:160)){let dt=Math.min(.12,(ts-frameT)/1000);elapsed+=ts-frameT;frameT=ts;stepWorld(dt);try{drawScene()}catch(e){diag.error('drawScene()',e);if(!forceSoftware){forceSoftware=true;glCanvas.style.display='none';document.getElementById('renderMode').textContent='Software 3D · recovered';try{drawScene()}catch(e2){diag.error('Canvas 2D fallback',e2)}}}}requestAnimationFrame(animation)}resize();overview();show('warehouse');diag.note('INFO','Initial resize complete: '+W+' x '+H);requestAnimationFrame(animation);let timer=0;setInterval(()=>{let d=new Date();$('clock').textContent=d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:false})},1000);
+})();
+</script></body></html>
