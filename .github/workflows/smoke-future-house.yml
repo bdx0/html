@@ -1,0 +1,49 @@
+name: Smoke test 3D house
+on:
+  push:
+    branches: [main]
+    paths:
+      - future-house-3d.html
+      - assets/three.min.js
+      - scripts/test_future_house.mjs
+      - .github/workflows/smoke-future-house.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+  issues: write
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install browser
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Open actual HTML in Chromium desktop and mobile
+        id: test
+        continue-on-error: true
+        run: node scripts/test_future_house.mjs
+      - name: Post diagnostic results to issue 1
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require("fs");
+            const path = "nexus-smoke-report.md";
+            const body = fs.existsSync(path) ? fs.readFileSync(path,"utf8").slice(0,60000) : "Playwright did not reach the test phase. See workflow installation logs."; 
+            await github.rest.issues.createComment({owner:context.repo.owner,repo:context.repo.repo,issue_number:1,body});
+      - name: Attach screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nexus-3d-screenshots
+          path: nexus-*.png
+          if-no-files-found: ignore
+      - name: Signal failure
+        if: steps.test.outcome == 'failure'
+        run: exit 1
