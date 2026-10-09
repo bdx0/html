@@ -21,7 +21,7 @@ try{
    const gl=canvas?.getContext('webgl2')||canvas?.getContext('webgl');
    return {title:document.title,hasThree:!!window.THREE,archvizAddon:typeof window.NEXUS_ARCHVIZ==='function',version:window.THREE?.REVISION,canvas:!!canvas,canvasSize:canvas?[canvas.width,canvas.height]:null,webgl:!!gl,loader:loader?.className,loaderMessage:status?.textContent,viewport:[innerWidth,innerHeight]};
   });
-  try{await page.locator('#debugBtn').click();await sleep(800);}catch(e){issues.push('DEBUG BTN: '+String(e));}
+  try{await page.locator('#debugBtn').click();await page.waitForFunction(()=>document.querySelector('#debug')?.textContent.includes('Triangles:'),{timeout:20000});}catch(e){issues.push('DEBUG BTN: '+String(e));}
   const debug=await page.locator('#debug').textContent().catch(e=>'Could not read debug: '+String(e));
   try{await page.locator('#dayBtn').click();await page.locator('#explodeBtn').click();await page.locator('#xrayBtn').click();await sleep(500);}catch(e){issues.push('BUTTON: '+String(e));}
   const after=await page.evaluate(()=>({night:document.querySelector('#dayBtn')?.getAttribute('aria-pressed'),explode:document.querySelector('#explodeBtn')?.getAttribute('aria-pressed'),xray:document.querySelector('#xrayBtn')?.getAttribute('aria-pressed')}));
