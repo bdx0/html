@@ -14,5 +14,22 @@
     "theme": "cyan",
     "featured": true,
     "order": 1
+  },
+  "warestack-3d.html": {
+    "title": "WareStack 3D — Warehouse Explorer v4",
+    "description": "Khám phá khu logistics WebGL 3D có nhà kho, xe nâng, xe tải, 240 ô chứa pallet, minimap và Debug Panel. Xoay camera, zoom, ẩn mái, chọn hàng hóa và theo dõi trạng thái mô phỏng.",
+    "category": "Mô phỏng 3D",
+    "tags": [
+      "3D",
+      "WebGL",
+      "Kho hàng",
+      "Digital Twin",
+      "Logistics",
+      "Interactive"
+    ],
+    "icon": "🏭",
+    "theme": "emerald",
+    "featured": true,
+    "order": 2
   }
 }
