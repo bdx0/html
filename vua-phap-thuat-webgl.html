@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#07121f">
+<title>Vua Pháp Thuật — WebGL 2.5D Prototype</title>
+<meta name="description" content="Prototype HTML5 + WebGL 2.5D lấy cảm hứng từ cấu trúc webgame nhập vai: bản đồ isometric, depth sorting, click-to-move, Pet và hiệu ứng kỹ năng.">
+<meta name="catalog:category" content="Game & WebGL">
+<meta name="catalog:tags" content="WebGL,HTML5,2.5D,Isometric,Game,Prototype">
+<meta name="catalog:icon" content="🔮">
+<style>
+:root{color-scheme:dark;--bg:#06101b;--panel:#0c1826e8;--border:#26435e;--text:#eef7ff;--muted:#9bb0c5;--accent:#73f0d4;--gold:#ffd980}
+*{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--text)}
+body{touch-action:none;background:radial-gradient(circle at 70% 0,#112746 0,#07101c 48%,#040a12 100%)}
+#game{position:fixed;inset:0;width:100%;height:100%;display:block;cursor:crosshair}
+.ui{position:fixed;inset:0;pointer-events:none}
+.topbar{position:absolute;left:18px;right:18px;top:max(14px,env(safe-area-inset-top));display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.brand,.hud,.panel,.hint{pointer-events:auto;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);background:linear-gradient(145deg,#102239e8,#0a1524e8);border:1px solid #294962;border-radius:18px;box-shadow:0 16px 55px #0008}
+.brand{padding:13px 16px;min-width:240px}.brand b{display:block;font-size:15px;letter-spacing:.02em}.brand small{display:block;color:#8ea8bf;margin-top:4px;font-size:11px}.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 18px var(--accent);margin-right:7px}
+.hud{padding:12px 14px;min-width:270px}.row{display:flex;align-items:center;gap:9px}.avatar{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(145deg,#493d8a,#24a5b4);border:2px solid #e9d8ff;font-size:21px}.stats{flex:1}.name{font-weight:800;font-size:13px}.bar{height:7px;margin-top:5px;background:#17253a;border-radius:99px;overflow:hidden;border:1px solid #233850}.bar i{display:block;height:100%;border-radius:inherit}.hp i{width:82%;background:linear-gradient(90deg,#ff637e,#ff9272)}.mp i{width:68%;background:linear-gradient(90deg,#5aa7ff,#64e3ff)}
+.panel{position:absolute;right:18px;bottom:max(18px,env(safe-area-inset-bottom));width:min(330px,calc(100vw - 36px));padding:15px}.panel h2{font-size:13px;margin:0 0 9px;color:#d9efff}.panel p{font-size:11.5px;line-height:1.5;color:#93abc1;margin:0}.chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}.chip{border:1px solid #37536c;background:#13253a;color:#cfe8f8;border-radius:999px;padding:6px 9px;font-size:10px}.chip strong{color:#7cf2d8}
+.actions{position:absolute;left:50%;bottom:max(18px,env(safe-area-inset-bottom));transform:translateX(-50%);display:flex;gap:10px;pointer-events:auto}.action{width:54px;height:54px;border-radius:17px;border:1px solid #4a617c;background:linear-gradient(160deg,#182b43,#0d1726);color:white;display:grid;place-items:center;font-size:24px;box-shadow:0 10px 30px #0008;cursor:pointer;position:relative}.action:hover{border-color:#83ead9;transform:translateY(-2px)}.action small{position:absolute;right:5px;bottom:4px;font-size:9px;color:#a9bed0}.action.primary{background:linear-gradient(160deg,#4c3f93,#1c5f72);border-color:#8c9cff}
+.hint{position:absolute;left:18px;bottom:max(18px,env(safe-area-inset-bottom));padding:10px 12px;color:#9cb1c6;font-size:11px}.hint b{color:#dff9f1}.status{position:absolute;left:50%;top:max(18px,env(safe-area-inset-top));transform:translateX(-50%);padding:7px 11px;background:#07131fbb;border:1px solid #24455d;border-radius:99px;color:#9fbacf;font-size:10px;letter-spacing:.08em;text-transform:uppercase}.status strong{color:#75efd5}
+#toast{position:absolute;left:50%;top:84px;transform:translate(-50%,-15px);opacity:0;background:#0b1c2de8;border:1px solid #37617b;border-radius:12px;padding:9px 13px;font-size:12px;transition:.2s;white-space:nowrap}#toast.show{opacity:1;transform:translate(-50%,0)}
+@media(max-width:720px){.brand{min-width:0;padding:10px 12px}.brand small{display:none}.hud{min-width:205px;padding:9px 10px}.panel{display:none}.hint{font-size:10px;max-width:190px}.actions{bottom:22px}.action{width:49px;height:49px}.status{display:none}}
+@media(max-width:520px){.topbar{left:10px;right:10px}.brand{display:none}.hud{margin-left:auto}.hint{left:10px;bottom:86px}.actions{gap:7px}.action{width:47px;height:47px;border-radius:14px}}
+</style>
+</head>
+<body>
+<canvas id="game" aria-label="Prototype game WebGL 2.5D"></canvas>
+<div class="ui">
+  <div class="topbar">
+    <div class="brand"><b><span class="dot"></span>Vua Pháp Thuật · WebGL Lab</b><small>Prototype kỹ thuật — asset dựng thủ tục, không dùng tài nguyên game gốc</small></div>
+    <div class="hud"><div class="row"><div class="avatar">🧙</div><div class="stats"><div class="name">Pháp Sư · Lv. 42</div><div class="bar hp"><i></i></div><div class="bar mp"><i></i></div></div></div></div>
+  </div>
+  <div class="status"><strong>WEBGL</strong> · isometric renderer · depth sort</div>
+  <div id="toast"></div>
+  <div class="hint"><b>Chạm / click</b> lên bản đồ để di chuyển.<br>Pet tự bám theo nhân vật.</div>
+  <div class="actions">
+    <button class="action primary" id="skill" title="Kỹ năng">✨<small>1</small></button>
+    <button class="action" id="pet" title="Gọi Pet">🐉<small>2</small></button>
+    <button class="action" id="center" title="Đưa camera về nhân vật">🎯<small>C</small></button>
+  </div>
+  <aside class="panel">
+    <h2>Vertical slice 2.5D</h2>
+    <p>Renderer dùng WebGL thật. Tile isometric, sprite, cây/NPC/Pet đều được sắp xếp theo chiều sâu dựa trên tọa độ thế giới. Phần combat/economy chỉ là demo client; trong game thật, server phải là nguồn dữ liệu quyết định.</p>
+    <div class="chips"><span class="chip"><strong>WebGL</strong> render</span><span class="chip">Isometric</span><span class="chip">Depth sort</span><span class="chip">Click-to-move</span><span class="chip">Pet follow</span></div>
+  </aside>
+</div>
+<script>
+(() => {
+'use strict';
+const canvas=document.getElementById('game');
+const gl=canvas.getContext('webgl',{alpha:false,antialias:true,premultipliedAlpha:false});
+if(!gl){document.body.innerHTML='<div style="padding:30px;color:white">Trình duyệt này không hỗ trợ WebGL.</div>';return;}
+
+const TILE_W=96,TILE_H=48,MAP_W=18,MAP_H=18;
+let vw=innerWidth,vh=innerHeight,dpr=Math.min(devicePixelRatio||1,2);
+let camera={x:0,y:0,targetX:0,targetY:0};
+let last=performance.now(),time=0,petVisible=true;
+const pointer={x:0,y:0};
+
+const vs=`
+attribute vec2 a_pos;attribute vec2 a_uv;uniform vec2 u_res;varying vec2 v_uv;
+void main(){vec2 z=a_pos/u_res;vec2 c=z*2.0-1.0;gl_Position=vec4(c*vec2(1.0,-1.0),0,1);v_uv=a_uv;}`;
+const fs=`
+precision mediump float;uniform sampler2D u_tex;uniform vec4 u_tint;varying vec2 v_uv;
+void main(){vec4 c=texture2D(u_tex,v_uv)*u_tint;if(c.a<0.03)discard;gl_FragColor=c;}`;
+function shader(type,src){const s=gl.createShader(type);gl.shaderSource(s,src);gl.compileShader(s);if(!gl.getShaderParameter(s,gl.COMPILE_STATUS))throw new Error(gl.getShaderInfoLog(s));return s;}
+const program=gl.createProgram();gl.attachShader(program,shader(gl.VERTEX_SHADER,vs));gl.attachShader(program,shader(gl.FRAGMENT_SHADER,fs));gl.linkProgram(program);gl.useProgram(program);
+const aPos=gl.getAttribLocation(program,'a_pos'),aUv=gl.getAttribLocation(program,'a_uv');
+const uRes=gl.getUniformLocation(program,'u_res'),uTex=gl.getUniformLocation(program,'u_tex'),uTint=gl.getUniformLocation(program,'u_tint');
+const buf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buf);gl.enableVertexAttribArray(aPos);gl.enableVertexAttribArray(aUv);
+const STRIDE=16;gl.vertexAttribPointer(aPos,2,gl.FLOAT,false,STRIDE,0);gl.vertexAttribPointer(aUv,2,gl.FLOAT,false,STRIDE,8);
+gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);gl.clearColor(.025,.055,.085,1);
+
+function makeTexture(w,h,draw){const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d');x.imageSmoothingEnabled=true;draw(x,w,h);const t=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,t);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,c);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);return t;}
+const textures={};
+textures.grass=makeTexture(TILE_W,TILE_H,(x,w,h)=>{x.clearRect(0,0,w,h);x.beginPath();x.moveTo(w/2,1);x.lineTo(w-1,h/2);x.lineTo(w/2,h-1);x.lineTo(1,h/2);x.closePath();const g=x.createLinearGradient(0,0,0,h);g.addColorStop(0,'#4d936b');g.addColorStop(1,'#2e6a55');x.fillStyle=g;x.fill();x.strokeStyle='#6ab087';x.lineWidth=1;x.stroke();for(let i=0;i<14;i++){const px=18+Math.random()*(w-36),py=12+Math.random()*(h-24);x.fillStyle=i%3?'#4b8f62':'#86b970';x.fillRect(px,py,1.5,3)}});
+textures.path=makeTexture(TILE_W,TILE_H,(x,w,h)=>{x.beginPath();x.moveTo(w/2,1);x.lineTo(w-1,h/2);x.lineTo(w/2,h-1);x.lineTo(1,h/2);x.closePath();const g=x.createLinearGradient(0,0,0,h);g.addColorStop(0,'#b08a62');g.addColorStop(1,'#7d5e48');x.fillStyle=g;x.fill();x.strokeStyle='#d5b182';x.stroke();});
+textures.water=makeTexture(TILE_W,TILE_H,(x,w,h)=>{x.beginPath();x.moveTo(w/2,1);x.lineTo(w-1,h/2);x.lineTo(w/2,h-1);x.lineTo(1,h/2);x.closePath();const g=x.createLinearGradient(0,0,w,h);g.addColorStop(0,'#247b97');g.addColorStop(1,'#194b7a');x.fillStyle=g;x.fill();x.strokeStyle='#67bad0';x.stroke();x.globalAlpha=.55;for(let i=0;i<4;i++){x.strokeStyle='#91e9ef';x.beginPath();x.moveTo(22+i*13,18+i%2*6);x.lineTo(41+i*12,18+i%2*6);x.stroke()}});
+textures.hero=makeTexture(72,104,(x,w,h)=>{x.clearRect(0,0,w,h);x.fillStyle='#0007';x.beginPath();x.ellipse(w/2,h-12,20,7,0,0,Math.PI*2);x.fill();x.fillStyle='#6140b7';x.beginPath();x.moveTo(21,86);x.quadraticCurveTo(36,40,51,86);x.lineTo(44,96);x.lineTo(27,96);x.closePath();x.fill();x.fillStyle='#f2c9a4';x.beginPath();x.arc(36,37,13,0,Math.PI*2);x.fill();x.fillStyle='#23253e';x.beginPath();x.arc(36,33,15,Math.PI,0);x.fill();x.fillStyle='#3de4e3';x.fillRect(48,43,5,37);x.fillStyle='#b6ffff';x.beginPath();x.arc(50,40,7,0,Math.PI*2);x.fill();x.fillStyle='#fff';x.font='bold 11px system-ui';x.textAlign='center';x.fillText('★',36,72)});
+textures.pet=makeTexture(64,64,(x,w,h)=>{x.fillStyle='#0006';x.beginPath();x.ellipse(32,55,18,5,0,0,Math.PI*2);x.fill();x.fillStyle='#64c7b0';x.beginPath();x.moveTo(11,37);x.quadraticCurveTo(14,18,29,19);x.quadraticCurveTo(45,12,51,29);x.quadraticCurveTo(58,43,42,48);x.quadraticCurveTo(25,58,11,37);x.fill();x.fillStyle='#8df4dd';x.beginPath();x.moveTo(18,23);x.lineTo(8,11);x.lineTo(27,18);x.fill();x.beginPath();x.moveTo(43,19);x.lineTo(55,8);x.lineTo(49,27);x.fill();x.fillStyle='#1b3851';x.beginPath();x.arc(39,29,3,0,7);x.fill();x.fillStyle='#fff';x.fillRect(39,28,1,1)});
+textures.tree=makeTexture(92,142,(x,w,h)=>{x.fillStyle='#0005';x.beginPath();x.ellipse(46,132,28,8,0,0,Math.PI*2);x.fill();x.fillStyle='#6d4b38';x.fillRect(40,77,13,49);const blobs=[[45,55,34,'#285f4a'],[27,68,25,'#337758'],[63,69,25,'#2c6d52'],[45,34,29,'#3b8460']];for(const [a,b,r,c] of blobs){x.fillStyle=c;x.beginPath();x.arc(a,b,r,0,7);x.fill()}x.fillStyle='#70a86b';x.beginPath();x.arc(35,35,7,0,7);x.fill()});
+textures.npc=makeTexture(66,96,(x,w,h)=>{x.fillStyle='#0006';x.beginPath();x.ellipse(33,88,18,6,0,0,7);x.fill();x.fillStyle='#d88b46';x.beginPath();x.moveTo(19,79);x.lineTo(28,43);x.lineTo(40,43);x.lineTo(49,79);x.closePath();x.fill();x.fillStyle='#efc09b';x.beginPath();x.arc(34,31,12,0,7);x.fill();x.fillStyle='#6a3d25';x.fillRect(21,17,27,9);x.fillStyle='#ffe99a';x.font='bold 16px serif';x.fillText('!',30,12)});
+textures.spark=makeTexture(40,40,(x,w,h)=>{const g=x.createRadialGradient(20,20,1,20,20,19);g.addColorStop(0,'#fff');g.addColorStop(.25,'#9fffea');g.addColorStop(.55,'#9aa7ffcc');g.addColorStop(1,'#7f5bff00');x.fillStyle=g;x.fillRect(0,0,w,h)});
+textures.ring=makeTexture(128,64,(x,w,h)=>{x.translate(w/2,h/2);x.scale(1,.38);x.strokeStyle='#9affeb';x.lineWidth=4;x.shadowColor='#83f5df';x.shadowBlur=14;x.beginPath();x.arc(0,0,50,0,Math.PI*2);x.stroke()});
+
+function iso(gx,gy,z=0){return{x:(gx-gy)*TILE_W/2,y:(gx+gy)*TILE_H/2-z};}
+function screen(gx,gy,z=0){const p=iso(gx,gy,z);return{x:vw/2+(p.x-camera.x),y:vh/2+(p.y-camera.y)};}
+function worldFromScreen(sx,sy){const px=sx-vw/2+camera.x,py=sy-vh/2+camera.y;return{x:(py/(TILE_H/2)+px/(TILE_W/2))/2,y:(py/(TILE_H/2)-px/(TILE_W/2))/2};}
+function draw(tex,x,y,w,h,tint=[1,1,1,1]){const v=new Float32Array([x,y,0,0, x+w,y,1,0, x,y+h,0,1, x,y+h,0,1, x+w,y,1,0, x+w,y+h,1,1]);gl.bindBuffer(gl.ARRAY_BUFFER,buf);gl.bufferData(gl.ARRAY_BUFFER,v,gl.STREAM_DRAW);gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,tex);gl.uniform1i(uTex,0);gl.uniform4fv(uTint,tint);gl.drawArrays(gl.TRIANGLES,0,6);}
+function resize(){vw=innerWidth;vh=innerHeight;dpr=Math.min(devicePixelRatio||1,2);canvas.width=Math.floor(vw*dpr);canvas.height=Math.floor(vh*dpr);canvas.style.width=vw+'px';canvas.style.height=vh+'px';gl.viewport(0,0,canvas.width,canvas.height);gl.uniform2f(uRes,vw,vh);}
+addEventListener('resize',resize,{passive:true});resize();
+
+const tiles=[];for(let y=0;y<MAP_H;y++)for(let x=0;x<MAP_W;x++){let type='grass';if(x===8||x===9||y===9)type='path';if((x<3&&y>11)||(x>14&&y<5))type='water';tiles.push({x,y,type});}
+const objects=[
+ {type:'tree',x:4.4,y:4.2,z:0,w:92,h:142,oy:125},{type:'tree',x:12.4,y:3.2,z:0,w:92,h:142,oy:125},{type:'tree',x:3.2,y:12.5,z:0,w:92,h:142,oy:125},{type:'tree',x:13.3,y:12.1,z:0,w:92,h:142,oy:125},
+ {type:'npc',x:7.2,y:7.0,z:0,w:66,h:96,oy:86,name:'Thương nhân'},{type:'npc',x:10.3,y:10.8,z:0,w:66,h:96,oy:86,name:'Đạo sư'}
+];
+const player={x:8.4,y:8.2,tx:8.4,ty:8.2,speed:3.2,bob:0};
+const pet={x:7.8,y:8.6,trail:[],bob:0};
+let particles=[],rings=[];
+function recenter(immediate=false){const p=iso(player.x,player.y);camera.targetX=p.x;camera.targetY=p.y-20;if(immediate){camera.x=camera.targetX;camera.y=camera.targetY;}}
+recenter(true);
+
+function setTarget(gx,gy){player.tx=Math.max(.5,Math.min(MAP_W-1.5,gx));player.ty=Math.max(.5,Math.min(MAP_H-1.5,gy));}
+function update(dt){time+=dt;player.bob=Math.sin(time*7)*1.3;const dx=player.tx-player.x,dy=player.ty-player.y,d=Math.hypot(dx,dy);if(d>.015){const s=Math.min(d,player.speed*dt);player.x+=dx/d*s;player.y+=dy/d*s;pet.trail.push({x:player.x,y:player.y});if(pet.trail.length>42)pet.trail.shift();}
+ if(petVisible&&pet.trail.length>18){const t=pet.trail[Math.max(0,pet.trail.length-18)];pet.x+=(t.x-pet.x)*Math.min(1,dt*5);pet.y+=(t.y-pet.y)*Math.min(1,dt*5);pet.bob=Math.sin(time*8+1)*2;}
+ const cp=iso(player.x,player.y);camera.targetX=cp.x;camera.targetY=cp.y-20;camera.x+=(camera.targetX-camera.x)*Math.min(1,dt*3.5);camera.y+=(camera.targetY-camera.y)*Math.min(1,dt*3.5);
+ particles.forEach(p=>{p.t-=dt;p.x+=p.vx*dt;p.y+=p.vy*dt;p.z+=p.vz*dt;p.vz-=35*dt;});particles=particles.filter(p=>p.t>0);rings.forEach(r=>r.t-=dt);rings=rings.filter(r=>r.t>0);
+}
+function render(){gl.clear(gl.COLOR_BUFFER_BIT);gl.uniform2f(uRes,vw,vh);
+ // world tiles, back-to-front
+ for(const t of tiles){const p=screen(t.x,t.y);draw(textures[t.type],p.x-TILE_W/2,p.y-TILE_H/2,TILE_W,TILE_H,t.type==='water'?[.9,.98,1,1]:[1,1,1,1]);}
+ // decor path stones
+ for(let i=2;i<15;i+=2){const p=screen(8.5,i+.2);draw(textures.ring,p.x-12,p.y-5,24,12,[.36,.45,.39,.35]);}
+ const entities=objects.map(o=>({...o,sort:o.x+o.y}));entities.push({type:'hero',x:player.x,y:player.y,z:22,w:72,h:104,oy:92,sort:player.x+player.y+.02});if(petVisible)entities.push({type:'pet',x:pet.x,y:pet.y,z:9,w:64,h:64,oy:55,sort:pet.x+pet.y+.01});entities.sort((a,b)=>a.sort-b.sort);
+ for(const o of entities){const z=o.type==='hero'?22+player.bob:o.type==='pet'?9+pet.bob:0;const p=screen(o.x,o.y,z);draw(textures[o.type],p.x-o.w/2,p.y-o.oy,o.w,o.h,[1,1,1,1]);}
+ for(const r of rings){const p=screen(r.x,r.y,4);const k=1+(1-r.t/r.life)*.8,alpha=Math.max(0,r.t/r.life);draw(textures.ring,p.x-64*k,p.y-32*k,128*k,64*k,[.7,1,.95,alpha]);}
+ for(const q of particles){const p=screen(q.x,q.y,q.z);const a=Math.min(1,q.t/.3);draw(textures.spark,p.x-14,p.y-14,28,28,[1,1,1,a]);}
+}
+function loop(now){const dt=Math.min(.033,(now-last)/1000);last=now;update(dt);render();requestAnimationFrame(loop);}requestAnimationFrame(loop);
+
+function activateSkill(){rings.push({x:player.x,y:player.y,t:.7,life:.7});for(let i=0;i<18;i++){const a=Math.PI*2*i/18+Math.random()*.3;particles.push({x:player.x,y:player.y,z:35+Math.random()*28,vx:Math.cos(a)*(.5+Math.random()*.8),vy:Math.sin(a)*(.5+Math.random()*.8),vz:20+Math.random()*28,t:.7+Math.random()*.55});}toast('✨ Linh Quang — hiệu ứng client demo');}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(()=>t.classList.remove('show'),1500);}
+function pointerToTarget(e){const r=canvas.getBoundingClientRect();const p=worldFromScreen(e.clientX-r.left,e.clientY-r.top);setTarget(p.x,p.y);rings.push({x:player.tx,y:player.ty,t:.36,life:.36});}
+canvas.addEventListener('pointerdown',e=>{pointer.x=e.clientX;pointer.y=e.clientY;pointerToTarget(e);});
+document.getElementById('skill').onclick=activateSkill;
+document.getElementById('pet').onclick=()=>{petVisible=!petVisible;toast(petVisible?'🐉 Pet đã xuất hiện':'Pet đã được cất');};
+document.getElementById('center').onclick=()=>{recenter(false);toast('🎯 Camera bám nhân vật');};
+addEventListener('keydown',e=>{if(e.key==='1')activateSkill();if(e.key==='2')document.getElementById('pet').click();if(e.key.toLowerCase()==='c')document.getElementById('center').click();});
+})();
+</script>
+</body>
+</html>
