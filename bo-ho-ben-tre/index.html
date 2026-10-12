@@ -29,7 +29,7 @@ button{border:1px solid #38536a;background:#1a3047;border-radius:9px;padding:8px
 .tabs{display:grid;grid-template-columns:repeat(3,1fr);padding:10px;gap:5px}.tabs button{padding:9px 2px;font-size:11px}
 .panel{overflow:auto;min-height:0;padding:8px 14px 20px;overscroll-behavior:contain}.panel h2{font-size:16px;margin:8px 0 10px}.sub{color:#aec3d7;font-size:12px}.note{color:#ffd29c;background:#51382550;border:1px solid #775a39;padding:9px;border-radius:8px;font-size:11px}
 .photo{border:1px solid #314a5f;border-radius:11px;background:#162b40;overflow:hidden;margin-bottom:10px}.photo img{width:100%;height:108px;object-fit:cover;background:#274056;display:block}.photo .txt{padding:10px}.photo .txt b{font-size:12px}.photo .txt p{margin:4px 0 7px;color:#aabdd0;font-size:11px}.photo a{font-size:11px}
-.line{display:flex;justify-content:space-between;align-items:flex-start;gap:6px;padding:10px 0;border-bottom:1px solid #2a4258}.line b{font-size:11px}.line span{color:#aabed2;text-align:right;font-size:11px}
+.line{display:flex;justify-content:space-between;align-items:flex-start;gap:6px;padding:10px 0;border-bottom:1px solid #2a4258}.filters{display:flex;gap:7px;flex-wrap:wrap;grid-column:1/-1;margin:10px 0}.filters select,.filters input{background:#1c3046;border:1px solid #42617b;color:#ebf7ff;border-radius:8px;padding:8px;width:100%}#reqList{grid-column:1/-1}.catalog-entry{border-bottom:1px solid #314961;padding:8px 0;display:flex;gap:8px;justify-content:space-between;align-items:center}.catalog-entry b{display:block;font-size:11px}.catalog-entry small{display:block;color:#9cb4c6;font-size:10px;margin-top:3px}.entryphotos{display:flex;gap:4px;flex-shrink:0}.entryphotos img{width:38px;height:38px;border-radius:5px;object-fit:cover}.photolabel{padding:7px 10px;color:#acebd6;font-weight:700;font-size:11px}.photo .txt button{padding:5px 7px;font-size:10px}.line b{font-size:11px}.line span{color:#aabed2;text-align:right;font-size:11px}
 .statgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}.stat{padding:12px;background:#172d42;border:1px solid #31485d;border-radius:11px}.stat strong{font-size:24px;line-height:1.1}.stat small{display:block;color:#9db5ca;margin-top:5px}
 .legend{display:flex;gap:7px;flex-wrap:wrap;margin-top:7px;color:#b7cad8;font-size:10px}.dot{width:8px;height:8px;display:inline-block;border-radius:50%;margin-right:4px}
 .debug{position:absolute;bottom:156px;right:12px;width:min(370px,calc(100% - 24px));max-height:40vh;overflow:auto;z-index:6;background:#06121af2;border:1px solid #6294a3;border-radius:12px;display:none;padding:12px;box-shadow:0 15px 50px #0008}
@@ -148,16 +148,38 @@ stage.addEventListener("wheel",function(e){e.preventDefault();dist=clamp(dist*Ma
 mini.addEventListener("click",function(e){var r=mini.getBoundingClientRect();target.x=((e.clientX-r.left)/r.width-.5)*1100;target.z=(.5-(e.clientY-r.top)/r.height)*650;updateCamera()});
 }
 function safe(s){return String(s==null?"":s).replace(/[&<>"']/g,function(v){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[v]})}
+function findImg(id){return data.images.find(function(a){return a.id===id})}
+function switchTab(tab){activeTab=tab;document.querySelectorAll("[data-tab]").forEach(function(c){c.classList.toggle("active",c.dataset.tab===tab)});$("inspector").classList.remove("collapsed");$("collapse").textContent="Thu gọn";showPanel()}
+function showRequirements(){var grp=$("catFilter"),search=$("reqSearch"),list=$("reqList");if(!grp||!search||!list)return;
+var cat=grp.value,needle=search.value.trim().toLocaleLowerCase("vi-VN"),matches=[];
+(data.catalog_groups||[]).forEach(function(g){if(cat!=="ALL"&&g.category!==cat)return;g.items.forEach(function(it){if(!needle||(it.title+" "+it.id+" "+g.category).toLocaleLowerCase("vi-VN").includes(needle))matches.push({group:g.category,item:it})})});
+var a='<p class="sub">'+matches.length+' kết quả · hiển thị tối đa 45 mục. Liên kết ảnh mang tính tham chiếu, không đồng nghĩa xác minh hiện trạng.</p>';
+matches.slice(0,45).forEach(function(o){var it=o.item;a+='<div class="catalog-entry"><div><b>'+safe(it.id)+' · '+safe(it.title)+'</b><small>'+safe(o.group)+' · '+safe(it.priority)+' · '+safe(it.status)+'</small></div><div class="entryphotos">';
+(it.photo_ids||[]).slice(0,2).forEach(function(pid){var i=findImg(pid);if(i)a+='<a title="'+safe(i.title)+'" href="'+safe(i.source_url)+'" rel="noopener noreferrer" target="_blank"><img loading="lazy" src="'+safe(i.image_url)+'" alt="'+safe(i.title)+'"></a>'});
+a+='</div></div>'});list.innerHTML=a}
 function showPanel(){if(!data){panel.innerHTML="<h2>Chưa có dữ liệu</h2>";return}
-if(activeTab==="images"){var a='<h2>Ảnh theo danh mục</h2><p class="sub">Ảnh được liên kết từ nguồn gốc; không đóng gói/nhận quyền tái sử dụng. Ảnh cũ có thể khác hiện trạng.</p>';
-data.images.forEach(function(i){a+='<article class="photo"><img loading="lazy" alt="'+safe(i.title)+'" src="'+safe(i.image_url)+'" onerror="this.style.display=&quot;none&quot;"><div class="txt"><b>'+safe(i.title)+'</b><p>'+safe(i.category)+' · '+safe(i.year)+' · '+safe(i.author)+'</p><a target="_blank" rel="noopener noreferrer" href="'+safe(i.source_url)+'">Mở nguồn ảnh ↗</a></div></article>'});panel.innerHTML=a}
-else if(activeTab==="data"){var s=data.stats;var a='<h2>Kiểm kê dữ liệu</h2><div class="statgrid">';
-[["requirements","Danh mục yêu cầu"],["survey_shots","Góc chụp cần khảo sát"],["osm_features","Hình học OSM"],["photo_links","Liên kết ảnh"]].forEach(function(k){a+='<div class="stat"><strong>'+safe(s[k[0]])+'</strong><small>'+safe(k[1])+'</small></div>'});
+if(activeTab==="images"){var a='<h2>16 nhóm dữ liệu và ảnh thực tế</h2><p class="sub">Mỗi nhóm liên kết tới ảnh nguồn và các yêu cầu riêng trong SQLite. Ảnh lịch sử chỉ để tham chiếu; không sao chép thành asset nếu chưa có quyền.</p>';
+(data.catalog_groups||[]).forEach(function(g,idx){var id=(g.image_ids||[])[0],p=findImg(id);
+a+='<article class="photo"><div class="photolabel">'+safe(g.category)+' · '+g.count+' hạng mục</div>';
+if(p)a+='<img loading="lazy" src="'+safe(p.image_url)+'" alt="'+safe(p.title)+'">';
+a+='<div class="txt"><b>'+safe(p?p.title:"Cần ảnh chụp mới")+'</b><p>'+safe(p?p.author+" · "+p.year:"Chưa có hình riêng")+'</p>';
+if(p)a+='<a href="'+safe(p.source_url)+'" rel="noopener noreferrer" target="_blank">Xem ảnh gốc ↗</a> · ';
+a+='<button data-cat-index="'+idx+'">Xem các hạng mục và ảnh</button></div></article>'});
+panel.innerHTML=a;
+panel.querySelectorAll("[data-cat-index]").forEach(function(b){b.onclick=function(){var selected=(data.catalog_groups||[])[Number(b.dataset.catIndex)];switchTab("data");if($("catFilter")){$("catFilter").value=selected.category;showRequirements()}}})}
+else if(activeTab==="data"){var s=data.stats;var a='<h2>Danh mục có ảnh theo từng đối tượng</h2><div class="statgrid">';
+[["requirements","Yêu cầu dữ liệu"],["survey_shots","Góc chụp cần khảo sát"],["osm_features","Đối tượng OSM"],["photo_links","Liên kết ảnh"]].forEach(function(k){a+='<div class="stat"><strong>'+safe(s[k[0]])+'</strong><small>'+safe(k[1])+'</small></div>'});
 a+='</div><p class="note">'+safe(data.warning)+'</p>';
-data.objects.forEach(function(o){a+='<div class="line"><b>'+safe(o.name)+'</b><span>'+safe(o.kind)+' · cần xác minh</span></div>'});
-a+='<div class="line"><b>WGS84</b><span>'+safe(data.origin.lat)+', '+safe(data.origin.lon)+'</span></div><div class="line"><b>Snapshot</b><span>'+safe(data.snapshot)+'</span></div>';
-a+='<a href="data/catalog.sqlite" download>Tải SQLite database</a> · <a href="data/scene.json" target="_blank">Xem JSON scene</a> · <a href="data/catalog-blueprint-v1.json" target="_blank">305 mục gốc</a>';panel.innerHTML=a}
-else{var a='<h2>Giá / chi phí trong SQLite</h2><p class="sub">Không tự điền báo giá: NULL = chưa thu thập. Giá 0 chỉ là giả định phạm vi miễn phí, không phải hóa đơn.</p>';data.costs.forEach(function(c){var val=c.amount_low_vnd===null?"Chưa báo giá":Number(c.amount_low_vnd).toLocaleString("vi-VN")+" đ";a+='<div class="line"><b>'+safe(c.name)+'<br><small style="color:#96aec3">'+safe(c.unit)+'</small></b><span>'+safe(val)+'<br>'+safe(c.price_type)+'</span></div>'});panel.innerHTML=a}}
+a+='<div class="filters"><select id="catFilter"><option value="ALL">Tất cả 16 nhóm</option>';
+(data.catalog_groups||[]).forEach(function(g){a+='<option value="'+safe(g.category)+'">'+safe(g.category)+' ('+g.count+')</option>'});
+a+='</select><input id="reqSearch" placeholder="Lọc theo ID / tên hạng mục…"></div><div id="reqList"></div>';
+a+='<p class="sub"><a href="data/catalog.sqlite" download>Tải SQLite database</a> · <a href="data/scene.json" target="_blank">JSON scene</a> · <a href="data/catalog-blueprint-v1.json" target="_blank">305 mục gốc</a></p>';
+panel.innerHTML=a;
+$("catFilter").onchange=showRequirements;$("reqSearch").oninput=showRequirements;showRequirements()}
+else{var a='<h2>Giá / chi phí trong SQLite</h2><p class="sub">Không tự điền báo giá: NULL = chưa thu thập. Giá 0 chỉ là giả định miễn phí GitHub Pages trong phạm vi quy định, không phải hóa đơn.</p>';
+data.costs.forEach(function(c){var val=c.amount_low_vnd===null?"Chưa báo giá":Number(c.amount_low_vnd).toLocaleString("vi-VN")+" đ";
+a+='<div class="line"><b>'+safe(c.name)+'<br><small style="color:#96aec3">'+safe(c.unit)+'</small></b><span>'+safe(val)+'<br>'+safe(c.price_type)+'</span></div>'});
+a+='<p class="sub">Bảng gốc: cost_items + cost_quotes trong <a href="data/catalog.sqlite" download>SQLite</a>. Bổ sung báo giá thật cần nguồn, thời điểm, số lượng và đơn vị tiền tệ.</p>';panel.innerHTML=a}}
 function updateDebug(){if(!$("debug").classList.contains("open"))return;var gl=renderer&&renderer.getContext&&renderer.getContext();var info=renderer&&renderer.info;
 var d={engine:mode,webgl:webglOK,three:window.THREE&&THREE.REVISION,viewport:stage.clientWidth+" x "+stage.clientHeight,devicePixelRatio:window.devicePixelRatio,webglVersion:gl?gl.getParameter(gl.VERSION):"n/a",
 frame:frame,sceneMeshes:counts.mesh,sceneTrianglesApprox:counts.tri,drawCalls:info&&info.render.calls,renderTriangles:info&&info.render.triangles,zoomDistance:Math.round(dist),
