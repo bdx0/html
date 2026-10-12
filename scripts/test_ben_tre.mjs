@@ -98,6 +98,51 @@ try {
       const price=await page.locator('#panel').innerText();
       if(!price.includes('1.698.502.090'))errors.push(name+' public price panel missing');
     }
+    // Satellite is a real imagery service, not a fake aerial screenshot.
+    const satelliteAction=page.locator('#satelliteToggle');
+    if(!(await satelliteAction.count()))errors.push(name+' satellite imagery control absent');
+    else{
+      await satelliteAction.click();
+      if(!(await page.locator('#satelliteOverlay').isVisible()))
+        errors.push(name+' satellite viewer did not open');
+      const esriSrc=await page.locator('#satImg').getAttribute('src');
+      if(!esriSrc||!esriSrc.includes('World_Imagery/MapServer'))
+        errors.push(name+' no Esri World Imagery URL');
+      if(name==='desktop'||name==='mobile-390')
+        await page.screenshot({path:'ben-tre-satellite-'+name+'.png'});
+      await page.locator('#satClose').click();
+    }
+    // One opt-in field-photo roundtrip in a real browser. User GPS point is a manual pin.
+    if(name==='desktop'||name==='mobile-390'){
+      await page.locator('#surveyToggle').click();
+      if(!(await page.locator('#surveyToggle').innerText()).includes('Đang chọn điểm'))
+        errors.push(name+' field survey selection not enabled');
+      const stageBox=await page.locator('#stage').boundingBox();
+      let editorOpen=false;
+      for(const [x,y] of [[.50,.50],[.49,.57],[.51,.42]]){
+        await page.mouse.click(stageBox.x+stageBox.width*x,stageBox.y+stageBox.height*y);
+        await page.waitForTimeout(180);
+        if(await page.locator('#surveyOverlay').isVisible()){editorOpen=true;break}
+      }
+      if(!editorOpen)errors.push(name+' cannot pin ground point within 300m shoreline');
+      else{
+        const fixture=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4z8DwHwAFgAI/ScL/nwAAAABJRU5ErkJggg==','base64');
+        await page.locator('#surveyImage').setInputFiles({name:'test-ben-tre.png',mimeType:'image/png',buffer:fixture});
+        await page.locator('#surveyTitle').fill('Test khảo sát bờ hồ');
+        await page.locator('#surveyBearing').fill('90');
+        await page.locator('#surveyRights').check();
+        await page.locator('#surveySave').click();
+        await page.waitForFunction(()=>document.querySelectorAll('.field-marker').length>=1,{timeout:10000});
+        const exported=page.waitForEvent('download',{timeout:15000});
+        await page.locator('#surveyExport').click();
+        const dl=await exported;
+        const json=JSON.parse(fs.readFileSync(await dl.path(),'utf8'));
+        if(json.schema!=='ben-tre-field-survey-v1'||json.photos.length!==1||
+           json.photos[0].heading_deg!==90||!json.photos[0].rights_approved||
+           !json.photos[0].image.base64)
+          errors.push(name+' exported survey missing bearings, image, or rights');
+      }
+    }
     await page.locator('#dbg').click();
     const diagnosis=await page.locator('#report').innerText();
     let diag={};
