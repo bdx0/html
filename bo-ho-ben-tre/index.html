@@ -176,7 +176,9 @@ a+='</select><input id="reqSearch" placeholder="Lọc theo ID / tên hạng mụ
 a+='<p class="sub"><a href="data/catalog.sqlite" download>Tải SQLite database</a> · <a href="data/scene.json" target="_blank">JSON scene</a> · <a href="data/catalog-blueprint-v1.json" target="_blank">305 mục gốc</a></p>';
 panel.innerHTML=a;
 $("catFilter").onchange=showRequirements;$("reqSearch").oninput=showRequirements;showRequirements()}
-else{var a='<h2>Giá / chi phí trong SQLite</h2><p class="sub">Không tự điền báo giá: NULL = chưa thu thập. Giá 0 chỉ là giả định miễn phí GitHub Pages trong phạm vi quy định, không phải hóa đơn.</p>';
+else{var a='<h2>Giá công trình & ngân sách mô hình 3D</h2><p class="sub">Tách dữ liệu công trình thực tế khỏi chi phí phát triển mô hình. Giá công khai không phải giá hoàn công.</p>';
+(data.reference_prices||[]).forEach(function(p){a+='<article class="photo"><div class="txt"><b>'+safe(p.description)+'</b><p>'+safe(p.price_label)+' · '+safe(p.year)+'</p><strong style="font-size:19px;color:#ffd7a0">'+Number(p.amount_vnd).toLocaleString('vi-VN')+' đ</strong><p><a href="'+safe(p.source_url)+'" target="_blank" rel="noopener noreferrer">Nguồn dữ liệu giá ↗</a></p></div></article>'});
+a+='<h2>Chi phí triển khai 3D (chưa báo giá)</h2><p class="sub">NULL = chưa thu thập. Giá 0 chỉ là giả định sử dụng GitHub Pages trong hạn mức, không phải hóa đơn.</p>';
 data.costs.forEach(function(c){var val=c.amount_low_vnd===null?"Chưa báo giá":Number(c.amount_low_vnd).toLocaleString("vi-VN")+" đ";
 a+='<div class="line"><b>'+safe(c.name)+'<br><small style="color:#96aec3">'+safe(c.unit)+'</small></b><span>'+safe(val)+'<br>'+safe(c.price_type)+'</span></div>'});
 a+='<p class="sub">Bảng gốc: cost_items + cost_quotes trong <a href="data/catalog.sqlite" download>SQLite</a>. Bổ sung báo giá thật cần nguồn, thời điểm, số lượng và đơn vị tiền tệ.</p>';panel.innerHTML=a}}
