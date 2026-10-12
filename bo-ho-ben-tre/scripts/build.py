@@ -79,38 +79,107 @@ def open_db(path):
 def lonlat_m(lon,lat):
     return ((lon-ORIGIN[0])*111320*math.cos(math.radians(ORIGIN[1])),(lat-ORIGIN[1])*111320)
 
+
+SHORE_BUFFER_M = 300.0
+
+def distance_to_shore(point, ring):
+    """Shortest planar distance in meters from point to OSM shoreline; 0 inside lake."""
+    x,y=lonlat_m(*point)
+    pts=[lonlat_m(*p) for p in ring]
+    inside=False
+    d2=float("inf")
+    for (ax,ay),(bx,by) in zip(pts,pts[1:]):
+        dx,dy=bx-ax,by-ay
+        v=(x-ax)*dx+(y-ay)*dy
+        t=max(0.0,min(1.0,v/(dx*dx+dy*dy))) if dx*dx+dy*dy else 0.0
+        d2=min(d2,(x-ax-dx*t)**2+(y-ay-dy*t)**2)
+        if (ay>y)!=(by>y) and x<(bx-ax)*(y-ay)/(by-ay)+ax:
+            inside=not inside
+    return 0.0 if inside else math.sqrt(d2)
+
+def clipped_road(parts, lake):
+    """Clip OSM road polyline to <= 300m from shoreline, interpolating segment edges."""
+    result=[]
+    current=[]
+    def point_at(a,b,t):return [a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t]
+    def cross(a,b,lo,hi,lo_inside):
+        for _ in range(19):
+            mid=(lo+hi)/2
+            if (distance_to_shore(point_at(a,b,mid),lake)<=SHORE_BUFFER_M)==lo_inside:lo=mid
+            else:hi=mid
+        return point_at(a,b,(lo+hi)/2)
+    for a,b in zip(parts,parts[1:]):
+        x0,y0=lonlat_m(*a);x1,y1=lonlat_m(*b)
+        steps=max(1,int(math.ceil(math.hypot(x1-x0,y1-y0)/12)))
+        flags=[distance_to_shore(point_at(a,b,k/steps),lake)<=SHORE_BUFFER_M for k in range(steps+1)]
+        for k in range(steps):
+            p=point_at(a,b,k/steps);q=point_at(a,b,(k+1)/steps)
+            left,right=flags[k:k+2]
+            if left and right:
+                if not current:current=[p]
+                current.append(q)
+            elif left:
+                boundary=cross(p,q,0.0,1.0,True)
+                if not current:current=[p]
+                current.append(boundary)
+                if len(current)>1:result.append(current)
+                current=[]
+            elif right:
+                boundary=cross(p,q,0.0,1.0,False)
+                current=[boundary,q]
+    if len(current)>1:result.append(current)
+    return result
+
 def fetch_osm():
-    # A small bounded AOI snapshot. OSM API does not provide survey-grade accuracy.
-    bbox=(ORIGIN[0]-.0068,ORIGIN[1]-.0068,ORIGIN[0]+.0068,ORIGIN[1]+.0068)
+    # AOI is exactly 300 meters from the shoreline (not 300m from the lake centre).
+    # Bounding download may be wider to avoid cutting through the 300m shoreline buffer.
+    bbox=(ORIGIN[0]-.0065,ORIGIN[1]-.0065,ORIGIN[0]+.0065,ORIGIN[1]+.0065)
     url="https://api.openstreetmap.org/api/0.6/map?bbox="+",".join(str(x) for x in bbox)
-    req=urllib.request.Request(url,headers={"User-Agent":"TrucGiangDigitalTwin/0.1 (GitHub project bdx0/html; OSM attribution)"})
-    with urllib.request.urlopen(req,timeout=26) as f: data=f.read(12_000_000)
+    req=urllib.request.Request(url,headers={"User-Agent":"TrucGiangDigitalTwin/0.2 (GitHub bdx0/html; attribution OpenStreetMap)"})
+    with urllib.request.urlopen(req,timeout=26) as f:data=f.read(15_000_000)
     root=ET.fromstring(data)
     nodes={e.get("id"):[float(e.get("lon")),float(e.get("lat"))] for e in root.findall("node")}
+    ways=root.findall("way")
+    lake_way=next((w for w in ways if w.get("id")=="217484891"),None)
+    if lake_way is None:
+        raise RuntimeError("OSM lake way 217484891 not present: refusing arbitrary 300m geometry")
+    lake=[nodes[r.get("ref")] for r in lake_way.findall("nd") if r.get("ref") in nodes]
+    if len(lake)<4 or lake[0]!=lake[-1]:
+        raise RuntimeError("OSM lake polygon missing or not closed")
     features=[]
-    for way in root.findall("way"):
+    for way in ways:
         tags={t.get("k"):t.get("v") for t in way.findall("tag")}
         ids=[n.get("ref") for n in way.findall("nd")]
         coords=[nodes[i] for i in ids if i in nodes]
         if len(coords)<2:continue
-        wid=way.get("id"); kind=None; closed=(len(coords)>3 and coords[0]==coords[-1])
-        if wid=="217484891" or tags.get("natural")=="water" and closed:kind="water"
+        wid=way.get("id")
+        closed=(len(coords)>3 and coords[0]==coords[-1])
+        kind=None
+        if wid=="217484891":kind="water"
+        elif tags.get("natural")=="water" and closed:kind="water"
         elif tags.get("building") and closed:kind="building"
         elif tags.get("leisure")=="park" and closed:kind="park"
-        elif tags.get("highway") and not tags.get("area")=="yes":kind="road"
+        elif tags.get("highway") and tags.get("area")!="yes":kind="road"
         if not kind:continue
         if kind in ("water","park","building") and not closed:continue
-        # Bound excessive remote geometries and outliers.
-        if any(abs(lonlat_m(*p)[0])>1300 or abs(lonlat_m(*p)[1])>1300 for p in coords):continue
-        shape={"type":"Polygon" if kind in ("water","park","building") else "LineString",
-               "coordinates":[coords] if kind in ("water","park","building") else coords}
+        if kind=="road":
+            geometries=[{"type":"LineString","coordinates":g} for g in clipped_road(coords,lake)]
+        elif wid=="217484891" or all(distance_to_shore(p,lake)<=SHORE_BUFFER_M for p in coords):
+            # Require full polygon to be within 300m; partial polygons are excluded,
+            # not silently rendered beyond the requested buffer.
+            geometries=[{"type":"Polygon","coordinates":[coords]}]
+        else:continue
         lvl=tags.get("building:levels")
         try:height=float(tags.get("height","").replace("m","").strip())
-        except (ValueError,TypeError):height=(float(lvl)*3.1 if lvl and lvl.replace(".","",1).isdigit() else 7.5)
-        features.append({"id":"osm-way-"+wid,"kind":kind,"osm_id":int(wid),
-                         "geometry":shape,"properties":{"name":tags.get("name",""),"highway":tags.get("highway",""),"height_m":height,
-                         "height_estimated":not bool(tags.get("height")),"osm_tags":{k:tags[k] for k in ("building","building:levels","height","natural","leisure","highway") if k in tags}},
-                         "accuracy":"osm_crowdsourced"})
+        except (ValueError,TypeError):height=float(lvl)*3.1 if lvl and lvl.replace(".","",1).isdigit() else 7.5
+        properties={"name":tags.get("name",""),"highway":tags.get("highway",""),"height_m":height,
+                    "height_estimated":not bool(tags.get("height")),
+                    "aoi":"shoreline_buffer_300m",
+                    "osm_tags":{k:tags[k] for k in ("building","building:levels","height","natural","leisure","highway") if k in tags}}
+        for i,shape in enumerate(geometries):
+            features.append({"id":"osm-way-"+wid+("-seg-"+str(i) if len(geometries)>1 else ""),
+                             "kind":kind,"osm_id":int(wid),"geometry":shape,
+                             "properties":properties,"accuracy":"osm_crowdsourced"})
     return url,features
 
 def build(outdir, use_osm=False):
@@ -121,7 +190,7 @@ def build(outdir, use_osm=False):
     db.executemany("INSERT INTO project_meta VALUES(?,?)",[
         ("name","Hồ Trúc Giang — Bờ Hồ Bến Tre Digital Twin"),("catalog_version",d["catalog_version"]),
         ("origin_lon",str(ORIGIN[0])),("origin_lat",str(ORIGIN[1])),("crs","EPSG:4326"),("catalog_date",d["catalog_date"]),
-        ("asset_geometry_stage","OSM optional; verified field survey pending")])
+        ("asset_geometry_stage","OSM optional; verified field survey pending"),("focus_rule","OSM shoreline way 217484891 + 300m; roads clipped, whole polygons required")])
     for s in d["source_registry"]:
         db.execute("INSERT INTO sources VALUES(?,?,?,?,?,?,?)",(s["id"],s.get("name",""),s.get("kind",""),s.get("url",""),s.get("license",""),s.get("data_period",""),s.get("notes","")))
     for i,name,url,kind,lic in SOURCE_EXTRA:
@@ -195,8 +264,8 @@ def build(outdir, use_osm=False):
         catalog_groups.append({"category":cat,"count":num,"image_ids":list(dict.fromkeys(thumbnail_ids))[:4],"items":item_list})
     db.close()
     scene={
-      "schemaVersion":1,"title":"Hồ Trúc Giang — Bờ Hồ Bến Tre","origin":{"lon":ORIGIN[0],"lat":ORIGIN[1],"crs":"EPSG:4326"},
-      "mode":"osm_snapshot" if features else "illustrative_no_osm","snapshot":TODAY,"osm_url":osm_url,"osm_error":error,
+      "schemaVersion":2,"title":"Hồ Trúc Giang — Bờ Hồ Bến Tre","origin":{"lon":ORIGIN[0],"lat":ORIGIN[1],"crs":"EPSG:4326"},
+      "area_of_interest":{"basis":"OSM shoreline 217484891","buffer_m":SHORE_BUFFER_M,"rule":"Distance to lakeshore; clip roads; retain only fully contained polygons","units":"meters"},"mode":"osm_snapshot" if features else "illustrative_no_osm","snapshot":TODAY,"osm_url":osm_url,"osm_error":error,
       "warning":"Chỉ đối tượng OSM có source được xem là hình học bản đồ cộng đồng. Mọi geometry fallback là minh họa.",
       "stats":counts,
       "objects":[{"id":o[0],"kind":o[1],"name":o[2],"lon":o[3],"lat":o[4],"verified":False} for o in objs],
