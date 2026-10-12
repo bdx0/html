@@ -1,0 +1,36 @@
+name: Smoke test Bờ Hồ Bến Tre 3D
+on:
+  push:
+    branches: [main]
+    paths:
+      - "bo-ho-ben-tre/**"
+      - "scripts/test_ben_tre.mjs"
+      - ".github/workflows/smoke-ben-tre.yml"
+      - "assets/three.min.js"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install Chromium and Playwright
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Run browser test for desktop and mobile
+        run: node scripts/test_ben_tre.mjs
+      - name: Archive screenshots and diagnostic
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ben-tre-3d-smoke
+          path: |
+            ben-tre-*.png
+            ben-tre-smoke-report.json
+          if-no-files-found: warn
