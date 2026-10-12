@@ -25,9 +25,9 @@ ORIGIN = (106.37814, 10.23861)
 TODAY = datetime.date.today().isoformat()
 
 IMAGES = [
- ('IMG-01','Hồ nước và công trình ven hồ','water','https://triphunter.vn/media/W1siZiIsIjIwMTYvMDgvMDIvNWZjMzZoa3lkMF9fbmhfUEEuanBnIl1d/%E1%BA%A3nh%20PA.jpg?sha=f24114c271a0314a','https://triphunter.vn/places/ben-tre/items/ho-truc-giang','TripHunter / PA','2016','reference_only'),
+ ('IMG-01','Flycam toàn cảnh mặt hồ và các dãy nhà','water','https://addflag.com/images/user/6484f710-1dc1-4786-880b-9e042c478b9b/anh1.jpg','https://addflag.com/ho_truc_giang__4361','Addflag / contributor','unknown','reference_only'),
  ('IMG-02','Bờ kè uốn cong, lát gạch và cây','promenade','https://addflag.com/images/user/3eeca968-685a-401f-9677-1654372df800/25454507.jpg','https://addflag.com/ho_truc_giang__4361','Addflag / contributor','unknown','reference_only'),
- ('IMG-03','Toàn cảnh hồ về đêm, đài phun cũ','night','https://triphunter.vn/media/W1siZiIsIjIwMTYvMDgvMDIvNHBranFwcmNmYl9fbmhfSHV5bmhfVGhhbmguanBnIl0sWyJwIiwidGh1bWIiLCI2NDB4NDgwXHUwMDNlIl1d/%E1%BA%A3nh%20Huynh%20Thanh.jpg?sha=363f03a993696393','https://triphunter.vn/places/ben-tre/items/ho-truc-giang','TripHunter / Huynh Thanh','2016','reference_only'),
+ ('IMG-03','Toàn cảnh Hồ Trúc Giang về đêm năm 2019','night','https://dongkhoi.baovinhlong.vn/image/fckeditor/upload/2019/20190423/images/ho-truc-giang.jpg','https://baodongkhoi.vn/phong-su-anh-tp-ben-tre-hom-nay-a59368.html','Báo Đồng Khởi','2019','reference_only'),
  ('IMG-04','Tượng Trần Văn Ơn năm 2023','monument','https://dongkhoi.baovinhlong.vn/image/fckeditor/upload/2023/20230109/images/tranvanon1.jpg','https://dongkhoi.baovinhlong.vn/le-an-vi-tuong-anh-hung-liet-si-tran-van-on-09012023-a109942.html','Báo Đồng Khởi','2023','reference_only'),
  ('IMG-05','Đường ven hồ, đèn và vòng giao thông','roads','https://dongkhoi.baovinhlong.vn/image/fckeditor/upload/2019/20190423/images/ho-truc-giang.jpg','https://baodongkhoi.vn/phong-su-anh-tp-ben-tre-hom-nay-a59368.html','Báo Đồng Khởi','2019','reference_only'),
  ('IMG-06','Lan can xanh, thiết bị tập thể dục','amenities','https://ik.imagekit.io/tvlk/blog/2025/05/canh-dep-ben-tre-2-1024x768.jpg?tr=q-70%2Cc-at_max%2Cw-1000%2Ch-600','https://www.traveloka.com/vi-vn/explore/destination/canh-dep-ben-tre/581647','Traveloka','2025','reference_only'),
