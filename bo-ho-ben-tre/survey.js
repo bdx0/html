@@ -19,7 +19,7 @@ if(!window.indexedDB)return reject(Error("Thiết bị không hỗ trợ Indexed
 var req=indexedDB.open(DB_NAME,DB_VERSION);
 req.onupgradeneeded=function(){var d=req.result;if(!d.objectStoreNames.contains(STORE))d.createObjectStore(STORE,{keyPath:"id"})};
 req.onsuccess=function(){resolve(req.result)};req.onerror=function(){reject(req.error||Error("Cannot open IndexedDB"))}
-)}
+})}
 function transact(mode,method,item){return new Promise(function(resolve,reject){
 if(!S.db)return reject(Error("Không thể lưu dữ liệu cục bộ"));
 var tx=S.db.transaction(STORE,mode),req=tx.objectStore(STORE)[method](item);
