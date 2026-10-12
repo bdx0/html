@@ -30,6 +30,37 @@ try {
     await page.goto('http://127.0.0.1:8765/bo-ho-ben-tre/',{waitUntil:'load',timeout:45000});
     await page.waitForFunction(()=>document.getElementById('status')?.textContent.includes('300 m'),{timeout:30000});
     await page.waitForTimeout(1500);
+    const sceneData=await page.evaluate(async()=>await (await fetch('data/scene.json')).json());
+    if(sceneData.photo_hotspots?.length!==8)errors.push(name+' expected eight DB hotspots');
+    if(sceneData.photo_hotspots?.some(h=>h.is_camera_location!==false))
+      errors.push(name+' image anchors must not pretend camera EXIF position');
+    await page.waitForFunction(()=>document.querySelectorAll('.photo-hotspot').length===8,{timeout:10000});
+    const markerState=await page.locator('.photo-hotspot').evaluateAll(elements=>elements.map(el=>({
+      id:el.dataset.hotspotId,visible:!el.classList.contains('hidden'),
+      bound:el.getBoundingClientRect().width>0
+    })));
+    if(markerState.filter(x=>x.visible&&x.bound).length<1)
+      errors.push(name+' no photo hotspot is projected in camera viewport '+JSON.stringify(markerState));
+    let clicked=false;
+    for(const choice of ['HS-FOUNTAIN','HS-LAKE-OVERVIEW','HS-NORTH-WALK']){
+      const marker=page.locator('[data-hotspot-id="'+choice+'"]');
+      if(await marker.isVisible() && !(await marker.evaluate(el=>el.classList.contains('hidden')))){
+        try {await marker.click({timeout:2200});clicked=true;break} catch {}
+      }
+    }
+    if(!clicked)errors.push(name+' cannot tap an interactive photo hotspot');
+    else {
+      const heading=await page.locator('#panel').innerText();
+      if(!heading.includes('Điểm ghim')||!heading.includes('Xem nguồn ảnh'))
+        errors.push(name+' hotspot did not show photo provenance and source');
+      const links=await page.locator('#panel .image-row').count();
+      if(links<1)errors.push(name+' hotspot returned no image reference');
+      if(mobile){
+        const isExpanded=await page.locator('#inspector').evaluate(el=>el.classList.contains('expanded'));
+        if(!isExpanded)errors.push(name+' photo hotspot failed to expand bottom sheet');
+        await page.locator('#sheetToggle').click();
+      }
+    }
     const viewport=await page.evaluate(()=>({
       innerWidth:window.innerWidth,innerHeight:window.innerHeight,
       scrollWidth:document.documentElement.scrollWidth,scrollHeight:document.documentElement.scrollHeight,
