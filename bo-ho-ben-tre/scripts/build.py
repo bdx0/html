@@ -168,6 +168,7 @@ def build(outdir, use_osm=False):
         db.execute("INSERT INTO object_photos(photo_id,object_id) VALUES(?,?)",(id1,id2))
     for c in COSTS: db.execute("INSERT INTO cost_items VALUES(?,?,?,?,?,?,?,?,?,?)",(c[0],c[1],c[2],c[3],c[4],c[5],c[6],"planning_assumption" if c[3] is not None else "unknown",c[7],TODAY))
     db.execute("INSERT INTO reference_prices VALUES(?,?,?,?,?,?,?,?,?)",("REF-PRICE-001","OBJ-FOUNTAIN","Gói thầu sửa chữa đài phun nước nghệ thuật Hồ Trúc Giang",1698502090,"Giá gói thầu được công bố","2025-05-27","https://dauthau.asia/ketqua/luachon-nhathau/thi-cong-sua-chua-dai-phun-nuoc-nghe-thuat-ho-truc-giang-2230530.html","public_procurement_listing","Không phải báo giá dựng 3D, cũng không khẳng định là giá trúng thầu hay quyết toán."))
+    db.execute("INSERT INTO reference_prices VALUES(?,?,?,?,?,?,?,?,?)",("REF-PRICE-002","OBJ-FOUNTAIN","Gói thầu sửa chữa đài phun nước Hồ Trúc Giang — kết quả lựa chọn",1664590330,"Giá trúng thầu được công bố","2025-05-27","https://dauthau.asia/ketqua/luachon-nhathau/thi-cong-sua-chua-dai-phun-nuoc-nghe-thuat-ho-truc-giang-2230530.html","public_procurement_award","Vilight là đơn vị trúng thầu theo nguồn công khai; không phải quyết toán thực tế hay chi phí dựng 3D."))
     # True formal quote amount is never populated without a source. The 0 cost is a scoped free-tier assumption only.
     osm_url=None;features=[];error=None
     if use_osm:
@@ -201,7 +202,7 @@ def build(outdir, use_osm=False):
       "objects":[{"id":o[0],"kind":o[1],"name":o[2],"lon":o[3],"lat":o[4],"verified":False} for o in objs],
       "images":[{"id":x[0],"title":x[1],"category":x[2],"image_url":x[3],"source_url":x[4],"author":x[5],"year":x[6],"license":"reference_only"} for x in IMAGES],
       "costs":[{"id":x[0],"name":x[1],"unit":x[2],"amount_low_vnd":x[3],"amount_high_vnd":x[4],"quantity":x[5],"price_type":"unknown" if x[3] is None else "planning_assumption"} for x in COSTS],
-      "reference_prices":[{"id":"REF-PRICE-001","object_id":"OBJ-FOUNTAIN","description":"Giá gói thầu sửa chữa đài phun nước Hồ Trúc Giang","amount_vnd":1698502090,"year":2025,"price_label":"Giá gói thầu, không phải chi phí dự án 3D","source_url":"https://dauthau.asia/ketqua/luachon-nhathau/thi-cong-sua-chua-dai-phun-nuoc-nghe-thuat-ho-truc-giang-2230530.html"}],
+      "reference_prices":[{"id":"REF-PRICE-001","object_id":"OBJ-FOUNTAIN","description":"Giá gói thầu sửa chữa đài phun nước Hồ Trúc Giang","amount_vnd":1698502090,"year":2025,"price_label":"Giá gói thầu, không phải chi phí dự án 3D","source_url":"https://dauthau.asia/ketqua/luachon-nhathau/thi-cong-sua-chua-dai-phun-nuoc-nghe-thuat-ho-truc-giang-2230530.html"},{"id":"REF-PRICE-002","object_id":"OBJ-FOUNTAIN","description":"Giá trúng thầu sửa chữa đài phun nước Hồ Trúc Giang","amount_vnd":1664590330,"year":2025,"price_label":"Giá trúng thầu, không phải quyết toán hoặc chi phí dự án 3D","source_url":"https://dauthau.asia/ketqua/luachon-nhathau/thi-cong-sua-chua-dai-phun-nuoc-nghe-thuat-ho-truc-giang-2230530.html"}],
       "features":features,
       "catalog_groups":catalog_groups,
       "provenance":{"baseline":"catalog-blueprint-v1.json","map":"© OpenStreetMap contributors, ODbL; https://www.openstreetmap.org/copyright","photos":"external reference only, no redistribution permissions asserted"}
