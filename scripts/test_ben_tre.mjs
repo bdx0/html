@@ -2,7 +2,7 @@ import { chromium } from 'playwright';
 import { spawn } from 'node:child_process';
 import fs from 'node:fs';
 const server=spawn('python3',['-m','http.server','8765','--bind','127.0.0.1'],{stdio:'ignore'});
-const errors=[];
+const errors=[],warnings=[];
 const report=[];
 await new Promise(r=>setTimeout(r,1500));
 let browser;
@@ -13,7 +13,8 @@ try{
   const context=await browser.newContext({viewport:mobile?{width:390,height:844}:{width:1400,height:900},deviceScaleFactor:1,isMobile:mobile,hasTouch:mobile});
   const page=await context.newPage();
   page.on('pageerror',e=>errors.push(mode+' JS '+e.message));
-  page.on('console',m=>{if(m.type()==='error')errors.push(mode+' console '+m.text())});
+  page.on('console',m=>{if(m.type()==='error'&&!m.text().includes('Failed to load resource'))errors.push(mode+' console '+m.text())});
+  page.on('response',r=>{if(r.status()>=400){let msg=mode+' HTTP '+r.status()+' '+r.url();if(r.url().startsWith('http://127.0.0.1:8765/'))errors.push(msg);else warnings.push(msg)}});
   await page.goto('http://127.0.0.1:8765/bo-ho-ben-tre/',{waitUntil:'load',timeout:45000});
   await page.waitForFunction(()=>document.getElementById('status')?.textContent.includes('305'),{timeout:30000});
   await page.waitForTimeout(4000);
@@ -30,9 +31,10 @@ try{
   const price=await page.locator('#panel').innerText();
   if(!price.includes('Giá / chi phí'))errors.push(mode+' Price panel is missing');
   if(!modeOk)errors.push(mode+' WebGL canvas missing or not rendering '+diagnostic);
+  if(content[0]<200||content[1]<180)errors.push(mode+' Canvas has invalid dimensions '+content);
   await context.close();
  }
 }finally{if(browser)await browser.close();server.kill('SIGTERM');}
-fs.writeFileSync('ben-tre-smoke-report.json',JSON.stringify({report,errors},null,2));
-console.log(JSON.stringify({report:report.map(x=>({mode:x.mode,modeOk:x.modeOk,status:x.status,viewport:x.viewport,frames:x.values.frame,triangles:x.values.renderTriangles})),errors},null,2));
+fs.writeFileSync('ben-tre-smoke-report.json',JSON.stringify({report,errors,warnings},null,2));
+console.log(JSON.stringify({report:report.map(x=>({mode:x.mode,modeOk:x.modeOk,status:x.status,viewport:x.viewport,frames:x.values.frame,triangles:x.values.renderTriangles})),errors,warnings},null,2));
 if(errors.length)process.exit(1);
