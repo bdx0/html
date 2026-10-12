@@ -178,7 +178,7 @@ def build(outdir, use_osm=False):
     counts={k:db.execute("SELECT COUNT(*) FROM "+k).fetchone()[0] for k in
             ("requirements","survey_shots","sources","zones","objects","photos","photo_links","cost_items","cost_quotes","osm_features")}
     assert counts["requirements"]==305 and counts["survey_shots"]==90
-    db.commit();db.execute("PRAGMA integrity_check");db.execute("VACUUM");db.close()
+    db.commit();db.execute("PRAGMA integrity_check");db.execute("VACUUM")
     # Export the exact photo-to-requirement mapping for catalog navigation.
     catalog_groups=[]
     for cat,num in db.execute("SELECT category,COUNT(*) FROM requirements GROUP BY category ORDER BY category").fetchall():
@@ -190,6 +190,7 @@ def build(outdir, use_osm=False):
             thumbnail_ids.extend(photo_ids)
             item_list.append({"id":rid,"title":title,"priority":priority,"status":status,"photo_ids":photo_ids})
         catalog_groups.append({"category":cat,"count":num,"image_ids":list(dict.fromkeys(thumbnail_ids))[:4],"items":item_list})
+    db.close()
     scene={
       "schemaVersion":1,"title":"Hồ Trúc Giang — Bờ Hồ Bến Tre","origin":{"lon":ORIGIN[0],"lat":ORIGIN[1],"crs":"EPSG:4326"},
       "mode":"osm_snapshot" if features else "illustrative_no_osm","snapshot":TODAY,"osm_url":osm_url,"osm_error":error,
