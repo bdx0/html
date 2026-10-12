@@ -67,6 +67,17 @@ Giữ `data/catalog-blueprint-v1.json` và `scripts/build.py` trong commit để
 - Snapshot screenshot desktop/mobile là yêu cầu nghiệm thu; không chỉ dựa vào report FPS.
 - Nguồn đối chiếu ảnh: https://addflag.com/ho_truc_giang__4361 và https://triphunter.vn/places/ben-tre/items/ho-truc-giang; ảnh nguồn chỉ để xem tham chiếu.
  
+## Xem vệ tinh và bổ sung ảnh khảo sát
+- Nhấn **🛰 Vệ tinh** để xem ảnh vệ tinh khu vực Hồ Trúc Giang từ Esri World Imagery; có liên kết thay thế tới Google Maps vệ tinh nếu trình duyệt không hỗ trợ nhúng. Ảnh có thể được chụp vào thời điểm khác với hiện trạng.
+- Nhấn **📍 Ghim ảnh**, chạm một vị trí trên mặt đất trong thế giới 3D (tối đa 300 m từ bờ hồ), tải ảnh JPG/PNG/WebP, nhập hướng từ Bắc 0–359°, ngày chụp và nội dung so sánh.
+- Tất cả ảnh lưu trong IndexedDB ngay trên thiết bị, chưa đưa lên GitHub hoặc máy chủ. Xem/xóa bằng biểu tượng 📍 trong mô hình.
+- Nhấn **⇩ Xuất ảnh** để tải gói JSON (gồm ảnh base64, vị trí, hướng chụp); người dùng có thể gửi gói này để nhập vào repo.
+- Người quản trị kiểm tra giấy phép, tính nhạy cảm của GPS và ảnh, sau đó chạy:
+  `python3 bo-ho-ben-tre/scripts/import_survey.py /path/to/ho-truc-giang-khao-sat-YYYY-MM-DD.json`
+  `python3 bo-ho-ben-tre/scripts/build.py --osm`
+- Kết quả tồn tại bền trong `data/surveys/manifest.json`, `assets/surveys/`, SQLite `field_surveys` và `scene.json.photo_hotspots`.
+- Đối chiếu thật–giả và danh sách sai lệch: [COMPARISON.md](COMPARISON.md).
+
 ## Công việc tiếp theo
 - Đối chiếu mặt hồ OSM với ảnh vệ tinh / đo thực địa, tách chính xác bờ nước–bờ kè.
 - Nhập ảnh hiện trường được cấp phép, đo bề rộng lòng đường/vỉa hè và cao độ công trình.
