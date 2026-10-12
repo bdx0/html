@@ -52,6 +52,14 @@ Giữ `data/catalog-blueprint-v1.json` và `scripts/build.py` trong commit để
 - Giao lộ, mặt cắt đường, hệ thống đèn, bảng hiệu, bãi xe.
 - Mọi tệp nhận từ người dùng có thể gắn EXIF, mốc thời gian, GPS, hướng nhìn, tác giả và quyền sử dụng.
 
+## Giai đoạn dựng cảnh v2 — nhận diện hồ
+- Biên mặt nước lấy trực tiếp từ OSM, không phải hồ ellipse giả; khoảng 200×105 m, các đoạn lõm/bo góc được giữ lại.
+- Dựng liên tục bờ kè, dải lối đi lát sáng, bồn cây, hàng lan can xanh, cây me/phượng tán rộng theo ảnh tham chiếu, vòi phun đa tầng.
+- Sửa lỗi mặt nước bị thủng tam giác và sửa OSM đường thành các dải asphalt nằm ngang thay vì tường gai.
+- Thêm dãy mặt tiền nhà ở bốn hướng theo tương quan đường thực. **Mặt đứng và chiều cao của các dãy nhà này là mô hình minh họa chưa khảo sát.**
+- Snapshot screenshot desktop/mobile là yêu cầu nghiệm thu; không chỉ dựa vào report FPS.
+- Nguồn đối chiếu ảnh: https://addflag.com/ho_truc_giang__4361 và https://triphunter.vn/places/ben-tre/items/ho-truc-giang; ảnh nguồn chỉ để xem tham chiếu.
+ 
 ## Công việc tiếp theo
 - Đối chiếu mặt hồ OSM với ảnh vệ tinh / đo thực địa, tách chính xác bờ nước–bờ kè.
 - Nhập ảnh hiện trường được cấp phép, đo bề rộng lòng đường/vỉa hè và cao độ công trình.
