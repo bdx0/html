@@ -32,6 +32,9 @@ jobs:
           set -euo pipefail
           mkdir -p _site
           rsync -a --exclude='.git/' --exclude='.github/' --exclude='_site/' --exclude='scripts/' --exclude='_catalog.json' --exclude='README.md' ./ _site/
+          python3 bo-ho-ben-tre/scripts/build.py --osm --output _site/bo-ho-ben-tre/data
+          test -s _site/bo-ho-ben-tre/data/catalog.sqlite
+          test -s _site/bo-ho-ben-tre/data/scene.json
           python3 scripts/build_catalog.py --root . --output _site/catalog.json
           touch _site/.nojekyll
           test -s _site/index.html
