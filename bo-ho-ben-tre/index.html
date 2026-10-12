@@ -482,7 +482,7 @@ function showSelectedHotspot(){
  a+='</div>';panel.innerHTML=a;
  panel.querySelector("#backImages").onclick=function(){selectedHotspot=null;showPanel();updateHotspots()};
  panel.querySelectorAll(".image-row img").forEach(function(img){
-   img.addEventListener("error",function(){img.hidden=true;var fallback=img.nextElementSibling;if(fallback)fallback.hidden=false})
+   img.addEventListener("error",function(){img.hidden=true;img.style.display="none";var fallback=img.nextElementSibling;if(fallback){fallback.hidden=false;fallback.style.display="block"}})
  });
  return true
 }
