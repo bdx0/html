@@ -359,7 +359,7 @@ def build(outdir, use_osm=False):
     assert counts["photo_hotspots"]==8+counts["field_surveys"] and counts["photo_hotspot_items"]==len(HOTSPOT_PHOTOS)+counts["field_surveys"]
     db.commit();db.execute("PRAGMA integrity_check");db.execute("VACUUM")
     # Export complete photo catalog from SQLite, including locally curated field captures.
-    photo_rows=db.execute("SELECT id,title,category,image_url,source_url,author,year,license_status FROM photos ORDER BY rowid").fetchall()
+    all_photo_rows=db.execute("SELECT id,title,category,image_url,source_url,author,year,license_status FROM photos ORDER BY rowid").fetchall()
     # Export the exact photo-to-requirement mapping for catalog navigation.
     catalog_groups=[]
     for cat,num in db.execute("SELECT category,COUNT(*) FROM requirements GROUP BY category ORDER BY category").fetchall():
@@ -393,7 +393,7 @@ def build(outdir, use_osm=False):
       "warning":"Chỉ đối tượng OSM có source được xem là hình học bản đồ cộng đồng. Mọi geometry fallback là minh họa.",
       "stats":counts,
       "objects":[{"id":o[0],"kind":o[1],"name":o[2],"lon":o[3],"lat":o[4],"verified":False} for o in objs],
-      "images":[{"id":x[0],"title":x[1],"category":x[2],"image_url":x[3],"source_url":x[4],"author":x[5],"year":x[6],"license":x[7]} for x in photo_rows],
+      "images":[{"id":x[0],"title":x[1],"category":x[2],"image_url":x[3],"source_url":x[4],"author":x[5],"year":x[6],"license":x[7]} for x in all_photo_rows],
       "costs":[{"id":x[0],"name":x[1],"unit":x[2],"amount_low_vnd":x[3],"amount_high_vnd":x[4],"quantity":x[5],"price_type":"unknown" if x[3] is None else "planning_assumption"} for x in COSTS],
       "reference_prices":[{"id":"REF-PRICE-001","object_id":"OBJ-FOUNTAIN","description":"Giá gói thầu sửa chữa đài phun nước Hồ Trúc Giang","amount_vnd":1698502090,"year":2025,"price_label":"Giá gói thầu, không phải chi phí dự án 3D","source_url":"https://dauthau.asia/ketqua/luachon-nhathau/thi-cong-sua-chua-dai-phun-nuoc-nghe-thuat-ho-truc-giang-2230530.html"},{"id":"REF-PRICE-002","object_id":"OBJ-FOUNTAIN","description":"Giá trúng thầu sửa chữa đài phun nước Hồ Trúc Giang","amount_vnd":1664590330,"year":2025,"price_label":"Giá trúng thầu, không phải quyết toán hoặc chi phí dự án 3D","source_url":"https://dauthau.asia/ketqua/luachon-nhathau/thi-cong-sua-chua-dai-phun-nuoc-nghe-thuat-ho-truc-giang-2230530.html"}],
       "features":features,
