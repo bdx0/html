@@ -46,6 +46,40 @@ COSTS = [
  ('C09','Ảnh texture có quyền dùng công khai','bộ',None,None,None,'P1','Chưa có giấy phép rõ ràng'),
  ('C10','Bảo trì ảnh/POI theo thay đổi thực tế','đợt',None,None,None,'P2','Chưa có phương án bảo trì')
 ]
+
+# Hotspots are anchors for browsing reference photos, NOT geotagged camera positions.
+# Coordinates in local east/north meters, origin 106.37814E, 10.23861N.
+# Sources describe the depicted subject/category, NOT the exact shooting position.
+HOTSPOTS = [
+  # id, label, related object id, east x, height y, north z, kind, geometry provenance, description
+  ("HS-LAKE-OVERVIEW","Toàn cảnh Hồ Trúc Giang","OBJ-LAKE",-40,2,4,"lake","OSM lake polygon / approximate anchor","Ảnh toàn cảnh; góc máy gốc chưa xác minh."),
+  ("HS-FOUNTAIN","Đài phun nước","OBJ-FOUNTAIN",0,4,0,"fountain","approximate center / model proxy","Ảnh công trình đài phun; vị trí phao thực tế và góc chụp cần khảo sát."),
+  ("HS-STATUE","Tượng Trần Văn Ơn","OBJ-STATUE",-155,7,-14,"monument","OSM nearby monument / model proxy","Ảnh tượng liên quan trực tiếp; chưa có vị trí camera nguồn."),
+  ("HS-NORTH-WALK","Lối dạo bờ bắc","OBJ-LAKE",0,2,60,"promenade","OSM shoreline approximate","Ảnh đường dạo/lan can chỉ là tham chiếu chung, chưa chứng minh góc phía bắc."),
+  ("HS-SOUTH-WALK","Lối dạo bờ nam","OBJ-LAKE",0,2,-69,"promenade","OSM shoreline approximate","Ảnh mặt đường và cây ven hồ mang tính minh họa, chưa xác minh là bờ nam."),
+  ("HS-WEST-PARK","Công viên Trần Văn Ơn","OBJ-PARK",-177,2,-12,"park","OSM park nearby / approximate center","Tư liệu tượng đài và công viên lân cận; cần ảnh công viên trực tiếp."),
+  ("HS-EAST-FRONTAGE","Dãy phố phía đông",None,143,9,-16,"facades","OSM nearby / illustrative facade","Ảnh đường phố tham chiếu bối cảnh, không xác minh mặt tiền nhà cụ thể."),
+  ("HS-CIVIC","Khu UBND Bến Tre","OBJ-CIVIC",-195,9,78,"civic","OSM named footprint approximate","Chưa có ảnh mặt đứng UBND được xác minh. Ảnh flycam chỉ mang tính bối cảnh.")
+]
+# id → photo id, relation, caption. Distinguish subject-specific vs generic reference.
+HOTSPOT_PHOTOS = [
+  ("HS-LAKE-OVERVIEW","IMG-01","overview","Toàn cảnh hồ — đối chiếu đường bao",1),
+  ("HS-LAKE-OVERVIEW","IMG-08","overview","Flycam lịch sử toàn vùng",2),
+  ("HS-LAKE-OVERVIEW","IMG-03","historical_context","Khung cảnh hồ năm 2019",3),
+  ("HS-FOUNTAIN","IMG-07","depicts_subject","Đài phun nước tại Hồ Trúc Giang năm 2025",1),
+  ("HS-FOUNTAIN","IMG-03","historical_context","Cảnh hồ trước khi cải tạo",2),
+  ("HS-STATUE","IMG-04","depicts_subject","Ảnh tượng đài Trần Văn Ơn, năm 2023",1),
+  ("HS-NORTH-WALK","IMG-02","general_context","Tham chiếu lối dạo quanh hồ; chưa định vị phía bắc",1),
+  ("HS-NORTH-WALK","IMG-06","general_context","Lan can và vật dụng ven hồ; góc chụp chưa xác minh",2),
+  ("HS-SOUTH-WALK","IMG-02","general_context","Tham chiếu bờ kè, không xác nhận góc phía nam",1),
+  ("HS-SOUTH-WALK","IMG-01","overview","Ảnh toàn cảnh để định hướng",2),
+  ("HS-WEST-PARK","IMG-04","nearby_subject","Tượng Trần Văn Ơn cạnh công viên",1),
+  ("HS-WEST-PARK","IMG-06","general_context","Cảnh quan công viên/chỗ tập; vị trí chưa xác minh",2),
+  ("HS-EAST-FRONTAGE","IMG-05","general_context","Đường phố Bến Tre, không phải mặt tiền được xác minh",1),
+  ("HS-EAST-FRONTAGE","IMG-08","overview","Flycam khu trung tâm, không phải ảnh từng căn",2),
+  ("HS-CIVIC","IMG-08","overview","Flycam chung; chưa có ảnh mặt đứng UBND",1)
+]
+
 SOURCE_EXTRA = [
  ('PHOTO-01','Ảnh bờ hồ TripHunter','https://triphunter.vn/places/ben-tre/items/ho-truc-giang','online_image','reference_only'),
  ('PHOTO-02','Ảnh đài phun Vilight','https://vilight.vn/website/thi-cong-dai-phun-nuoc-ho-truc-giang-ben-tre/','online_image','reference_only')
@@ -68,6 +102,22 @@ def open_db(path):
     CREATE TABLE photos(id TEXT PRIMARY KEY,title TEXT NOT NULL,category TEXT,image_url TEXT,source_url TEXT NOT NULL,author TEXT,year TEXT,license_status TEXT NOT NULL,local_asset_path TEXT,rights_approved INTEGER NOT NULL DEFAULT 0);
     CREATE TABLE photo_links(photo_id TEXT NOT NULL,requirement_id TEXT NOT NULL,relation TEXT NOT NULL DEFAULT 'reference',PRIMARY KEY(photo_id,requirement_id),FOREIGN KEY(photo_id) REFERENCES photos(id),FOREIGN KEY(requirement_id) REFERENCES requirements(id));
     CREATE TABLE object_photos(photo_id TEXT NOT NULL,object_id TEXT NOT NULL,relation TEXT NOT NULL DEFAULT 'reference',PRIMARY KEY(photo_id,object_id),FOREIGN KEY(photo_id) REFERENCES photos(id),FOREIGN KEY(object_id) REFERENCES objects(id));
+    CREATE TABLE photo_hotspots(
+      id TEXT PRIMARY KEY, label TEXT NOT NULL, object_id TEXT,
+      x_m REAL NOT NULL, y_m REAL NOT NULL, z_m REAL NOT NULL,
+      kind TEXT NOT NULL, position_accuracy TEXT NOT NULL, notes TEXT NOT NULL,
+      is_camera_location INTEGER NOT NULL DEFAULT 0 CHECK(is_camera_location=0),
+      FOREIGN KEY(object_id) REFERENCES objects(id)
+    );
+    CREATE TABLE photo_hotspot_items(
+      hotspot_id TEXT NOT NULL, photo_id TEXT NOT NULL,
+      relation TEXT NOT NULL CHECK(relation IN ('depicts_subject','nearby_subject','overview','general_context','historical_context')),
+      caption TEXT NOT NULL, sort_order INTEGER NOT NULL,
+      PRIMARY KEY(hotspot_id,photo_id),
+      FOREIGN KEY(hotspot_id) REFERENCES photo_hotspots(id),
+      FOREIGN KEY(photo_id) REFERENCES photos(id)
+    );
+    CREATE INDEX hotspot_item_photo ON photo_hotspot_items(photo_id);
     CREATE TABLE cost_items(id TEXT PRIMARY KEY,description TEXT NOT NULL,unit TEXT,amount_low_vnd INTEGER,amount_high_vnd INTEGER,quantity REAL,priority TEXT,price_type TEXT NOT NULL,notes TEXT,checked_on TEXT);
     CREATE TABLE cost_quotes(id TEXT PRIMARY KEY,cost_id TEXT NOT NULL,quote_source TEXT NOT NULL,amount_vnd INTEGER NOT NULL,currency TEXT NOT NULL DEFAULT 'VND',valid_on TEXT NOT NULL,evidence_url TEXT,source_type TEXT NOT NULL,FOREIGN KEY(cost_id) REFERENCES cost_items(id));
     CREATE TABLE reference_prices(id TEXT PRIMARY KEY,object_id TEXT,description TEXT NOT NULL,price_vnd INTEGER NOT NULL,price_label TEXT NOT NULL,price_date TEXT,source_url TEXT NOT NULL,source_kind TEXT NOT NULL,notes TEXT,FOREIGN KEY(object_id) REFERENCES objects(id));
@@ -235,6 +285,14 @@ def build(outdir, use_osm=False):
     db.executemany("INSERT INTO objects VALUES(?,?,?,?,?,?,?,?,?,?)",objs)
     for id1,id2 in [("IMG-01","OBJ-LAKE"),("IMG-02","OBJ-LAKE"),("IMG-03","OBJ-LAKE"),("IMG-07","OBJ-FOUNTAIN"),("IMG-04","OBJ-STATUE"),("IMG-05","OBJ-CIVIC"),("IMG-06","OBJ-PARK")]:
         db.execute("INSERT INTO object_photos(photo_id,object_id) VALUES(?,?)",(id1,id2))
+    db.executemany(
+      "INSERT INTO photo_hotspots(id,label,object_id,x_m,y_m,z_m,kind,position_accuracy,notes) VALUES(?,?,?,?,?,?,?,?,?)",
+      HOTSPOTS
+    )
+    db.executemany(
+      "INSERT INTO photo_hotspot_items(hotspot_id,photo_id,relation,caption,sort_order) VALUES(?,?,?,?,?)",
+      HOTSPOT_PHOTOS
+    )
     for c in COSTS: db.execute("INSERT INTO cost_items VALUES(?,?,?,?,?,?,?,?,?,?)",(c[0],c[1],c[2],c[3],c[4],c[5],c[6],"planning_assumption" if c[3] is not None else "unknown",c[7],TODAY))
     db.execute("INSERT INTO reference_prices VALUES(?,?,?,?,?,?,?,?,?)",("REF-PRICE-001","OBJ-FOUNTAIN","Gói thầu sửa chữa đài phun nước nghệ thuật Hồ Trúc Giang",1698502090,"Giá gói thầu được công bố","2025-05-27","https://dauthau.asia/ketqua/luachon-nhathau/thi-cong-sua-chua-dai-phun-nuoc-nghe-thuat-ho-truc-giang-2230530.html","public_procurement_listing","Không phải báo giá dựng 3D, cũng không khẳng định là giá trúng thầu hay quyết toán."))
     db.execute("INSERT INTO reference_prices VALUES(?,?,?,?,?,?,?,?,?)",("REF-PRICE-002","OBJ-FOUNTAIN","Gói thầu sửa chữa đài phun nước Hồ Trúc Giang — kết quả lựa chọn",1664590330,"Giá trúng thầu được công bố","2025-05-27","https://dauthau.asia/ketqua/luachon-nhathau/thi-cong-sua-chua-dai-phun-nuoc-nghe-thuat-ho-truc-giang-2230530.html","public_procurement_award","Vilight là đơn vị trúng thầu theo nguồn công khai; không phải quyết toán thực tế hay chi phí dựng 3D."))
@@ -248,8 +306,9 @@ def build(outdir, use_osm=False):
                    json.dumps(f["geometry"],ensure_ascii=False,separators=(",",":")),
                    json.dumps(f["properties"],ensure_ascii=False,separators=(",",":")),TODAY,f["accuracy"]))
     counts={k:db.execute("SELECT COUNT(*) FROM "+k).fetchone()[0] for k in
-            ("requirements","survey_shots","sources","zones","objects","photos","photo_links","cost_items","cost_quotes","reference_prices","osm_features")}
+            ("requirements","survey_shots","sources","zones","objects","photos","photo_links","photo_hotspots","photo_hotspot_items","cost_items","cost_quotes","reference_prices","osm_features")}
     assert counts["requirements"]==305 and counts["survey_shots"]==90
+    assert counts["photo_hotspots"]==8 and counts["photo_hotspot_items"]==len(HOTSPOT_PHOTOS)
     db.commit();db.execute("PRAGMA integrity_check");db.execute("VACUUM")
     # Export the exact photo-to-requirement mapping for catalog navigation.
     catalog_groups=[]
@@ -262,9 +321,24 @@ def build(outdir, use_osm=False):
             thumbnail_ids.extend(photo_ids)
             item_list.append({"id":rid,"title":title,"priority":priority,"status":status,"photo_ids":photo_ids})
         catalog_groups.append({"category":cat,"count":num,"image_ids":list(dict.fromkeys(thumbnail_ids))[:4],"items":item_list})
+    # Export generated hotspot links from SQLite; browser never needs hardcoded photo mappings.
+    photo_hotspots=[]
+    for id,label,object_id,x,y,z,kind,position_accuracy,notes in db.execute(
+      "SELECT id,label,object_id,x_m,y_m,z_m,kind,position_accuracy,notes FROM photo_hotspots ORDER BY rowid"
+    ).fetchall():
+        photo_rows=db.execute(
+          "SELECT photo_id,relation,caption FROM photo_hotspot_items WHERE hotspot_id=? ORDER BY sort_order",
+          (id,)
+        ).fetchall()
+        photo_hotspots.append({
+          "id":id,"label":label,"object_id":object_id,"position":{"x":x,"y":y,"z":z},
+          "kind":kind,"position_accuracy":position_accuracy,"notes":notes,
+          "is_camera_location":False,
+          "photos":[{"photo_id":row[0],"relation":row[1],"caption":row[2]} for row in photo_rows]
+        })
     db.close()
     scene={
-      "schemaVersion":2,"title":"Hồ Trúc Giang — Bờ Hồ Bến Tre","origin":{"lon":ORIGIN[0],"lat":ORIGIN[1],"crs":"EPSG:4326"},
+      "schemaVersion":3,"title":"Hồ Trúc Giang — Bờ Hồ Bến Tre","origin":{"lon":ORIGIN[0],"lat":ORIGIN[1],"crs":"EPSG:4326"},
       "area_of_interest":{"basis":"OSM shoreline 217484891","buffer_m":SHORE_BUFFER_M,"rule":"Distance to lakeshore; clip roads; retain only fully contained polygons","units":"meters"},"mode":"osm_snapshot" if features else "illustrative_no_osm","snapshot":TODAY,"osm_url":osm_url,"osm_error":error,
       "warning":"Chỉ đối tượng OSM có source được xem là hình học bản đồ cộng đồng. Mọi geometry fallback là minh họa.",
       "stats":counts,
@@ -274,6 +348,7 @@ def build(outdir, use_osm=False):
       "reference_prices":[{"id":"REF-PRICE-001","object_id":"OBJ-FOUNTAIN","description":"Giá gói thầu sửa chữa đài phun nước Hồ Trúc Giang","amount_vnd":1698502090,"year":2025,"price_label":"Giá gói thầu, không phải chi phí dự án 3D","source_url":"https://dauthau.asia/ketqua/luachon-nhathau/thi-cong-sua-chua-dai-phun-nuoc-nghe-thuat-ho-truc-giang-2230530.html"},{"id":"REF-PRICE-002","object_id":"OBJ-FOUNTAIN","description":"Giá trúng thầu sửa chữa đài phun nước Hồ Trúc Giang","amount_vnd":1664590330,"year":2025,"price_label":"Giá trúng thầu, không phải quyết toán hoặc chi phí dự án 3D","source_url":"https://dauthau.asia/ketqua/luachon-nhathau/thi-cong-sua-chua-dai-phun-nuoc-nghe-thuat-ho-truc-giang-2230530.html"}],
       "features":features,
       "catalog_groups":catalog_groups,
+      "photo_hotspots":photo_hotspots,
       "provenance":{"baseline":"catalog-blueprint-v1.json","map":"© OpenStreetMap contributors, ODbL; https://www.openstreetmap.org/copyright","photos":"external reference only, no redistribution permissions asserted"}
     }
     (outdir/"scene.json").write_text(json.dumps(scene,ensure_ascii=False,separators=(",",":")),encoding="utf-8")
