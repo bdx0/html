@@ -23,6 +23,15 @@ Build a progressively verifiable geographically anchored 3D Digital Twin of Hồ
 - Keep source images externally referenced, with source-link fallback for hotlink 403 failures; never download/copy copyrighted images without permission.
 - Playwright QA checks DB/schema counts, projected visible markers, opens at least one photo with source/provenance on 320/390px phones and desktop, verifies drawer interaction and does not regress WebGL/camera.
 
+## B3 mobile photo placement + satellite reference (implemented)
+- Viewer loads `survey.css` and `survey.js`. The **📍 Ghim ảnh** action enables selecting a 3D ground-plane point, which is rejected when more than 300m from OSM shoreline. Existing photo markers must not intercept selection.
+- Local IndexedDB (`bdx0-ben-tre-survey`) stores user-selected JPEG/PNG/WebP blobs, manual 0–359 degree bearing, capture date, notes and model-pinned lat/lon. Do not falsely claim EXIF camera pose or GPS survey accuracy.
+- Selected photos stay on the device until user explicitly clicks **⇩ Xuất ảnh**. GitHub Pages is static and must never claim immediate SQL writes/uploads. Privacy: photo and approximate location are sensitive to publish; do not auto-export or auto-commit them.
+- Human-reviewed exported JSON is imported with `python3 bo-ho-ben-tre/scripts/import_survey.py <file>.json`. Validation rejects missing rights, files over 12MB, unsupported bytes, bad coordinates, points outside lake's 300m buffer, mismatched origin; image is stored in `assets/surveys/` and metadata in `data/surveys/manifest.json`.
+- `scripts/build.py --osm` reads that curated manifest as source input, writes `field_surveys`, `photos`, `photo_hotspots`, `photo_hotspot_items` SQLite rows and corresponding `scene.json` entries. No orphan assets or unlicensed photos.
+- Satellite button opens Esri World Imagery *for geospatial context*, includes Esri attribution and links to Google satellite map. Do not imply a live image, specific acquisition date or reuse rights; compare with historical aerial photos separately. GIS comparison findings are in `COMPARISON.md`.
+- QA: run `python3 bo-ho-ben-tre/scripts/test_survey.py`, `node --check bo-ho-ben-tre/survey.js`, existing Chromium browser smoke for desktop/phones including dialogs, no page scrolling, accurate marker anchoring.
+
 ## Mobile-first interface contract
 - Landscape / portrait at 320px, 390px and tablet widths, incl. safe-area insets, must preserve a positive-height WebGL canvas, no horizontal/page scroll.
 - Mobile entry state: fullscreen scene with **collapsed** bottom drawer. Quick tabs for Images / Catalog / Prices expand the drawer; drawer has an accessible open/close control and swiping. No permanently 41vh-obscured scene.
