@@ -132,7 +132,7 @@ button{border:1px solid #38536a;background:#1a3047;border-radius:9px;padding:8px
 (function(){
 "use strict";
 var $=function(id){return document.getElementById(id)},stage=$("stage"),panel=$("panel"),mini=$("mini"),mc=mini.getContext("2d");
-var data=null,renderer=null,scene=null,camera=null,world=null,layers={trees:true},night=false,az=.76,el=.83,dist=510,target={x:0,z:0},frame=0,errors=[],mode="preparing",webglOK=false,activeTab="images",controlPointers=new Map(),touchPinch=0,mouseDown=null,raf=0,pinchCenter=null;
+var data=null,renderer=null,scene=null,camera=null,world=null,layers={trees:true},night=false,az=.60,el=1.07,dist=330,target={x:0,z:0},frame=0,errors=[],mode="preparing",webglOK=false,activeTab="images",controlPointers=new Map(),touchPinch=0,mouseDown=null,raf=0,pinchCenter=null;
 var counts={mesh:0,tri:0};
 function say(s){errors.push(new Date().toLocaleTimeString("vi-VN")+" "+s);if(errors.length>20)errors.shift();console.warn(s);}
 window.addEventListener("error",function(e){say("JS: "+e.message);updateDebug()});
@@ -166,26 +166,152 @@ var lake=addMesh(new THREE.ShapeGeometry(s),new THREE.MeshPhongMaterial({color:"
 for(var q=-1;q<=1;q++){roadLine([[-330,(120+q*100)], [330,(120+q*100)]],11);roadLine([[(160+q*75),-330],[(160+q*75),330]],10)}
 linesAroundLake(147,106,58);putBuildingsIllustrative();fountain(0,0);
 }
-function drawOSM(features){var waters=0,buildings=0,roads=0,parks=0;
-for(var i=0;i<features.length;i++){var f=features[i],p=f.properties||{},g=f.geometry;if(!g)continue;
-try{if(f.kind==="water"){fillPolygon(g,"#29949c",.15);waters++}
-else if(f.kind==="park"){fillPolygon(g,"#4b8b68",.13);parks++}
-else if(f.kind==="road"){var coords=g.coordinates.map(geoXY);roadLine(coords,/primary|secondary/.test(p.highway)?12: /residential|tertiary/.test(p.highway)?8:5);roads++}
-else if(f.kind==="building"){extrude(g,Math.min(70,Math.max(2,p.height_m||7.5)),"#c1bbac");buildings++}
-}catch(e){say("OSM "+f.id+": "+e.message)}}
-if(waters===0){say("OSM snapshot does not contain water way 217484891; showing highlighted center only");fountain(0,0)}
-// Tree layout requires field positioning; the procedural foliage is explicitly illustrative.
-linesAroundLake(145,106,48);if(waters)fountain(0,0);
-counts.features={water:waters,building:buildings,road:roads,park:parks}}
+
+/* TRÚC GIANG V2 — verified water boundary; PHOTO-INSPIRED detail proxies.
+   OSM provides plan geometry. Decorative objects and façade heights are illustrative,
+   not survey-grade measurements. All within shoreline +300m scene area. */
+var landmarks=[];
+function osmRing(g){return (g.coordinates[0]||[]).slice(0,-1).map(function(p){var q=geoXY(p);return {x:q[0],z:q[1]}})}
+function polygonArea2(p){var a=0;for(var i=0;i<p.length;i++){var n=p[(i+1)%p.length];a+=p[i].x*n.z-n.x*p[i].z}return a}
+function ringOffset(poly,d){var ccw=polygonArea2(poly)>0;
+return poly.map(function(p,i){var prv=poly[(i+poly.length-1)%poly.length],nxt=poly[(i+1)%poly.length],
+a={x:p.x-prv.x,z:p.z-prv.z},b={x:nxt.x-p.x,z:nxt.z-p.z},
+al=Math.hypot(a.x,a.z)||1,bl=Math.hypot(b.x,b.z)||1;
+var pa=ccw?{x:a.z/al,z:-a.x/al}:{x:-a.z/al,z:a.x/al};
+var pb=ccw?{x:b.z/bl,z:-b.x/bl}:{x:-b.z/bl,z:b.x/bl};
+var v={x:pa.x+pb.x,z:pa.z+pb.z},len=Math.hypot(v.x,v.z)||1;v.x/=len;v.z/=len;
+var dot=v.x*pb.x+v.z*pb.z;
+var amount=Math.min(d*2.2,Math.abs(dot)<.12?d:d/Math.max(.32,dot));
+return {x:p.x+v.x*amount,z:p.z+v.z*amount}})}
+function ringStripe(a,b,top,mat){var vertices=[],indices=[];
+for(var i=0;i<a.length;i++){var n=(i+1)%a.length,k=i*4;vertices.push(a[i].x,top,a[i].z,b[i].x,top,b[i].z,
+a[n].x,top,a[n].z,b[n].x,top,b[n].z);indices.push(k,k+1,k+2,k+1,k+3,k+2)}
+var g=new THREE.BufferGeometry();g.setAttribute("position",new THREE.Float32BufferAttribute(vertices,3));g.setIndex(indices);g.computeVertexNormals();
+return addMesh(g,mat,world)}
+function sideWall(poly,top,bottom,col){var verts=[],idx=[];for(var i=0;i<poly.length;i++){var a=poly[i],b=poly[(i+1)%poly.length],j=verts.length/3;
+verts.push(a.x,top,a.z,b.x,top,b.z,a.x,bottom,a.z,b.x,bottom,b.z);
+idx.push(j,j+2,j+1,j+1,j+2,j+3)}
+var g=new THREE.BufferGeometry();g.setAttribute("position",new THREE.Float32BufferAttribute(verts,3));g.setIndex(idx);g.computeVertexNormals();
+return addMesh(g,new THREE.MeshStandardMaterial({color:col,roughness:.85,side:THREE.DoubleSide}),world)}
+function curvedBorder(poly,y,radius,col){var pts=poly.map(function(p){return new THREE.Vector3(p.x,y,p.z)});pts.push(pts[0].clone());
+var curve=new THREE.CatmullRomCurve3(pts,true,"centripetal");
+var geo=new THREE.TubeGeometry(curve,Math.max(120,poly.length*7),radius,5,true);
+return addMesh(geo,material(col),world)}
+function sampleRing(poly,step){var out=[],length=0;
+for(var i=0;i<poly.length;i++){var a=poly[i],b=poly[(i+1)%poly.length];length+=Math.hypot(b.x-a.x,b.z-a.z)}
+var pos=0,edge=0,carry=0;
+while(pos<length&&out.length<200){
+ var a=poly[edge],b=poly[(edge+1)%poly.length],seg=Math.hypot(b.x-a.x,b.z-a.z)||1;
+ if(carry+seg<pos){carry+=seg;edge=(edge+1)%poly.length;continue}
+ var t=Math.max(0,Math.min(1,(pos-carry)/seg));var dx=(b.x-a.x)/seg,dz=(b.z-a.z)/seg;
+ out.push({x:a.x+(b.x-a.x)*t,z:a.z+(b.z-a.z)*t,angle:Math.atan2(dx,dz)});
+ pos+=step;
+}return out}
+function foliageTree(x,z,r,variant){var g=new THREE.Group();g.position.set(x,0,z);g.userData.tree=true;world.add(g);
+var shadow=addMesh(new THREE.CircleGeometry(r*.95,12),new THREE.MeshBasicMaterial({color:0x203f30,transparent:true,opacity:.20,depthWrite:false}),g,0,.47,0);shadow.rotation.x=-Math.PI/2;
+cylinder(r*.08,r*.12,r*.85,"#79624b",0,.47+r*.43,0,g);
+var cols=variant===0?["#447c4c","#56875b","#427752"]:["#477b3c","#5b8c49","#629451"];
+for(var i=0;i<4;i++){var a=i*2.399,spread=r*.39,xx=Math.cos(a)*spread,zz=Math.sin(a)*spread;
+var crown=addMesh(new THREE.IcosahedronGeometry(r*(i===0?.77:.57),1),new THREE.MeshLambertMaterial({color:cols[i%3]}),g,xx,r*.85+(i%3)*r*.12,zz);crown.scale.y=.66}
+return g}
+function lowShrub(x,z,r){var g=new THREE.Group();g.userData.tree=true;g.position.set(x,0,z);world.add(g);
+addMesh(new THREE.IcosahedronGeometry(r,0),material("#5f934f"),g,0,.65,0).scale.y=.65;
+if(Math.round(x*7+z)%3===0){for(var i=0;i<3;i++)addMesh(new THREE.IcosahedronGeometry(.18,0),material("#f7cf70"),g,.4*Math.cos(i*2.1),1.06,.35*Math.sin(i*2.1))}}
+function lakesideLamp(x,z){var g=new THREE.Group();g.position.set(x,0,z);world.add(g);
+cylinder(.12,.2,5.4,"#445b60",0,3.1,0,g);
+var cap=cylinder(.9,.65,.16,"#334b51",0,5.85,0,g);
+addMesh(new THREE.SphereGeometry(.35,8,6),new THREE.MeshBasicMaterial({color:night?"#ffe5b3":"#f2f7e0"}),g,0,5.57,0);
+return g}
+function bench(x,z,angle){var g=new THREE.Group();g.position.set(x,0,z);g.rotation.y=angle;world.add(g);
+box(2.0,.13,.62,"#9e6d48",0,.9,0,g);box(2.0,.65,.14,"#a77954",0,1.25,-.32,g);
+for(var q of [-.7,.7]){box(.12,.83,.12,"#526065",q,.52,0,g)}}
+function mainWater(poly){var sh=new THREE.Shape();
+poly.forEach(function(p,i){if(!i)sh.moveTo(p.x,-p.z);else sh.lineTo(p.x,-p.z)});sh.closePath();
+var geo=new THREE.ShapeGeometry(sh);var waterMat=new THREE.MeshPhongMaterial({color:0x247a84,shininess:75,specular:0x94d5cb,side:THREE.DoubleSide,depthWrite:true,transparent:false});
+var m=addMesh(geo,waterMat,world,0,.30,0);m.rotation.x=-Math.PI/2;m.renderOrder=8;
+return m}
+function makeShore(poly){var s05=ringOffset(poly,.75),s2=ringOffset(poly,2.0),s7=ringOffset(poly,7.5),s9=ringOffset(poly,9.8),s13=ringOffset(poly,13.5);
+var beige=new THREE.MeshLambertMaterial({color:0xc5b79f,side:THREE.DoubleSide});
+var paving=new THREE.MeshLambertMaterial({color:0xdacaaa,side:THREE.DoubleSide});
+var bed=new THREE.MeshLambertMaterial({color:0x477b45,side:THREE.DoubleSide});
+ringStripe(poly,s05,.37,beige);ringStripe(s05,s7,.37,paving);ringStripe(s7,s9,.38,bed);ringStripe(s9,s13,.38,paving);
+sideWall(poly,.39,.05,"#9caba3");curvedBorder(poly,.45,.16,"#d9e1d6");
+curvedBorder(s7,.41,.07,"#f1ddbf");
+var outline=sampleRing(ringOffset(poly,8.6),6);
+outline.forEach(function(p,i){if(i%2===0)lowShrub(p.x,p.z,i%4?1.2:1.5)});
+var trees=sampleRing(ringOffset(poly,16.1),16);
+trees.forEach(function(p,i){foliageTree(p.x,p.z,4.1+(i%5)*.48,i%2);if(i%3===0)lakesideLamp(p.x*.96,p.z*.96);if(i%4===1)bench(p.x*.97,p.z*.97,p.angle+Math.PI/2)});
+return {treeCount:trees.length,edgeLength:Math.round(sampleRing(poly,3).length*3)}}
+function makeFountain(x,z){var g=new THREE.Group();g.position.set(x,0,z);g.userData.fountain=true;world.add(g);
+addMesh(new THREE.CylinderGeometry(5.0,5.0,.22,40),material("#74949b"),g,0,.35,0);
+var ring=new THREE.TorusGeometry(5,.10,5,64);
+var tor=addMesh(ring,material("#d4dfdf"),g,0,.49,0);tor.rotation.x=-Math.PI/2;
+var ring2=new THREE.TorusGeometry(2.5,.10,5,40);
+addMesh(ring2,material("#d0dcdd"),g,0,.5,0).rotation.x=-Math.PI/2;
+var spray=new THREE.MeshPhongMaterial({color:0xaddde4,emissive:0x0f393c,transparent:true,opacity:.76,side:THREE.DoubleSide});
+for(var i=0;i<40;i++){var a=i*Math.PI*2/40,ht=1.8+Math.sin(i*.8)*.5;
+var column=addMesh(new THREE.CylinderGeometry(.038,.075,ht,5),spray,g,Math.cos(a)*4.7,.65+ht/2,Math.sin(a)*4.7);column.rotation.z=Math.sin(a)*.12}
+for(var j=0;j<12;j++){var a=j*Math.PI/6,h=4.4+Math.sin(j*.7)*.8;
+var m=addMesh(new THREE.CylinderGeometry(.085,.12,h,5),spray,g,Math.cos(a)*2.4,.65+h/2,Math.sin(a)*2.4);m.rotation.z=Math.sin(a)*.14}
+cylinder(.18,.25,14.0,"#caedf4",0,7.6,0,g);
+var splash=addMesh(new THREE.CircleGeometry(8,32),new THREE.MeshBasicMaterial({color:0xc2f5eb,transparent:true,opacity:.12,side:THREE.DoubleSide,depthWrite:false}),g,0,.34,0);splash.rotation.x=-Math.PI/2;
+return g}
+function makeMonument(x,z){var g=new THREE.Group();g.position.set(x,0,z);world.add(g);
+box(8,.48,8,"#c3c3b8",0,.5,0,g);
+box(6,1,6,"#cfc9b8",0,1.1,0,g);
+box(4,1,4,"#928c80",0,2.1,0,g);
+box(2.4,3.0,2.4,"#a49b88",0,4.1,0,g);
+var sp=addMesh(new THREE.IcosahedronGeometry(1.05,1),material("#685341"),g,0,6.25,0);sp.scale.set(.6,1.35,.7);
+landmarks.push({name:"Tượng Trần Văn Ơn · mô hình khái quát",x,z});return g}
+function facadeBuilding(x,z,w,dep,h,rot,seed){var g=new THREE.Group();g.position.set(x,0,z);g.rotation.y=rot;world.add(g);
+var shell=["#ddd2bd","#f0e1c8","#c4d6d3","#edd4bb","#d2bcaa","#d9d6c9","#efe3cc"][seed%7];
+box(w,h,dep,shell,0,h/2,0,g);
+box(w+.6,.32,dep+.7,seed%4===0?"#b45c4e":"#777b74",0,h+.16,0,g);
+var floors=Math.max(1,Math.min(6,Math.round(h/3.2))),cols=Math.max(2,Math.floor(w/3.1));
+for(var row=0;row<floors;row++)for(var col=0;col<cols;col++){var xx=-w/2+(col+.5)*w/cols,yy=1.6+row*3.0;
+box(Math.min(1.65,w/cols*.55),1.45,.05,"#45697a",xx,yy,dep/2+.08,g);
+if(row>0&&col%2===0)box(Math.min(2.1,w/cols*.8),.12,.7,"#ddd9ca",xx,yy-1,dep/2+.34,g)}
+box(w*.82,.63,.10,["#659a91","#a85a4b","#e0ad57","#486e9b"][seed%4],0,2.8,dep/2+.12,g);
+if(seed%4===0)box(w*.8,.12,1.3,"#cc8763",0,2.40,dep/2+.8,g);
+return g}
+function populateFrontages(){var count=0;
+function row(start,n,dx,dz,rot,side){for(var i=0;i<n;i++){
+var x=start.x+dx*i,z=start.z+dz*i,w=10+(i%3)*2,d=9+(i%3),h=8+(i%5)*2.6;
+facadeBuilding(x,z,w,d,h,rot,i+side*8);count++}}
+row({x:-75,z:114},14,12.0,0,Math.PI,1); // behind Hai Bà Trưng north
+row({x:-77,z:-119},14,12.0,0,0,2);     // Lê Quý Đôn south
+row({x:172,z:-43},8,0,14,-Math.PI/2,3);// Nguyễn Trung Trực east
+row({x:-226,z:-56},6,0,17,Math.PI/2,4);// western civic zone proxies
+return count}
+function lakeWorldDescription(){var k=data&&data.features&&data.features.filter(function(f){return f.kind==="water"&&f.osm_id===217484891})[0];return k&&k.geometry}
+function drawOSM(features){var countsLocal={water:0,building:0,road:0,park:0,trees:0,frontage:0};
+var lakeFeature=features.find(function(f){return f.kind==="water"&&f.osm_id===217484891});
+if(!lakeFeature){say("Không tìm thấy biên Hồ Trúc Giang từ OSM, chuyển bản minh họa");drawIllustrative();return}
+var ring=osmRing(lakeFeature.geometry);
+features.filter(function(f){return f.kind==="park"}).forEach(function(f){fillPolygon(f.geometry,"#598b5c",.09);countsLocal.park++});
+features.filter(function(f){return f.kind==="road"}).forEach(function(f){var p=f.properties||{},coords=f.geometry.coordinates.map(geoXY);
+roadLine(coords,/primary|secondary/.test(p.highway)?9: /residential|tertiary/.test(p.highway)?6.8:3.4);countsLocal.road++});
+features.filter(function(f){return f.kind==="building"}).forEach(function(f){
+var p=f.properties||{};
+if(/Tượng Trần Văn Ơn/.test(p.name||""))return;
+var h=Math.min(38,Math.max(2,p.height_m||7.5));
+extrude(f.geometry,h,p.name?"#c9bfad":"#c4bcae");countsLocal.building++});
+countsLocal.frontage=populateFrontages();
+mainWater(ring);
+var shoreline=makeShore(ring);countsLocal.trees=shoreline.treeCount;
+makeFountain(0,0);makeMonument(-155,-14);
+countsLocal.water=1;counts.features=countsLocal;
+}
 function initialize(){
 if(!window.THREE)throw Error("Thiếu thư viện Three.js cục bộ ../assets/three.min.js");
-counts={mesh:0,tri:0};scene=new THREE.Scene();scene.background=color(night?"#071528":"#9acbd9");scene.fog=new THREE.Fog(scene.background,750,1950);
+counts={mesh:0,tri:0};scene=new THREE.Scene();scene.background=color(night?"#0a1c32":"#add1dc");scene.fog=new THREE.Fog(scene.background,690,1440);
 world=new THREE.Group();scene.add(world);
 var hemi=new THREE.HemisphereLight(night?0x8199c9:0xe6faff,0x778572,night?.6:1.12);scene.add(hemi);
 var sun=new THREE.DirectionalLight(night?0x81a8ff:0xffebcf,night?.5:.9);sun.position.set(-200,360,130);scene.add(sun);
-plane(990,990,"#719481",0,-.12,0);
-for(var j=-450;j<=450;j+=50){streetSegment([-450,j],[450,j],.3,"#92a697");streetSegment([j,-450],[j,450],.3,"#92a697")}
-if(data&&data.features&&data.features.length>0){drawOSM(data.features);mode="OSM + tree/fountain illustrative"}else{drawIllustrative();mode="MINH HỌA · chờ geometry OSM"}
+plane(990,990,"#789678",0,-.12,0);
+/* GIS roadlines provide real street placement; remove artificial global grid */
+if(data&&data.features&&data.features.length>0){drawOSM(data.features);mode="Biên hồ OSM · cảnh quan tham chiếu ảnh"}else{drawIllustrative();mode="MINH HỌA · chờ geometry OSM"}
+dist=window.innerWidth<860?460:330;
 renderer=new THREE.WebGLRenderer({antialias:true,alpha:false,powerPreference:"high-performance",preserveDrawingBuffer:false});renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.5));renderer.setSize(stage.clientWidth,stage.clientHeight,false);renderer.domElement.id="webgl";renderer.domElement.style.cssText="position:absolute;inset:0";renderer.domElement.style.touchAction="none";stage.insertBefore(renderer.domElement,$("fallback"));
 camera=new THREE.PerspectiveCamera(54,Math.max(1,stage.clientWidth)/Math.max(1,stage.clientHeight),.7,6000);updateCamera();webglOK=true;
 renderer.domElement.addEventListener("webglcontextlost",function(e){e.preventDefault();webglOK=false;say("WebGL context lost. Canvas fallback enabled.");showFallback();});
@@ -195,10 +321,10 @@ resize();updateStatus();renderLoop();
 function updateCamera(){if(!camera)return;var rr=dist*Math.cos(el);camera.position.set(target.x+Math.sin(az)*rr,Math.max(12,dist*Math.sin(el)),target.z+Math.cos(az)*rr);camera.lookAt(target.x,0,target.z)}
 function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
 function resize(){var w=Math.max(1,stage.clientWidth),h=Math.max(1,stage.clientHeight);if(renderer)renderer.setSize(w,h,false);if(camera){camera.aspect=w/h;camera.updateProjectionMatrix();updateCamera()}var c=$("fallback");c.width=w;c.height=h;drawMini();if(!webglOK)showFallback()}
-function updateStatus(){var s=$("status");s.textContent=mode+" · "+(data?data.stats.osm_features:0)+" đối tượng · "+(data?data.stats.requirements:0)+" mục";s.className=(mode.indexOf("MINH")>=0?"warn":"")}
+function updateStatus(){var s=$("status");s.textContent=mode+" · Khu vực 300 m · "+(data?data.stats.osm_features:0)+" đối tượng";s.className=(mode.indexOf("MINH")>=0?"warn":"")}
 function drawMini(){var w=mini.width,h=mini.height;mc.fillStyle="#162b3b";mc.fillRect(0,0,w,h);mc.strokeStyle="#426477";mc.lineWidth=1;
 for(var i=0;i<7;i++){mc.beginPath();mc.moveTo(i*w/6,0);mc.lineTo(i*w/6,h);mc.stroke();mc.beginPath();mc.moveTo(0,i*h/6);mc.lineTo(w,i*h/6);mc.stroke()}
-mc.fillStyle="#2e8e9c";mc.beginPath();mc.ellipse(w/2,h/2,29,22,0,0,Math.PI*2);mc.fill();
+if(!data||!data.features||!data.features.length){mc.fillStyle="#2e8e9c";mc.beginPath();mc.ellipse(w/2,h/2,29,22,0,0,Math.PI*2);mc.fill()}
 if(data&&data.features&&data.features.length){mc.fillStyle="#30a1b4";data.features.filter(function(f){return f.kind==="water"}).slice(0,5).forEach(function(f){var points=f.geometry.coordinates[0];mc.beginPath();points.forEach(function(p,i){var xy=geoXY(p),x=w/2+xy[0]*.14,y=h/2-xy[1]*.14;if(!i)mc.moveTo(x,y);else mc.lineTo(x,y)});mc.closePath();mc.fill()})}
 mc.strokeStyle="#f5c67d";mc.lineWidth=1.5;mc.strokeRect(w/2-3+target.x*.14,h/2-3-target.z*.14,6,6);
 mc.fillStyle="#b9d5e2";mc.font="9px system-ui";mc.fillText("N",w/2-3,10)}
@@ -208,7 +334,7 @@ function renderLoop(){cancelAnimationFrame(raf);var prev=0;function tick(t){raf=
 try{if(webglOK&&renderer&&scene&&camera){renderer.render(scene,camera)}else if(frame%25===0)drawFallback();if(frame%10===0)drawMini();if(frame%30===0)updateDebug()}
 catch(e){say("Render: "+e.message);webglOK=false;showFallback()}}
 raf=requestAnimationFrame(tick)}
-function reset(){dist=510;az=.76;el=.83;target={x:0,z:0};updateCamera();drawMini()}
+function reset(){dist=window.innerWidth<860?460:330;az=.60;el=1.07;target={x:0,z:0};updateCamera();drawMini()}
 function touchHandlers(){stage.addEventListener("pointerdown",function(e){if(e.target.closest&&e.target.closest(".minimap,.zoom-controls,.debug"))return;e.preventDefault();controlPointers.set(e.pointerId,{x:e.clientX,y:e.clientY});stage.setPointerCapture&&stage.setPointerCapture(e.pointerId);stage.classList.add("grabbing");if(controlPointers.size===2){var a=Array.from(controlPointers.values());touchPinch=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);pinchCenter={x:(a[0].x+a[1].x)*.5,y:(a[0].y+a[1].y)*.5}}});
 stage.addEventListener("pointermove",function(e){var p=controlPointers.get(e.pointerId);if(!p)return;e.preventDefault();var dx=e.clientX-p.x,dy=e.clientY-p.y;p.x=e.clientX;p.y=e.clientY;
 if(controlPointers.size===1){az-=dx*.006;el=clamp(el+dy*.005,.13,1.43);updateCamera()}
