@@ -9,6 +9,7 @@
 <meta name="catalog:icon" content="🏞️">
 <meta name="theme-color" content="#0b1527">
 <title>Bờ Hồ Bến Tre — Digital Twin 3D | BDX0</title>
+<link rel="stylesheet" href="survey.css">
 <style>
 :root{color-scheme:dark;--base:#081421;--panel:#122237;--panel2:#192c43;--line:#32445a;--text:#f0f6ff;--muted:#94abc1;--accent:#68e4c4;--gold:#fac782}
 *{box-sizing:border-box}html,body{height:100%;width:100%;margin:0;overflow:hidden;overscroll-behavior:none;background:var(--base);font:13px/1.45 system-ui,-apple-system,"Segoe UI",Arial,sans-serif;color:var(--text)}
@@ -159,6 +160,7 @@ button{border:1px solid #38536a;background:#1a3047;border-radius:9px;padding:8px
 </aside>
 </main></div>
 <script src="../assets/three.min.js"></script>
+<script src="survey.js"></script>
 <script>
 (function(){
 "use strict";
@@ -386,7 +388,7 @@ plane(990,990,"#789678",0,-.12,0);
 if(data&&data.features&&data.features.length>0){drawOSM(data.features);mode="Biên hồ OSM · cảnh quan tham chiếu ảnh"}else{drawIllustrative();mode="MINH HỌA · chờ geometry OSM"}
 dist=window.innerWidth<860?460:330;
 renderer=new THREE.WebGLRenderer({antialias:true,alpha:false,powerPreference:"high-performance",preserveDrawingBuffer:false});renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.5));renderer.setSize(stage.clientWidth,stage.clientHeight,false);renderer.domElement.id="webgl";renderer.domElement.style.cssText="position:absolute;inset:0";renderer.domElement.style.touchAction="none";stage.insertBefore(renderer.domElement,$("fallback"));
-camera=new THREE.PerspectiveCamera(54,Math.max(1,stage.clientWidth)/Math.max(1,stage.clientHeight),.7,6000);raycaster=new THREE.Raycaster();updateCamera();initHotspots();webglOK=true;
+camera=new THREE.PerspectiveCamera(54,Math.max(1,stage.clientWidth)/Math.max(1,stage.clientHeight),.7,6000);raycaster=new THREE.Raycaster();updateCamera();initHotspots();if(window.BenTreSurvey)BenTreSurvey.init(data,camera,stage);webglOK=true;
 renderer.domElement.addEventListener("webglcontextlost",function(e){e.preventDefault();webglOK=false;say("WebGL context lost. Canvas fallback enabled.");showFallback();});
 renderer.domElement.addEventListener("webglcontextrestored",function(){say("WebGL context restored");try{renderer.dispose();renderer.domElement.remove();renderer=null;initialize()}catch(e){say(e.message);showFallback()}});
 resize();updateStatus();renderLoop();
@@ -404,11 +406,11 @@ mc.fillStyle="#b9d5e2";mc.font="9px system-ui";mc.fillText("N",w/2-3,10)}
 function drawFallback(){var c=$("fallback"),g=c.getContext("2d"),w=c.width,h=c.height;g.fillStyle="#20374a";g.fillRect(0,0,w,h);g.strokeStyle="#324e60";for(var i=0;i<w;i+=34){g.beginPath();g.moveTo(i,0);g.lineTo(i,h);g.stroke()}for(var j=0;j<h;j+=34){g.beginPath();g.moveTo(0,j);g.lineTo(w,j);g.stroke()}g.save();g.translate(w/2,h/2);g.rotate(-.25);g.fillStyle="#3c7080";g.beginPath();g.ellipse(0,0,Math.min(w*.33,210),Math.min(h*.24,125),0,0,6.284);g.fill();g.strokeStyle="#e0c9a0";g.lineWidth=13;g.stroke();g.restore();g.fillStyle="#eef6ff";g.font="bold 16px system-ui";g.fillText("Canvas 2D — chế độ dự phòng",24,36);g.font="12px system-ui";g.fillText("Hồ Trúc Giang · ảnh tham chiếu và SQLite vẫn sử dụng được",24,57)}
 function showFallback(){$("fallback").style.display="block";drawFallback();mode="CANVAS 2D FALLBACK";updateStatus()}
 function renderLoop(){cancelAnimationFrame(raf);var prev=0;function tick(t){raf=requestAnimationFrame(tick);if(t-prev<25)return;prev=t;frame++;if(lakeWaterMaterial&&lakeWaterMaterial.uniforms)lakeWaterMaterial.uniforms.uTime.value=t*.001;
-try{if(webglOK&&renderer&&scene&&camera){renderer.render(scene,camera)}else if(frame%25===0)drawFallback();if(frame%3===0)updateHotspots();if(frame%10===0)drawMini();if(frame%30===0)updateDebug()}
+try{if(webglOK&&renderer&&scene&&camera){renderer.render(scene,camera)}else if(frame%25===0)drawFallback();if(frame%3===0){updateHotspots();if(window.BenTreSurvey)BenTreSurvey.update(camera)}if(frame%10===0)drawMini();if(frame%30===0)updateDebug()}
 catch(e){say("Render: "+e.message);webglOK=false;showFallback()}}
 raf=requestAnimationFrame(tick)}
 function reset(){dist=window.innerWidth<860?460:330;az=.60;el=1.07;target={x:0,z:0};updateCamera();drawMini()}
-function touchHandlers(){stage.addEventListener("pointerdown",function(e){if(e.target.closest&&e.target.closest(".minimap,.zoom-controls,.debug,.photo-hotspot"))return;e.preventDefault();tapOrigin.set(e.pointerId,{x:e.clientX,y:e.clientY,wasMulti:controlPointers.size>0});controlPointers.set(e.pointerId,{x:e.clientX,y:e.clientY});stage.setPointerCapture&&stage.setPointerCapture(e.pointerId);stage.classList.add("grabbing");if(controlPointers.size===2){var a=Array.from(controlPointers.values());touchPinch=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);pinchCenter={x:(a[0].x+a[1].x)*.5,y:(a[0].y+a[1].y)*.5}}});
+function touchHandlers(){stage.addEventListener("pointerdown",function(e){if(e.target.closest&&e.target.closest(".minimap,.zoom-controls,.debug,.photo-hotspot,.field-marker,.survey-actions"))return;e.preventDefault();tapOrigin.set(e.pointerId,{x:e.clientX,y:e.clientY,wasMulti:controlPointers.size>0});controlPointers.set(e.pointerId,{x:e.clientX,y:e.clientY});stage.setPointerCapture&&stage.setPointerCapture(e.pointerId);stage.classList.add("grabbing");if(controlPointers.size===2){var a=Array.from(controlPointers.values());touchPinch=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);pinchCenter={x:(a[0].x+a[1].x)*.5,y:(a[0].y+a[1].y)*.5}}});
 stage.addEventListener("pointermove",function(e){var p=controlPointers.get(e.pointerId);if(!p)return;e.preventDefault();var dx=e.clientX-p.x,dy=e.clientY-p.y;p.x=e.clientX;p.y=e.clientY;
 if(controlPointers.size===1){az-=dx*.006;el=clamp(el+dy*.005,.13,1.43);updateCamera()}
 else if(controlPointers.size===2){var ar=Array.from(controlPointers.values()),pd=Math.hypot(ar[0].x-ar[1].x,ar[0].y-ar[1].y);
@@ -418,7 +420,7 @@ if(pinchCenter){var mx=mid.x-pinchCenter.x,my=mid.y-pinchCenter.y,panScale=dist*
 target.x=clamp(target.x+(-mx*Math.cos(az)-my*Math.sin(az))*panScale,-430,430);
 target.z=clamp(target.z+(mx*Math.sin(az)-my*Math.cos(az))*panScale,-430,430)}
 touchPinch=pd;pinchCenter=mid;updateCamera()}});
-function end(e){var first=tapOrigin.get(e.pointerId),isTap=first&&!first.wasMulti&&controlPointers.size===1&&Math.hypot(e.clientX-first.x,e.clientY-first.y)<7;controlPointers.delete(e.pointerId);tapOrigin.delete(e.pointerId);touchPinch=0;pinchCenter=null;if(controlPointers.size===0)stage.classList.remove("grabbing");if(isTap&&(!e.target.closest||!e.target.closest(".minimap,.zoom-controls,.debug,.photo-hotspot")))pick3D(e)}stage.addEventListener("pointerup",end);stage.addEventListener("pointercancel",end);
+function end(e){var first=tapOrigin.get(e.pointerId),isTap=first&&!first.wasMulti&&controlPointers.size===1&&Math.hypot(e.clientX-first.x,e.clientY-first.y)<7;controlPointers.delete(e.pointerId);tapOrigin.delete(e.pointerId);touchPinch=0;pinchCenter=null;if(controlPointers.size===0)stage.classList.remove("grabbing");if(isTap&&(!e.target.closest||!e.target.closest(".minimap,.zoom-controls,.debug,.photo-hotspot,.field-marker,.survey-actions")))pick3D(e)}stage.addEventListener("pointerup",end);stage.addEventListener("pointercancel",end);
 stage.addEventListener("wheel",function(e){e.preventDefault();dist=clamp(dist*Math.exp(clamp(e.deltaY,-150,150)*.002),48,1250);updateCamera()},{passive:false});
 mini.addEventListener("click",function(e){var r=mini.getBoundingClientRect();target.x=clamp(((e.clientX-r.left)/r.width-.5)*930,-450,450);target.z=clamp((.5-(e.clientY-r.top)/r.height)*820,-400,400);updateCamera()});
 }
@@ -494,6 +496,7 @@ function openHotspot(id){
  showPanel();setSheet(true);updateHotspots()
 }
 function pick3D(e){
+ if(window.BenTreSurvey&&BenTreSurvey.onSceneTap(e,camera,stage))return;
  if(!raycaster||!camera||!renderer||!pickables.length||!webglOK)return;
  var rect=stage.getBoundingClientRect();
  var ndc=new THREE.Vector2((e.clientX-rect.left)/rect.width*2-1,1-(e.clientY-rect.top)/rect.height*2);
