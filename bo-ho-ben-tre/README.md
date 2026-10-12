@@ -1,10 +1,21 @@
-# Hồ Trúc Giang / Bờ Hồ Bến Tre — Digital Twin B0/B1
+# Hồ Trúc Giang / Bờ Hồ Bến Tre — Digital Twin (vùng 300m)
 
 ## Mở và kiểm tra
 - Trực tiếp: https://bdx0.github.io/html/bo-ho-ben-tre/
 - Repo: https://github.com/bdx0/html/tree/main/bo-ho-ben-tre
 - Bản UX tham khảo: https://github.com/bdx0/html/blob/main/warestack-3d.html
 - Hướng dẫn agent: [AGENTS.md](AGENTS.md), [../AGENTS.md](../AGENTS.md).
+
+## Ranh giới dự án
+- Chỉ dựng trong phạm vi **300 mét tính từ mép hồ Trúc Giang** (đường bao nước OSM way `217484891`), không phải 300m tính từ tâm hồ.
+- Dữ liệu OSM được lọc tại nguồn: đoạn đường cắt theo khoảng cách tới bờ; polygon công trình/công viên phải nằm hoàn toàn trong vùng. Đây là bản đồ cộng đồng chứ không phải khảo sát địa chính.
+- Trước đây đề xuất toàn khu 750m, hiện đã bỏ phạm vi đó khỏi scene. Danh mục gốc 305 hạng mục và ảnh/giá vẫn được giữ để làm chứng cứ.
+
+## Giao diện mobile
+- Khi mở điện thoại, cảnh 3D chiếm phần lớn màn hình và bảng dữ liệu thu gọn ở cạnh dưới.
+- Chạm nút **▧ / ▤ / ₫** để mở nhanh Ảnh / Danh mục / Giá. Chạm **Thu gọn bảng** để trở lại cảnh 3D.
+- Kéo một ngón để xoay, chụm hai ngón để zoom và dịch chuyển, nút **+ / −** để chỉnh khoảng cách, nút **⌂** để về toàn cảnh. Giao diện có hỗ trợ safe-area.
+- Có chế độ ngày/đêm, bật/tắt cây minh họa, minimap, Debug; kiểm thử Chromium desktop và mobile qua GitHub Actions.
 
 ## Đã thực hiện
 1. Import blueprint v1 đầy đủ (305 yêu cầu, 90 góc khảo sát đề xuất, 16 nhóm và 16 vùng, nguồn dẫn).
