@@ -8,7 +8,7 @@ import sqlite3
 import tempfile
 import unittest
 
-ROOT=Path(__file__).resolve().parents[1]
+ROOT=Path(__file__).resolve().parents[2]
 SCRIPT=ROOT/"bo-ho-ben-tre"/"scripts"
 
 def load(name):
