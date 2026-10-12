@@ -5,6 +5,8 @@ on:
     paths:
       - "bo-ho-ben-tre/scripts/**"
       - "bo-ho-ben-tre/data/catalog-blueprint-v1.json"
+      - "bo-ho-ben-tre/data/surveys/**"
+      - "bo-ho-ben-tre/assets/surveys/**"
       - ".github/workflows/build-ben-tre-data.yml"
   workflow_dispatch:
 
@@ -19,6 +21,9 @@ jobs:
         uses: actions/checkout@v4
         with:
           persist-credentials: true
+      - name: Unit test survey validation and roundtrip
+        run: |
+          python3 bo-ho-ben-tre/scripts/test_survey.py
       - name: Generate SQLite and geographic scene
         run: |
           python3 bo-ho-ben-tre/scripts/build.py --osm
@@ -33,6 +38,9 @@ jobs:
           assert db.execute('select count(*) from survey_shots').fetchone()[0]==90
           assert db.execute('select count(*) from photo_links').fetchone()[0]>=305
           assert db.execute('select count(*) from cost_items').fetchone()[0]>=10
+          assert db.execute('select count(*) from photo_hotspots').fetchone()[0]>=8
+          assert db.execute('select count(*) from field_surveys').fetchone()[0]>=0
+          assert db.execute('select count(*) from photo_hotspot_items').fetchone()[0]>=15
           d=json.loads((p/'scene.json').read_text())
           assert d['stats']['requirements']==305
           html=pathlib.Path('bo-ho-ben-tre/index.html').read_text()
@@ -41,6 +49,7 @@ jobs:
           print('Database validated; mode:',d['mode'], 'geometry',len(d['features']))
           PY
           node --check /tmp/ben-tre-client-check.js
+          node --check bo-ho-ben-tre/survey.js
       - name: Commit generated database snapshot
         run: |
           git config user.name "github-actions[bot]"
