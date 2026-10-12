@@ -150,7 +150,7 @@ mini.addEventListener("click",function(e){var r=mini.getBoundingClientRect();tar
 function safe(s){return String(s==null?"":s).replace(/[&<>"']/g,function(v){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[v]})}
 function showPanel(){if(!data){panel.innerHTML="<h2>Chưa có dữ liệu</h2>";return}
 if(activeTab==="images"){var a='<h2>Ảnh theo danh mục</h2><p class="sub">Ảnh được liên kết từ nguồn gốc; không đóng gói/nhận quyền tái sử dụng. Ảnh cũ có thể khác hiện trạng.</p>';
-data.images.forEach(function(i){a+='<article class="photo"><img loading="lazy" alt="'+safe(i.title)+'" src="'+safe(i.image_url)+'" onerror="this.style.display=\\'none\\'"><div class="txt"><b>'+safe(i.title)+'</b><p>'+safe(i.category)+' · '+safe(i.year)+' · '+safe(i.author)+'</p><a target="_blank" rel="noopener noreferrer" href="'+safe(i.source_url)+'">Mở nguồn ảnh ↗</a></div></article>'});panel.innerHTML=a}
+data.images.forEach(function(i){a+='<article class="photo"><img loading="lazy" alt="'+safe(i.title)+'" src="'+safe(i.image_url)+'" onerror="this.style.display=&quot;none&quot;"><div class="txt"><b>'+safe(i.title)+'</b><p>'+safe(i.category)+' · '+safe(i.year)+' · '+safe(i.author)+'</p><a target="_blank" rel="noopener noreferrer" href="'+safe(i.source_url)+'">Mở nguồn ảnh ↗</a></div></article>'});panel.innerHTML=a}
 else if(activeTab==="data"){var s=data.stats;var a='<h2>Kiểm kê dữ liệu</h2><div class="statgrid">';
 [["requirements","Danh mục yêu cầu"],["survey_shots","Góc chụp cần khảo sát"],["osm_features","Hình học OSM"],["photo_links","Liên kết ảnh"]].forEach(function(k){a+='<div class="stat"><strong>'+safe(s[k[0]])+'</strong><small>'+safe(k[1])+'</small></div>'});
 a+='</div><p class="note">'+safe(data.warning)+'</p>';
