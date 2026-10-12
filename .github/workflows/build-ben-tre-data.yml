@@ -1,0 +1,54 @@
+name: Build Ben Tre SQLite and scene
+on:
+  push:
+    branches: [main]
+    paths:
+      - "bo-ho-ben-tre/scripts/**"
+      - "bo-ho-ben-tre/data/catalog-blueprint-v1.json"
+      - ".github/workflows/build-ben-tre-data.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sqlite-and-scene:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Generate SQLite and geographic scene
+        run: |
+          python3 bo-ho-ben-tre/scripts/build.py --osm
+      - name: Validate catalog + database and JS parse
+        run: |
+          python3 - <<'PY'
+          import sqlite3,json,pathlib,re
+          p=pathlib.Path('bo-ho-ben-tre/data')
+          db=sqlite3.connect(p/'catalog.sqlite')
+          assert db.execute('PRAGMA integrity_check').fetchone()[0]=='ok'
+          assert db.execute('select count(*) from requirements').fetchone()[0]==305
+          assert db.execute('select count(*) from survey_shots').fetchone()[0]==90
+          assert db.execute('select count(*) from photo_links').fetchone()[0]>=305
+          assert db.execute('select count(*) from cost_items').fetchone()[0]>=10
+          d=json.loads((p/'scene.json').read_text())
+          assert d['stats']['requirements']==305
+          html=pathlib.Path('bo-ho-ben-tre/index.html').read_text()
+          js=re.findall(r'<script>(.*?)</script>',html,re.S)[-1]
+          pathlib.Path('/tmp/ben-tre-client-check.js').write_text(js)
+          print('Database validated; mode:',d['mode'], 'geometry',len(d['features']))
+          PY
+          node --check /tmp/ben-tre-client-check.js
+      - name: Commit generated database snapshot
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add bo-ho-ben-tre/data/catalog.sqlite bo-ho-ben-tre/data/scene.json
+          if ! git diff --cached --quiet; then
+            git commit -m "build(ben-tre): refresh SQLite and static GIS scene [skip ci]"
+            git push origin HEAD:main
+          else
+            echo "Generated data unchanged"
+          fi
