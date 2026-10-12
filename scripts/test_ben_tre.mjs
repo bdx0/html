@@ -29,7 +29,7 @@ try{
   await page.locator('#dbg').click();
   await page.locator('[data-tab="cost"]').click();
   const price=await page.locator('#panel').innerText();
-  if(!price.includes('Giá / chi phí'))errors.push(mode+' Price panel is missing');
+  if(!price.includes('Giá công trình')||!price.includes('1.698.502.090'))errors.push(mode+' Public price reference panel is missing');
   if(!modeOk)errors.push(mode+' WebGL canvas missing or not rendering '+diagnostic);
   if(content[0]<200||content[1]<180)errors.push(mode+' Canvas has invalid dimensions '+content);
   await context.close();
