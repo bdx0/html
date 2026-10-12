@@ -209,11 +209,17 @@ try{if(webglOK&&renderer&&scene&&camera){renderer.render(scene,camera)}else if(f
 catch(e){say("Render: "+e.message);webglOK=false;showFallback()}}
 raf=requestAnimationFrame(tick)}
 function reset(){dist=510;az=.76;el=.83;target={x:0,z:0};updateCamera();drawMini()}
-function touchHandlers(){stage.addEventListener("pointerdown",function(e){if(e.target.closest&&e.target.closest(".minimap,.zoom-controls,.debug"))return;e.preventDefault();controlPointers.set(e.pointerId,{x:e.clientX,y:e.clientY});stage.setPointerCapture&&stage.setPointerCapture(e.pointerId);stage.classList.add("grabbing");if(controlPointers.size===2){var a=Array.from(controlPointers.values());touchPinch=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y)}});
+function touchHandlers(){stage.addEventListener("pointerdown",function(e){if(e.target.closest&&e.target.closest(".minimap,.zoom-controls,.debug"))return;e.preventDefault();controlPointers.set(e.pointerId,{x:e.clientX,y:e.clientY});stage.setPointerCapture&&stage.setPointerCapture(e.pointerId);stage.classList.add("grabbing");if(controlPointers.size===2){var a=Array.from(controlPointers.values());touchPinch=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);pinchCenter={x:(a[0].x+a[1].x)*.5,y:(a[0].y+a[1].y)*.5}}});
 stage.addEventListener("pointermove",function(e){var p=controlPointers.get(e.pointerId);if(!p)return;e.preventDefault();var dx=e.clientX-p.x,dy=e.clientY-p.y;p.x=e.clientX;p.y=e.clientY;
 if(controlPointers.size===1){az-=dx*.006;el=clamp(el+dy*.005,.13,1.43);updateCamera()}
-else if(controlPointers.size===2){var ar=Array.from(controlPointers.values());var pd=Math.hypot(ar[0].x-ar[1].x,ar[0].y-ar[1].y);if(touchPinch>0&&pd>0)dist=clamp(dist*touchPinch/pd,48,1250);touchPinch=pd;updateCamera()}});
-function end(e){controlPointers.delete(e.pointerId);touchPinch=0;if(controlPointers.size===0)stage.classList.remove("grabbing")}stage.addEventListener("pointerup",end);stage.addEventListener("pointercancel",end);
+else if(controlPointers.size===2){var ar=Array.from(controlPointers.values()),pd=Math.hypot(ar[0].x-ar[1].x,ar[0].y-ar[1].y);
+var mid={x:(ar[0].x+ar[1].x)*.5,y:(ar[0].y+ar[1].y)*.5};
+if(touchPinch>0&&pd>0)dist=clamp(dist*touchPinch/pd,48,1250);
+if(pinchCenter){var mx=mid.x-pinchCenter.x,my=mid.y-pinchCenter.y,panScale=dist*.85/Math.max(260,Math.min(stage.clientWidth,stage.clientHeight));
+target.x=clamp(target.x+(-mx*Math.cos(az)-my*Math.sin(az))*panScale,-430,430);
+target.z=clamp(target.z+(mx*Math.sin(az)-my*Math.cos(az))*panScale,-430,430)}
+touchPinch=pd;pinchCenter=mid;updateCamera()}});
+function end(e){controlPointers.delete(e.pointerId);touchPinch=0;pinchCenter=null;if(controlPointers.size===0)stage.classList.remove("grabbing")}stage.addEventListener("pointerup",end);stage.addEventListener("pointercancel",end);
 stage.addEventListener("wheel",function(e){e.preventDefault();dist=clamp(dist*Math.exp(clamp(e.deltaY,-150,150)*.002),48,1250);updateCamera()},{passive:false});
 mini.addEventListener("click",function(e){var r=mini.getBoundingClientRect();target.x=clamp(((e.clientX-r.left)/r.width-.5)*930,-450,450);target.z=clamp((.5-(e.clientY-r.top)/r.height)*820,-400,400);updateCamera()});
 }
