@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="description" content="Digital Twin 3D Hồ Trúc Giang Bến Tre: dữ liệu SQLite, ảnh tham chiếu, OSM, chi phí và cảnh WebGL tương tác.">
+<meta name="catalog:category" content="Mô phỏng 3D">
+<meta name="catalog:tags" content="Bến Tre, Hồ Trúc Giang, Digital Twin, SQLite, WebGL, GIS, 3D">
+<meta name="catalog:icon" content="🏞️">
+<meta name="theme-color" content="#0b1527">
+<title>Bờ Hồ Bến Tre — Digital Twin 3D | BDX0</title>
+<style>
+:root{color-scheme:dark;--base:#081421;--panel:#122237;--panel2:#192c43;--line:#32445a;--text:#f0f6ff;--muted:#94abc1;--accent:#68e4c4;--gold:#fac782}
+*{box-sizing:border-box}html,body{height:100%;width:100%;margin:0;overflow:hidden;overscroll-behavior:none;background:var(--base);font:13px/1.45 system-ui,-apple-system,"Segoe UI",Arial,sans-serif;color:var(--text)}
+button,input{font:inherit}button{cursor:pointer;color:inherit}a{color:#81e7d1}button:focus-visible,a:focus-visible{outline:2px solid #94f4df;outline-offset:2px}
+#app{height:100dvh;display:grid;grid-template-rows:62px minmax(0,1fr)}.top{border-bottom:1px solid #2c4158;background:#101f32;display:flex;align-items:center;padding:0 18px;gap:12px;z-index:6}
+.brand{font-weight:800;font-size:16px;white-space:nowrap}.brand small{color:var(--muted);font-size:10px;display:block;font-weight:500;letter-spacing:.11em}.tag{border:1px solid #32665d;color:var(--accent);background:#0e3837;padding:5px 10px;border-radius:40px;font-size:10px}.grow{flex:1}.toolbar{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+button{border:1px solid #38536a;background:#1a3047;border-radius:9px;padding:8px 12px;font-weight:650;white-space:nowrap}button:hover{background:#28435d}button.active{background:#125347;border-color:#3ba68d;color:#b9ffee}
+.main{position:relative;display:grid;grid-template-columns:minmax(0,1fr) 320px;min-height:0}
+#stage{position:relative;overflow:hidden;background:radial-gradient(ellipse at 42% 28%,#324e65,#12293b 60%,#081722);touch-action:none;user-select:none;cursor:grab}
+#stage.grabbing{cursor:grabbing}#stage canvas{display:block;width:100%;height:100%;touch-action:none}#fallback{position:absolute;inset:0;display:none}
+#hud{position:absolute;z-index:2;top:13px;left:13px;max-width:min(420px,calc(100% - 26px));pointer-events:none}
+.pill{border-radius:11px;background:#0d2438e6;border:1px solid #416075b8;box-shadow:0 8px 24px #0003;padding:10px 12px;margin-bottom:8px;backdrop-filter:blur(8px)}
+.pill strong{font-size:13px}.pill p{color:#c0d1e0;margin:4px 0 0;font-size:11px}.warn{color:var(--gold)!important}
+.foot{position:absolute;bottom:12px;left:12px;z-index:2;color:#d1e0f0;background:#122236c9;border-radius:9px;padding:8px 11px;font-size:10px;pointer-events:none}
+.minimap{position:absolute;z-index:3;bottom:12px;right:12px;border:1px solid #648199;border-radius:12px;background:#101f32ef;box-shadow:0 12px 24px #0008;padding:7px;max-width:32vw}
+.minimap canvas{width:200px!important;height:122px!important;max-width:100%;cursor:crosshair;touch-action:manipulation!important}.minihead{font-size:10px;color:#b5cadd;padding:0 2px 4px}
+.inspector{border-left:1px solid #2d4359;background:#101f30;min-height:0;display:flex;flex-direction:column}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);padding:10px;gap:5px}.tabs button{padding:9px 2px;font-size:11px}
+.panel{overflow:auto;min-height:0;padding:8px 14px 20px;overscroll-behavior:contain}.panel h2{font-size:16px;margin:8px 0 10px}.sub{color:#aec3d7;font-size:12px}.note{color:#ffd29c;background:#51382550;border:1px solid #775a39;padding:9px;border-radius:8px;font-size:11px}
+.photo{border:1px solid #314a5f;border-radius:11px;background:#162b40;overflow:hidden;margin-bottom:10px}.photo img{width:100%;height:108px;object-fit:cover;background:#274056;display:block}.photo .txt{padding:10px}.photo .txt b{font-size:12px}.photo .txt p{margin:4px 0 7px;color:#aabdd0;font-size:11px}.photo a{font-size:11px}
+.line{display:flex;justify-content:space-between;align-items:flex-start;gap:6px;padding:10px 0;border-bottom:1px solid #2a4258}.line b{font-size:11px}.line span{color:#aabed2;text-align:right;font-size:11px}
+.statgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}.stat{padding:12px;background:#172d42;border:1px solid #31485d;border-radius:11px}.stat strong{font-size:24px;line-height:1.1}.stat small{display:block;color:#9db5ca;margin-top:5px}
+.legend{display:flex;gap:7px;flex-wrap:wrap;margin-top:7px;color:#b7cad8;font-size:10px}.dot{width:8px;height:8px;display:inline-block;border-radius:50%;margin-right:4px}
+.debug{position:absolute;bottom:156px;right:12px;width:min(370px,calc(100% - 24px));max-height:40vh;overflow:auto;z-index:6;background:#06121af2;border:1px solid #6294a3;border-radius:12px;display:none;padding:12px;box-shadow:0 15px 50px #0008}
+.debug.open{display:block}.debug pre{font-size:10px;white-space:pre-wrap;word-break:break-word}.debug .actions{display:flex;gap:6px}.debug .actions button{font-size:11px}
+.close-panel{display:none}
+@media(max-width:860px){.top{padding:0 9px;gap:7px}.brand{font-size:12px}.brand small{font-size:9px}.top .tag{display:none}.top button{padding:8px 9px;font-size:11px}.main{display:block}.inspector{position:absolute;z-index:5;left:0;bottom:0;right:0;height:41dvh;border:1px solid #37516a;border-radius:16px 16px 0 0;box-shadow:0 -14px 30px #0006}.inspector.collapsed{height:49px;overflow:hidden}.inspector.collapsed .panel{display:none}.tabs{display:flex;gap:8px;align-items:center;padding:6px 9px;overflow:hidden}.tabs button{padding:7px 12px}.close-panel{display:inline-block!important;margin-left:auto}.panel{padding:4px 12px 18px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.panel h2,.panel .sub,.panel .note,.panel .statgrid{grid-column:1/-1}.photo{margin:0}.foot{bottom:calc(41dvh + 9px);font-size:9px;max-width:40vw}.minimap{bottom:calc(41dvh + 10px);right:7px}.minimap canvas{width:120px!important;height:85px!important}.debug{bottom:calc(41dvh + 105px);max-height:29vh}.panel .line{grid-column:1/-1}}
+@media(max-width:450px){.toolbar button{padding:7px 8px}.brand small{display:none}.brand{max-width:135px;white-space:normal;line-height:1.1}.photo img{height:72px}.minimap{max-width:39vw}.pill{padding:8px 9px}.pill strong{font-size:11px}.pill p{font-size:10px}}
+</style>
+</head>
+<body>
+<div id="app"><header class="top">
+<div class="brand">🏞️ Bờ Hồ Bến Tre<small>TRÚC GIANG DIGITAL TWIN · B0/B1</small></div><span class="tag">WebGL + SQLite + GIS</span><span class="grow"></span>
+<div class="toolbar">
+<button id="home">⌂ Toàn cảnh</button><button id="day">☾ Ban đêm</button><button id="layers">♧ Cây xanh</button><button id="dbg">⚙ Debug</button>
+</div></header>
+<main class="main">
+<div id="stage" aria-label="Cảnh 3D tương tác Hồ Trúc Giang"><canvas id="fallback"></canvas>
+ <div id="hud"><div class="pill"><strong>Hồ Trúc Giang · khu trung tâm</strong><p id="status">Đang đọc danh mục và dữ liệu bản đồ...</p></div></div>
+ <div class="foot">Kéo để xoay · Cuộn/chụm để zoom · Chọn tab để xem ảnh và chi phí</div>
+ <div class="minimap"><div class="minihead">◉ BẢN ĐỒ NHỎ · tâm hồ</div><canvas id="mini" width="220" height="134"></canvas></div>
+ <div class="debug" id="debug"><b>ENGINE DIAGNOSTICS</b><div class="actions"><button id="copy">Sao chép</button><button id="retry">Khởi tạo lại</button><button id="debugclose">Đóng</button></div><pre id="report">Đang kiểm tra…</pre></div>
+</div>
+<aside class="inspector" id="inspector">
+ <nav class="tabs"><button data-tab="images" class="active">Ảnh chứng cứ</button><button data-tab="data">Dữ liệu</button><button data-tab="cost">Giá / Chi phí</button><button class="close-panel" id="collapse">Thu gọn</button></nav>
+ <section class="panel" id="panel"><h2>Kho tư liệu</h2><p class="sub">Đang kết nối SQLite export…</p></section>
+</aside>
+</main></div>
+<script src="../assets/three.min.js"></script>
+<script>
+(function(){
+"use strict";
+var $=function(id){return document.getElementById(id)},stage=$("stage"),panel=$("panel"),mini=$("mini"),mc=mini.getContext("2d");
+var data=null,renderer=null,scene=null,camera=null,world=null,layers={trees:true},night=false,az=.76,el=.83,dist=510,target={x:0,z:0},frame=0,errors=[],mode="preparing",webglOK=false,activeTab="images",controlPointers=new Map(),touchPinch=0,mouseDown=null,raf=0;
+var counts={mesh:0,tri:0};
+function say(s){errors.push(new Date().toLocaleTimeString("vi-VN")+" "+s);if(errors.length>20)errors.shift();console.warn(s);}
+window.addEventListener("error",function(e){say("JS: "+e.message);updateDebug()});
+window.addEventListener("unhandledrejection",function(e){say("Promise: "+e.reason);updateDebug()});
+function color(s){return new THREE.Color(s)}
+function material(col){return new THREE.MeshLambertMaterial({color:col})}
+var materials={grass:null,street:null,concrete:null,water:null,glass:null,tree:null,wood:null,roof:null,accent:null};
+function addMesh(geo,mat,parent,x,y,z){var m=new THREE.Mesh(geo,mat);m.position.set(x||0,y||0,z||0);parent.add(m);counts.mesh++;counts.tri+=Math.floor(geo.index?geo.index.count/3:(geo.attributes.position?geo.attributes.position.count/3:0));return m}
+function plane(w,d,col,x,y,z,parent){var m=addMesh(new THREE.PlaneGeometry(w,d),material(col),parent||world,x||0,y||0,z||0);m.rotation.x=-Math.PI/2;return m}
+function box(w,h,d,col,x,y,z,par){return addMesh(new THREE.BoxGeometry(w,h,d),material(col),par||world,x||0,y||0,z||0)}
+function cylinder(r1,r2,h,col,x,y,z,par){return addMesh(new THREE.CylinderGeometry(r1,r2,h,8),material(col),par||world,x||0,y||0,z||0)}
+function geoXY(p){var o=data&&data.origin||{lon:106.37814,lat:10.23861};return [(p[0]-o.lon)*111320*Math.cos(o.lat*Math.PI/180),(p[1]-o.lat)*111320]}
+function shapePolygon(geometry){var ring=geometry.coordinates&&geometry.coordinates[0];if(!ring||ring.length<4)return null;var s=new THREE.Shape();ring.forEach(function(p,i){var pt=geoXY(p);if(!i)s.moveTo(pt[0],-pt[1]);else s.lineTo(pt[0],-pt[1])});s.closePath();return s}
+function fillPolygon(geometry,col,h){var sh=shapePolygon(geometry);if(!sh)return null;var m=addMesh(new THREE.ShapeGeometry(sh),material(col),world,0,h,0);m.rotation.x=-Math.PI/2;return m}
+function extrude(geometry,height,col){var sh=shapePolygon(geometry);if(!sh)return;var geo=new THREE.ExtrudeGeometry(sh,{depth:height,bevelEnabled:false,curveSegments:1});var m=addMesh(geo,[material(col),material("#30415b")],world,0,.25,0);m.rotation.x=-Math.PI/2;return m}
+function streetSegment(a,b,width,col){var dx=b[0]-a[0],dz=b[1]-a[1],len=Math.hypot(dx,dz);if(len<.2)return;var m=plane(width,len,col,(a[0]+b[0])/2,.07,(a[1]+b[1])/2);m.rotation.y=Math.atan2(dx,dz)}
+function roadLine(points,width){for(var i=1;i<points.length;i++)streetSegment(points[i-1],points[i],width,"#475669")}
+function tree(x,z,scale){var g=new THREE.Group();g.position.set(x,0,z);world.add(g);g.userData.tree=true;var trunk=cylinder(.37*scale,.54*scale,4.3*scale,"#765a42",0,2.2*scale,0,g);var crown=addMesh(new THREE.IcosahedronGeometry(3.2*scale,1),material("#347f61"),g,0,6.4*scale,0);crown.scale.set(1.2,.73,1.05);return g}
+function linesAroundLake(a,b,num){for(var i=0;i<num;i++){var ang=i*2*Math.PI/num,rr=.85+(.21*Math.sin(i*12.9));tree(Math.cos(ang)*a*rr,Math.sin(ang)*b*rr,.65+(i%5)*.09)}}
+function fountain(x,z){var base=cylinder(6,6,0.45,"#b9d1d8",x,.33,z);for(var i=0;i<32;i++){var a=i*Math.PI*2/32;var h=1.7+Math.sin(i*11)*.9;var m=cylinder(.11,.19,h,"#a2e7ec",x+Math.cos(a)*5,h/2+.5,z+Math.sin(a)*5);m.userData.fountain=true}cylinder(.28,.32,12,"#e9fbff",x,6.7,z).userData.fountain=true}
+function building(x,z,w,d,h,seed){var palette=["#cfb6a0","#c6d1d6","#ead3a7","#b4bbc5","#d8c6a9","#a3c2c6"];box(w,h,d,palette[seed%palette.length],x,h/2,z);
+box(w+.4,.8,d+.4,"#465568",x,h+.35,z);
+var floors=Math.max(1,Math.min(9,Math.round(h/3.2)));for(var row=0;row<floors;row++)for(var col=0;col<Math.min(8,Math.round(w/4));col++){var px=x-w/2+(col+.5)*w/Math.min(8,Math.round(w/4));box(Math.min(1.6,w*.10),1.15,.12,"#638ca0",px,2.3+row*3.1,z+d/2+.09)}}
+function putBuildingsIllustrative(){var n=0;for(var ring=0;ring<3;ring++){var R=175+ring*80;for(var k=0;k<24+ring*10;k++){var a=(k+.18*ring)*Math.PI*2/(24+ring*10),x=Math.cos(a)*R,z=Math.sin(a)*R;
+ if(Math.abs(x)<130&&Math.abs(z)<90)continue;building(x,z,12+(k%5)*3,15+(k%3)*2,9+(k%7)*3,k+ring*7);n++}}return n}
+function drawIllustrative(){// Not real geodetic data; never promote this fallback to an OSM-observed fact.
+var s=new THREE.Shape();var n=90;for(var i=0;i<=n;i++){var a=i/n*2*Math.PI,x=Math.cos(a)*121,z=Math.sin(a)*80;if(i===0)s.moveTo(x,-z);else s.lineTo(x,-z)}s.closePath();
+var outer=new THREE.Shape();for(var j=0;j<=n;j++){var b=j/n*2*Math.PI,xx=Math.cos(b)*136,zz=Math.sin(b)*94;if(j===0)outer.moveTo(xx,-zz);else outer.lineTo(xx,-zz)}outer.closePath();outer.holes.push(new THREE.Path(s.getPoints().reverse()));
+var sidewalk=addMesh(new THREE.ShapeGeometry(outer),material("#d0c0a6"),world,0,.26,0);sidewalk.rotation.x=-Math.PI/2;
+var lake=addMesh(new THREE.ShapeGeometry(s),new THREE.MeshPhongMaterial({color:"#238495",transparent:true,opacity:.93,shininess:93,side:THREE.DoubleSide}),world,0,.17,0);lake.rotation.x=-Math.PI/2;
+for(var q=-1;q<=1;q++){roadLine([[-410,(120+q*100)], [410,(120+q*100)]],11);roadLine([[(160+q*90),-390],[(160+q*90),390]],10)}
+linesAroundLake(147,106,58);putBuildingsIllustrative();fountain(0,0);
+}
+function drawOSM(features){var waters=0,buildings=0,roads=0,parks=0;
+for(var i=0;i<features.length;i++){var f=features[i],p=f.properties||{},g=f.geometry;if(!g)continue;
+try{if(f.kind==="water"){fillPolygon(g,"#29949c",.15);waters++}
+else if(f.kind==="park"){fillPolygon(g,"#4b8b68",.13);parks++}
+else if(f.kind==="road"){var coords=g.coordinates.map(geoXY);roadLine(coords,/primary|secondary/.test(p.highway)?12: /residential|tertiary/.test(p.highway)?8:5);roads++}
+else if(f.kind==="building"){extrude(g,Math.min(70,Math.max(2,p.height_m||7.5)),"#c1bbac");buildings++}
+}catch(e){say("OSM "+f.id+": "+e.message)}}
+if(waters===0){say("OSM snapshot does not contain water way 217484891; showing highlighted center only");fountain(0,0)}
+// Tree layout requires field positioning; the procedural foliage is explicitly illustrative.
+linesAroundLake(145,106,48);if(waters)fountain(0,0);
+counts.features={water:waters,building:buildings,road:roads,park:parks}}
+function initialize(){
+if(!window.THREE)throw Error("Thiếu thư viện Three.js cục bộ ../assets/three.min.js");
+counts={mesh:0,tri:0};scene=new THREE.Scene();scene.background=color(night?"#071528":"#9acbd9");scene.fog=new THREE.Fog(scene.background,750,1950);
+world=new THREE.Group();scene.add(world);
+var hemi=new THREE.HemisphereLight(night?0x8199c9:0xe6faff,0x778572,night?.6:1.12);scene.add(hemi);
+var sun=new THREE.DirectionalLight(night?0x81a8ff:0xffebcf,night?.5:.9);sun.position.set(-200,360,130);scene.add(sun);
+plane(2700,2700,"#719481",0,-.12,0);
+for(var j=-1000;j<=1000;j+=50){streetSegment([-1000,j],[1000,j],.3,"#92a697");streetSegment([j,-1000],[j,1000],.3,"#92a697")}
+if(data&&data.features&&data.features.length>0){drawOSM(data.features);mode="OSM + tree/fountain illustrative"}else{drawIllustrative();mode="MINH HỌA · chờ geometry OSM"}
+renderer=new THREE.WebGLRenderer({antialias:true,alpha:false,powerPreference:"high-performance",preserveDrawingBuffer:false});renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.5));renderer.setSize(stage.clientWidth,stage.clientHeight,false);renderer.domElement.id="webgl";renderer.domElement.style.cssText="position:absolute;inset:0";renderer.domElement.style.touchAction="none";stage.insertBefore(renderer.domElement,$("fallback"));
+camera=new THREE.PerspectiveCamera(54,Math.max(1,stage.clientWidth)/Math.max(1,stage.clientHeight),.7,6000);updateCamera();webglOK=true;
+renderer.domElement.addEventListener("webglcontextlost",function(e){e.preventDefault();webglOK=false;say("WebGL context lost. Canvas fallback enabled.");showFallback();});
+renderer.domElement.addEventListener("webglcontextrestored",function(){say("WebGL context restored");try{renderer.dispose();renderer.domElement.remove();renderer=null;initialize()}catch(e){say(e.message);showFallback()}});
+resize();updateStatus();renderLoop();
+}
+function updateCamera(){if(!camera)return;var rr=dist*Math.cos(el);camera.position.set(target.x+Math.sin(az)*rr,Math.max(12,dist*Math.sin(el)),target.z+Math.cos(az)*rr);camera.lookAt(target.x,0,target.z)}
+function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
+function resize(){var w=Math.max(1,stage.clientWidth),h=Math.max(1,stage.clientHeight);if(renderer)renderer.setSize(w,h,false);if(camera){camera.aspect=w/h;camera.updateProjectionMatrix();updateCamera()}var c=$("fallback");c.width=w;c.height=h;drawMini();if(!webglOK)showFallback()}
+function updateStatus(){var s=$("status");s.textContent=mode+" · "+(data?data.stats.requirements:0)+" danh mục · "+(data?data.stats.photos:0)+" ảnh · "+(data?data.stats.cost_items:0)+" đầu việc giá";s.className=(mode.indexOf("MINH")>=0?"warn":"")}
+function drawMini(){var w=mini.width,h=mini.height;mc.fillStyle="#162b3b";mc.fillRect(0,0,w,h);mc.strokeStyle="#426477";mc.lineWidth=1;
+for(var i=0;i<7;i++){mc.beginPath();mc.moveTo(i*w/6,0);mc.lineTo(i*w/6,h);mc.stroke();mc.beginPath();mc.moveTo(0,i*h/6);mc.lineTo(w,i*h/6);mc.stroke()}
+mc.fillStyle="#2e8e9c";mc.beginPath();mc.ellipse(w/2,h/2,29,22,0,0,Math.PI*2);mc.fill();
+if(data&&data.features&&data.features.length){mc.fillStyle="#30a1b4";data.features.filter(function(f){return f.kind==="water"}).slice(0,5).forEach(function(f){var points=f.geometry.coordinates[0];mc.beginPath();points.forEach(function(p,i){var xy=geoXY(p),x=w/2+xy[0]*.14,y=h/2-xy[1]*.14;if(!i)mc.moveTo(x,y);else mc.lineTo(x,y)});mc.closePath();mc.fill()})}
+mc.strokeStyle="#f5c67d";mc.lineWidth=1.5;mc.strokeRect(w/2-3+target.x*.14,h/2-3-target.z*.14,6,6);
+mc.fillStyle="#b9d5e2";mc.font="9px system-ui";mc.fillText("N",w/2-3,10)}
+function drawFallback(){var c=$("fallback"),g=c.getContext("2d"),w=c.width,h=c.height;g.fillStyle="#20374a";g.fillRect(0,0,w,h);g.strokeStyle="#324e60";for(var i=0;i<w;i+=34){g.beginPath();g.moveTo(i,0);g.lineTo(i,h);g.stroke()}for(var j=0;j<h;j+=34){g.beginPath();g.moveTo(0,j);g.lineTo(w,j);g.stroke()}g.save();g.translate(w/2,h/2);g.rotate(-.25);g.fillStyle="#3c7080";g.beginPath();g.ellipse(0,0,Math.min(w*.33,210),Math.min(h*.24,125),0,0,6.284);g.fill();g.strokeStyle="#e0c9a0";g.lineWidth=13;g.stroke();g.restore();g.fillStyle="#eef6ff";g.font="bold 16px system-ui";g.fillText("Canvas 2D — chế độ dự phòng",24,36);g.font="12px system-ui";g.fillText("Hồ Trúc Giang · ảnh tham chiếu và SQLite vẫn sử dụng được",24,57)}
+function showFallback(){$("fallback").style.display="block";drawFallback();mode="CANVAS 2D FALLBACK";updateStatus()}
+function renderLoop(){cancelAnimationFrame(raf);var prev=0;function tick(t){raf=requestAnimationFrame(tick);if(t-prev<25)return;prev=t;frame++;
+try{if(webglOK&&renderer&&scene&&camera){renderer.render(scene,camera)}else if(frame%25===0)drawFallback();if(frame%10===0)drawMini();if(frame%30===0)updateDebug()}
+catch(e){say("Render: "+e.message);webglOK=false;showFallback()}}
+raf=requestAnimationFrame(tick)}
+function reset(){dist=510;az=.76;el=.83;target={x:0,z:0};updateCamera();drawMini()}
+function touchHandlers(){stage.addEventListener("pointerdown",function(e){if(e.target.closest&&e.target.closest(".minimap"))return;e.preventDefault();controlPointers.set(e.pointerId,{x:e.clientX,y:e.clientY});stage.setPointerCapture&&stage.setPointerCapture(e.pointerId);stage.classList.add("grabbing");if(controlPointers.size===2){var a=Array.from(controlPointers.values());touchPinch=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y)}});
+stage.addEventListener("pointermove",function(e){var p=controlPointers.get(e.pointerId);if(!p)return;e.preventDefault();var dx=e.clientX-p.x,dy=e.clientY-p.y;p.x=e.clientX;p.y=e.clientY;
+if(controlPointers.size===1){az-=dx*.006;el=clamp(el+dy*.005,.13,1.43);updateCamera()}
+else if(controlPointers.size===2){var ar=Array.from(controlPointers.values());var pd=Math.hypot(ar[0].x-ar[1].x,ar[0].y-ar[1].y);if(touchPinch>0&&pd>0)dist=clamp(dist*touchPinch/pd,48,1700);touchPinch=pd;updateCamera()}});
+function end(e){controlPointers.delete(e.pointerId);touchPinch=0;if(controlPointers.size===0)stage.classList.remove("grabbing")}stage.addEventListener("pointerup",end);stage.addEventListener("pointercancel",end);
+stage.addEventListener("wheel",function(e){e.preventDefault();dist=clamp(dist*Math.exp(clamp(e.deltaY,-150,150)*.002),48,1700);updateCamera()},{passive:false});
+mini.addEventListener("click",function(e){var r=mini.getBoundingClientRect();target.x=((e.clientX-r.left)/r.width-.5)*1100;target.z=(.5-(e.clientY-r.top)/r.height)*650;updateCamera()});
+}
+function safe(s){return String(s==null?"":s).replace(/[&<>"']/g,function(v){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[v]})}
+function showPanel(){if(!data){panel.innerHTML="<h2>Chưa có dữ liệu</h2>";return}
+if(activeTab==="images"){var a='<h2>Ảnh theo danh mục</h2><p class="sub">Ảnh được liên kết từ nguồn gốc; không đóng gói/nhận quyền tái sử dụng. Ảnh cũ có thể khác hiện trạng.</p>';
+data.images.forEach(function(i){a+='<article class="photo"><img loading="lazy" alt="'+safe(i.title)+'" src="'+safe(i.image_url)+'" onerror="this.style.display=\\'none\\'"><div class="txt"><b>'+safe(i.title)+'</b><p>'+safe(i.category)+' · '+safe(i.year)+' · '+safe(i.author)+'</p><a target="_blank" rel="noopener noreferrer" href="'+safe(i.source_url)+'">Mở nguồn ảnh ↗</a></div></article>'});panel.innerHTML=a}
+else if(activeTab==="data"){var s=data.stats;var a='<h2>Kiểm kê dữ liệu</h2><div class="statgrid">';
+[["requirements","Danh mục yêu cầu"],["survey_shots","Góc chụp cần khảo sát"],["osm_features","Hình học OSM"],["photo_links","Liên kết ảnh"]].forEach(function(k){a+='<div class="stat"><strong>'+safe(s[k[0]])+'</strong><small>'+safe(k[1])+'</small></div>'});
+a+='</div><p class="note">'+safe(data.warning)+'</p>';
+data.objects.forEach(function(o){a+='<div class="line"><b>'+safe(o.name)+'</b><span>'+safe(o.kind)+' · cần xác minh</span></div>'});
+a+='<div class="line"><b>WGS84</b><span>'+safe(data.origin.lat)+', '+safe(data.origin.lon)+'</span></div><div class="line"><b>Snapshot</b><span>'+safe(data.snapshot)+'</span></div>';
+a+='<a href="data/catalog.sqlite" download>Tải SQLite database</a> · <a href="data/scene.json" target="_blank">Xem JSON scene</a> · <a href="data/catalog-blueprint-v1.json" target="_blank">305 mục gốc</a>';panel.innerHTML=a}
+else{var a='<h2>Giá / chi phí trong SQLite</h2><p class="sub">Không tự điền báo giá: NULL = chưa thu thập. Giá 0 chỉ là giả định phạm vi miễn phí, không phải hóa đơn.</p>';data.costs.forEach(function(c){var val=c.amount_low_vnd===null?"Chưa báo giá":Number(c.amount_low_vnd).toLocaleString("vi-VN")+" đ";a+='<div class="line"><b>'+safe(c.name)+'<br><small style="color:#96aec3">'+safe(c.unit)+'</small></b><span>'+safe(val)+'<br>'+safe(c.price_type)+'</span></div>'});panel.innerHTML=a}}
+function updateDebug(){if(!$("debug").classList.contains("open"))return;var gl=renderer&&renderer.getContext&&renderer.getContext();var info=renderer&&renderer.info;
+var d={engine:mode,webgl:webglOK,three:window.THREE&&THREE.REVISION,viewport:stage.clientWidth+" x "+stage.clientHeight,devicePixelRatio:window.devicePixelRatio,webglVersion:gl?gl.getParameter(gl.VERSION):"n/a",
+frame:frame,sceneMeshes:counts.mesh,sceneTrianglesApprox:counts.tri,drawCalls:info&&info.render.calls,renderTriangles:info&&info.render.triangles,zoomDistance:Math.round(dist),
+pointerCount:controlPointers.size,osmElements:data&&data.stats.osm_features,modelMode:data&&data.mode,errors:errors.slice(-8)};$("report").textContent=JSON.stringify(d,null,2)}
+$("home").onclick=reset;$("day").onclick=function(){night=!night;$("day").textContent=night?"☀ Ban ngày":"☾ Ban đêm";if(scene){scene.background=color(night?"#071528":"#9acbd9");scene.fog.color=scene.background;scene.children.forEach(function(c){if(c.type==="DirectionalLight")c.intensity=night?.35:.9;if(c.type==="HemisphereLight")c.intensity=night?.5:1.12})}};
+$("layers").onclick=function(){layers.trees=!layers.trees;$("layers").classList.toggle("active",!layers.trees);if(world)world.traverse(function(o){if(o.userData&&o.userData.tree)o.visible=layers.trees})};
+$("dbg").onclick=function(){$("debug").classList.toggle("open");updateDebug()};$("debugclose").onclick=function(){$("debug").classList.remove("open")};
+$("retry").onclick=function(){location.reload()};$("copy").onclick=function(){var t=$("report").textContent;if(navigator.clipboard)navigator.clipboard.writeText(t).catch(function(){say("Clipboard blocked")});else say("Clipboard unavailable")};
+document.querySelectorAll("[data-tab]").forEach(function(b){b.onclick=function(){activeTab=b.dataset.tab;document.querySelectorAll("[data-tab]").forEach(function(c){c.classList.toggle("active",c===b)});$("inspector").classList.remove("collapsed");$("collapse").textContent="Thu gọn";showPanel()}});
+$("collapse").onclick=function(){var p=$("inspector");p.classList.toggle("collapsed");$("collapse").textContent=p.classList.contains("collapsed")?"Mở bảng":"Thu gọn"};
+window.addEventListener("resize",resize);touchHandlers();drawMini();
+fetch("data/scene.json",{cache:"no-store"}).then(function(r){if(!r.ok)throw Error("HTTP "+r.status+" scene.json");return r.json()}).then(function(d){data=d;showPanel();try{initialize()}catch(e){say("WebGL init: "+e.message);showFallback()}updateStatus()}).catch(function(e){say("Không tải được scene.json: "+e.message);data={origin:{lon:106.37814,lat:10.23861},stats:{requirements:0,photos:0,cost_items:0,osm_features:0,survey_shots:0,photo_links:0},images:[],costs:[],objects:[],features:[],mode:"illustrative_no_osm",warning:"Không có scene.json"};showPanel();try{initialize()}catch(e2){say(e2.message);showFallback()}updateStatus()});
+})();
+</script>
+</body>
+</html>
