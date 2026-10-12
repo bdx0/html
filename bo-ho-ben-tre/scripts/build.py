@@ -179,6 +179,17 @@ def build(outdir, use_osm=False):
             ("requirements","survey_shots","sources","zones","objects","photos","photo_links","cost_items","cost_quotes","osm_features")}
     assert counts["requirements"]==305 and counts["survey_shots"]==90
     db.commit();db.execute("PRAGMA integrity_check");db.execute("VACUUM");db.close()
+    # Export the exact photo-to-requirement mapping for catalog navigation.
+    catalog_groups=[]
+    for cat,num in db.execute("SELECT category,COUNT(*) FROM requirements GROUP BY category ORDER BY category").fetchall():
+        item_list=[]
+        thumbnail_ids=[]
+        reqs=db.execute("SELECT id,description,priority,status FROM requirements WHERE category=? ORDER BY id",(cat,)).fetchall()
+        for rid,title,priority,status in reqs:
+            photo_ids=[row[0] for row in db.execute("SELECT photo_id FROM photo_links WHERE requirement_id=? ORDER BY photo_id",(rid,))]
+            thumbnail_ids.extend(photo_ids)
+            item_list.append({"id":rid,"title":title,"priority":priority,"status":status,"photo_ids":photo_ids})
+        catalog_groups.append({"category":cat,"count":num,"image_ids":list(dict.fromkeys(thumbnail_ids))[:4],"items":item_list})
     scene={
       "schemaVersion":1,"title":"Hồ Trúc Giang — Bờ Hồ Bến Tre","origin":{"lon":ORIGIN[0],"lat":ORIGIN[1],"crs":"EPSG:4326"},
       "mode":"osm_snapshot" if features else "illustrative_no_osm","snapshot":TODAY,"osm_url":osm_url,"osm_error":error,
@@ -188,6 +199,7 @@ def build(outdir, use_osm=False):
       "images":[{"id":x[0],"title":x[1],"category":x[2],"image_url":x[3],"source_url":x[4],"author":x[5],"year":x[6],"license":"reference_only"} for x in IMAGES],
       "costs":[{"id":x[0],"name":x[1],"unit":x[2],"amount_low_vnd":x[3],"amount_high_vnd":x[4],"quantity":x[5],"price_type":"unknown" if x[3] is None else "planning_assumption"} for x in COSTS],
       "features":features,
+      "catalog_groups":catalog_groups,
       "provenance":{"baseline":"catalog-blueprint-v1.json","map":"© OpenStreetMap contributors, ODbL; https://www.openstreetmap.org/copyright","photos":"external reference only, no redistribution permissions asserted"}
     }
     (outdir/"scene.json").write_text(json.dumps(scene,ensure_ascii=False,separators=(",",":")),encoding="utf-8")
