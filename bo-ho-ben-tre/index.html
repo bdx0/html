@@ -148,7 +148,11 @@ function geoXY(p){var o=data&&data.origin||{lon:106.37814,lat:10.23861};return [
 function shapePolygon(geometry){var ring=geometry.coordinates&&geometry.coordinates[0];if(!ring||ring.length<4)return null;var s=new THREE.Shape();ring.forEach(function(p,i){var pt=geoXY(p);if(!i)s.moveTo(pt[0],-pt[1]);else s.lineTo(pt[0],-pt[1])});s.closePath();return s}
 function fillPolygon(geometry,col,h){var sh=shapePolygon(geometry);if(!sh)return null;var m=addMesh(new THREE.ShapeGeometry(sh),material(col),world,0,h,0);m.rotation.x=-Math.PI/2;return m}
 function extrude(geometry,height,col){var sh=shapePolygon(geometry);if(!sh)return;var geo=new THREE.ExtrudeGeometry(sh,{depth:height,bevelEnabled:false,curveSegments:1});var m=addMesh(geo,[material(col),material("#30415b")],world,0,.25,0);m.rotation.x=-Math.PI/2;return m}
-function streetSegment(a,b,width,col){var dx=b[0]-a[0],dz=b[1]-a[1],len=Math.hypot(dx,dz);if(len<.2)return;var m=plane(width,len,col,(a[0]+b[0])/2,.07,(a[1]+b[1])/2);m.rotation.y=Math.atan2(dx,dz)}
+function streetSegment(a,b,width,col){var dx=b[0]-a[0],dz=b[1]-a[1],len=Math.hypot(dx,dz);if(len<.2)return;
+var nx=-dz/len*width/2,nz=dx/len*width/2;
+var points=[a[0]+nx,.14,a[1]+nz,a[0]-nx,.14,a[1]-nz,b[0]-nx,.14,b[1]-nz,b[0]+nx,.14,b[1]+nz];
+var g=new THREE.BufferGeometry();g.setAttribute("position",new THREE.Float32BufferAttribute(points,3));g.setIndex([0,1,2,0,2,3]);g.computeVertexNormals();
+return addMesh(g,new THREE.MeshLambertMaterial({color:col,side:THREE.DoubleSide}),world)}
 function roadLine(points,width){for(var i=1;i<points.length;i++)streetSegment(points[i-1],points[i],width,"#475669")}
 function tree(x,z,scale){var g=new THREE.Group();g.position.set(x,0,z);world.add(g);g.userData.tree=true;var trunk=cylinder(.37*scale,.54*scale,4.3*scale,"#765a42",0,2.2*scale,0,g);var crown=addMesh(new THREE.IcosahedronGeometry(3.2*scale,1),material("#347f61"),g,0,6.4*scale,0);crown.scale.set(1.2,.73,1.05);return g}
 function linesAroundLake(a,b,num){for(var i=0;i<num;i++){var ang=i*2*Math.PI/num,rr=.85+(.21*Math.sin(i*12.9));tree(Math.cos(ang)*a*rr,Math.sin(ang)*b*rr,.65+(i%5)*.09)}}
