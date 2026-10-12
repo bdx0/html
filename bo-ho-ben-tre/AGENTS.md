@@ -15,6 +15,14 @@ Build a progressively verifiable geographically anchored 3D Digital Twin of Hồ
 - Before shipping, use automated Playwright screenshot artifacts (desktop, narrow mobile and landscape), **inspect the screenshots visually** against identifiable Trúc Giang photo sources (not merely count meshes or frames).
 - The real field photos have priority over fabricated details; metadata may reference copyrighted sources but do not mirror those image binaries in public asset folders without permission.
 
+## Photo-to-3D hotspot data contract (B2.1)
+- SQLite owns all reference-to-location relationships: \`photo_hotspots\` (id, local XY position, related object, positional provenance, explicitly NOT camera position), \`photo_hotspot_items\` (photo foreign key, relation, caption, order). The deterministic scene export includes \`photo_hotspots\` with \`photos\`; never hand-edit the browser's embedded hotspot array.
+- Initially seed 8 traceable scene anchors: lake overview, fountain, Trần Văn Ơn monument, north and south promenade, west park, east facades, historical city office. These are **approximated world anchors**, not actual photo GPS/camera pose.
+- Relations are \`depicts_subject\` (actual specific landmark), \`nearby_subject\`, \`overview\`, \`general_context\`, \`historical_context\`. Display relations and original link/author/year on photo cards. Do not imply a landscape image is a photo of a specific unknown facade, or that a photo was taken from the anchor's location.
+- The browser projects world coordinates into screen markers on orbit/zoom/resize. The stage's pointer-event handler must not steal clicks from photo markers. On mobile a marker opens the bottom sheet; selecting a mapped 3D mesh uses Raycaster and the same hotspot ID.
+- Keep source images externally referenced, with source-link fallback for hotlink 403 failures; never download/copy copyrighted images without permission.
+- Playwright QA checks DB/schema counts, projected visible markers, opens at least one photo with source/provenance on 320/390px phones and desktop, verifies drawer interaction and does not regress WebGL/camera.
+
 ## Mobile-first interface contract
 - Landscape / portrait at 320px, 390px and tablet widths, incl. safe-area insets, must preserve a positive-height WebGL canvas, no horizontal/page scroll.
 - Mobile entry state: fullscreen scene with **collapsed** bottom drawer. Quick tabs for Images / Catalog / Prices expand the drawer; drawer has an accessible open/close control and swiping. No permanently 41vh-obscured scene.
