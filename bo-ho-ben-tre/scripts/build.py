@@ -335,7 +335,7 @@ def build(outdir, use_osm=False):
               (hid,pid,"field_observation","Ảnh hiện trường được ghim thủ công tại đây.",1)
             )
             db.execute(
-              "INSERT INTO field_surveys VALUES(?,?,?,?,?,?,?,?,?,?)",
+              "INSERT INTO field_surveys VALUES(?,?,?,?,?,?,?,?,?,?,?)",
               (pid,pid,hid,entry["lat"],entry["lon"],entry["heading_deg"],
                 entry.get("captured_on",""),entry.get("recorded_on",""),
                 entry["image_sha256"],entry.get("location_quality","manually_pinned_3d_not_surveyed_gps"),
