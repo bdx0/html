@@ -11,6 +11,13 @@
 - Dữ liệu OSM được lọc tại nguồn: đoạn đường cắt theo khoảng cách tới bờ; polygon công trình/công viên phải nằm hoàn toàn trong vùng. Đây là bản đồ cộng đồng chứ không phải khảo sát địa chính.
 - Trước đây đề xuất toàn khu 750m, hiện đã bỏ phạm vi đó khỏi scene. Danh mục gốc 305 hạng mục và ảnh/giá vẫn được giữ để làm chứng cứ.
 
+## Liên kết ảnh trực tiếp với các vị trí 3D (B2.1)
+- SQLite có các bảng \`photo_hotspots\` và \`photo_hotspot_items\`, được chuyển thành \`scene.json.photo_hotspots\` qua script build.
+- 8 mốc gồm: Toàn cảnh Hồ Trúc Giang, Đài phun nước, Tượng Trần Văn Ơn, Bờ bắc, Bờ nam, Công viên Trần Văn Ơn, Dãy phố phía đông và Khu UBND.
+- Camera 3D chiếu tọa độ của các mốc thành nút 📷 nổi; người dùng chạm nút để xem ảnh, nguồn gốc, năm và độ liên quan ngay trong bottom-sheet. Chạm 3D vào đối tượng có liên kết sẽ mở cùng bộ ảnh.
+- Các mốc là tọa độ đại diện cho đối tượng hoặc khu vực **không phải nơi đứng chụp ảnh**. Nguồn ảnh có thể mang tính toàn cảnh, tư liệu lịch sử hoặc tham chiếu chung; mối quan hệ này được ghi minh bạch trong DB.
+- Hình ảnh từ nguồn bên ngoài không được đưa vào repo khi chưa có quyền. Ảnh lỗi tải trực tiếp vẫn mở được trang nguồn.
+
 ## Giao diện mobile
 - Khi mở điện thoại, cảnh 3D chiếm phần lớn màn hình và bảng dữ liệu thu gọn ở cạnh dưới.
 - Chạm nút **▧ / ▤ / ₫** để mở nhanh Ảnh / Danh mục / Giá. Chạm **Thu gọn bảng** để trở lại cảnh 3D.
