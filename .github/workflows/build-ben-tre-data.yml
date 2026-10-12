@@ -4,6 +4,9 @@ on:
     branches: [main]
     paths:
       - "bo-ho-ben-tre/scripts/**"
+      - "bo-ho-ben-tre/index.html"
+      - "bo-ho-ben-tre/survey.js"
+      - "bo-ho-ben-tre/survey.css"
       - "bo-ho-ben-tre/data/catalog-blueprint-v1.json"
       - "bo-ho-ben-tre/data/surveys/**"
       - "bo-ho-ben-tre/assets/surveys/**"
