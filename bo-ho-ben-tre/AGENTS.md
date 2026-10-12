@@ -2,6 +2,18 @@
 ## Goal
 Build a progressively verifiable geographically anchored 3D Digital Twin of Hồ Trúc Giang and the surrounding streets, park, civic buildings and urban fabric. Reference UI patterns from `../warestack-3d.html`. Prioritize actual positioning and traceability over imaginary details.
 
+## Geographic scope — fixed until user changes it
+- **Only the region within 300 metres of the actual Hồ Trúc Giang OSM shoreline** is in scope, not a 300m circle around the lake center; use OSM water way `217484891` as the reference ring.
+- Clip road segments at the 300m lakeshore buffer; import polygon features only when fully contained. Do not publish out-of-scope road/building geometry. Record the source, import timestamp and buffer rule in SQLite and `scene.json`.
+- Keep the full 305-item catalog for traceability, but prioritize photographs and LOD in this 300m zone. Never use the legacy 750m context design for rendering without an explicit scope change.
+
+## Mobile-first interface contract
+- Landscape / portrait at 320px, 390px and tablet widths, incl. safe-area insets, must preserve a positive-height WebGL canvas, no horizontal/page scroll.
+- Mobile entry state: fullscreen scene with **collapsed** bottom drawer. Quick tabs for Images / Catalog / Prices expand the drawer; drawer has an accessible open/close control and swiping. No permanently 41vh-obscured scene.
+- 44px-ish touch targets, icon toolbar and zoom +/- controls. One-finger orbit, two-finger pinch+pan; prevent page zoom/scroll when interacting with scene.
+- Never rely on JS/CSS hiding scene when drawer opens. Debug diagnostics, day/night and OSM provenance continue to work; fallback Canvas should be visible if GPU unavailable.
+- Browser CI must test small phones and drawer/gesture interactions, not merely presence of a WebGL context.
+
 ## Work order — mandatory roadmap
 1. **B0 Data foundation:** choose EPSG:4326 and local tangent XY in metres with origin (lon 106.37814, lat 10.23861); establish SQLite, schema migrations and IDs; import all 305 catalog requirements and 90 planned survey shots. Capture 2026-vs-historical evidence, photo licensing and cost assumptions.
 2. **B1 GIS geometry:** import OSM live geometry where available (water way 217484891, roads, actual building footprints, parks), snapshot and timestamp it. Check ring closure and coordinate order [lon,lat]. Never infer real geometry from a photograph or raster pixel size.
@@ -9,7 +21,7 @@ Build a progressively verifiable geographically anchored 3D Digital Twin of Hồ
 4. **B3 Reality capture:** user photo survey in `survey_shots`. For each approved photo capture date, rough GPS, camera azimuth, source, author, license and which asset/detail it proves. Import no user photo without permission.
 5. **B4 Detailed objects:** refine shoreline, ramps, promenade paving, Trần Văn Ơn statue and park, central fountain, roofs/facades, signs, benches and lighting. Keep documented specifications separate from as-built verification.
 6. **B5 Environmental realism:** materials, shadow, water movement, vegetation species, lighting, day/night, vehicle/person optional simulated layers.
-7. **B6 QA:** validate geometry/georeferencing, metadata, no missing selected assets, WebGL1 context and loss behavior, mobile pinch, zoom under/overflow, resize, Github Pages relative paths. Keep a diagnostic panel and clear errors.
+7. **B6 QA:** validate 300m buffer geometry/georeferencing, metadata, missing selected assets, WebGL context and loss behavior, 320/390px mobile, safe areas, pinch/pan, zoom bounds, drawer open/close, no page scroll, resize and Github Pages relative paths. Keep a diagnostic panel and clear errors.
 8. **B7 Publish:** build SQLite and static scene from same source in CI, deploy on GitHub Pages, smoke test the hosted URL and log provenance snapshot. Do not overwrite WareStack.
 
 ## SQLite source and export policy
