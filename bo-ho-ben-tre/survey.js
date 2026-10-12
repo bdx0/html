@@ -97,7 +97,7 @@ $("surveyExport").textContent="⇩ Xuất ảnh ("+S.records.length+")";
 }
 function toggleMode(){
 if(!S.db){alert("Chưa sẵn sàng lưu ảnh trên thiết bị. Hãy kiểm tra quyền lưu trữ của trình duyệt.");return}
-S.mode=!S.mode;refreshButtons();S.stage.style.cursor=S.mode?"crosshair":"grab";
+S.mode=!S.mode;S.stage.classList.toggle("survey-picking",S.mode);refreshButtons();S.stage.style.cursor=S.mode?"crosshair":"grab";
 }
 function previewFile(){
 clearPreview();
@@ -118,7 +118,7 @@ var gps=coords(x,z);S.current={x:x,z:z,lon:gps.lon,lat:gps.lat,previewUrl:null};
 $("surveyCoords").textContent="E: "+x.toFixed(1)+" m · N: "+z.toFixed(1)+" m | GPS "+gps.lat.toFixed(6)+", "+gps.lon.toFixed(6);
 $("surveyImage").value="";$("surveyTitle").value="";$("surveyNotes").value="";$("surveyBearing").value="0";
 $("surveyDate").value=new Date().toLocaleDateString("sv-SE");$("surveyRights").checked=false;msg("");
-$("surveyOverlay").hidden=false;$("surveyTitle").focus();S.mode=false;refreshButtons();S.stage.style.cursor="grab";
+$("surveyOverlay").hidden=false;$("surveyTitle").focus();S.mode=false;S.stage.classList.remove("survey-picking");refreshButtons();S.stage.style.cursor="grab";
 }
 function idNew(){if(window.crypto&&crypto.randomUUID)return "SURV-"+crypto.randomUUID().replace(/-/g,"").slice(0,24).toUpperCase();
 return "SURV-"+Date.now().toString(36).toUpperCase()+Math.random().toString(36).slice(2,13).toUpperCase()}
