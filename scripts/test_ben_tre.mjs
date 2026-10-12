@@ -28,7 +28,7 @@ try {
       if(response.url().startsWith('http://127.0.0.1:8765/'))errors.push(msg);else warnings.push(msg);
     });
     await page.goto('http://127.0.0.1:8765/bo-ho-ben-tre/',{waitUntil:'load',timeout:45000});
-    await page.waitForFunction(()=>document.getElementById('status')?.textContent.includes('305'),{timeout:30000});
+    await page.waitForFunction(()=>document.getElementById('status')?.textContent.includes('300 m'),{timeout:30000});
     await page.waitForTimeout(1500);
     const viewport=await page.evaluate(()=>({
       innerWidth:window.innerWidth,innerHeight:window.innerHeight,
