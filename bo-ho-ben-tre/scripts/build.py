@@ -10,6 +10,7 @@ downloads produce an explicitly illustrative scene rather than invented GIS.
 """
 import argparse
 import datetime
+import hashlib
 import json
 import math
 import pathlib
@@ -111,13 +112,21 @@ def open_db(path):
     );
     CREATE TABLE photo_hotspot_items(
       hotspot_id TEXT NOT NULL, photo_id TEXT NOT NULL,
-      relation TEXT NOT NULL CHECK(relation IN ('depicts_subject','nearby_subject','overview','general_context','historical_context')),
+      relation TEXT NOT NULL CHECK(relation IN ('depicts_subject','nearby_subject','overview','general_context','historical_context','field_observation')),
       caption TEXT NOT NULL, sort_order INTEGER NOT NULL,
       PRIMARY KEY(hotspot_id,photo_id),
       FOREIGN KEY(hotspot_id) REFERENCES photo_hotspots(id),
       FOREIGN KEY(photo_id) REFERENCES photos(id)
     );
     CREATE INDEX hotspot_item_photo ON photo_hotspot_items(photo_id);
+    CREATE TABLE field_surveys(
+      id TEXT PRIMARY KEY, photo_id TEXT NOT NULL UNIQUE, hotspot_id TEXT NOT NULL UNIQUE,
+      lat REAL NOT NULL, lon REAL NOT NULL, heading_deg INTEGER NOT NULL,
+      captured_on TEXT, recorded_on TEXT, photo_sha256 TEXT NOT NULL,
+      location_accuracy TEXT NOT NULL, user_notes TEXT NOT NULL,
+      FOREIGN KEY(photo_id) REFERENCES photos(id),
+      FOREIGN KEY(hotspot_id) REFERENCES photo_hotspots(id)
+    );
     CREATE TABLE cost_items(id TEXT PRIMARY KEY,description TEXT NOT NULL,unit TEXT,amount_low_vnd INTEGER,amount_high_vnd INTEGER,quantity REAL,priority TEXT,price_type TEXT NOT NULL,notes TEXT,checked_on TEXT);
     CREATE TABLE cost_quotes(id TEXT PRIMARY KEY,cost_id TEXT NOT NULL,quote_source TEXT NOT NULL,amount_vnd INTEGER NOT NULL,currency TEXT NOT NULL DEFAULT 'VND',valid_on TEXT NOT NULL,evidence_url TEXT,source_type TEXT NOT NULL,FOREIGN KEY(cost_id) REFERENCES cost_items(id));
     CREATE TABLE reference_prices(id TEXT PRIMARY KEY,object_id TEXT,description TEXT NOT NULL,price_vnd INTEGER NOT NULL,price_label TEXT NOT NULL,price_date TEXT,source_url TEXT NOT NULL,source_kind TEXT NOT NULL,notes TEXT,FOREIGN KEY(object_id) REFERENCES objects(id));
@@ -293,6 +302,45 @@ def build(outdir, use_osm=False):
       "INSERT INTO photo_hotspot_items(hotspot_id,photo_id,relation,caption,sort_order) VALUES(?,?,?,?,?)",
       HOTSPOT_PHOTOS
     )
+    # Import curated, permission-approved field observations. The browser never edits SQLite directly.
+    manifest=BASE/"data"/"surveys"/"manifest.json"
+    if manifest.exists():
+        payload=json.loads(manifest.read_text(encoding="utf-8"))
+        if payload.get("schema")!="ben-tre-curated-surveys-v1":
+            raise ValueError("Unsupported curated field manifest schema")
+        for entry in payload.get("photos",[]):
+            path=entry["image_path"]
+            asset=BASE/path
+            if not path.startswith("assets/surveys/") or not asset.is_file():
+                raise ValueError("Survey asset missing or unsafe path "+str(path))
+            if hashlib.sha256(asset.read_bytes()).hexdigest()!=entry["image_sha256"]:
+                raise ValueError("Survey image checksum mismatch "+entry["id"])
+            if entry.get("rights_approved") is not True:
+                raise ValueError("Field observation missing publishing consent: "+entry["id"])
+            pid=entry["id"]
+            hid="HS-"+pid
+            db.execute(
+              "INSERT INTO photos(id,title,category,image_url,source_url,author,year,license_status,local_asset_path,rights_approved) VALUES(?,?,?,?,?,?,?,?,?,?)",
+              (pid,entry["title"],"field_survey",path,path,"Người đóng góp ảnh khảo sát",
+                (entry.get("captured_on") or "")[:4] or "unknown","user_supplied_permission_to_publish",path,1)
+            )
+            db.execute(
+              "INSERT INTO photo_hotspots(id,label,object_id,x_m,y_m,z_m,kind,position_accuracy,notes) VALUES(?,?,?,?,?,?,?,?,?)",
+              (hid,entry["title"],None,entry["x_m"],entry.get("y_m",1.7),entry["z_m"],
+                "field_photo",entry.get("location_quality","manually_pinned_3d_not_surveyed_gps"),
+                "Ảnh khảo sát do người dùng chọn điểm trên mô hình. Hướng nhìn nhập tay. "+entry.get("notes",""))
+            )
+            db.execute(
+              "INSERT INTO photo_hotspot_items(hotspot_id,photo_id,relation,caption,sort_order) VALUES(?,?,?,?,?)",
+              (hid,pid,"field_observation","Ảnh hiện trường được ghim thủ công tại đây.",1)
+            )
+            db.execute(
+              "INSERT INTO field_surveys VALUES(?,?,?,?,?,?,?,?,?,?)",
+              (pid,pid,hid,entry["lat"],entry["lon"],entry["heading_deg"],
+                entry.get("captured_on",""),entry.get("recorded_on",""),
+                entry["image_sha256"],entry.get("location_quality","manually_pinned_3d_not_surveyed_gps"),
+                entry.get("notes",""))
+            )
     for c in COSTS: db.execute("INSERT INTO cost_items VALUES(?,?,?,?,?,?,?,?,?,?)",(c[0],c[1],c[2],c[3],c[4],c[5],c[6],"planning_assumption" if c[3] is not None else "unknown",c[7],TODAY))
     db.execute("INSERT INTO reference_prices VALUES(?,?,?,?,?,?,?,?,?)",("REF-PRICE-001","OBJ-FOUNTAIN","Gói thầu sửa chữa đài phun nước nghệ thuật Hồ Trúc Giang",1698502090,"Giá gói thầu được công bố","2025-05-27","https://dauthau.asia/ketqua/luachon-nhathau/thi-cong-sua-chua-dai-phun-nuoc-nghe-thuat-ho-truc-giang-2230530.html","public_procurement_listing","Không phải báo giá dựng 3D, cũng không khẳng định là giá trúng thầu hay quyết toán."))
     db.execute("INSERT INTO reference_prices VALUES(?,?,?,?,?,?,?,?,?)",("REF-PRICE-002","OBJ-FOUNTAIN","Gói thầu sửa chữa đài phun nước Hồ Trúc Giang — kết quả lựa chọn",1664590330,"Giá trúng thầu được công bố","2025-05-27","https://dauthau.asia/ketqua/luachon-nhathau/thi-cong-sua-chua-dai-phun-nuoc-nghe-thuat-ho-truc-giang-2230530.html","public_procurement_award","Vilight là đơn vị trúng thầu theo nguồn công khai; không phải quyết toán thực tế hay chi phí dựng 3D."))
@@ -306,10 +354,12 @@ def build(outdir, use_osm=False):
                    json.dumps(f["geometry"],ensure_ascii=False,separators=(",",":")),
                    json.dumps(f["properties"],ensure_ascii=False,separators=(",",":")),TODAY,f["accuracy"]))
     counts={k:db.execute("SELECT COUNT(*) FROM "+k).fetchone()[0] for k in
-            ("requirements","survey_shots","sources","zones","objects","photos","photo_links","photo_hotspots","photo_hotspot_items","cost_items","cost_quotes","reference_prices","osm_features")}
+            ("requirements","survey_shots","sources","zones","objects","photos","photo_links","photo_hotspots","photo_hotspot_items","field_surveys","cost_items","cost_quotes","reference_prices","osm_features")}
     assert counts["requirements"]==305 and counts["survey_shots"]==90
-    assert counts["photo_hotspots"]==8 and counts["photo_hotspot_items"]==len(HOTSPOT_PHOTOS)
+    assert counts["photo_hotspots"]==8+counts["field_surveys"] and counts["photo_hotspot_items"]==len(HOTSPOT_PHOTOS)+counts["field_surveys"]
     db.commit();db.execute("PRAGMA integrity_check");db.execute("VACUUM")
+    # Export complete photo catalog from SQLite, including locally curated field captures.
+    photo_rows=db.execute("SELECT id,title,category,image_url,source_url,author,year,license_status FROM photos ORDER BY rowid").fetchall()
     # Export the exact photo-to-requirement mapping for catalog navigation.
     catalog_groups=[]
     for cat,num in db.execute("SELECT category,COUNT(*) FROM requirements GROUP BY category ORDER BY category").fetchall():
@@ -338,12 +388,12 @@ def build(outdir, use_osm=False):
         })
     db.close()
     scene={
-      "schemaVersion":3,"title":"Hồ Trúc Giang — Bờ Hồ Bến Tre","origin":{"lon":ORIGIN[0],"lat":ORIGIN[1],"crs":"EPSG:4326"},
+      "schemaVersion":4,"title":"Hồ Trúc Giang — Bờ Hồ Bến Tre","origin":{"lon":ORIGIN[0],"lat":ORIGIN[1],"crs":"EPSG:4326"},
       "area_of_interest":{"basis":"OSM shoreline 217484891","buffer_m":SHORE_BUFFER_M,"rule":"Distance to lakeshore; clip roads; retain only fully contained polygons","units":"meters"},"mode":"osm_snapshot" if features else "illustrative_no_osm","snapshot":TODAY,"osm_url":osm_url,"osm_error":error,
       "warning":"Chỉ đối tượng OSM có source được xem là hình học bản đồ cộng đồng. Mọi geometry fallback là minh họa.",
       "stats":counts,
       "objects":[{"id":o[0],"kind":o[1],"name":o[2],"lon":o[3],"lat":o[4],"verified":False} for o in objs],
-      "images":[{"id":x[0],"title":x[1],"category":x[2],"image_url":x[3],"source_url":x[4],"author":x[5],"year":x[6],"license":"reference_only"} for x in IMAGES],
+      "images":[{"id":x[0],"title":x[1],"category":x[2],"image_url":x[3],"source_url":x[4],"author":x[5],"year":x[6],"license":x[7]} for x in photo_rows],
       "costs":[{"id":x[0],"name":x[1],"unit":x[2],"amount_low_vnd":x[3],"amount_high_vnd":x[4],"quantity":x[5],"price_type":"unknown" if x[3] is None else "planning_assumption"} for x in COSTS],
       "reference_prices":[{"id":"REF-PRICE-001","object_id":"OBJ-FOUNTAIN","description":"Giá gói thầu sửa chữa đài phun nước Hồ Trúc Giang","amount_vnd":1698502090,"year":2025,"price_label":"Giá gói thầu, không phải chi phí dự án 3D","source_url":"https://dauthau.asia/ketqua/luachon-nhathau/thi-cong-sua-chua-dai-phun-nuoc-nghe-thuat-ho-truc-giang-2230530.html"},{"id":"REF-PRICE-002","object_id":"OBJ-FOUNTAIN","description":"Giá trúng thầu sửa chữa đài phun nước Hồ Trúc Giang","amount_vnd":1664590330,"year":2025,"price_label":"Giá trúng thầu, không phải quyết toán hoặc chi phí dự án 3D","source_url":"https://dauthau.asia/ketqua/luachon-nhathau/thi-cong-sua-chua-dai-phun-nuoc-nghe-thuat-ho-truc-giang-2230530.html"}],
       "features":features,
