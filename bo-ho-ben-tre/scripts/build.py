@@ -164,7 +164,7 @@ def build(outdir, use_osm=False):
     ]
     db.executemany("INSERT INTO objects VALUES(?,?,?,?,?,?,?,?,?,?)",objs)
     for id1,id2 in [("IMG-01","OBJ-LAKE"),("IMG-02","OBJ-LAKE"),("IMG-03","OBJ-LAKE"),("IMG-07","OBJ-FOUNTAIN"),("IMG-04","OBJ-STATUE"),("IMG-05","OBJ-CIVIC"),("IMG-06","OBJ-PARK")]:
-        db.execute("INSERT INTO object_photos VALUES(?,?,?)",(id1,id2))
+        db.execute("INSERT INTO object_photos(photo_id,object_id) VALUES(?,?)",(id1,id2))
     for c in COSTS: db.execute("INSERT INTO cost_items VALUES(?,?,?,?,?,?,?,?,?,?)",(c[0],c[1],c[2],c[3],c[4],c[5],c[6],"planning_assumption" if c[3] is not None else "unknown",c[7],TODAY))
     # True formal quote amount is never populated without a source. The 0 cost is a scoped free-tier assumption only.
     osm_url=None;features=[];error=None
