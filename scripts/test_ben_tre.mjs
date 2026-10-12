@@ -30,6 +30,17 @@ try {
     await page.goto('http://127.0.0.1:8765/bo-ho-ben-tre/',{waitUntil:'load',timeout:45000});
     await page.waitForFunction(()=>document.getElementById('status')?.textContent.includes('300 m'),{timeout:30000});
     await page.waitForTimeout(1500);
+    const viewport=await page.evaluate(()=>({
+      innerWidth:window.innerWidth,innerHeight:window.innerHeight,
+      scrollWidth:document.documentElement.scrollWidth,scrollHeight:document.documentElement.scrollHeight,
+      stage:[document.getElementById('stage').clientWidth,document.getElementById('stage').clientHeight],
+      drawer:Math.round(document.getElementById('inspector').getBoundingClientRect().height),
+      collapsed:!document.getElementById('inspector').classList.contains('expanded'),
+      sceneScope:document.getElementById('status').textContent
+    }));
+    if(viewport.stage[0]<200||viewport.stage[1]<170)errors.push(name+' stage too small '+viewport.stage);
+    if(viewport.scrollWidth>viewport.innerWidth+1||viewport.scrollHeight>viewport.innerHeight+1)
+      errors.push(name+' global viewport overflow '+JSON.stringify(viewport));
     const sceneData=await page.evaluate(async()=>await (await fetch('data/scene.json')).json());
     if(sceneData.photo_hotspots?.length!==8)errors.push(name+' expected eight DB hotspots');
     if(sceneData.photo_hotspots?.some(h=>h.is_camera_location!==false))
@@ -58,20 +69,9 @@ try {
       if(mobile){
         const isExpanded=await page.locator('#inspector').evaluate(el=>el.classList.contains('expanded'));
         if(!isExpanded)errors.push(name+' photo hotspot failed to expand bottom sheet');
-        await page.locator('#sheetToggle').click();
+        await page.locator('#sheetToggle').click();await page.waitForTimeout(260);
       }
     }
-    const viewport=await page.evaluate(()=>({
-      innerWidth:window.innerWidth,innerHeight:window.innerHeight,
-      scrollWidth:document.documentElement.scrollWidth,scrollHeight:document.documentElement.scrollHeight,
-      stage:[document.getElementById('stage').clientWidth,document.getElementById('stage').clientHeight],
-      drawer:Math.round(document.getElementById('inspector').getBoundingClientRect().height),
-      collapsed:!document.getElementById('inspector').classList.contains('expanded'),
-      sceneScope:document.getElementById('status').textContent
-    }));
-    if(viewport.stage[0]<200||viewport.stage[1]<170)errors.push(name+' stage too small '+viewport.stage);
-    if(viewport.scrollWidth>viewport.innerWidth+1||viewport.scrollHeight>viewport.innerHeight+1)
-      errors.push(name+' global viewport overflow '+JSON.stringify(viewport));
     if(mobile){
       if(!viewport.collapsed||viewport.drawer>110)errors.push(name+' default drawer obstructs scene '+viewport.drawer);
       await page.locator('#zoomIn').click();
