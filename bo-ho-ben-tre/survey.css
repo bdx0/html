@@ -40,3 +40,5 @@
  .survey-dialog .controls button{min-height:44px}
  .field-marker{min-width:42px;height:42px}
 }
+
+#stage.survey-picking .photo-hotspot,#stage.survey-picking .field-marker{pointer-events:none;opacity:.22}
