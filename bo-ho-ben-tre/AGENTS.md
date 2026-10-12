@@ -7,6 +7,14 @@ Build a progressively verifiable geographically anchored 3D Digital Twin of Hồ
 - Clip road segments at the 300m lakeshore buffer; import polygon features only when fully contained. Do not publish out-of-scope road/building geometry. Record the source, import timestamp and buffer rule in SQLite and `scene.json`.
 - Keep the full 305-item catalog for traceability, but prioritize photographs and LOD in this 300m zone. Never use the legacy 750m context design for rendering without an explicit scope change.
 
+## Visual fidelity and lake recognition (v2)
+- **Never replace the verified lake outline with an ellipse** when OSM water way 217484891 is available. Center and bounds roughly 200m East-West and 105m North-South in local projected metres.
+- The signature shape is a softly curved trapezoid with small concavities; visually validate the entire water polygon. Prevent green wedge overlap, triangulation artifacts and road geometry tilted off the ground.
+- Essential recognition layer: continuous retaining wall, tan pedestrian promenade, planter/hedge border, low green rails, mature shade trees with broad crowns, fountain, adjacent streets and lowrise street-facing facades.
+- Monument/fountain/adjacent facades modelled procedurally must be tagged *photo-inspired / illustrative* unless matched against verified dated site photos. Preserve original OSM building geometry and sources; missing footprints may be visual proxies.
+- Before shipping, use automated Playwright screenshot artifacts (desktop, narrow mobile and landscape), **inspect the screenshots visually** against identifiable Trúc Giang photo sources (not merely count meshes or frames).
+- The real field photos have priority over fabricated details; metadata may reference copyrighted sources but do not mirror those image binaries in public asset folders without permission.
+
 ## Mobile-first interface contract
 - Landscape / portrait at 320px, 390px and tablet widths, incl. safe-area insets, must preserve a positive-height WebGL canvas, no horizontal/page scroll.
 - Mobile entry state: fullscreen scene with **collapsed** bottom drawer. Quick tabs for Images / Catalog / Prices expand the drawer; drawer has an accessible open/close control and swiping. No permanently 41vh-obscured scene.
