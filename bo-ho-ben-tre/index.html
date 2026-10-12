@@ -174,7 +174,7 @@ linesAroundLake(147,106,58);putBuildingsIllustrative();fountain(0,0);
 /* TRÚC GIANG V2 — verified water boundary; PHOTO-INSPIRED detail proxies.
    OSM provides plan geometry. Decorative objects and façade heights are illustrative,
    not survey-grade measurements. All within shoreline +300m scene area. */
-var landmarks=[];
+var landmarks=[],lakeWaterMaterial=null;
 function osmRing(g){return (g.coordinates[0]||[]).slice(0,-1).map(function(p){var q=geoXY(p);return {x:q[0],z:q[1]}})}
 function polygonArea2(p){var a=0;for(var i=0;i<p.length;i++){var n=p[(i+1)%p.length];a+=p[i].x*n.z-n.x*p[i].z}return a}
 function ringOffset(poly,d){var ccw=polygonArea2(poly)>0;
@@ -231,15 +231,52 @@ box(2.0,.13,.62,"#9e6d48",0,.9,0,g);box(2.0,.65,.14,"#a77954",0,1.25,-.32,g);
 for(var q of [-.7,.7]){box(.12,.83,.12,"#526065",q,.52,0,g)}}
 function mainWater(poly){var sh=new THREE.Shape();
 poly.forEach(function(p,i){if(!i)sh.moveTo(p.x,-p.z);else sh.lineTo(p.x,-p.z)});sh.closePath();
-var geo=new THREE.ShapeGeometry(sh);var waterMat=new THREE.MeshPhongMaterial({color:0x247a84,shininess:75,specular:0x94d5cb,side:THREE.DoubleSide,depthWrite:true,transparent:false});
+var geo=new THREE.ShapeGeometry(sh);
+var waterMat=lakeWaterMaterial=new THREE.ShaderMaterial({
+ uniforms:{uTime:{value:0},uNight:{value:night?1:0}},
+ side:THREE.DoubleSide,depthWrite:true,transparent:false,
+ vertexShader:"varying vec2 vSite; void main(){vSite=position.xy;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}",
+ fragmentShader:[
+ "precision mediump float; varying vec2 vSite;uniform float uTime;uniform float uNight;",
+ "void main(){",
+ "float w1=sin(vSite.x*.19+uTime*.62)*sin(vSite.y*.27-uTime*.51);",
+ "float w2=sin(vSite.x*.49-vSite.y*.17+uTime*.8);",
+ "float broad=sin(vSite.x*.047+vSite.y*.025+uTime*.09);",
+ "float wave=(w1*.48+w2*.22+broad*.3);",
+ "vec3 deep=vec3(.055,.275,.285), light=vec3(.115,.355,.345);",
+ "vec3 color=mix(deep,light,clamp(.5+.32*wave,0.,1.));",
+ "float sheen=pow(max(0.,sin(vSite.x*.08+vSite.y*.10+uTime*.3)),15.)*.10;",
+ "color+=vec3(.15,.19,.18)*sheen;",
+ "color=mix(color,vec3(.020,.080,.13),uNight*.74);",
+ "gl_FragColor=vec4(color,1.);",
+ "}"
+ ].join("\n")
+});
 var m=addMesh(geo,waterMat,world,0,.30,0);m.rotation.x=-Math.PI/2;m.renderOrder=8;
 return m}
+
+function lakesideRail(poly){var pts=ringOffset(poly,.85),samp=sampleRing(pts,3.15);
+var rings=pts.map(function(p){return new THREE.Vector3(p.x,0,p.z)});
+rings.push(rings[0].clone());
+var crv=new THREE.CatmullRomCurve3(rings,true,"centripetal");
+var railMat=new THREE.MeshLambertMaterial({color:0x4d8375});
+for(var alt of [1.04,1.32]){
+ var rr=new THREE.CatmullRomCurve3(pts.map(function(p){return new THREE.Vector3(p.x,alt,p.z)}),true,"centripetal");
+ addMesh(new THREE.TubeGeometry(rr,180,.045,4,true),railMat,world);
+}
+if(THREE.InstancedMesh){
+ var postGeom=new THREE.CylinderGeometry(.042,.055,1.16,5),postMat=new THREE.MeshLambertMaterial({color:0x527d74});
+ var inst=new THREE.InstancedMesh(postGeom,postMat,samp.length),tmp=new THREE.Object3D();
+ samp.forEach(function(p,i){tmp.position.set(p.x,.92,p.z);tmp.updateMatrix();inst.setMatrixAt(i,tmp.matrix)});
+ inst.instanceMatrix.needsUpdate=true;world.add(inst);counts.mesh++;counts.tri+=samp.length*postGeom.index.count/3;
+}
+}
 function makeShore(poly){var s05=ringOffset(poly,.75),s2=ringOffset(poly,2.0),s7=ringOffset(poly,7.5),s9=ringOffset(poly,9.8),s13=ringOffset(poly,13.5);
 var beige=new THREE.MeshLambertMaterial({color:0xc5b79f,side:THREE.DoubleSide});
 var paving=new THREE.MeshLambertMaterial({color:0xdacaaa,side:THREE.DoubleSide});
 var bed=new THREE.MeshLambertMaterial({color:0x477b45,side:THREE.DoubleSide});
 ringStripe(poly,s05,.37,beige);ringStripe(s05,s7,.37,paving);ringStripe(s7,s9,.38,bed);ringStripe(s9,s13,.38,paving);
-sideWall(poly,.39,.05,"#9caba3");curvedBorder(poly,.45,.16,"#d9e1d6");
+sideWall(poly,.39,.05,"#9caba3");curvedBorder(poly,.45,.16,"#d9e1d6");lakesideRail(poly);
 curvedBorder(s7,.41,.07,"#f1ddbf");
 var outline=sampleRing(ringOffset(poly,8.6),6);
 outline.forEach(function(p,i){if(i%2===0)lowShrub(p.x,p.z,i%4?1.2:1.5)});
@@ -334,7 +371,7 @@ mc.strokeStyle="#f5c67d";mc.lineWidth=1.5;mc.strokeRect(w/2-3+target.x*.14,h/2-3
 mc.fillStyle="#b9d5e2";mc.font="9px system-ui";mc.fillText("N",w/2-3,10)}
 function drawFallback(){var c=$("fallback"),g=c.getContext("2d"),w=c.width,h=c.height;g.fillStyle="#20374a";g.fillRect(0,0,w,h);g.strokeStyle="#324e60";for(var i=0;i<w;i+=34){g.beginPath();g.moveTo(i,0);g.lineTo(i,h);g.stroke()}for(var j=0;j<h;j+=34){g.beginPath();g.moveTo(0,j);g.lineTo(w,j);g.stroke()}g.save();g.translate(w/2,h/2);g.rotate(-.25);g.fillStyle="#3c7080";g.beginPath();g.ellipse(0,0,Math.min(w*.33,210),Math.min(h*.24,125),0,0,6.284);g.fill();g.strokeStyle="#e0c9a0";g.lineWidth=13;g.stroke();g.restore();g.fillStyle="#eef6ff";g.font="bold 16px system-ui";g.fillText("Canvas 2D — chế độ dự phòng",24,36);g.font="12px system-ui";g.fillText("Hồ Trúc Giang · ảnh tham chiếu và SQLite vẫn sử dụng được",24,57)}
 function showFallback(){$("fallback").style.display="block";drawFallback();mode="CANVAS 2D FALLBACK";updateStatus()}
-function renderLoop(){cancelAnimationFrame(raf);var prev=0;function tick(t){raf=requestAnimationFrame(tick);if(t-prev<25)return;prev=t;frame++;
+function renderLoop(){cancelAnimationFrame(raf);var prev=0;function tick(t){raf=requestAnimationFrame(tick);if(t-prev<25)return;prev=t;frame++;if(lakeWaterMaterial&&lakeWaterMaterial.uniforms)lakeWaterMaterial.uniforms.uTime.value=t*.001;
 try{if(webglOK&&renderer&&scene&&camera){renderer.render(scene,camera)}else if(frame%25===0)drawFallback();if(frame%10===0)drawMini();if(frame%30===0)updateDebug()}
 catch(e){say("Render: "+e.message);webglOK=false;showFallback()}}
 raf=requestAnimationFrame(tick)}
@@ -392,7 +429,7 @@ function updateDebug(){if(!$("debug").classList.contains("open"))return;var gl=r
 var d={engine:mode,webgl:webglOK,three:window.THREE&&THREE.REVISION,viewport:stage.clientWidth+" x "+stage.clientHeight,devicePixelRatio:window.devicePixelRatio,webglVersion:gl?gl.getParameter(gl.VERSION):"n/a",
 frame:frame,sceneMeshes:counts.mesh,sceneTrianglesApprox:counts.tri,drawCalls:info&&info.render.calls,renderTriangles:info&&info.render.triangles,zoomDistance:Math.round(dist),
 pointerCount:controlPointers.size,osmElements:data&&data.stats.osm_features,modelMode:data&&data.mode,errors:errors.slice(-8)};$("report").textContent=JSON.stringify(d,null,2)}
-$("home").onclick=reset;$("day").onclick=function(){night=!night;$("dayIcon").textContent=night?"☀":"☾";$("dayLabel").textContent=night?" Ban ngày":" Ban đêm";if(scene){scene.background=color(night?"#071528":"#9acbd9");scene.fog.color=scene.background;scene.children.forEach(function(c){if(c.type==="DirectionalLight")c.intensity=night?.35:.9;if(c.type==="HemisphereLight")c.intensity=night?.5:1.12})}};
+$("home").onclick=reset;$("day").onclick=function(){night=!night;if(lakeWaterMaterial)lakeWaterMaterial.uniforms.uNight.value=night?1:0;$("dayIcon").textContent=night?"☀":"☾";$("dayLabel").textContent=night?" Ban ngày":" Ban đêm";if(scene){scene.background=color(night?"#071528":"#9acbd9");scene.fog.color=scene.background;scene.children.forEach(function(c){if(c.type==="DirectionalLight")c.intensity=night?.35:.9;if(c.type==="HemisphereLight")c.intensity=night?.5:1.12})}};
 $("layers").onclick=function(){layers.trees=!layers.trees;$("layers").classList.toggle("active",!layers.trees);if(world)world.traverse(function(o){if(o.userData&&o.userData.tree)o.visible=layers.trees})};
 $("dbg").onclick=function(){$("debug").classList.toggle("open");updateDebug()};$("debugclose").onclick=function(){$("debug").classList.remove("open")};
 $("retry").onclick=function(){location.reload()};$("copy").onclick=function(){var t=$("report").textContent;if(navigator.clipboard)navigator.clipboard.writeText(t).catch(function(){say("Clipboard blocked")});else say("Clipboard unavailable")};
