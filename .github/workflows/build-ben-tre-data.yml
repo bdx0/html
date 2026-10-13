@@ -73,8 +73,21 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add bo-ho-ben-tre/data/catalog.sqlite bo-ho-ben-tre/data/scene.json bo-ho-ben-tre/data/sqlite-explorer.json
           if ! git diff --cached --quiet; then
-            git commit -m "build(ben-tre): refresh SQLite and static GIS scene [skip ci]"
-            git push origin HEAD:main
+            git commit -m "build(ben-tre): refresh SQLite, SQLite Explorer and GIS scene [skip ci]"
+            # Many source commits may arrive while the remote OSM build is running.
+            # Rebase on current main before push; preserve later code changes.
+            pushed=0
+            for attempt in 1 2 3; do
+              git fetch origin main
+              git rebase origin/main
+              if git push origin HEAD:main; then
+                pushed=1
+                break
+              fi
+              echo "Remote moved during generated-data push, retrying ($attempt/3)"
+              sleep 2
+            done
+            test "$pushed" -eq 1
           else
             echo "Generated data unchanged"
           fi
