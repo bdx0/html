@@ -11,7 +11,7 @@ function attach(container,draw){
  sec.append(e("p","Nhập tọa độ GPS hoặc GIS độc lập, không lấy tọa độ từ ảnh Google. Điểm mới lưu trên máy và chưa được xác minh.","note"));
  const actions=e("div",null,"shore-actions"),start=e("button","＋ Nhập mốc tọa độ"),exp=e("button","⇩ Xuất mốc JSON");
  start.type=exp.type="button";actions.append(start,exp);sec.append(actions);
- const results=e("div");sec.append(results);
+ const results=e("div");results.className="shore-results";sec.append(results);
  const form=e("form",null,"shore-form");form.hidden=true;form.innerHTML=
  '<label>Vĩ độ WGS84 (lat)<input name="lat" type="number" step="any" required placeholder="10.238…" inputmode="decimal"></label>'+
  '<label>Kinh độ WGS84 (lon)<input name="lon" type="number" step="any" required placeholder="106.378…" inputmode="decimal"></label>'+
