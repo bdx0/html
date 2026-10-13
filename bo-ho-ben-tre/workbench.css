@@ -140,3 +140,12 @@ body.sheet-open .inspector{box-shadow:0 -10px 30px #2b486639}
  .wb-shape-control{bottom:calc(var(--sheet-rest) + 8px)}
  .wb-floor .wb-plan-head{min-height:44px;padding-right:112px}
 }
+
+/* Database explorer and rejection notice, responsive to mobile landscape. */
+.wb-shape-control [data-wb-shape="candidate"]:disabled{opacity:.55;cursor:not-allowed;text-decoration:line-through;pointer-events:none;background:#f0f0f0;color:#87909b}
+#app .top #openSqlite{border-color:#9eb9ed;background:#e6f0ff;color:#2464d2}
+#mobileSqlite{color:#2769dc;font-weight:850}
+.sqlite-jump{display:inline-block;padding:10px 14px;border-radius:8px;background:#286aff;color:#fff!important;font-weight:750}
+.inspector .tabs{grid-template-columns:repeat(4,minmax(0,1fr))}
+.inspector .tabs button{min-width:0;font-size:10px}
+@media(max-width:860px){#app .top #openSqlite{display:none}.quickbtn{min-width:39px;max-width:39px}}
