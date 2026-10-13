@@ -133,8 +133,10 @@ body.sheet-open .inspector{box-shadow:0 -10px 30px #2b486639}
  .wb-plan-actions{flex-wrap:wrap}
 }
 @media(max-width:860px) and (orientation:landscape){
- .wb-modes{top:53px}
- .wb-axis{top:96px}
+ /* Avoid the native zoom column at top ~70–162px; keep every tool reachable. */
+ .wb-modes{top:8px}
+ .wb-axis{top:10px;right:240px}
+ .wb-split .wb-axis{right:calc(52% + 4px);top:10px}
  .wb-shape-control{bottom:calc(var(--sheet-rest) + 8px)}
  .wb-floor .wb-plan-head{min-height:44px;padding-right:112px}
 }
