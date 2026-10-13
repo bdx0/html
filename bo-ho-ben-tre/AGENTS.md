@@ -17,6 +17,14 @@ Build a progressively verifiable geographically anchored 3D Digital Twin of Hồ
 - Full audit, stage counts, and prioritized gap table: read `COMPARISON.md` subsection "Đối chiếu bổ sung — Google Maps Terrain / Raised Buildings".
 - When users provide screenshots, compare **same heading, pitch, center, visible area**. Flag Google imagery acquisition dates when unknown; never treat recent changes as historically verified.
 
+## Hồ Trúc Giang water visual fidelity — water V3
+- Source lake footprint must remain OSM way 217484891. The source geometry is an approx. **16,840 m²** surface with a perimeter about **553m** and 24 unique OSM points (at the checked snapshot). Not survey-grade; don't falsely assert water outline equals a recent Google satellite image.
+- Smooth geometry only for **visual presentation** using bounded centripetal Catmull-Rom interpolation; max displacement 1.7 m from original segment, fallback to raw boundary if area differs by more than 3.5%. **Never edit SQLite/scene.json source ring to reflect a visual smoothing operation**.
+- Water shader uses calm dark jade, view-angle-dependent broad sky tint, very mild ripples, and soft procedural vegetation reflections anchored near shoreline. It does **not implement physically accurate mirror reflections**. Avoid exaggerated electric cyan opaque water and thick concentric beige promenades.
+- Concrete curb remains narrow; approximate paved path, hedge strip and outer pavement together are about 9m. Trees are a visual sample near shore and need actual surveyed position later.
+- Compare at least two real Trúc Giang photos with different sky conditions: Addflag flycam view and TripHunter daytime eye-level. Reflection/color varies greatly with weather; no single opaque color can match every time of day.
+- QA must check the screenshot **visually**, verify WebGL shader compile on desktop/320/390px mobile and lakeGeometry originalArea/visualDeviationPct in debug. Never treat WebGL frame count as proof of source geometry accuracy.
+
 ## Visual fidelity and lake recognition (v2)
 - **Never replace the verified lake outline with an ellipse** when OSM water way 217484891 is available. Center and bounds roughly 200m East-West and 105m North-South in local projected metres.
 - The signature shape is a softly curved trapezoid with small concavities; visually validate the entire water polygon. Prevent green wedge overlap, triangulation artifacts and road geometry tilted off the ground.
