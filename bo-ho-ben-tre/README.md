@@ -126,6 +126,16 @@ Bản HTML đã có **3D / PLAN / SPLIT** theo style Warestack 3D (trắng – x
 - Kết quả tồn tại bền trong `data/surveys/manifest.json`, `assets/surveys/`, SQLite `field_surveys` và `scene.json.photo_hotspots`.
 - Đối chiếu thật–giả và danh sách sai lệch: [COMPARISON.md](COMPARISON.md).
 
+
+## Annotation: ghim trực tiếp những chi tiết 3D đang sai (13/10/2026)
+- **Vào thẳng chế độ ghim:** https://bdx0.github.io/html/bo-ho-ben-tre/?annotate=1
+- Hoặc vào 3D, nhấn **✎ Ghim lỗi trên Floor Plan**; trình xem chuyển sang PLAN. Chạm vị trí cần sửa; kéo ngón/chuột chỉ di chuyển mặt bằng, không tạo ghim.
+- Nhập **loại lỗi, tiêu đề, mô tả hiện trạng sai / mong muốn đúng** rồi **✓ Lưu ghim**. Mỗi ghim có số thứ tự đỏ, tọa độ local X (Đông), Z (Bắc) theo mét và vị trí WGS84 *suy ra xấp xỉ*, **không phải GPS khảo sát**.
+- Nhấn **☷ Số ghim** để xem/sửa/xóa ghi chú; chạm số đỏ trên bản đồ cũng mở đúng ghi chú. Có thể chọn **Ghim mới** để đánh dấu tiếp.
+- **⇩ Xuất JSON** lưu ID, X/Z, lat/lon suy ra, mô tả và nguồn; **▧ Xuất ảnh PLAN** tải PNG mặt bằng với các ghim đánh số. Gửi **cả JSON và PNG** trong cuộc trò chuyện để xác định từng điểm cần sửa.
+- **↑ Nhập JSON** khôi phục file trên thiết bị khác. Ghi chú lưu tại localStorage của trình duyệt, không tự đồng bộ giữa các thiết bị và có thể mất nếu xóa dữ liệu website / dùng chế độ ẩn danh. Giới hạn 150 điểm.
+- Annotation **không ghi vào SQLite/scene.json/OSM**, không tự xác nhận hình học; chỉnh đường bờ vẫn yêu cầu bằng chứng khảo sát độc lập.
+
 ## Công việc tiếp theo
 - Đối chiếu mặt hồ OSM với ảnh vệ tinh / đo thực địa, tách chính xác bờ nước–bờ kè.
 - Nhập ảnh hiện trường được cấp phép, đo bề rộng lòng đường/vỉa hè và cao độ công trình.
