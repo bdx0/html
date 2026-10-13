@@ -285,11 +285,11 @@ try {
       if(points.schema!=='truc-giang-shoreline-ground-controls-v1'||points.points[0].verification_status!=='self_reported_unreviewed')
         errors.push(name+' shoreline ground control JSON mislabels verification status');
     }
-    if(mobile){
+    if(width<=760){
       const visible=await model.locator('#details').evaluate(el=>el.classList.contains('open'));
       if(!visible)await model.locator('#list .node-item').first().click();
       if(!(await model.locator('#details').evaluate(el=>el.classList.contains('open'))))
-        errors.push(name+' tap modeled object did not open mobile details');
+        errors.push(name+' tap modeled object did not open narrow-screen details');
     }
     if(name==='desktop'||name==='mobile-390')
       await model.screenshot({path:'ben-tre-model-'+name+'.png'});
