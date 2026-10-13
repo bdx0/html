@@ -428,6 +428,10 @@ def build(outdir, use_osm=False):
           "is_camera_location":False,
           "photos":[{"photo_id":row[0],"relation":row[1],"caption":row[2]} for row in photo_rows]
         })
+    from model_export import build as export_semantic_model
+    semantic = export_semantic_model(db, outdir/"model-view.json")
+    assert semantic["lake_audit"]["verified_corrections"] == 0
+    assert semantic["table_counts"]["requirements"] == counts["requirements"]
     inspector_counts = export_sqlite_inspector(db, outdir/"sqlite-explorer.json")
     assert inspector_counts["requirements"] == counts["requirements"]
     assert inspector_counts["osm_features"] == counts["osm_features"]
