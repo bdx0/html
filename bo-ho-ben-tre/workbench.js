@@ -1,0 +1,208 @@
+/* Bờ Hồ Bến Tre × Warestack Workbench.
+ * Floor plan, North-up QA, 3-axis gizmo, split 3D/2D and selectable source shape.
+ * Geometry candidate is schematic, not surveyed GIS.
+ */
+(function(){
+"use strict";
+var $=function(id){return document.getElementById(id)};
+var W={ready:false,mode:"3d",shape:"candidate",view:"iso",data:null,host:null,
+  planCanvas:null,axisCanvas:null,planZoom:1,panX:0,panZ:0,mouse:null,metrics:null};
+function local(p){var o=W.data.origin;return[(p[0]-o.lon)*111320*Math.cos(o.lat*Math.PI/180),(p[1]-o.lat)*111320]}
+function rawPoints(){var f=(W.data.features||[]).find(function(q){return q.kind==="water"&&q.osm_id===217484891});
+return f?f.geometry.coordinates[0].slice(0,-1).map(function(p){var a=local(p);return{x:a[0],z:a[1]}}):[]}
+function activePoints(){return window.TrucGiangLake?TrucGiangLake.proposal(rawPoints(),W.shape):rawPoints()}
+function el(t,klass,text){var n=document.createElement(t);n.className=klass||"";if(text!==undefined)n.textContent=text;return n}
+function build(){
+ var stage=$("stage");
+ var modes=el("nav","wb-modes");modes.id="wbModes";modes.setAttribute("aria-label","Chế độ hiển thị");
+ modes.innerHTML='<span class="wb-modes-title">VIEW</span>'+
+ '<button type="button" data-wb-mode="3d" aria-label="Chế độ 3D" class="selected">◫ <span>3D</span></button>'+
+ '<button type="button" data-wb-mode="floor" aria-label="Floor Plan">▤ <span>PLAN</span></button>'+
+ '<button type="button" data-wb-mode="split" aria-label="Chia đôi 3D và Floor Plan">◧ <span>SPLIT</span></button>';
+ stage.append(modes);
+ var shapes=el("section","wb-shape-control");shapes.id="wbShapes";shapes.innerHTML=
+ '<strong>LAKE SHORELINE</strong><div class="wb-shape-buttons">'+
+ '<button type="button" data-wb-shape="candidate" class="selected">◆ Đề xuất</button>'+
+ '<button type="button" data-wb-shape="raw">◇ OSM gốc</button></div>'+
+ '<small id="wbShapeStatus">Dáng hồ đề xuất · chưa khảo sát</small>';
+ stage.append(shapes);
+ var dock=el("section","wb-plan-dock");dock.id="wbPlanDock";
+ dock.setAttribute("aria-label","Floor plan mặt bằng Hồ Trúc Giang");
+ dock.innerHTML='<div class="wb-plan-head"><span class="wb-plan-label">⌗ FLOOR PLAN <em>LOCAL XY · NORTH UP</em></span>'+
+ '<div class="wb-plan-actions">'+
+ '<label title="Hiện OSM để đối chiếu"><input id="wbCompare" type="checkbox" checked> OSM</label>'+
+ '<label title="Mốc hình dạng"><input id="wbAnchors" type="checkbox" checked> MỐC</label>'+
+ '<button type="button" id="wbPlanMinus" aria-label="Thu nhỏ Floor Plan">−</button>'+
+ '<button type="button" id="wbPlanPlus" aria-label="Phóng to Floor Plan">+</button></div></div>'+
+ '<canvas id="wbPlanCanvas" aria-label="Bản vẽ mặt bằng nước hồ, đường, nhà và mốc đặc trưng"></canvas>'+
+ '<div class="wb-plan-footer"><span><i class="wb-dot proposed"></i> DÁNG ĐỀ XUẤT</span>'+
+ '<span><i class="wb-dot raw"></i> OSM 217484891</span><small>Chạm mặt bằng để tập trung camera 3D</small></div>';
+ stage.append(dock);
+ var axis=el("div","wb-axis");axis.id="wbAxis";axis.innerHTML=
+ '<div class="wb-axis-title">AXIS · XYZ</div>'+
+ '<canvas id="wbAxisCanvas" width="110" height="100" aria-label="Axis gizmo: X Đông, Y Cao, Z Bắc" title="Chạm đầu trục để chọn góc nhìn"></canvas>'+
+ '<div class="wb-preset-row"><button data-wb-view="top" aria-label="Nhìn từ trên xuống">TOP</button>'+
+ '<button data-wb-view="north" aria-label="Nhìn từ Bắc">N</button>'+
+ '<button data-wb-view="east" aria-label="Nhìn từ Đông">E</button>'+
+ '<button data-wb-view="iso" aria-label="Phối cảnh isometric" class="selected">ISO</button></div>';
+ stage.append(axis);
+ var status=el("div","wb-status");status.id="wbStatus";status.textContent="SHAPE CANDIDATE · PLAN (X EAST / Z NORTH) · METERS";
+ stage.append(status);
+ W.planCanvas=$("wbPlanCanvas");W.axisCanvas=$("wbAxisCanvas");
+ stage.querySelectorAll("[data-wb-mode]").forEach(function(b){b.addEventListener("click",function(e){e.stopPropagation();setMode(b.dataset.wbMode)})});
+ stage.querySelectorAll("[data-wb-shape]").forEach(function(b){b.addEventListener("click",function(e){e.stopPropagation();setShape(b.dataset.wbShape)})});
+ stage.querySelectorAll("[data-wb-view]").forEach(function(b){b.addEventListener("click",function(e){e.stopPropagation();setView(b.dataset.wbView)})});
+ $("wbPlanPlus").addEventListener("click",function(){W.planZoom=Math.min(6,W.planZoom*1.28);drawPlan()});
+ $("wbPlanMinus").addEventListener("click",function(){W.planZoom=Math.max(.55,W.planZoom/1.28);drawPlan()});
+ $("wbCompare").addEventListener("change",drawPlan);
+ $("wbAnchors").addEventListener("change",drawPlan);
+ attachPlanInteraction();
+ W.axisCanvas.addEventListener("click",function(e){
+   var r=W.axisCanvas.getBoundingClientRect(),x=(e.clientX-r.left)*110/r.width,y=(e.clientY-r.top)*100/r.height;
+   if(W.metrics&&W.metrics.ends){var near=null,d=Infinity;
+    W.metrics.ends.forEach(function(q){var dist=Math.hypot(x-q.x,y-q.y);if(dist<d){d=dist;near=q}});
+    if(near&&d<24){setView(near.key);return}
+   }
+   setView("iso")
+ });
+ window.addEventListener("resize",resize);
+}
+function setMode(mode){
+ if(!["3d","floor","split"].includes(mode))return;
+ W.mode=mode;var stage=$("stage");stage.classList.remove("wb-3d","wb-floor","wb-split");stage.classList.add("wb-"+mode);
+ stage.querySelectorAll("[data-wb-mode]").forEach(function(b){b.classList.toggle("selected",b.dataset.wbMode===mode);b.setAttribute("aria-pressed",String(b.dataset.wbMode===mode))});
+ if(W.host&&W.host.resize3D)W.host.resize3D(mode);
+ resize();
+}
+function setShape(shape){
+ if(!["candidate","raw"].includes(shape))return;
+ W.shape=shape;
+ document.querySelectorAll("[data-wb-shape]").forEach(function(b){b.classList.toggle("selected",b.dataset.wbShape===shape);b.setAttribute("aria-pressed",String(b.dataset.wbShape===shape))});
+ $("wbShapeStatus").textContent=shape==="raw"?"OSM gốc 217484891 · dữ liệu có nguồn":"Hình dáng đề xuất · cần đo xác minh";
+ if(W.host&&W.host.updateShape)W.host.updateShape(shape);
+ W.planZoom=1;drawPlan();
+}
+function setView(view){
+ if(!["top","north","south","east","west","iso"].includes(view))return;
+ W.view=view;W.host.setView(view);
+ document.querySelectorAll("[data-wb-view]").forEach(function(b){b.classList.toggle("selected",b.dataset.wbView===view)});
+ drawAxis();
+}
+function resize(){if(!W.ready)return;drawPlan();drawAxis();}
+function setupCanvas(canvas){var rect=canvas.getBoundingClientRect();if(rect.width<1||rect.height<1)return null;
+ var scale=Math.min(window.devicePixelRatio||1,2),w=rect.width,h=rect.height;
+ var pxw=Math.round(w*scale),pxh=Math.round(h*scale);
+ if(canvas.width!==pxw)canvas.width=pxw;if(canvas.height!==pxh)canvas.height=pxh;
+ var c=canvas.getContext("2d");c.setTransform(scale,0,0,scale,0,0);return {ctx:c,w:w,h:h}}
+function screen(point,w,h,scale){return {x:w/2+(point.x-W.panX)*scale,y:h/2-(point.z-W.panZ)*scale}}
+function screenToLocal(x,y){var M=W.metrics;if(!M||!M.plan)return null;var a=M.plan;
+return{x:W.panX+(x-a.w/2)/a.scale,z:W.panZ-(y-a.h/2)/a.scale}}
+function trace(c,pts,w,h,k){if(!pts||pts.length<2)return;c.beginPath();pts.forEach(function(p,i){
+ var s=screen(p,w,h,k);if(!i)c.moveTo(s.x,s.y);else c.lineTo(s.x,s.y)
+ });c.closePath()}
+function drawPlan(){
+ if(!W.ready||W.mode==="3d")return;
+ var obj=setupCanvas(W.planCanvas);if(!obj)return;
+ var c=obj.ctx,w=obj.w,h=obj.h,k=Math.min(w/450,h/390)*W.planZoom;
+ W.metrics=W.metrics||{};W.metrics.plan={w:w,h:h,scale:k};
+ c.fillStyle="#f8fbff";c.fillRect(0,0,w,h);
+ var step=25;
+ var halfX=w/k/2+step,halfZ=h/k/2+step;
+ c.strokeStyle="#e6ecf6";c.lineWidth=1;
+ for(var x=Math.floor((W.panX-halfX)/step)*step;x<=W.panX+halfX;x+=step){var xx=w/2+(x-W.panX)*k;c.beginPath();c.moveTo(xx,0);c.lineTo(xx,h);c.stroke()}
+ for(var z=Math.floor((W.panZ-halfZ)/step)*step;z<=W.panZ+halfZ;z+=step){var yy=h/2-(z-W.panZ)*k;c.beginPath();c.moveTo(0,yy);c.lineTo(w,yy);c.stroke()}
+ var features=W.data.features||[];
+ features.filter(function(f){return f.kind==="park"||f.kind==="building"}).forEach(function(f){
+  if(!f.geometry||f.geometry.type!=="Polygon")return;
+  var pts=f.geometry.coordinates[0].map(function(p){var a=local(p);return{x:a[0],z:a[1]}});
+  trace(c,pts,w,h,k);c.fillStyle=f.kind==="park"?"#d7f2e5":"#d5dde9";c.strokeStyle=f.kind==="park"?"#9acdb0":"#afbfd3";c.lineWidth=.8;c.fill();c.stroke()
+ });
+ c.strokeStyle="#afbecf";c.lineWidth=3.3;
+ features.filter(function(f){return f.kind==="road"&&f.geometry.type==="LineString"}).forEach(function(f){
+   var pts=f.geometry.coordinates.map(function(p){var a=local(p);return{x:a[0],z:a[1]}});
+   if(pts.length<2)return;c.beginPath();pts.forEach(function(p,i){var v=screen(p,w,h,k);if(!i)c.moveTo(v.x,v.y);else c.lineTo(v.x,v.y)});c.stroke();
+ });
+ var raw=rawPoints(),candidate=activePoints();
+ trace(c,candidate,w,h,k);c.fillStyle="rgba(47,140,219,.15)";c.fill();c.lineWidth=3.8;c.strokeStyle=W.shape==="candidate"?"#256dce":"#1685ca";c.stroke();
+ if($("wbCompare").checked&&W.shape!=="raw"&&raw.length>0){
+   c.save();c.setLineDash([6,4]);c.strokeStyle="#fb9c48";c.lineWidth=2;trace(c,raw,w,h,k);c.stroke();c.restore()
+ }
+ var hotspots=W.data.photo_hotspots||[];
+ hotspots.forEach(function(p){var v=screen({x:p.position.x,z:p.position.z},w,h,k);
+  if(v.x<0||v.x>w||v.y<0||v.y>h)return;
+  c.fillStyle="#f3a846";c.beginPath();c.arc(v.x,v.y,3.2,0,7);c.fill()
+ });
+ if($("wbAnchors").checked&&window.TrucGiangLake&&W.shape==="candidate"){
+  var pts=TrucGiangLake.points();
+  pts.forEach(function(p){
+   var xy=screen(p,w,h,k);
+   c.fillStyle=p.type==="notch"?"#ed6252":"#286aff";c.strokeStyle="#fff";c.lineWidth=1.3;
+   c.beginPath();c.arc(xy.x,xy.y,p.type==="notch"?6:4,0,7);c.fill();c.stroke();
+   c.font="bold 10px system-ui";c.fillStyle="#192c4e";c.fillText(p.id,xy.x+7,xy.y-5)
+  })
+ }
+ var view=W.host.getCameraInfo();
+ if(view){var v=screen(view.target,w,h,k),sz=14,dx=Math.sin(view.az)*sz,dz=Math.cos(view.az)*sz;
+  c.strokeStyle="#286aff";c.lineWidth=2;c.beginPath();c.arc(v.x,v.y,7,0,Math.PI*2);c.stroke();
+  c.beginPath();c.moveTo(v.x,v.y);c.lineTo(v.x+dx,v.y-dz);c.stroke()
+ }
+ c.fillStyle="#2c4469";c.font="bold 11px system-ui";c.fillText("N ↑",14,19);
+ // 50-metre scalable ruler
+ var ruler=50*k;
+ c.strokeStyle="#1e3860";c.lineWidth=2;c.beginPath();c.moveTo(17,h-21);c.lineTo(17+ruler,h-21);c.moveTo(17,h-26);c.lineTo(17,h-16);c.moveTo(17+ruler,h-26);c.lineTo(17+ruler,h-16);c.stroke();
+ c.font="10px system-ui";c.fillText("50 m",19,h-29);
+ $("wbStatus").textContent=(W.shape==="candidate"?"CANDIDATE / NOT SURVEYED":"OSM SOURCE / UNMODIFIED")+
+ " · "+(W.mode==="floor"?"FLOOR PLAN":"SPLIT VIEW")+" · "+Math.round(1/k*100)+" cm/pixel (visual)";
+}
+function drawAxis(){
+ if(!W.ready)return;var obj=setupCanvas(W.axisCanvas);if(!obj)return;
+ var c=obj.ctx,w=obj.w,h=obj.h;
+ c.clearRect(0,0,w,h);
+ var s=W.host.getCameraInfo();
+ if(!s||!s.camera)return;
+ s.camera.updateMatrixWorld();
+ var q=s.camera.quaternion.clone().invert();
+ var a=[{v:new THREE.Vector3(1,0,0),name:"X",key:"east",color:"#ec7064"},
+        {v:new THREE.Vector3(0,1,0),name:"Y",key:"top",color:"#2ea979"},
+        {v:new THREE.Vector3(0,0,1),name:"Z",key:"north",color:"#3579ee"}];
+ var cx=w/2,cy=h/2+1,ends=[];
+ a.forEach(function(x){var v=x.v.applyQuaternion(q),px=cx+v.x*34,py=cy-v.y*34;
+ c.strokeStyle=x.color;c.lineWidth=3;c.beginPath();c.moveTo(cx,cy);c.lineTo(px,py);c.stroke();
+ c.fillStyle=x.color;c.beginPath();c.arc(px,py,12,0,7);c.fill();
+ c.fillStyle="#fff";c.font="bold 12px system-ui";c.textAlign="center";c.textBaseline="middle";c.fillText(x.name,px,py);
+ ends.push({x:px,y:py,key:x.key})
+ });
+ W.metrics=W.metrics||{};W.metrics.ends=ends;
+}
+function attachPlanInteraction(){
+ var canvas=W.planCanvas;
+ canvas.addEventListener("pointerdown",function(e){e.stopPropagation();e.preventDefault();canvas.setPointerCapture(e.pointerId);
+   W.mouse={x:e.clientX,y:e.clientY,startX:e.clientX,startY:e.clientY,moved:false};});
+ canvas.addEventListener("pointermove",function(e){if(!W.mouse)return;e.stopPropagation();
+   var dx=e.clientX-W.mouse.x,dy=e.clientY-W.mouse.y;
+   if(Math.hypot(e.clientX-W.mouse.startX,e.clientY-W.mouse.startY)>6)W.mouse.moved=true;
+   if(W.mouse.moved&&W.metrics&&W.metrics.plan){W.panX-=dx/W.metrics.plan.scale;W.panZ+=dy/W.metrics.plan.scale;drawPlan()}
+   W.mouse.x=e.clientX;W.mouse.y=e.clientY
+ });
+ function up(e){e.stopPropagation();if(!W.mouse)return;var moved=W.mouse.moved;W.mouse=null;
+  if(moved)return;
+  var r=canvas.getBoundingClientRect(),loc=screenToLocal(e.clientX-r.left,e.clientY-r.top);
+  if(loc){W.host.focus(loc.x,loc.z);if(W.mode==="floor")setMode("split");drawPlan()}
+ }
+ canvas.addEventListener("pointerup",up);canvas.addEventListener("pointercancel",function(e){e.stopPropagation();W.mouse=null});
+ canvas.addEventListener("wheel",function(e){e.preventDefault();e.stopPropagation();W.planZoom=Math.max(.55,Math.min(6,W.planZoom*Math.exp(-e.deltaY*.0014)));drawPlan()},{passive:false});
+}
+function update(){
+ if(!W.ready)return;
+ if(W.mode!=="3d"&&W.metrics&&W.metrics.plan)drawPlan();
+ drawAxis();
+}
+function init(data,host){
+ W.data=data;W.host=host;
+ if(!W.ready){build();W.ready=true}
+ setMode(W.mode);setShape(W.shape);setView("iso");
+}
+window.TrucGiangWorkbench={init:init,update:update,setMode:setMode,setShape:setShape,setView:setView,
+ getInfo:function(){return {mode:W.mode,shape:W.shape,view:W.view,planReady:!!W.planCanvas}},
+ refresh:resize};
+})();
