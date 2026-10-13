@@ -74,7 +74,8 @@ td code{color:#345c85;font-size:10px}
 .record-backdrop.open{display:flex}
 .record-panel{width:min(630px,100%);height:100%;background:#fff;box-shadow:-12px 0 45px #101f3f35;display:flex;flex-direction:column}
 .record-head{padding:17px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:9px}
-.record-head strong{font-size:15px;flex:1;min-width:0}
+.record-head strong{font-size:15px;flex:1 1 0;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;pointer-events:none}
+#closeRecord{position:relative;z-index:5;flex:0 0 44px;min-width:44px;min-height:44px;display:grid;place-items:center}
 .record-rows{padding:10px 18px;overflow:auto;flex:1}
 .record-field{padding:12px 0;border-bottom:1px solid #e9edf5;display:grid;grid-template-columns:minmax(95px,30%) minmax(0,1fr);gap:12px;align-items:start}
 .record-field label{font-size:11px;color:#7186a5;font-weight:750;word-break:break-word}
