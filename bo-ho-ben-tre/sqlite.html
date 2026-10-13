@@ -281,6 +281,16 @@ $("schemaTab").onclick=()=>{state.view="schema";render()};
 $("exportCsv").onclick=exportCsv;
 $("closeRecord").onclick=$("closeRecordFoot").onclick=close;
 $("recordBackdrop").onclick=e=>{if(e.target===$("recordBackdrop"))close()};
+// On some mobile/WebGL browser compositors the translucent backdrop wins hit
+// testing over the independent close icon. Resolve the visible close hit area
+// at capture time, so the actual physical tap always closes the drawer.
+document.addEventListener("pointerdown",function(e){
+ if(!$("recordBackdrop").classList.contains("open"))return;
+ var b=$("closeRecord").getBoundingClientRect();
+ if(e.clientX>=b.left&&e.clientX<=b.right&&e.clientY>=b.top&&e.clientY<=b.bottom){
+  e.preventDefault();e.stopPropagation();close()
+ }
+},true);
 document.addEventListener("keydown",e=>{if(e.key==="Escape")close()});
 $("copyRow").onclick=()=>{
  if(!state.opened)return;
