@@ -23,6 +23,8 @@ jobs:
         run: |
           npm install --no-save playwright
           npx playwright install --with-deps chromium
+      - name: Export SQLite explorer snapshot for browser
+        run: python3 bo-ho-ben-tre/scripts/build.py --osm
       - name: Run browser test for desktop and mobile
         run: node scripts/test_ben_tre.mjs
       - name: Archive screenshots and diagnostic
