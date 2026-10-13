@@ -266,7 +266,7 @@ try {
     if(stats.scrollWidth>stats.innerWidth+1||stats.screenHeight>stats.innerHeight+1)
       errors.push(name+' semantic model viewport overflow '+JSON.stringify(stats));
     if(name==='desktop'||name==='mobile-390'){
-      await model.goto('http://127.0.0.1:8765/bo-ho-ben-tre/model.html#osm-way-217484891',{waitUntil:'load'});
+      await model.goto('http://127.0.0.1:8765/bo-ho-ben-tre/model.html?survey-check=1#osm-way-217484891',{waitUntil:'load'});
       await model.waitForFunction(()=>document.getElementById('loading').hidden);
       await model.locator('#kinds button').filter({hasText:'Hồ nước'}).click();
       await model.locator('#list .node-item').first().click();
