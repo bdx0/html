@@ -350,6 +350,7 @@ $("search").oninput=e=>{state.q=e.target.value;renderList()};
 $("detailClose").onclick=()=>{$("details").classList.remove("open")};
 document.addEventListener("keydown",e=>{if(e.key==="Escape")$("details").classList.remove("open")});
 window.addEventListener("resize",redraw);
+window.addEventListener("hashchange",()=>{let id=decodeURIComponent(location.hash.slice(1));if(state.byId.has(id)&&id!==state.selected)select(id,true)});
 }
 fetch("data/model-view.json",{cache:"no-store"}).then(r=>{if(!r.ok)throw Error("HTTP "+r.status);return r.json()}).then(d=>{
 if(d.schema!=="ben-tre-semantic-model-v1"||!d.read_only||!Array.isArray(d.nodes))throw Error("Dữ liệu mô hình không đúng phiên bản");
