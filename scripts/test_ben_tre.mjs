@@ -211,7 +211,9 @@ try {
     if(!(await explorer.locator('#schemaView').innerText()).includes('CREATE TABLE'))
       errors.push(name+' DDL/schema not exposed');
     await explorer.locator('#rowsTab').click();
-    await explorer.locator('#dataGrid tbody tr').first().locator('td').first().click();
+    const tableScroll=explorer.locator('#gridScroll');
+    await tableScroll.evaluate(el=>{el.scrollTop=0;el.scrollLeft=0});
+    await explorer.locator('#dataGrid tbody tr').nth(3).locator('td').first().click();
     if(!(await explorer.locator('#recordBackdrop').evaluate(el=>el.classList.contains('open'))))
       errors.push(name+' row detail drawer did not open');
     const closeRect=await explorer.locator('#closeRecord').boundingBox();
