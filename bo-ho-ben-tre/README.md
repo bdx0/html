@@ -75,6 +75,14 @@ Giữ `data/catalog-blueprint-v1.json` và `scripts/build.py` trong commit để
 - Snapshot screenshot desktop/mobile là yêu cầu nghiệm thu; không chỉ dựa vào report FPS.
 - Nguồn đối chiếu ảnh: https://addflag.com/ho_truc_giang__4361 và https://triphunter.vn/places/ben-tre/items/ho-truc-giang; ảnh nguồn chỉ để xem tham chiếu.
  
+## Xác minh hình hồ ngay trên mặt bằng (4 vùng được đánh số)
+- Vào [Model Data View](model.html#osm-way-217484891), mở Hồ Trúc Giang. Trên đường bờ hiện **4 đoạn màu cam**, có các nút ①–④ ngay trên hình; chạm vào số hoặc vùng tô đậm rồi chọn **Duyệt sửa**.
+- ① **Bắc**: mũi đất nhô xuống nước → kiểm xem mép nước cần lõm thêm hay nới ra. ② **Nam**: đường bờ chéo và những góc đổi hướng → dịch song song thôi **không đủ**, cần ảnh/mốc địa lý để đặt điểm uốn. ③ **Đông**: cung bờ và chỗ bo góc Đông–Nam. ④ **Tây**: các mũi/góc bị tán cây che.
+- Mỗi vùng có câu hỏi đơn giản, danh sách lựa chọn **Chưa rõ / Cần sửa / OSM có vẻ đúng**, ghi chú và thanh kéo thử ±25m. Cam = đoạn OSM **chưa xác minh**, nét xanh đứt = dịch thử mép nước bằng một phép biến dạng có giảm dần về hai đầu đoạn; **không phải proposed geometry chính xác**, không chỉnh trực tiếp OSM/SQLite. Giá trị 0m nghĩa là xem đúng ranh OSM hiện có.
+- Bấm **Lưu nhận xét trên máy**: lưu tại trình duyệt hiện tại, trạng thái \`visual_review_only_not_georeferenced\`. **⇩ Xuất bản đánh giá** tải \`truc-giang-shore-review-YYYY-MM-DD.json\` gồm từng vùng, nhận xét và số mét dịch thử. Không phải xác nhận GPS; cần điểm đo độc lập trước khi chốt ranh hồ.
+- Nếu có tọa độ thực địa, tiếp tục dùng **＋ Nhập mốc tọa độ** (ghi nguồn, ngày đo và sai số); file điểm đo xuất riêng. Mọi điểm tự nhập \`self_reported_unreviewed\` tới khi kiểm chứng chính thức.
+- Model Data Viewer đã tăng zoom mặc định vào nước hồ trên mobile, dùng panel dưới tối đa 53dvh khi duyệt để không che hoàn toàn hình; smoke test Chromium kiểm 4 overlay, ± preview, điều hướng vùng, lưu/xuất nhận xét.
+
 ## Model Data View (mô hình dữ liệu dễ hiểu) — cập nhật 13/10/2026
 - **Mở trực tiếp:** https://bdx0.github.io/html/bo-ho-ben-tre/model.html
 - Đây là chế độ dành cho người đọc hiểu đối tượng, không phải trình xem hàng/cột SQL: mặt bằng OSM North-up, danh sách hồ, đường phố đã **gộp các đoạn cùng tên**, công trình, công viên, 5 mốc địa điểm; chọn một đối tượng để thấy dữ liệu địa lý, tên, nguồn, mức tin cậy, ảnh liên quan, mức khảo sát và liên kết với đối tượng khác.
