@@ -339,13 +339,13 @@ var waterMat=lakeWaterMaterial=new THREE.ShaderMaterial({
  "float ripple=sin(site.x*.87-site.y*.17+uTime*.7)*sin(site.y*.64+uTime*.33);",
  "vec3 view=normalize(uCamera-vWorld);",
  "float grazing=pow(1.-clamp(abs(view.y),0.,1.),2.2);",
- "float sky=clamp(.25+.52*grazing+.018*wave,0.,1.);",
- "vec3 deep=vec3(.050,.153,.140);",
- "vec3 broad=vec3(.105,.225,.215);",
+ "float sky=clamp(.38+.45*grazing+.012*wave,0.,1.);",
+ "vec3 deep=vec3(.073,.185,.175);",
+ "vec3 broad=vec3(.160,.325,.315);",
  "vec3 water=mix(deep,broad,sky);",
  "vec2 uv=clamp(vec2((site.x+160.)/320.,(site.y+135.)/320.),vec2(.004),vec2(.996));",
  "vec4 vegetation=texture2D(uReflections,uv);",
- "water=mix(water,vec3(.021,.083,.054),clamp(vegetation.a*(.7+.2*wave),0.,.7));",
+ "water=mix(water,vec3(.020,.073,.052),clamp(vegetation.a*(1.0+.15*wave),0.,.8));",
  "float line=pow(max(0.,sin(site.x*.72+site.y*.35+uTime*.48)),20.)*.030;",
  "float glance=pow(max(0.,sin(site.x*.32-site.y*.13+uTime*.09)),34.)*.035;",
  "water+=vec3(.09,.13,.11)*(line+glance)*(1.+grazing);",
@@ -373,16 +373,16 @@ if(THREE.InstancedMesh){
  inst.instanceMatrix.needsUpdate=true;world.add(inst);counts.mesh++;counts.tri+=samp.length*postGeom.index.count/3;
 }
 }
-function makeShore(poly){var s05=ringOffset(poly,.75),s2=ringOffset(poly,2.0),s7=ringOffset(poly,7.5),s9=ringOffset(poly,9.8),s13=ringOffset(poly,13.5);
+function makeShore(poly){var s05=ringOffset(poly,.45),s2=ringOffset(poly,1.1),s7=ringOffset(poly,5.8),s9=ringOffset(poly,7.0),s13=ringOffset(poly,9.2);
 var beige=new THREE.MeshLambertMaterial({color:0xc5b79f,side:THREE.DoubleSide});
 var paving=new THREE.MeshLambertMaterial({color:0xdacaaa,side:THREE.DoubleSide});
 var bed=new THREE.MeshLambertMaterial({color:0x477b45,side:THREE.DoubleSide});
 ringStripe(poly,s05,.37,beige);ringStripe(s05,s7,.37,paving);ringStripe(s7,s9,.38,bed);ringStripe(s9,s13,.38,paving);
 sideWall(poly,.39,.05,"#9caba3");curvedBorder(poly,.45,.16,"#d9e1d6");lakesideRail(poly);
 curvedBorder(s7,.41,.07,"#f1ddbf");
-var outline=sampleRing(ringOffset(poly,8.6),6);
+var outline=sampleRing(ringOffset(poly,6.5),5);
 outline.forEach(function(p,i){if(i%2===0)lowShrub(p.x,p.z,i%4?1.2:1.5)});
-var trees=sampleRing(ringOffset(poly,16.1),16);
+var trees=sampleRing(ringOffset(poly,12.5),16);
 trees.forEach(function(p,i){foliageTree(p.x,p.z,4.1+(i%5)*.48,i%2);if(i%3===0)lakesideLamp(p.x*.96,p.z*.96);if(i%4===1)bench(p.x*.97,p.z*.97,p.angle+Math.PI/2)});
 return {treeCount:trees.length,edgeLength:Math.round(sampleRing(poly,3).length*3)}}
 function makeFountain(x,z){var g=new THREE.Group();g.position.set(x,0,z);g.userData.fountain=true;g.userData.hotspotId="HS-FOUNTAIN";pickables.push(g);world.add(g);
