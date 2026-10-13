@@ -268,10 +268,8 @@ try {
     if(name==='desktop'||name==='mobile-390'){
       await model.goto('http://127.0.0.1:8765/bo-ho-ben-tre/model.html#osm-way-217484891',{waitUntil:'load'});
       await model.waitForFunction(()=>document.getElementById('loading').hidden);
-      if(mobile){
-        await model.locator('#kinds button').filter({hasText:'Hồ nước'}).click();
-        await model.locator('#list .node-item').first().click();
-      }
+      await model.locator('#kinds button').filter({hasText:'Hồ nước'}).click();
+      await model.locator('#list .node-item').first().click();
       const add= model.locator('.shore-actions button').filter({hasText:'Nhập mốc tọa độ'}).first();
       await add.click();
       await model.locator('.shore-form input[name="lat"]').fill('10.23861');
