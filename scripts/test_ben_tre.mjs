@@ -143,6 +143,44 @@ try {
           errors.push(name+' exported survey missing bearings, image, or rights');
       }
     }
+    // Warestack floor-plan / split / axis and reversible corrected shoreline QA.
+    const state=await page.evaluate(()=>window.TrucGiangWorkbench?.getInfo());
+    if(state?.shape!=="candidate"||state?.mode!=="3d")errors.push(name+' Workbench did not start with the candidate 3D model: '+JSON.stringify(state));
+    const anchors=await page.evaluate(()=>window.TrucGiangLake?.points());
+    if(anchors?.length!==12||anchors.find(a=>a.id==='B03')?.z>38||anchors.find(a=>a.id==='B10')?.z>0)
+      errors.push(name+' shoreline is missing corrected north notch / diagonal south landmark');
+    const planButton=page.locator('[data-wb-mode="floor"]');
+    await planButton.click();
+    await page.waitForTimeout(180);
+    if(!(await page.locator('#wbPlanDock').isVisible()))errors.push(name+' floor plan missing');
+    const planState=await page.evaluate(()=>({
+      w:document.getElementById('wbPlanCanvas')?.width,
+      h:document.getElementById('wbPlanCanvas')?.height,
+      points:window.TrucGiangLake?.points().length
+    }));
+    if(!planState.w||!planState.h||planState.points!==12)errors.push(name+' invalid rendered floorplan '+JSON.stringify(planState));
+    if(name==='desktop'||name==='mobile-390')await page.screenshot({path:'ben-tre-floorplan-'+name+'.png'});
+    await page.locator('[data-wb-shape="raw"]').click();
+    const sourceShape=await page.evaluate(()=>window.TrucGiangWorkbench.getInfo().shape);
+    if(sourceShape!=="raw")errors.push(name+' raw OSM toggle failed');
+    await page.locator('[data-wb-shape="candidate"]').click();
+    await page.locator('[data-wb-mode="split"]').click();
+    await page.waitForTimeout(200);
+    const splitData=await page.evaluate(()=>({
+      ready:document.getElementById('stage').classList.contains('wb-split'),
+      dock:document.getElementById('wbPlanDock').getBoundingClientRect().width,
+      model:document.getElementById('webgl').getBoundingClientRect().width,
+      stage:document.getElementById('stage').getBoundingClientRect().width
+    }));
+    if(!splitData.ready||splitData.dock<=0||splitData.model>=splitData.stage*.9)
+      errors.push(name+' split 3D/plan layout failed '+JSON.stringify(splitData));
+    if(name==='desktop'||name==='mobile-390')await page.screenshot({path:'ben-tre-split-'+name+'.png'});
+    await page.locator('[data-wb-view="top"]').click();
+    if((await page.evaluate(()=>window.TrucGiangWorkbench.getInfo().view))!=='top')
+      errors.push(name+' TOP axis view not active');
+    await page.locator('[data-wb-view="iso"]').click();
+    await page.locator('[data-wb-mode="3d"]').click();
+    await page.waitForTimeout(180);
     await page.locator('#dbg').click();
     const diagnosis=await page.locator('#report').innerText();
     let diag={};
@@ -150,8 +188,8 @@ try {
     const modeOk=diag.webgl===true&&Number(diag.frame)>=3
       &&Number(diag.renderTriangles)>0&&(await page.locator('#webgl').count())===1;
     if(!modeOk)errors.push(name+' WebGL not active: '+diagnosis);
-    if(!diag.lakeGeometry||diag.lakeGeometry.originalAreaM2<12000||diag.lakeGeometry.visualVertices<80||diag.lakeGeometry.visualDeviationPct>3.5)
-      errors.push(name+' lake shoreline shape drift or smoothing not enabled: '+JSON.stringify(diag.lakeGeometry));
+    if(!diag.lakeGeometry||diag.lakeGeometry.shapeMode!=="candidate"||diag.lakeGeometry.controlPoints?.length!==12||diag.lakeGeometry.originalAreaM2<12000||diag.lakeGeometry.visualVertices<150||diag.lakeGeometry.visualAreaM2<11000)
+      errors.push(name+' lake semantic proposal not active or missing 12 landmarks: '+JSON.stringify(diag.lakeGeometry));
     const snapshot={name,modeOk,viewport,drawCalls:diag.drawCalls,triangles:diag.renderTriangles,frames:diag.frame,errorLog:diag.errors};
     report.push(snapshot);
     await page.locator('#dbg').click();
