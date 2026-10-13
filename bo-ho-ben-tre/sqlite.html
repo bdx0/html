@@ -57,6 +57,12 @@ tbody tr:hover{background:#eff6ff;cursor:pointer}
 tbody tr:focus-visible{outline:2px solid var(--blue);outline-offset:-2px}
 tbody tr:nth-child(even){background:#fbfcff}
 tbody tr:nth-child(even):hover{background:#eff6ff}
+/* Keep record IDs reachable even when a table has many horizontally-scrolled columns. */
+thead th:first-child{position:sticky;top:0;left:0;z-index:5;box-shadow:1px 0 0 #d9e4f1}
+tbody td:first-child{position:sticky;left:0;z-index:2;background:#fff;box-shadow:1px 0 0 #e7edf6}
+tbody tr:nth-child(even) td:first-child{background:#fbfcff}
+tbody tr:hover td:first-child{background:#eff6ff}
+
 td div.truncate{max-width:315px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 td small.sqlnull{color:#acbacb;font-size:10px;font-style:italic}
 td code{color:#345c85;font-size:10px}
