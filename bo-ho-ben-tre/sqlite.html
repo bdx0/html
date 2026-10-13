@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f9fbff">
+<meta name="description" content="SQLite Explorer read-only — tra cứu bảng, cột và bản ghi gốc của mô hình Hồ Trúc Giang.">
+<title>SQLite Explorer — Hồ Trúc Giang | BDX0</title>
+<style>
+:root{--blue:#286aff;--ink:#1b3355;--muted:#788ba6;--border:#dfE7f3;--bg:#f4f7fd;--white:#fff;--code:#edf4fd}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;background:var(--bg);color:var(--ink);font:12px/1.45 Inter,system-ui,-apple-system,"Segoe UI",Arial,sans-serif}
+button,input,select{font:inherit}
+button,select{color:inherit}
+button{cursor:pointer}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid #3d83f7;outline-offset:2px}
+a{color:#2466c9;text-decoration:none}a:hover{text-decoration:underline}
+button,.action{background:#fff;border:1px solid #d9e4f3;padding:8px 11px;border-radius:8px;font-weight:650}
+button:hover{background:#eff5ff}
+button.primary{background:var(--blue);color:#fff;border-color:var(--blue)}
+button.primary:hover{background:#1458e2}
+#layout{height:100dvh;display:grid;grid-template-rows:57px minmax(0,1fr)}
+header{background:var(--white);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:13px;padding:0 18px;min-width:0}
+.brand{font-size:15px;font-weight:850;letter-spacing:-.4px;white-space:nowrap}
+.brand span{color:var(--blue)}
+.header-note{font-size:10px;color:#7a8ca5;border-left:1px solid #e5eaf4;padding-left:12px}
+.header-fill{flex:1}
+.top-actions{display:flex;gap:6px}
+.top-actions a{border:1px solid #d9e5f2;color:#305478;border-radius:8px;padding:8px 10px;background:#fbfdff;font-weight:650;white-space:nowrap}
+.workspace{min-height:0;display:grid;grid-template-columns:238px minmax(0,1fr)}
+nav{background:var(--white);border-right:1px solid var(--border);min-height:0;overflow-y:auto;padding:14px 9px;overscroll-behavior:contain}
+.nav-head{font-size:9px;letter-spacing:.15em;font-weight:800;color:#96a8c2;padding:0 9px 11px}
+.table-nav{display:flex;flex-direction:column;gap:3px}
+.table-nav button{background:transparent;border:0;text-align:left;border-radius:8px;padding:11px 10px;display:flex;align-items:center;justify-content:space-between;gap:6px;font-weight:650}
+.table-nav button.selected{color:#245ee5;background:#eaf1ff}
+.table-nav button small{color:#8fa2ba;display:inline-flex;font-size:10px;background:#f2f5f9;border-radius:5px;padding:2px 5px;font-weight:700}
+.table-nav button.selected small{background:#d9e7ff;color:#326bdc}
+main{min-width:0;min-height:0;display:flex;flex-direction:column}
+.summary{padding:15px 20px 10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.summary h1{font-size:19px;line-height:1.2;margin:0 10px 0 0;letter-spacing:-.4px}
+.summary span{font-size:10px;color:#7789a5;border:1px solid #dfe7f1;background:#fff;border-radius:7px;padding:5px 8px}
+.summary .tag{background:#eaf2ff;color:#2665d6;border-color:#c9dcfa}
+.toolbar{padding:5px 20px 12px;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.toolbar input[type="search"]{border:1px solid #d8e4f2;background:#fff;border-radius:8px;min-width:155px;flex:1;max-width:470px;padding:11px 12px;min-height:40px;color:#1a3152}
+.toolbar select{border:1px solid #d8e4f2;background:#fff;border-radius:8px;max-width:100%;padding:10px;min-height:40px}
+.view-switch{display:flex;align-items:center;gap:2px;background:#e9eef7;border-radius:9px;padding:3px}
+.view-switch button{border:0;background:transparent;padding:7px 10px;font-size:11px}
+.view-switch button.selected{background:#fff;color:var(--blue);box-shadow:0 1px 5px #496c9b25}
+.toolbar .db-save{margin-left:auto}
+.mobile-table-select{display:none}
+.surface{margin:0 20px 12px;background:#fff;border:1px solid #dfe7f3;border-radius:11px;box-shadow:0 4px 22px #315a9d0a;display:flex;flex-direction:column;min-height:0;flex:1;overflow:hidden}
+#gridScroll{overflow:auto;flex:1;min-height:0;overscroll-behavior:contain}
+table{border-collapse:collapse;min-width:100%;font-size:11px;white-space:nowrap}
+thead th{position:sticky;top:0;z-index:1;text-align:left;color:#567294;background:#f1f5fc;border-bottom:1px solid #d8e5f4;cursor:pointer;user-select:none}
+th,td{padding:12px 13px;border-bottom:1px solid #eff2f7;max-width:345px}
+tbody tr:hover{background:#eff6ff;cursor:pointer}
+tbody tr:focus-visible{outline:2px solid var(--blue);outline-offset:-2px}
+tbody tr:nth-child(even){background:#fbfcff}
+tbody tr:nth-child(even):hover{background:#eff6ff}
+td div.truncate{max-width:315px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+td small.sqlnull{color:#acbacb;font-size:10px;font-style:italic}
+td code{color:#345c85;font-size:10px}
+.table-foot{padding:10px 14px;border-top:1px solid #e8edf5;display:flex;align-items:center;gap:10px;justify-content:flex-end;color:#7c90ab;font-size:11px}
+.table-foot #pageMeta{margin-right:auto}
+.table-foot button{padding:7px 12px}
+.schema-view{overflow:auto;padding:15px 18px;flex:1;min-height:0}
+.schema-view h2{font-size:15px;margin:0 0 12px}
+.schema-view pre{background:#12243e;color:#c8e3ff;padding:16px;white-space:pre-wrap;overflow:auto;border-radius:9px;font:11px/1.6 ui-monospace,SFMono-Regular,Consolas,monospace}
+.schema-table{min-width:550px;width:100%}
+.schema-table td,.schema-table th{white-space:normal}
+.empty{padding:40px 16px;color:#8798b0;text-align:center}
+#state{color:#7d8fa8;font-size:11px}
+.record-backdrop{position:fixed;inset:0;z-index:20;display:none;background:#16263c77;align-items:center;justify-content:flex-end}
+.record-backdrop.open{display:flex}
+.record-panel{width:min(630px,100%);height:100%;background:#fff;box-shadow:-12px 0 45px #101f3f35;display:flex;flex-direction:column}
+.record-head{padding:17px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:9px}
+.record-head strong{font-size:15px;flex:1;min-width:0}
+.record-rows{padding:10px 18px;overflow:auto;flex:1}
+.record-field{padding:12px 0;border-bottom:1px solid #e9edf5;display:grid;grid-template-columns:minmax(95px,30%) minmax(0,1fr);gap:12px;align-items:start}
+.record-field label{font-size:11px;color:#7186a5;font-weight:750;word-break:break-word}
+.record-field code{overflow-wrap:anywhere;white-space:pre-wrap;color:#294363;font:11px/1.6 ui-monospace,Consolas,monospace}
+.record-field a{overflow-wrap:anywhere}
+.record-actions{padding:15px;display:flex;gap:8px;border-top:1px solid var(--border)}
+.record-actions button{flex:1}
+footer{display:flex;justify-content:space-between;align-items:center;gap:9px;padding:8px 20px 12px;font-size:10px;color:#8c9db3;flex-wrap:wrap}
+#loading{position:fixed;inset:56px 0 0;z-index:15;display:flex;align-items:center;justify-content:center;background:#f6f9ffeb;color:#657da0;text-align:center;padding:22px}
+#loading.hidden{display:none}
+@media(max-width:880px){
+ .workspace{grid-template-columns:minmax(0,1fr)}
+ nav{display:none}
+ header{padding:0 10px;gap:7px}
+ .brand{font-size:12px}
+ .header-note{display:none}
+ .top-actions a{font-size:10px;padding:8px 7px}
+ .summary{padding:12px 11px 8px}
+ .summary h1{font-size:16px}
+ .toolbar{padding:5px 10px 9px}
+ .mobile-table-select{display:block;flex:1;min-width:140px}
+ .toolbar input[type="search"]{min-width:0;max-width:100%;flex:1 1 100%}
+ .toolbar .db-save{margin-left:0}
+ .surface{margin:0 8px 8px;border-radius:9px}
+ footer{padding:6px 11px 11px}
+ .table-foot{gap:6px}
+ td div.truncate{max-width:240px}
+ .record-backdrop{align-items:flex-end}
+ .record-panel{width:100%;height:min(88dvh,890px);border-radius:17px 17px 0 0}
+ .record-field{grid-template-columns:100px minmax(0,1fr)}
+}
+</style>
+</head>
+<body>
+<div id="layout">
+<header>
+ <div class="brand">▦ <span>BDX0</span> / SQLITE EXPLORER</div>
+ <div class="header-note">HỒ TRÚC GIANG · DATA WORKBENCH</div>
+ <div class="header-fill"></div>
+ <div class="top-actions"><a href="./">← Mô hình 3D</a><a href="data/catalog.sqlite" download>↓ SQLite gốc</a></div>
+</header>
+<div class="workspace">
+<nav><div class="nav-head">TABLES · <span id="navTotal">…</span></div><div id="tableNav" class="table-nav"></div></nav>
+<main>
+ <div class="summary"><h1 id="currentTable">Đang tải dữ liệu</h1>
+  <span class="tag" id="readOnly">READ ONLY</span><span id="recordsBadge">… rows</span><span id="colsBadge">… columns</span>
+ </div>
+ <div class="toolbar">
+   <select id="mobileSelect" class="mobile-table-select" aria-label="Chọn bảng SQLite"></select>
+   <input id="search" type="search" placeholder="Tìm trong các cột của bảng…" autocomplete="off" aria-label="Tìm bản ghi">
+   <select id="sizeSelect" aria-label="Số hàng mỗi trang"><option value="25">25 rows</option><option value="50">50 rows</option><option value="100">100 rows</option></select>
+   <div class="view-switch" role="group" aria-label="Kiểu xem"><button id="rowsTab" class="selected" aria-pressed="true">DATA</button><button id="schemaTab" aria-pressed="false">SCHEMA</button></div>
+   <button id="exportCsv" class="db-save">↓ CSV</button>
+ </div>
+ <section class="surface" id="surface">
+   <div id="gridScroll"><table id="dataGrid"><thead></thead><tbody></tbody></table></div>
+   <section id="schemaView" class="schema-view" hidden></section>
+   <div class="table-foot" id="paging"><span id="pageMeta">…</span><button id="prev" aria-label="Trang trước">‹</button><span id="pageNumber">1/1</span><button id="next" aria-label="Trang tiếp">›</button></div>
+ </section>
+ <footer><span id="state">Bản xuất được tạo từ SQLite khi build · không chỉnh sửa database trực tuyến</span><span id="sourceLine">data/catalog.sqlite · data/sqlite-explorer.json</span></footer>
+</main>
+</div>
+</div>
+<div id="recordBackdrop" class="record-backdrop" role="presentation">
+ <div class="record-panel" role="dialog" aria-modal="true" aria-label="Chi tiết bản ghi">
+  <div class="record-head"><strong id="recordHeading">Chi tiết bản ghi</strong><button id="closeRecord" aria-label="Đóng chi tiết">✕</button></div>
+  <div class="record-rows" id="recordBody"></div>
+  <div class="record-actions"><button id="copyRow" class="primary">Sao chép JSON</button><button id="closeRecordFoot">Đóng</button></div>
+ </div>
+</div>
+<div id="loading" role="status">Đang tải cấu trúc và dữ liệu từ bản xuất SQLite…</div>
+<script>
+(function(){
+"use strict";
+var $=id=>document.getElementById(id);
+var state={db:null,table:null,view:"rows",query:"",sortIndex:-1,sortDir:1,offset:0,size:25,filtered:null,opened:null};
+function h(tag,txt){var e=document.createElement(tag);if(txt!==undefined)e.textContent=String(txt);return e}
+function value(v){if(v===null)return"NULL";if(typeof v==="object")return JSON.stringify(v);return String(v)}
+function nice(v){if(v===null)return"NULL";if(typeof v==="number")return v.toLocaleString("vi-VN");return value(v)}
+function table(){return state.db.tables.find(t=>t.name===state.table)}
+function byName(name){return state.db.tables.find(t=>t.name===name)}
+function nav(){
+var left=$("tableNav"),sel=$("mobileSelect");left.textContent="";sel.textContent="";
+state.db.tables.forEach(function(t){
+ var btn=h("button"),label=h("span",t.name),cnt=h("small",t.count.toLocaleString("vi-VN"));
+ btn.append(label,cnt);btn.classList.toggle("selected",t.name===state.table);
+ btn.addEventListener("click",()=>selectTable(t.name));left.append(btn);
+ var op=h("option",t.name+" · "+t.count);op.value=t.name;sel.append(op)
+});
+sel.value=state.table;$("navTotal").textContent=String(state.db.tables.length)
+}
+function selectTable(name){
+if(!byName(name))return;
+state.table=name;state.query="";state.sortIndex=-1;state.sortDir=1;state.offset=0;
+$("search").value="";nav();render();location.hash=encodeURIComponent(name)
+}
+function filter(){
+var t=table();if(!t)return [];
+var q=state.query.trim().toLocaleLowerCase("vi-VN");
+var rows=q?t.rows.filter(row=>row.some(v=>value(v).toLocaleLowerCase("vi-VN").includes(q))):t.rows.slice();
+if(state.sortIndex>=0){var n=state.sortIndex,dir=state.sortDir;rows.sort((a,b)=>{
+ var va=a[n],vb=b[n];if(va===null)return vb===null?0:1;if(vb===null)return -1;
+ if(typeof va==="number"&&typeof vb==="number")return (va-vb)*dir;
+ return value(va).localeCompare(value(vb),"vi",{numeric:true})*dir
+})}
+return rows
+}
+function drawData(){
+var t=table();if(!t)return;
+state.filtered=filter();state.offset=Math.max(0,Math.min(state.offset,Math.max(0,Math.ceil(state.filtered.length/state.size)-1)*state.size));
+var head=$("dataGrid").tHead,body=$("dataGrid").tBodies[0];head.textContent="";body.textContent="";
+var hr=h("tr");
+t.columns.forEach((col,j)=>{
+ var th=h("th",col.name+(state.sortIndex===j?(state.sortDir>0?" ▲":" ▼"):""));
+ th.tabIndex=0;th.setAttribute("aria-label","Sắp xếp theo "+col.name);
+ var sort=()=>{if(state.sortIndex===j)state.sortDir*=-1;else{state.sortIndex=j;state.sortDir=1}state.offset=0;drawData()};
+ th.onclick=sort;th.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();sort()}};
+ hr.append(th)
+});head.append(hr);
+var rows=state.filtered.slice(state.offset,state.offset+state.size);
+rows.forEach((row,offset)=>{
+ var tr=h("tr");tr.tabIndex=0;tr.setAttribute("aria-label","Xem bản ghi số "+(state.offset+offset+1));
+ row.forEach(v=>{var td=h("td"),box=h("div");box.className="truncate";box.title=value(v);
+  if(v===null){box.append(h("small","NULL"));box.lastChild.className="sqlnull"}
+  else if(typeof v==="number"){box.textContent=nice(v)}
+  else if(typeof v==="object"){var code=h("code",value(v));box.append(code)}
+  else{box.textContent=v}
+  td.append(box);tr.append(td)
+ });
+ var open=()=>openRow(row);tr.onclick=open;tr.onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();open()}};
+ body.append(tr)
+});
+if(!rows.length){var tr=h("tr"),td=h("td","Không tìm thấy bản ghi phù hợp");td.colSpan=t.columns.length;td.className="empty";tr.append(td);body.append(tr)}
+var pages=Math.max(1,Math.ceil(state.filtered.length/state.size)),pg=Math.floor(state.offset/state.size)+1;
+$("pageMeta").textContent=state.filtered.length.toLocaleString("vi-VN")+" / "+t.count.toLocaleString("vi-VN")+" bản ghi";
+$("pageNumber").textContent=pg+" / "+pages;$("prev").disabled=state.offset===0;
+$("next").disabled=state.offset+state.size>=state.filtered.length
+}
+function drawSchema(){
+var t=table(),box=$("schemaView");box.textContent="";
+box.append(h("h2","Cấu trúc bảng "+t.name));
+var wrap=h("div");wrap.style.overflowX="auto";
+var tab=h("table");tab.className="schema-table";
+var head=h("tr");["Tên cột","SQLite type","PRIMARY KEY","NOT NULL","DEFAULT"].forEach(x=>head.append(h("th",x)));tab.append(head);
+t.columns.forEach(col=>{var row=h("tr");[col.name,col.type,col.pk?"YES":"",col.not_null?"YES":"",col.default===null?"—":col.default].forEach(x=>row.append(h("td",x)));tab.append(row)});
+wrap.append(tab);box.append(wrap);
+box.append(h("h2","CREATE TABLE"));
+box.append(h("pre",t.sql||"Không có định nghĩa CREATE TABLE"));
+if(t.foreign_keys.length){box.append(h("h2","Foreign keys"));t.foreign_keys.forEach(f=>box.append(h("p",f.from+" → "+f.table+"."+f.to)))}
+}
+function render(){
+if(!state.db)return;
+var t=table();if(!t)return;
+$("currentTable").textContent=t.name;
+$("recordsBadge").textContent=t.count.toLocaleString("vi-VN")+" rows";
+$("colsBadge").textContent=t.columns.length+" columns";
+$("gridScroll").hidden=state.view!=="rows";$("schemaView").hidden=state.view!=="schema";$("paging").hidden=state.view!=="rows";
+$("rowsTab").classList.toggle("selected",state.view==="rows");$("schemaTab").classList.toggle("selected",state.view==="schema");
+$("rowsTab").setAttribute("aria-pressed",String(state.view==="rows"));$("schemaTab").setAttribute("aria-pressed",String(state.view==="schema"));
+$("search").disabled=state.view!=="rows";$("sizeSelect").disabled=state.view!=="rows";
+$("exportCsv").disabled=state.view!=="rows";
+if(state.view==="schema")drawSchema();else drawData();
+$("state").textContent="Snapshot "+state.db.generated_on+" · từ "+state.db.source+" · chỉ đọc · không đồng bộ dữ liệu sửa";
+}
+function recordObject(row){var t=table(),obj={};t.columns.forEach((col,i)=>obj[col.name]=row[i]);return obj}
+function openRow(row){
+state.opened=recordObject(row);$("recordHeading").textContent=state.table+" · bản ghi";
+var body=$("recordBody");body.textContent="";
+Object.entries(state.opened).forEach(([key,v])=>{
+ var box=h("section");box.className="record-field";box.append(h("label",key));
+ var isUrl=typeof v==="string"&&/^https?:\/\/\S+$/.test(v);
+ if(isUrl){var a=h("a",v);a.href=v;a.target="_blank";a.rel="noopener noreferrer";box.append(a)}
+ else{var code=h("code",typeof v==="object"&&v!==null?JSON.stringify(v,null,2):value(v));box.append(code)}
+ body.append(box)
+});
+$("recordBackdrop").classList.add("open")
+}
+function close(){state.opened=null;$("recordBackdrop").classList.remove("open")}
+function csvCell(v){var s=value(v);if(v===null)s="";return'"'+s.replace(/"/g,'""')+'"'}
+function exportCsv(){
+var t=table();if(!t)return;
+var lines=[t.columns.map(x=>csvCell(x.name)).join(",")];
+(filter()).forEach(r=>lines.push(r.map(csvCell).join(",")));
+var blob=new Blob(["\ufeff"+lines.join("\r\n")],{type:"text/csv;charset=utf-8"});
+var u=URL.createObjectURL(blob),a=h("a");a.href=u;a.download="ben-tre-"+t.name+".csv";document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),3000)
+}
+$("mobileSelect").onchange=e=>selectTable(e.target.value);
+$("search").oninput=e=>{state.query=e.target.value;state.offset=0;drawData()};
+$("sizeSelect").onchange=e=>{state.size=Number(e.target.value)||25;state.offset=0;drawData()};
+$("prev").onclick=()=>{state.offset=Math.max(0,state.offset-state.size);drawData()};
+$("next").onclick=()=>{state.offset+=state.size;drawData()};
+$("rowsTab").onclick=()=>{state.view="rows";render()};
+$("schemaTab").onclick=()=>{state.view="schema";render()};
+$("exportCsv").onclick=exportCsv;
+$("closeRecord").onclick=$("closeRecordFoot").onclick=close;
+$("recordBackdrop").onclick=e=>{if(e.target===$("recordBackdrop"))close()};
+document.addEventListener("keydown",e=>{if(e.key==="Escape")close()});
+$("copyRow").onclick=()=>{
+ if(!state.opened)return;
+ var str=JSON.stringify(state.opened,null,2);
+ if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(str).then(()=>{$("copyRow").textContent="Đã sao chép ✓"}).catch(()=>{});
+ else{$("copyRow").textContent="Trình duyệt chặn clipboard"}
+};
+window.addEventListener("hashchange",()=>{var name=decodeURIComponent(location.hash.slice(1));if(byName(name))selectTable(name)});
+fetch("data/sqlite-explorer.json",{cache:"no-store"}).then(r=>{if(!r.ok)throw Error("HTTP "+r.status);return r.json()}).then(db=>{
+ if(db.format!=="bdx0-sqlite-inspector-v1"||!Array.isArray(db.tables))throw Error("Dữ liệu SQLite export không hợp lệ");
+ state.db=db;state.table=db.tables.some(t=>t.name===decodeURIComponent(location.hash.slice(1)))?
+ decodeURIComponent(location.hash.slice(1)):"osm_features";
+ if(!byName(state.table))state.table=db.tables[0].name;
+ nav();render();$("loading").classList.add("hidden")
+}).catch(err=>{$("loading").textContent="Không tải được bản SQLite Explorer: "+err.message+
+ ". Vui lòng thử tải lại hoặc mở data/catalog.sqlite.";console.error(err)});
+})();
+</script>
+</body>
+</html>
