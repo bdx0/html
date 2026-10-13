@@ -140,6 +140,7 @@ header nav a{white-space:nowrap;border-radius:8px;border:1px solid #d8e4f3;backg
 </div>
 </div>
 <div id="loading" role="status">Đang xây dựng các thực thể và quan hệ từ bản xuất SQLite…</div>
+<script src="shoreline-controls.js"></script>
 <script>
 (function(){
 "use strict";
@@ -210,7 +211,7 @@ for(let [k,v,unit] of [["Diện tích",m.area_m2,"m²"],["Chu vi",m.perimeter_m,
 let refs=addSection(sec,"Nguồn đối chiếu");
 for(let l of a.comparison_links)link(refs,l.url,l.title);
 sec.append(el("p","Không tự chuyển pixel ảnh Google Maps thành GPS. Muốn cập nhật ranh thực phải có tọa độ đo hoặc dữ liệu địa lý được cấp phép.","note"));
-host.append(sec)
+host.append(sec);if(window.TrucGiangShoreControls)TrucGiangShoreControls.attach(host,redraw)
 }
 function renderDetail(){
 let host=$("detailContent");host.textContent="";
@@ -286,6 +287,11 @@ if(v.x<0||v.x>w||v.y<0||v.y>h)continue;
 g.beginPath();g.arc(v.x,v.y,n.kind==="hotspot"?2.7:4.5,0,7);
 g.fillStyle=n.kind==="hotspot"?"#ec9f56":"#3268b9";g.fill();
 if(n.id===state.selected){g.strokeStyle="#193f92";g.lineWidth=2;g.stroke()}
+}
+if(window.TrucGiangShoreControls){
+ let pts=TrucGiangShoreControls.points();
+ for(const p of pts){let a=project([p.lon,p.lat]);g.strokeStyle="#db752a";g.lineWidth=2;
+ g.beginPath();g.moveTo(a.x-6,a.y);g.lineTo(a.x+6,a.y);g.moveTo(a.x,a.y-6);g.lineTo(a.x,a.y+6);g.stroke();}
 }
 let s=state.byId.get(state.selected);
 if(s?.geometry){
