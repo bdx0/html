@@ -75,6 +75,15 @@ Giữ `data/catalog-blueprint-v1.json` và `scripts/build.py` trong commit để
 - Snapshot screenshot desktop/mobile là yêu cầu nghiệm thu; không chỉ dựa vào report FPS.
 - Nguồn đối chiếu ảnh: https://addflag.com/ho_truc_giang__4361 và https://triphunter.vn/places/ben-tre/items/ho-truc-giang; ảnh nguồn chỉ để xem tham chiếu.
  
+## Floor Plan, trục tọa độ và hình dạng hồ — cập nhật trực tiếp
+Bản HTML đã có **3D / PLAN / SPLIT** theo style Warestack 3D (trắng – xanh dương, panel kỹ thuật). \`PLAN\` là hình chiếu mặt bằng nhìn từ trên cao, bắc hướng lên, với đường phố/công viên/tòa nhà OSM và các mốc cạnh nước. \`SPLIT\` đặt mặt bằng bên cạnh renderer 3D; chạm mặt bằng để focus camera 3D.
+
+- **Axis (X/East, Y/Up, Z/North):** bấm lên đầu trục hoặc TOP / N / E / ISO để chọn góc nhìn. Trên sàn 3D, Y là độ cao; tọa độ mặt bằng là X (đông), Z (bắc).
+- **OSM gốc:** khôi phục polygon mặt hồ nguồn way \`217484891\`, giữ nguyên như trong \`scene.json\`.
+- **Dáng đề xuất:** mô hình hình học tạm thời \`lake-shape.js\` dựa trên các đặc điểm do người dùng xác định: một mũi đất ở phía bắc làm mặt nước lõm vào; bờ nam chạy chéo; bờ đông cung lồi; tây-nam bất đối xứng. 12 điểm B01–B12 hiển thị trong PLAN.
+- **Quan trọng:** đây là mẫu hình học đề xuất **chưa được đo thực địa, chưa có chuyển đổi pixel→GPS được xác minh**. Không sao chép dữ liệu bản đồ Google Maps vào cơ sở dữ liệu; cần kiểm chứng với khảo sát độc lập hoặc nguồn GIS được cấp phép trước khi dùng làm dữ liệu định vị chính thức.
+- Khi chuyển Raw/Candidate, toàn bộ mặt nước, bờ kè, cây xanh và đài phun (đang là proxy) được dựng lại đồng bộ. Giá trị tọa độ nguồn SQLite và JSON không bị sửa. Xem bảng trong \`SHORELINE_IMAGE_ANALYSIS.md\`.
+
 ## Xem vệ tinh và bổ sung ảnh khảo sát
 - Nhấn **🛰 Vệ tinh** để xem ảnh vệ tinh khu vực Hồ Trúc Giang từ Esri World Imagery; có liên kết thay thế tới Google Maps vệ tinh nếu trình duyệt không hỗ trợ nhúng. Ảnh có thể được chụp vào thời điểm khác với hiện trạng.
 - Nhấn **📍 Ghim ảnh**, chạm một vị trí trên mặt đất trong thế giới 3D (tối đa 300 m từ bờ hồ), tải ảnh JPG/PNG/WebP, nhập hướng từ Bắc 0–359°, ngày chụp và nội dung so sánh.
