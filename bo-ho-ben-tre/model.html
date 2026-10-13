@@ -45,7 +45,7 @@ header nav a{white-space:nowrap;border-radius:8px;border:1px solid #d8e4f3;backg
 .map-head strong{font-size:12px;letter-spacing:-.1px}.map-head small{color:#879bb8;font-size:10px;display:block}
 .map-controls{display:flex;gap:5px;align-items:center}
 .map-controls button{width:31px;height:31px;display:grid;place-items:center;border-radius:8px;border:1px solid #dbe4f2;background:#fff;font-size:17px;color:#37629a}
-#map{width:100%;height:100%;touch-action:none;cursor:grab;display:block}
+#map{width:100%;height:auto;min-height:0;flex:1;touch-action:none;cursor:grab;display:block}
 #map:active{cursor:grabbing}
 .map-bottom{position:absolute;z-index:1;bottom:13px;left:14px;right:14px;display:flex;align-items:flex-end;justify-content:space-between;pointer-events:none;gap:10px}
 .legend{display:flex;gap:9px;padding:9px 10px;background:#fffffff0;border:1px solid #e1e8f3;border-radius:9px;box-shadow:0 4px 14px #284d7618;font-size:10px;font-weight:750;color:#607594;flex-wrap:wrap}
@@ -349,7 +349,7 @@ fetch("data/model-view.json",{cache:"no-store"}).then(r=>{if(!r.ok)throw Error("
 if(d.schema!=="ben-tre-semantic-model-v1"||!d.read_only||!Array.isArray(d.nodes))throw Error("Dữ liệu mô hình không đúng phiên bản");
 state.data=d;state.nodes=d.nodes;state.byId=new Map(d.nodes.map(n=>[n.id,n]));
 $("nWater").textContent=d.table_counts.osm_features?d.nodes.filter(n=>n.kind==="water").length:"0";
-$("nRoad").textContent=d.table_counts.osm_features?d.table_counts.osm_features-d.nodes.filter(n=>["water","building","park"].includes(n.kind)).length+0:"—";
+
 $("nBuilding").textContent=d.nodes.filter(n=>n.kind==="building").length;
 $("nPark").textContent=d.nodes.filter(n=>n.kind==="park").length;
 $("nRequirement").textContent=d.table_counts.requirements;
