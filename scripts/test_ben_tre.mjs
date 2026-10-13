@@ -249,6 +249,8 @@ try {
       errors.push(name+' review overlay missing exact OSM ring sector boundaries '+JSON.stringify(reviewState));
     if(await model.locator('#shoreReviewBar [data-shore]').count()!==4)
       errors.push(name+' visible four sector tabs missing');
+    if(name==='desktop'||name==='mobile-390')
+      await model.screenshot({path:'ben-tre-shoreline-outline-'+name+'.png'});
     await model.locator('#shoreReviewBar [data-shore="south_slope"]').click();
     if((await model.evaluate(()=>TrucGiangReview.state().selected))!=="south_slope")
       errors.push(name+' shoreline sector selection failed');
