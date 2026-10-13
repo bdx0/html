@@ -149,3 +149,23 @@ body.sheet-open .inspector{box-shadow:0 -10px 30px #2b486639}
 .inspector .tabs{grid-template-columns:repeat(4,minmax(0,1fr))}
 .inspector .tabs button{min-width:0;font-size:10px}
 @media(max-width:860px){#app .top #openSqlite{display:none}.quickbtn{min-width:39px;max-width:39px}}
+
+/* Field-verification overlays: numbered markers are tied to existing
+   OSM shoreline vertices; they are NOT corrected coastlines. */
+.wb-review-open{display:block;text-align:center;margin-top:3px;padding:9px 7px;border:1px solid #efbd87;
+ border-radius:8px;background:#fff7eb;color:#9d561e!important;text-decoration:none;font-size:11px;font-weight:800}
+.wb-review-open:hover{background:#ffebd6}
+.wb-review-pins{position:absolute;inset:0;pointer-events:none;z-index:6;overflow:hidden}
+.wb-review-pin{position:absolute;display:grid;place-items:center;pointer-events:auto;width:35px;height:35px;
+ transform:translate(-50%,-50%);border:3px solid #fff;border-radius:50%;color:#fff!important;
+ background:#e77621;box-shadow:0 3px 13px #182d42ad,0 0 0 2px #ea8d3e;font-size:15px;
+ font-weight:900;text-decoration:none;touch-action:manipulation}
+.wb-review-pin:hover,.wb-review-pin:focus-visible{background:#a85512;transform:translate(-50%,-50%) scale(1.09)}
+.wb-review-pin[hidden]{display:none!important}
+.wb-floor .wb-review-pins{display:none}
+.wb-split .wb-review-pin{width:30px;height:30px}
+@media(max-width:860px){
+ .wb-review-open{font-size:9px;line-height:1.25;padding:7px 4px}
+ .wb-review-pin{width:31px;height:31px;font-size:12px}
+ .wb-review-pins{z-index:6}
+}
