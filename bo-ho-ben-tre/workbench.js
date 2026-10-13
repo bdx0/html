@@ -250,7 +250,17 @@ function attachPlanInteraction(){
  });
  function up(e){e.stopPropagation();if(!W.mouse)return;var moved=W.mouse.moved;W.mouse=null;
   if(moved)return;
-  var r=canvas.getBoundingClientRect(),loc=screenToLocal(e.clientX-r.left,e.clientY-r.top);
+  var r=canvas.getBoundingClientRect(),px=e.clientX-r.left,py=e.clientY-r.top;
+  if(W.metrics&&W.metrics.plan&&W.issues.length){
+   var m=W.metrics.plan,scale=m.scale;
+   var clicked=W.issues.find(function(issue){
+    var pos=issuePoint(issue);if(!pos)return false;
+    var screenPt=screen(pos,m.w,m.h,scale);
+    return Math.hypot(screenPt.x-px,screenPt.y-py)<=19
+   });
+   if(clicked){location.href=reviewUrl(clicked);return}
+  }
+  var loc=screenToLocal(px,py);
   if(loc){W.host.focus(loc.x,loc.z);if(W.mode==="floor")setMode("split");drawPlan()}
  }
  canvas.addEventListener("pointerup",up);canvas.addEventListener("pointercancel",function(e){e.stopPropagation();W.mouse=null});
