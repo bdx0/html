@@ -214,7 +214,11 @@ try {
     await explorer.locator('#dataGrid tbody tr').first().click();
     if(!(await explorer.locator('#recordBackdrop').evaluate(el=>el.classList.contains('open'))))
       errors.push(name+' row detail drawer did not open');
-    await explorer.locator('#closeRecord').click();
+    const closeRect=await explorer.locator('#closeRecord').boundingBox();
+    if(!closeRect)errors.push(name+' record-close button has no bounding box');
+    else await explorer.mouse.click(closeRect.x+closeRect.width/2,closeRect.y+closeRect.height/2);
+    if(await explorer.locator('#recordBackdrop').evaluate(el=>el.classList.contains('open')))
+      errors.push(name+' tapping record-close position failed');
     if(name==='desktop'||name==='mobile-390')await explorer.screenshot({path:'ben-tre-sqlite-'+name+'.png'});
     await explorer.close();
     await ctx.close();
