@@ -149,6 +149,13 @@ try {
       errors.push(name+' Workbench did not start in source-only mode: '+JSON.stringify(state));
     if(!(await page.locator('[data-wb-shape="candidate"]').isDisabled()))
       errors.push(name+' rejected shoreline must be disabled');
+    await page.waitForFunction(()=>window.TrucGiangWorkbench?.getInfo().reviewLoaded===true,{timeout:15000});
+    const shoreLinks=await page.locator('#wbReviewPins a[data-issue]').count();
+    if(shoreLinks!==4)errors.push(name+' 3D numbered shoreline correction markers missing: '+shoreLinks);
+    const sectors=await page.locator('#wbReviewPins a[data-issue]').evaluateAll(nodes=>nodes.map(n=>({id:n.dataset.issue,href:n.getAttribute('href')})));
+    if(!sectors.some(n=>n.id==='north_notch'&&n.href.includes('sector=north_notch'))||
+       !sectors.some(n=>n.id==='south_slope'))
+      errors.push(name+' 3D marker deep links do not resolve disputed bờ bắc/nam '+JSON.stringify(sectors));
     const planButton=page.locator('[data-wb-mode="floor"]');
     await planButton.click();await page.waitForTimeout(150);
     if(!(await page.locator('#wbPlanDock').isVisible()))
@@ -249,6 +256,12 @@ try {
       errors.push(name+' review overlay missing exact OSM ring sector boundaries '+JSON.stringify(reviewState));
     if(await model.locator('#shoreReviewBar [data-shore]').count()!==4)
       errors.push(name+' visible four sector tabs missing');
+    const reviewPage=await ctx.newPage();
+    await reviewPage.goto('http://127.0.0.1:8765/bo-ho-ben-tre/model.html?sector=east_curve#osm-way-217484891',{waitUntil:'load'});
+    await reviewPage.waitForFunction(()=>document.getElementById('loading').hidden,{timeout:30000});
+    if((await reviewPage.evaluate(()=>window.TrucGiangReview?.state().selected))!=="east_curve")
+      errors.push(name+' deep-linked 3D marker did not select the corresponding east shoreline section');
+    await reviewPage.close();
     if(name==='desktop'||name==='mobile-390')
       await model.screenshot({path:'ben-tre-shoreline-outline-'+name+'.png'});
     await model.locator('#shoreReviewBar [data-shore="south_slope"]').click();
