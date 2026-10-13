@@ -150,6 +150,8 @@ try {
     const modeOk=diag.webgl===true&&Number(diag.frame)>=3
       &&Number(diag.renderTriangles)>0&&(await page.locator('#webgl').count())===1;
     if(!modeOk)errors.push(name+' WebGL not active: '+diagnosis);
+    if(!diag.lakeGeometry||diag.lakeGeometry.originalAreaM2<12000||diag.lakeGeometry.visualVertices<80||diag.lakeGeometry.visualDeviationPct>3.5)
+      errors.push(name+' lake shoreline shape drift or smoothing not enabled: '+JSON.stringify(diag.lakeGeometry));
     const snapshot={name,modeOk,viewport,drawCalls:diag.drawCalls,triangles:diag.renderTriangles,frames:diag.frame,errorLog:diag.errors};
     report.push(snapshot);
     await page.locator('#dbg').click();
