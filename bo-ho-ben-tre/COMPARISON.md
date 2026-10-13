@@ -40,6 +40,14 @@ Cập nhật: 2026-10-13.
 - Ảnh chưa được cấp phép chỉ được tham chiếu qua liên kết nguồn; không gắn vào kho asset công khai.
 
 
+## Thực thi floor-plan/axis và thay hình hồ (code update)
+- Đã nối phần so shape trực quan thành code trong \`lake-shape.js\`, \`workbench.js\`, \`workbench.css\` và renderer \`index.html\`.
+- Shape source \`raw\` dùng unmodified OSM water way; shape \`candidate\` là **original schematic** với 12 mốc B01–B12 bằng XY local metres. Mốc lõm bắc B03, bờ nam chéo B10, cung bờ đông B05–B07. Đây là tọa độ thiết kế thử nghiệm, **không phải kết quả số hóa tọa độ từ Google Maps**.
+- Corrected candidate tạm thể hiện mũi nước và bờ nam, chuyển OSM raw/candidate theo nhu cầu. Đài phun hiển thị ở nửa đông theo quan sát ảnh nhưng vẫn phải kiểm chứng vị trí thật.
+- Floor Plan thể hiện hai đường bao, tuyến phố OSM, building polygons, ảnh hotspot, compass north-up. Axis View có X=East, Y=Up, Z=North, chế độ TOP/N/E/ISO và Split View.
+- Giao diện kế thừa thiết kế thực tế của \`warestack-3d.html\`: chrome trắng, nhấn xanh dương, thẻ sáng; không sử dụng dark theme giả định.
+- Dữ liệu OSM gốc và SQLite không đổi. Toàn bộ kết quả còn cần khảo sát hiện trường để thay mẫu sơ đồ thành đúng shoreline, không gọi đây là \`survey-grade GIS\`.
+
 ## Kiểm tra mặt nước hồ — cập nhật 2026-10-13
 - Từ hình học OSM: diện tích khoảng **16.840 m²**, chu vi khoảng **553m**, bề ngang/chiều dài bounding-box xấp xỉ 107 × 200m. Các con số này là ước lượng từ dữ liệu cộng đồng; một nguồn tham khảo mô tả hồ **gần 2 ha**. Chênh lệch không đủ để kết luận OSM sai nhưng cần đo từ tư liệu địa lý có giấy phép.
 - Ảnh flycam thực tế https://addflag.com/ho_truc_giang__4361 cho thấy mặt nước xanh đen/pha rêu, phản chiếu bóng cây và phố; ảnh TripHunter https://triphunter.vn/places/ben-tre/items/ho-truc-giang vào lúc trời sáng cho mặt nước xanh lam/sáng hơn. Vì thế không nên dùng màu nước xanh ngọc cố định.
