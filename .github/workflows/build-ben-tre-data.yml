@@ -11,6 +11,7 @@ on:
       - "bo-ho-ben-tre/workbench.js"
       - "bo-ho-ben-tre/workbench.css"
       - "bo-ho-ben-tre/lake-shape.js"
+      - "bo-ho-ben-tre/model.html"
       - "bo-ho-ben-tre/data/catalog-blueprint-v1.json"
       - "bo-ho-ben-tre/data/surveys/**"
       - "bo-ho-ben-tre/assets/surveys/**"
@@ -49,6 +50,13 @@ jobs:
           assert db.execute('select count(*) from field_surveys').fetchone()[0]>=0
           assert db.execute('select count(*) from photo_hotspot_items').fetchone()[0]>=15
           d=json.loads((p/'scene.json').read_text())
+          sem=json.loads((p/'model-view.json').read_text(encoding='utf-8'))
+          assert sem['schema']=='ben-tre-semantic-model-v1' and sem['read_only']
+          assert sem['lake_audit']['status']=='conflict_unresolved'
+          assert sem['lake_audit']['verified_corrections']==0
+          assert sem['table_counts']['osm_features']==db.execute('SELECT COUNT(*) FROM osm_features').fetchone()[0]
+          assert len([x for x in sem['nodes'] if x['kind']=='water'])==1
+          assert any(x['id']=='OBJ-LAKE' and any(e['target']=='osm-way-217484891' for e in x['relations']) for x in sem['nodes'])
           viewer=json.loads((p/'sqlite-explorer.json').read_text(encoding='utf-8'))
           assert viewer['read_only'] is True
           counts={t['name']:t['count'] for t in viewer['tables']}
@@ -71,7 +79,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add bo-ho-ben-tre/data/catalog.sqlite bo-ho-ben-tre/data/scene.json bo-ho-ben-tre/data/sqlite-explorer.json
+          git add bo-ho-ben-tre/data/catalog.sqlite bo-ho-ben-tre/data/scene.json bo-ho-ben-tre/data/sqlite-explorer.json bo-ho-ben-tre/data/model-view.json
           if ! git diff --cached --quiet; then
             git commit -m "build(ben-tre): refresh SQLite, SQLite Explorer and GIS scene [skip ci]"
             # Many source commits may arrive while the remote OSM build is running.
