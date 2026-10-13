@@ -165,7 +165,7 @@ button{border:1px solid #38536a;background:#1a3047;border-radius:9px;padding:8px
 (function(){
 "use strict";
 var $=function(id){return document.getElementById(id)},stage=$("stage"),panel=$("panel"),mini=$("mini"),mc=mini.getContext("2d");
-var data=null,renderer=null,scene=null,camera=null,world=null,layers={trees:true},night=false,az=.60,el=1.07,dist=330,target={x:0,z:0},frame=0,errors=[],mode="preparing",webglOK=false,activeTab="images",controlPointers=new Map(),touchPinch=0,mouseDown=null,raf=0,pinchCenter=null;
+var data=null,renderer=null,scene=null,camera=null,world=null,layers={trees:true},night=false,az=.64,el=.89,dist=305,target={x:0,z:0},frame=0,errors=[],mode="preparing",webglOK=false,activeTab="images",controlPointers=new Map(),touchPinch=0,mouseDown=null,raf=0,pinchCenter=null;
 var counts={mesh:0,tri:0};
 var hotspotEls=new Map(),selectedHotspot=null,pickables=[],raycaster=null,tapOrigin=new Map(),hotspotProjectionFrame=0;
 function say(s){errors.push(new Date().toLocaleTimeString("vi-VN")+" "+s);if(errors.length>20)errors.shift();console.warn(s);}
@@ -263,32 +263,100 @@ return g}
 function bench(x,z,angle){var g=new THREE.Group();g.position.set(x,0,z);g.rotation.y=angle;world.add(g);
 box(2.0,.13,.62,"#9e6d48",0,.9,0,g);box(2.0,.65,.14,"#a77954",0,1.25,-.32,g);
 for(var q of [-.7,.7]){box(.12,.83,.12,"#526065",q,.52,0,g)}}
+
+/* Visually smoothed OSM shoreline. This affects rendering only; raw geodata,
+   export coordinates and the 300m AOI remain unchanged. */
+function smoothLakeOutline(poly){
+ if(poly.length<5)return poly;
+ var nodes=poly.map(function(p){return new THREE.Vector3(p.x,0,p.z)});
+ var curve=new THREE.CatmullRomCurve3(nodes,true,"centripetal",.18);
+ var samples=curve.getSpacedPoints(Math.max(180,poly.length*8));
+ samples.pop();
+ var limited=[];
+ function nearestOriginal(pt){
+  var result=null,min=1e15;
+  for(var i=0;i<poly.length;i++){var a=poly[i],b=poly[(i+1)%poly.length],dx=b.x-a.x,dz=b.z-a.z;
+   var t=Math.max(0,Math.min(1,((pt.x-a.x)*dx+(pt.z-a.z)*dz)/(dx*dx+dz*dz||1))),
+     x=a.x+dx*t,z=a.z+dz*t,d2=(pt.x-x)**2+(pt.z-z)**2;
+   if(d2<min){min=d2;result={x:x,z:z}}}
+  return {point:result,d:Math.sqrt(min)}
+ }
+ samples.forEach(function(p){
+  var xy={x:p.x,z:p.z},n=nearestOriginal(xy);
+  if(n.d>1.7){var q=1.7/n.d;xy={x:n.point.x+(xy.x-n.point.x)*q,z:n.point.z+(xy.z-n.point.z)*q}}
+  limited.push(xy)
+ });
+ return limited
+}
+/* Reference-based, affordable reflection proxy: blurry shoreline greenery
+   carried into the water surface. NOT a camera-accurate ray-traced reflection. */
+function lakeReflectionTexture(poly){
+ var canvas=document.createElement("canvas");canvas.width=512;canvas.height=512;
+ var ctx=canvas.getContext("2d");
+ var center=poly.reduce(function(v,p){v.x+=p.x/poly.length;v.z+=p.z/poly.length;return v},{x:0,z:0});
+ var shore=sampleRing(poly,8);
+ var meterToPx=512/320;
+ function xy(x,z){return [(x+160)*meterToPx,(135-z)*meterToPx]}
+ for(var i=0;i<shore.length;i++){
+  var p=shore[i],dx=center.x-p.x,dz=center.z-p.z,len=Math.hypot(dx,dz)||1;
+  dx/=len;dz/=len;
+  var x=p.x+dx*(4+(i%4)*.8),z=p.z+dz*(4+(i%4)*.8);
+  var site=xy(x,z),rr=(7+(i%5)*1.5)*meterToPx;
+  ctx.save();ctx.translate(site[0],site[1]);ctx.rotate(Math.atan2(-dz,dx));
+  ctx.scale(1.3,2.3);
+  var grad=ctx.createRadialGradient(0,0,rr*.08,0,0,rr);
+  grad.addColorStop(0,"rgba(11,35,23,0.50)");
+  grad.addColorStop(.52,"rgba(18,48,27,0.20)");
+  grad.addColorStop(1,"rgba(10,30,15,0)");
+  ctx.fillStyle=grad;ctx.beginPath();ctx.arc(0,0,rr,0,Math.PI*2);ctx.fill();ctx.restore()
+ }
+ var texture=new THREE.CanvasTexture(canvas);
+ texture.wrapS=THREE.ClampToEdgeWrapping;texture.wrapT=THREE.ClampToEdgeWrapping;
+ texture.minFilter=THREE.LinearFilter;
+ return texture
+}
+
 function mainWater(poly){var sh=new THREE.Shape();
 poly.forEach(function(p,i){if(!i)sh.moveTo(p.x,-p.z);else sh.lineTo(p.x,-p.z)});sh.closePath();
 var geo=new THREE.ShapeGeometry(sh);
+var refTex=lakeReflectionTexture(poly);
 var waterMat=lakeWaterMaterial=new THREE.ShaderMaterial({
- uniforms:{uTime:{value:0},uNight:{value:night?1:0}},
+ uniforms:{uTime:{value:0},uNight:{value:night?1:0},uCamera:{value:new THREE.Vector3()},uReflections:{value:refTex}},
  side:THREE.DoubleSide,depthWrite:true,transparent:false,
- vertexShader:"varying vec2 vSite; void main(){vSite=position.xy;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}",
+ vertexShader:[
+ "varying vec2 vSite; varying vec3 vWorld;",
+ "void main(){vSite=position.xy; vec4 worldPos=modelMatrix*vec4(position,1.0);vWorld=worldPos.xyz;",
+ "gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}"
+ ].join("\n"),
  fragmentShader:[
- "precision mediump float; varying vec2 vSite;uniform float uTime;uniform float uNight;",
+ "precision mediump float;",
+ "varying vec2 vSite; varying vec3 vWorld;",
+ "uniform float uTime; uniform float uNight;uniform vec3 uCamera;uniform sampler2D uReflections;",
  "void main(){",
- "float w1=sin(vSite.x*.19+uTime*.62)*sin(vSite.y*.27-uTime*.51);",
- "float w2=sin(vSite.x*.49-vSite.y*.17+uTime*.8);",
- "float broad=sin(vSite.x*.047+vSite.y*.025+uTime*.09);",
- "float wave=(w1*.48+w2*.22+broad*.3);",
- "vec3 deep=vec3(.055,.275,.285), light=vec3(.115,.355,.345);",
- "vec3 color=mix(deep,light,clamp(.5+.32*wave,0.,1.));",
- "float sheen=pow(max(0.,sin(vSite.x*.08+vSite.y*.10+uTime*.3)),15.)*.10;",
- "color+=vec3(.15,.19,.18)*sheen;",
- "color=mix(color,vec3(.020,.080,.13),uNight*.74);",
- "gl_FragColor=vec4(color,1.);",
+ "vec2 site=vec2(vSite.x,-vSite.y);",
+ // Slow low-amplitude waves, green riverlike still water: no big noisy clouds.
+ "float wave=sin(site.x*.38+site.y*.06+uTime*.55)*sin(site.y*.51-uTime*.24);",
+ "float ripple=sin(site.x*.87-site.y*.17+uTime*.7)*sin(site.y*.64+uTime*.33);",
+ "vec3 view=normalize(uCamera-vWorld);",
+ "float grazing=pow(1.-clamp(abs(view.y),0.,1.),2.2);",
+ "float sky=clamp(.25+.52*grazing+.018*wave,0.,1.);",
+ "vec3 deep=vec3(.050,.153,.140);",
+ "vec3 broad=vec3(.105,.225,.215);",
+ "vec3 water=mix(deep,broad,sky);",
+ "vec2 uv=clamp(vec2((site.x+160.)/320.,(site.y+135.)/320.),vec2(.004),vec2(.996));",
+ "vec4 vegetation=texture2D(uReflections,uv);",
+ "water=mix(water,vec3(.021,.083,.054),clamp(vegetation.a*(.7+.2*wave),0.,.7));",
+ "float line=pow(max(0.,sin(site.x*.72+site.y*.35+uTime*.48)),20.)*.030;",
+ "float glance=pow(max(0.,sin(site.x*.32-site.y*.13+uTime*.09)),34.)*.035;",
+ "water+=vec3(.09,.13,.11)*(line+glance)*(1.+grazing);",
+ "water+=vec3(.010,.022,.025)*ripple*.16;",
+ "vec3 nightwater=vec3(.012,.038,.045)+vec3(.012,.021,.025)*wave*.12;",
+ "gl_FragColor=vec4(mix(water,nightwater,clamp(uNight,0.,1.)),1.);",
  "}"
  ].join("\n")
 });
 var m=addMesh(geo,waterMat,world,0,.30,0);m.rotation.x=-Math.PI/2;m.renderOrder=8;m.userData.hotspotId="HS-LAKE-OVERVIEW";pickables.push(m);
 return m}
-
 function lakesideRail(poly){var pts=ringOffset(poly,.85),samp=sampleRing(pts,3.15);
 var rings=pts.map(function(p){return new THREE.Vector3(p.x,0,p.z)});
 rings.push(rings[0].clone());
@@ -362,7 +430,7 @@ function lakeWorldDescription(){var k=data&&data.features&&data.features.filter(
 function drawOSM(features){var countsLocal={water:0,building:0,road:0,park:0,trees:0,frontage:0};
 var lakeFeature=features.find(function(f){return f.kind==="water"&&f.osm_id===217484891});
 if(!lakeFeature){say("Không tìm thấy biên Hồ Trúc Giang từ OSM, chuyển bản minh họa");drawIllustrative();return}
-var ring=osmRing(lakeFeature.geometry);
+var rawRing=osmRing(lakeFeature.geometry),ring=smoothLakeOutline(rawRing);
 features.filter(function(f){return f.kind==="park"}).forEach(function(f){var m=fillPolygon(f.geometry,"#598b5c",.09);if(m&&/Trần Văn Ơn/i.test((f.properties||{}).name||"")){m.userData.hotspotId="HS-WEST-PARK";pickables.push(m)}countsLocal.park++});
 features.filter(function(f){return f.kind==="road"}).forEach(function(f){var p=f.properties||{},coords=f.geometry.coordinates.map(geoXY);
 roadLine(coords,/primary|secondary/.test(p.highway)?9: /residential|tertiary/.test(p.highway)?6.8:3.4);countsLocal.road++});
@@ -385,8 +453,8 @@ var hemi=new THREE.HemisphereLight(night?0x8199c9:0xe6faff,0x778572,night?.6:1.1
 var sun=new THREE.DirectionalLight(night?0x81a8ff:0xffebcf,night?.5:.9);sun.position.set(-200,360,130);scene.add(sun);
 plane(990,990,"#789678",0,-.12,0);
 /* GIS roadlines provide real street placement; remove artificial global grid */
-if(data&&data.features&&data.features.length>0){drawOSM(data.features);mode="Biên hồ OSM · cảnh quan tham chiếu ảnh"}else{drawIllustrative();mode="MINH HỌA · chờ geometry OSM"}
-dist=window.innerWidth<860?460:330;
+if(data&&data.features&&data.features.length>0){drawOSM(data.features);mode="Mặt hồ xanh sẫm · bờ OSM làm mượt (tham chiếu ảnh)"}else{drawIllustrative();mode="MINH HỌA · chờ geometry OSM"}
+dist=window.innerWidth<860?420:305;el=window.innerWidth<860?1.00:.89;
 renderer=new THREE.WebGLRenderer({antialias:true,alpha:false,powerPreference:"high-performance",preserveDrawingBuffer:false});renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.5));renderer.setSize(stage.clientWidth,stage.clientHeight,false);renderer.domElement.id="webgl";renderer.domElement.style.cssText="position:absolute;inset:0";renderer.domElement.style.touchAction="none";stage.insertBefore(renderer.domElement,$("fallback"));
 camera=new THREE.PerspectiveCamera(54,Math.max(1,stage.clientWidth)/Math.max(1,stage.clientHeight),.7,6000);raycaster=new THREE.Raycaster();updateCamera();initHotspots();if(window.BenTreSurvey)BenTreSurvey.init(data,camera,stage);webglOK=true;
 renderer.domElement.addEventListener("webglcontextlost",function(e){e.preventDefault();webglOK=false;say("WebGL context lost. Canvas fallback enabled.");showFallback();});
@@ -405,11 +473,11 @@ mc.strokeStyle="#f5c67d";mc.lineWidth=1.5;mc.strokeRect(w/2-3+target.x*.14,h/2-3
 mc.fillStyle="#b9d5e2";mc.font="9px system-ui";mc.fillText("N",w/2-3,10)}
 function drawFallback(){var c=$("fallback"),g=c.getContext("2d"),w=c.width,h=c.height;g.fillStyle="#20374a";g.fillRect(0,0,w,h);g.strokeStyle="#324e60";for(var i=0;i<w;i+=34){g.beginPath();g.moveTo(i,0);g.lineTo(i,h);g.stroke()}for(var j=0;j<h;j+=34){g.beginPath();g.moveTo(0,j);g.lineTo(w,j);g.stroke()}g.save();g.translate(w/2,h/2);g.rotate(-.25);g.fillStyle="#3c7080";g.beginPath();g.ellipse(0,0,Math.min(w*.33,210),Math.min(h*.24,125),0,0,6.284);g.fill();g.strokeStyle="#e0c9a0";g.lineWidth=13;g.stroke();g.restore();g.fillStyle="#eef6ff";g.font="bold 16px system-ui";g.fillText("Canvas 2D — chế độ dự phòng",24,36);g.font="12px system-ui";g.fillText("Hồ Trúc Giang · ảnh tham chiếu và SQLite vẫn sử dụng được",24,57)}
 function showFallback(){$("fallback").style.display="block";drawFallback();mode="CANVAS 2D FALLBACK";updateStatus()}
-function renderLoop(){cancelAnimationFrame(raf);var prev=0;function tick(t){raf=requestAnimationFrame(tick);if(t-prev<25)return;prev=t;frame++;if(lakeWaterMaterial&&lakeWaterMaterial.uniforms)lakeWaterMaterial.uniforms.uTime.value=t*.001;
+function renderLoop(){cancelAnimationFrame(raf);var prev=0;function tick(t){raf=requestAnimationFrame(tick);if(t-prev<25)return;prev=t;frame++;if(lakeWaterMaterial&&lakeWaterMaterial.uniforms){lakeWaterMaterial.uniforms.uTime.value=t*.001;if(camera)lakeWaterMaterial.uniforms.uCamera.value.copy(camera.position)}
 try{if(webglOK&&renderer&&scene&&camera){renderer.render(scene,camera)}else if(frame%25===0)drawFallback();if(frame%3===0){updateHotspots();if(window.BenTreSurvey)BenTreSurvey.update(camera)}if(frame%10===0)drawMini();if(frame%30===0)updateDebug()}
 catch(e){say("Render: "+e.message);webglOK=false;showFallback()}}
 raf=requestAnimationFrame(tick)}
-function reset(){dist=window.innerWidth<860?460:330;az=.60;el=1.07;target={x:0,z:0};updateCamera();drawMini()}
+function reset(){dist=window.innerWidth<860?420:305;az=.64;el=window.innerWidth<860?1.00:.89;target={x:0,z:0};updateCamera();drawMini()}
 function touchHandlers(){stage.addEventListener("pointerdown",function(e){if(e.target.closest&&e.target.closest(".minimap,.zoom-controls,.debug,.photo-hotspot,.field-marker,.survey-actions"))return;e.preventDefault();tapOrigin.set(e.pointerId,{x:e.clientX,y:e.clientY,wasMulti:controlPointers.size>0});controlPointers.set(e.pointerId,{x:e.clientX,y:e.clientY});stage.setPointerCapture&&stage.setPointerCapture(e.pointerId);stage.classList.add("grabbing");if(controlPointers.size===2){var a=Array.from(controlPointers.values());touchPinch=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);pinchCenter={x:(a[0].x+a[1].x)*.5,y:(a[0].y+a[1].y)*.5}}});
 stage.addEventListener("pointermove",function(e){var p=controlPointers.get(e.pointerId);if(!p)return;e.preventDefault();var dx=e.clientX-p.x,dy=e.clientY-p.y;p.x=e.clientX;p.y=e.clientY;
 if(controlPointers.size===1){az-=dx*.006;el=clamp(el+dy*.005,.13,1.43);updateCamera()}
