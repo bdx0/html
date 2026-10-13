@@ -143,41 +143,33 @@ try {
           errors.push(name+' exported survey missing bearings, image, or rights');
       }
     }
-    // Warestack floor-plan / split / axis and reversible corrected shoreline QA.
+    // Rejected shape must NOT be shown; OSM geometry is the only active source.
     const state=await page.evaluate(()=>window.TrucGiangWorkbench?.getInfo());
-    if(state?.shape!=="candidate"||state?.mode!=="3d")errors.push(name+' Workbench did not start with the candidate 3D model: '+JSON.stringify(state));
-    const anchors=await page.evaluate(()=>window.TrucGiangLake?.points());
-    if(anchors?.length!==12||anchors.find(a=>a.id==='B03')?.z>38||anchors.find(a=>a.id==='B10')?.z>0)
-      errors.push(name+' shoreline is missing corrected north notch / diagonal south landmark');
+    if(state?.shape!=="raw"||state?.mode!=="3d")
+      errors.push(name+' Workbench did not start in source-only mode: '+JSON.stringify(state));
+    if(!(await page.locator('[data-wb-shape="candidate"]').isDisabled()))
+      errors.push(name+' rejected shoreline must be disabled');
     const planButton=page.locator('[data-wb-mode="floor"]');
-    await planButton.click();
-    await page.waitForTimeout(180);
-    if(!(await page.locator('#wbPlanDock').isVisible()))errors.push(name+' floor plan missing');
-    const planState=await page.evaluate(()=>({
-      w:document.getElementById('wbPlanCanvas')?.width,
-      h:document.getElementById('wbPlanCanvas')?.height,
-      points:window.TrucGiangLake?.points().length
-    }));
-    if(!planState.w||!planState.h||planState.points!==12)errors.push(name+' invalid rendered floorplan '+JSON.stringify(planState));
+    await planButton.click();await page.waitForTimeout(150);
+    if(!(await page.locator('#wbPlanDock').isVisible()))
+      errors.push(name+' floorplan not visible');
+    const planState=await page.evaluate(()=>({width:document.getElementById('wbPlanCanvas').width,height:document.getElementById('wbPlanCanvas').height}));
+    if(!planState.width||!planState.height)
+      errors.push(name+' floorplan canvas not rendered '+JSON.stringify(planState));
     if(name==='desktop'||name==='mobile-390')await page.screenshot({path:'ben-tre-floorplan-'+name+'.png'});
-    await page.locator('[data-wb-shape="raw"]').click();
-    const sourceShape=await page.evaluate(()=>window.TrucGiangWorkbench.getInfo().shape);
-    if(sourceShape!=="raw")errors.push(name+' raw OSM toggle failed');
-    await page.locator('[data-wb-shape="candidate"]').click();
-    await page.locator('[data-wb-mode="split"]').click();
-    await page.waitForTimeout(200);
-    const splitData=await page.evaluate(()=>({
-      ready:document.getElementById('stage').classList.contains('wb-split'),
+    await page.locator('[data-wb-mode="split"]').click();await page.waitForTimeout(120);
+    const split=await page.evaluate(()=>({
+      active:document.getElementById('stage').classList.contains('wb-split'),
       dock:document.getElementById('wbPlanDock').getBoundingClientRect().width,
       model:document.getElementById('webgl').getBoundingClientRect().width,
       stage:document.getElementById('stage').getBoundingClientRect().width
     }));
-    if(!splitData.ready||splitData.dock<=0||splitData.model>=splitData.stage*.9)
-      errors.push(name+' split 3D/plan layout failed '+JSON.stringify(splitData));
+    if(!split.active||split.dock<=0||split.model>=split.stage*.9)
+      errors.push(name+' split layout incorrect '+JSON.stringify(split));
     if(name==='desktop'||name==='mobile-390')await page.screenshot({path:'ben-tre-split-'+name+'.png'});
     await page.locator('[data-wb-view="top"]').click();
     if((await page.evaluate(()=>window.TrucGiangWorkbench.getInfo().view))!=='top')
-      errors.push(name+' TOP axis view not active');
+      errors.push(name+' axis top view incorrect');
     await page.locator('[data-wb-view="iso"]').click();
     await page.locator('[data-wb-mode="3d"]').click();
     await page.waitForTimeout(180);
@@ -188,12 +180,43 @@ try {
     const modeOk=diag.webgl===true&&Number(diag.frame)>=3
       &&Number(diag.renderTriangles)>0&&(await page.locator('#webgl').count())===1;
     if(!modeOk)errors.push(name+' WebGL not active: '+diagnosis);
-    if(!diag.lakeGeometry||diag.lakeGeometry.shapeMode!=="candidate"||diag.lakeGeometry.controlPoints?.length!==12||diag.lakeGeometry.originalAreaM2<12000||diag.lakeGeometry.visualVertices<150||diag.lakeGeometry.visualAreaM2<11000)
-      errors.push(name+' lake semantic proposal not active or missing 12 landmarks: '+JSON.stringify(diag.lakeGeometry));
+    if(!diag.lakeGeometry||diag.lakeGeometry.shapeMode!=="raw"||diag.lakeGeometry.originalAreaM2<12000||diag.lakeGeometry.visualVertices!==24||Math.abs(diag.lakeGeometry.visualAreaM2-diag.lakeGeometry.originalAreaM2)>1)
+      errors.push(name+' source OSM lake geometry not restored: '+JSON.stringify(diag.lakeGeometry));
     const snapshot={name,modeOk,viewport,drawCalls:diag.drawCalls,triangles:diag.renderTriangles,frames:diag.frame,errorLog:diag.errors};
     report.push(snapshot);
     await page.locator('#dbg').click();
     await page.screenshot({path:'ben-tre-'+name+'.png',fullPage:true});
+    // Open independent SQL browser and validate the snapshot against the real DB counts.
+    const explorer=await ctx.newPage();
+    explorer.on('pageerror',e=>errors.push(name+' SQLite JS '+e.message));
+    await explorer.goto('http://127.0.0.1:8765/bo-ho-ben-tre/sqlite.html',{waitUntil:'load',timeout:30000});
+    await explorer.waitForFunction(()=>document.getElementById('loading').classList.contains('hidden'),{timeout:30000});
+    const database=await explorer.evaluate(async()=>await (await fetch('data/sqlite-explorer.json')).json());
+    const dbTables=database.tables||[];
+    if(database.format!=='bdx0-sqlite-inspector-v1'||dbTables.length<14||
+       dbTables.find(t=>t.name==='requirements')?.count!==305||
+       dbTables.find(t=>t.name==='osm_features')?.count!==sceneData.stats.osm_features)
+      errors.push(name+' SQLite explorer source mismatch or incomplete');
+    if(!(await explorer.locator('#currentTable').innerText()).includes('osm_features'))
+      errors.push(name+' initial osm_features table missing');
+    await explorer.locator('#search').fill('217484891');
+    if(!(await explorer.locator('#pageMeta').innerText()).includes('/'))
+      errors.push(name+' search failed to show filtered count');
+    await explorer.locator('#search').fill('');
+    if(mobile)await explorer.locator('#mobileSelect').selectOption('requirements');
+    else await explorer.locator('#tableNav button').filter({hasText:'requirements'}).click();
+    if((await explorer.locator('#recordsBadge').innerText()).includes('305')===false)
+      errors.push(name+' requirements row count not visible in SQLite explorer');
+    await explorer.locator('#schemaTab').click();
+    if(!(await explorer.locator('#schemaView').innerText()).includes('CREATE TABLE'))
+      errors.push(name+' DDL/schema not exposed');
+    await explorer.locator('#rowsTab').click();
+    await explorer.locator('#dataGrid tbody tr').first().click();
+    if(!(await explorer.locator('#recordBackdrop').evaluate(el=>el.classList.contains('open'))))
+      errors.push(name+' row detail drawer did not open');
+    await explorer.locator('#closeRecord').click();
+    if(name==='desktop'||name==='mobile-390')await explorer.screenshot({path:'ben-tre-sqlite-'+name+'.png'});
+    await explorer.close();
     await ctx.close();
   }
 }finally{
