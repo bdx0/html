@@ -209,17 +209,36 @@ def build(conn, target):
         "verified_corrections":0,
         "metrics":lake_shape,
         "unresolved":[
-            {"id":"north_notch","title":"Mũi đất bờ bắc","description":"Ảnh người dùng cho thấy mũi đất lấn vào mặt nước; OSM chưa chứng minh được độ nhô và vị trí.","direction":"Bắc"},
-            {"id":"south_slope","title":"Bờ nam chéo","description":"Ảnh người dùng cho thấy mép nước hướng chéo; OSM hiện khá ngang.","direction":"Nam"},
-            {"id":"east_curve","title":"Cung cong bờ đông","description":"Cần kiểm tra độ cong và phần bo phía đông-nam bằng mốc khảo sát độc lập.","direction":"Đông"},
-            {"id":"west_bank","title":"Các đoạn gấp bờ tây","description":"Bị cây che trên ảnh; cần số đo hoặc khảo sát từ nhiều góc.","direction":"Tây"}
+            {"id":"north_notch","number":1,"title":"Mũi đất bờ bắc","description":"Ảnh người dùng cho thấy một mũi đất nhô xuống nước. Cần xem đường OSM ở đây đã khoét đủ sâu vào mặt hồ chưa.","direction":"Bắc",
+             "ring_indices":[15,16,17,18,19,20,21,22],
+             "question":"Mũi đất ở bờ Bắc nhô xuống mặt hồ thực tế sâu hơn hay ít hơn nét đang thấy?",
+             "possible_edit":"Nếu đất nhô sâu hơn: làm mặt nước lõm sâu vào phía giữa hồ. Nếu đất không nhô nhiều: mở rộng nước trở lại.",
+             "guide":"Đoạn màu cam chỉ là khu vực trên OSM cần đối chiếu; chưa khẳng định mọi đỉnh trong đoạn đều sai."},
+            {"id":"south_slope","number":2,"title":"Bờ nam chéo","description":"Ảnh người dùng cho thấy bờ phía Nam có độ nghiêng khác nét OSM. Cần xác định từng khúc nước sát Đường Lê Quí Đôn.","direction":"Nam",
+             "ring_indices":[3,4,5,6,7,8,9,10],
+             "question":"Bờ Nam trên thực địa chạy chéo tới mức nào, và đoạn nào đang thiếu góc gấp?",
+             "possible_edit":"Sửa góc và vị trí các đỉnh bờ Nam; không kéo tịnh tiến toàn bộ một cạnh chỉ để đổi diện tích.",
+             "guide":"Thanh xem trước chỉ dịch bờ vào/ra, không thể tự tái tạo độ nghiêng; cần thêm điểm đo."},
+            {"id":"east_curve","number":3,"title":"Cung bờ đông","description":"Cần kiểm tra độ cong phía Đông và đoạn bo xuống góc Đông–Nam; đây không phải một đường thẳng đứng.","direction":"Đông",
+             "ring_indices":[10,11,12,13,14,15],
+             "question":"Cung bờ Đông phình ra mặt nước hay bị khoét sâu vào hơn so với nét OSM?",
+             "possible_edit":"Điều chỉnh các điểm điều khiển dọc cung bờ, đặc biệt chỗ chuyển sang góc Đông–Nam.",
+             "guide":"Khoanh vùng tương ứng OSM, không phải ranh sai đã được đo."},
+            {"id":"west_bank","number":4,"title":"Các khúc bờ tây","description":"Cây che một phần mép nước phía Tây; có thể thiếu các góc lồi/lõm nhỏ.","direction":"Tây",
+             "ring_indices":[22,23,0,1,2,3],
+             "question":"Bờ Tây có bao nhiêu chỗ lồi/lõm, và nét OSM đang bỏ sót vị trí nào?",
+             "possible_edit":"Bổ sung hoặc chỉnh các đỉnh gấp từ điểm đo; tránh làm mượt tròn hóa toàn bộ bờ.",
+             "guide":"Khu vực bị cây che trên ảnh; cần ảnh góc khác hoặc mốc thực địa."}
         ],
         "comparison_links":[
             {"title":"OSM gốc","url":"https://www.openstreetmap.org/way/217484891"},
             {"title":"Copernicus Browser (ảnh công khai, cần kiểm tra thời điểm và độ phân giải)","url":"https://browser.dataspace.copernicus.eu/"},
             {"title":"Tài liệu QA đường bờ","url":"SHORELINE_IMAGE_ANALYSIS.md"}
         ],
-        "source_coordinates_are_not_surveyed":True
+        "source_coordinates_are_not_surveyed":True,
+        "review_overlay":{"basis":"indices on unmodified OSM way 217484891 ring, 0-based; highlight only, not a proposed correction",
+                          "preview_disclaimer":"User-controlled water-edge movement is purely a local demonstration, not a georeferenced fix",
+                          "verification_requirement":"Visual annotations are review notes; polygon acceptance requires independent surveyed or licensed control geometry"}
     }
     payload={
         "schema":"ben-tre-semantic-model-v1",
