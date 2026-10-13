@@ -25,6 +25,14 @@ Build a progressively verifiable geographically anchored 3D Digital Twin of Hồ
 - Compare at least two real Trúc Giang photos with different sky conditions: Addflag flycam view and TripHunter daytime eye-level. Reflection/color varies greatly with weather; no single opaque color can match every time of day.
 - QA must check the screenshot **visually**, verify WebGL shader compile on desktop/320/390px mobile and lakeGeometry originalArea/visualDeviationPct in debug. Never treat WebGL frame count as proof of source geometry accuracy.
 
+## Mandatory lake shape evidence from user screenshot (2026-10-13)
+- The user's 1536×1073 screenshot of Google Maps at Hồ Trúc Giang is the new **visual counterexample** to blindly trusting shape smoothing. Read \`SHORELINE_IMAGE_ANALYSIS.md\` before altering water, promenade, camera, fountain or park.
+- The lake is an asymmetric elongated bean-shaped surface: north bank has a **land promontory projecting south into water at approximately pixel (877,370)**, visibly leaving a concave notch in the WATER boundary; the south bank is **diagonal from west-upper to east-lower**, with another smaller inward bend near (967,785); east edge is a long convex curve; southeast round lobe; west side irregular.
+- Current OSM way 217484891 has a north indentation but its bottom edge stays almost east-west rather than the strong diagonal shown in the screenshot. Hence geometry itself—not only material, camera or CatmullRom smoothing—is potentially incorrect. Original area ~16,840m² is not a silhouette acceptance criterion.
+- **Do not assert the photo screenshot has survey-grade lat/lon**: screen coordinates are independent of GPS until georegistered against legally sourced control points. The fountain in the screenshot is in the lake's eastern section; the previous mesh at (0,0) is an unverified placeholder.
+- The 68-point hand-traced pixel outline and original Google/Airbus screenshot are **for user-private visual annotation only**; do not commit copyrighted image, vectorized Google imagery, or derived shape to the public GIS/model database. To correct geometry, require independent GPS/OSM/licensed imagery; store source/date/uncertainty.
+- Lake shape acceptance is segment-based: north #02–03–04 notch, southern #11–10–09–08 slope and land protrusions, east #05–06–07 curve. Show water-only north-up silhouette overlay **before** decorating shore. Verify annotations/images on desktop AND mobile.
+
 ## Visual fidelity and lake recognition (v2)
 - **Never replace the verified lake outline with an ellipse** when OSM water way 217484891 is available. Center and bounds roughly 200m East-West and 105m North-South in local projected metres.
 - The signature shape is a softly curved trapezoid with small concavities; visually validate the entire water polygon. Prevent green wedge overlap, triangulation artifacts and road geometry tilted off the ground.
