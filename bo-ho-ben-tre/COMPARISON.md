@@ -40,6 +40,14 @@ Cập nhật: 2026-10-13.
 - Ảnh chưa được cấp phép chỉ được tham chiếu qua liên kết nguồn; không gắn vào kho asset công khai.
 
 
+## Kiểm tra mặt nước hồ — cập nhật 2026-10-13
+- Từ hình học OSM: diện tích khoảng **16.840 m²**, chu vi khoảng **553m**, bề ngang/chiều dài bounding-box xấp xỉ 107 × 200m. Các con số này là ước lượng từ dữ liệu cộng đồng; một nguồn tham khảo mô tả hồ **gần 2 ha**. Chênh lệch không đủ để kết luận OSM sai nhưng cần đo từ tư liệu địa lý có giấy phép.
+- Ảnh flycam thực tế https://addflag.com/ho_truc_giang__4361 cho thấy mặt nước xanh đen/pha rêu, phản chiếu bóng cây và phố; ảnh TripHunter https://triphunter.vn/places/ben-tre/items/ho-truc-giang vào lúc trời sáng cho mặt nước xanh lam/sáng hơn. Vì thế không nên dùng màu nước xanh ngọc cố định.
+- Trước Water V3 shader cũ dùng hàm sin gây các vệt đều, như bề mặt sơn xanh; khối mặt nước thô 24 cạnh và dải lối đi màu be 13,5m làm thiếu cảm giác thực. Water V3 dùng shader tối-trong gợn yếu và phản xạ cây ở vị trí tương quan đường bờ, thay vì cố sao chép ảnh bên ngoài.
+- Đường bờ render hiện làm mượt riêng theo OSM (không chuyển sang shape ellipse), kẹp sai lệch cực đại 1,7m từ đoạn gốc và đảo về gốc nếu diện tích thay đổi quá 3,5%. Giá trị nguồn trong scene.json giữ nguyên.
+- Thu hẹp dải bờ rộng 13,5m xuống 9,2m; bóng cây chỉ là texture mô phỏng, không phải gương phẳng phản chiếu đúng tọa độ mắt/ánh sáng.
+- **Giới hạn quan trọng:** vẫn chưa xác minh được đường bờ từng đoạn bằng ảnh vệ tinh Google ở cùng thời điểm; không khẳng định đây là bản sao hiện trạng 2026. Cần ảnh flycam/survey năm gần nhất, vị trí cây, kích thước bồn hoa để chốt.
+- Kiểm thử: GitHub Actions desktop + mobile, xem screenshot và kiểm tra đối tượng `lakeGeometry` trong Debug chứa diện tích gốc/diện tích đã nội suy.
 ## Đối chiếu bổ sung — Google Maps Terrain / Raised Buildings (13-10-2026)
 
 ### Ba chế độ khác nhau, không được đồng nhất
