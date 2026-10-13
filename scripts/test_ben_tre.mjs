@@ -242,6 +242,44 @@ try {
     let modelMap=await model.locator('#map').evaluate(e=>({width:e.width,height:e.height,cssWidth:e.getBoundingClientRect().width,viewport:window.innerWidth}));
     if(modelMap.width<100||modelMap.height<80||modelMap.cssWidth>modelMap.viewport+1)
       errors.push(name+' model floorplan not rendered '+JSON.stringify(modelMap));
+    const reviewState=await model.evaluate(()=>window.TrucGiangReview?.state());
+    if(!reviewState||reviewState.items.length!==4||reviewState.source!=="OSM way 217484891"||
+       reviewState.applied_to_database!==false||
+       reviewState.items.some(x=>!x.ring_indices||x.ring_indices.length<5))
+      errors.push(name+' review overlay missing exact OSM ring sector boundaries '+JSON.stringify(reviewState));
+    if(await model.locator('#shoreReviewBar [data-shore]').count()!==4)
+      errors.push(name+' visible four sector tabs missing');
+    await model.locator('#shoreReviewBar [data-shore="south_slope"]').click();
+    if((await model.evaluate(()=>TrucGiangReview.state().selected))!=="south_slope")
+      errors.push(name+' shoreline sector selection failed');
+    if(name==='desktop'||name==='mobile-390'){
+      await model.locator('#shoreReviewBar .shore-review-open').click();
+      await model.locator('#shoreReviewDecision').selectOption('needs_change');
+      await model.locator('#shoreReviewDelta').evaluate(el=>{
+         el.value="12";el.dispatchEvent(new Event('input',{bubbles:true}))
+      });
+      await model.locator('#shoreReviewNote').fill('Bờ nam có góc chuyển hướng; đánh dấu trực quan, chưa đo GPS.');
+      await model.locator('#shoreSaveReview').click();
+      const output=await model.locator('#shoreReviewDeltaLabel').innerText();
+      if(!output.includes('+12 m'))
+        errors.push(name+' preview shift not shown');
+      const exp=model.waitForEvent('download',{timeout:10000});
+      await model.locator('#shoreExportReviews').click();
+      const reviewFile=await exp;
+      const json=JSON.parse(fs.readFileSync(await reviewFile.path(),'utf8'));
+      if(json.schema!=='truc-giang-shore-review-v1'||
+         json.status!=='USER_VISUAL_REVIEW_NOT_SURVEYED'||
+         json.reviews.find(x=>x.sector_id==='south_slope')?.delta!==12)
+        errors.push(name+' exported preview improperly labeled or not persisted');
+      // Closing review is only a visual annotation, never changes the model's OSM geometry.
+      const after=await model.evaluate(async()=>await (await fetch('data/model-view.json')).json());
+      if(after.lake_audit.verified_corrections!==0||after.lake_audit.status!=='conflict_unresolved')
+        errors.push(name+' changed authoritative lake geometry without verification');
+      if(width<=760)await model.locator('#detailClose').click();
+    }
+    await model.locator('#shoreReviewBar [data-shore="north_notch"]').click();
+    if((await model.evaluate(()=>TrucGiangReview.state().selected))!=="north_notch")
+      errors.push(name+' returning to north bank review failed');
     const firstRelation=model.locator('#detailContent .related button').first();
     if(await firstRelation.count()){
       await firstRelation.focus();
