@@ -18,6 +18,14 @@
 - Các mốc là tọa độ đại diện cho đối tượng hoặc khu vực **không phải nơi đứng chụp ảnh**. Nguồn ảnh có thể mang tính toàn cảnh, tư liệu lịch sử hoặc tham chiếu chung; mối quan hệ này được ghi minh bạch trong DB.
 - Hình ảnh từ nguồn bên ngoài không được đưa vào repo khi chưa có quyền. Ảnh lỗi tải trực tiếp vẫn mở được trang nguồn.
 
+## Mặt nước và đường bờ tham chiếu thực tế (Water V3)
+- Mặt hồ vẫn có đường bao từ OSM water way `217484891`: **khoảng 16.840 m² (1,68 ha)**, biên dài khoảng **553m**, kích thước bao xấp xỉ 200 × 107 m (số liệu OSM, chưa phải bản đo thực địa).
+- Khung hiển thị được làm mượt riêng (nội suy có giới hạn 1,7m), bản đồ OSM và SQLite **không đổi**; có cảnh báo/fallback nếu diện tích hình thể hiện lệch trên 3,5%.
+- Vật liệu shader chuyển sang **xanh sẫm pha xanh trời**, gợn rất nhẹ và mô phỏng bóng cây ven bờ. Bóng phản chiếu này là hiệu ứng thị giác gần đúng, chưa phải ray tracing.
+- Thu hẹp dải lát quanh hồ xuống khoảng 9 m thay vì 13,5 m, đưa cây xanh gần mép nước hơn. Phải khảo sát kích thước và vị trí cây trước khi xem đây là hiện trạng chính xác.
+- Độ giống phụ thuộc điều kiện trời: ảnh hồ lúc nắng sáng xanh, ảnh râm/chiều tối khá đen; không dùng một mẫu màu để nhận là hiện trạng duy nhất.
+- Đối chiếu ảnh thực tế trong [COMPARISON.md](COMPARISON.md), mở ứng dụng để thử camera ở góc thấp và trên điện thoại.
+
 ## Giao diện mobile
 - Khi mở điện thoại, cảnh 3D chiếm phần lớn màn hình và bảng dữ liệu thu gọn ở cạnh dưới.
 - Chạm nút **▧ / ▤ / ₫** để mở nhanh Ảnh / Danh mục / Giá. Chạm **Thu gọn bảng** để trở lại cảnh 3D.
