@@ -38,3 +38,46 @@ Cập nhật: 2026-10-13.
 - Vệ tinh không cho biết chiều cao nhà, kiểu mặt đứng, gạch lát, kích thước bồn hoa nhỏ hay ngày thi công phun nước.
 - Không suy vị trí máy chụp từ một ảnh đơn lẻ khi không có EXIF. Điểm ghim là **vị trí người dùng tự chọn trong scene**, sai số chưa đo.
 - Ảnh chưa được cấp phép chỉ được tham chiếu qua liên kết nguồn; không gắn vào kho asset công khai.
+
+
+## Đối chiếu bổ sung — Google Maps Terrain / Raised Buildings (13-10-2026)
+
+### Ba chế độ khác nhau, không được đồng nhất
+1. **Google Maps \`terrain\`** (MapTypeId.TERRAIN): lớp nền mô tả địa hình vật lý, không phải mô hình từng công trình. https://developers.google.com/maps/documentation/javascript/maptypes
+2. **3D/raised buildings trên vector maps**: vẽ footprint thành các khối nổi khi zoom gần, thường >=17, với khả năng tilt/heading. https://developers.google.com/maps/documentation/javascript/vector-map và https://developers.google.com/maps/documentation/javascript/cloud-customization/building-style
+3. **Photorealistic 3D Maps**: mô hình bề mặt textured, phụ thuộc vùng phủ; không khẳng định có ở Hồ Trúc Giang khi chưa kiểm tra coverage riêng. https://developers.google.com/maps/documentation/javascript/3d/coverage
+   - Trong Google Maps Android, '3D map details' cho dẫn đường có thể hiển thị khối nhà nổi ở khu vực chưa có 3D imagery. Đây là công nghệ hiển thị, không phải exportable dữ liệu 3D. https://support.google.com/maps/answer/3273406?hl=en
+   - Google Maps 3D API chỉ hỗ trợ \`satellite\` và \`hybrid\`; không có tổ hợp \`terrain\` + photorealistic 3D dưới cùng một MapTypeId. Bản đồ terrain vẫn hữu ích để so địa hình.
+
+### Kiểm toán phiên bản HTML hiện tại
+Nguồn: \`data/scene.json\`, \`scripts/build.py\`, \`index.html\`; các con số tại snapshot Oct-2026:
+- **1 polygon mặt nước** OSM way 217484891, local-bounds x=-100..+100m; z=-53..+54m.
+- **159 đoạn đường** OSM (không phải 159 tuyến đường độc lập), **8 polygon công viên**.
+- **16 OSM building-tag polygons**, trong đó một tag là tượng; ~15 building objects render. **0/16 polygon có \`height\` thực được nhập từ OSM**. \`building:levels\` chỉ hỗ trợ suy đoán số tầng x 3,1m; mặc định 7,5m cho trường hợp thiếu.
+- **42 nhà phố được sinh minh họa bằng code** \`populateFrontages\`: 14 bắc, 14 nam, 8 đông, 6 tây. Tọa độ x,z, chiều rộng, hướng và chiều cao đều sinh từ các công thức mẫu, không phải footprint ngoài thực địa.
+- Địa hình nền **mặt phẳng 990 x 990 mét cao độ cố định**. Không có DEM/DTM thực. Vì Hồ Trúc Giang nằm vùng địa hình thấp, điều này ít ảnh hưởng nhận diện bằng mắt hơn mật độ dãy nhà, nhưng không đạt tính năng Terrain.
+- Ảnh, hotspots: 8 điểm ảnh tham chiếu SQLite; ảnh điền địa bàn thủ công được thêm qua gói khảo sát, không coi địa điểm ghim là pose máy chụp thực.
+
+### Bảng đánh giá gap
+| Tiêu chí | Google Terrain / Raised buildings | Mô hình bdx0 hiện tại | Mức ưu tiên |
+|---|---|---|---|
+| Địa hình/elevation | Thể hiện relief theo lớp terrain; nơi có dữ liệu 3D có surfaces | Nền phẳng; không có DEM | P2 cho visual, P1 nếu cần độ cao ngập |
+| Nước/shoreline | Google imagery/OSM là hai nguồn khác nhau; kiểm tra thị giác riêng; không digitize Google | 1 polygon OSM, hình khá nhận diện | P1 kiểm tra các đoạn kè |
+| Footprint nhà | Raised buildings dựa trên lớp geometry bên Google; coverage khác nhau | 16 polygon OSM, nhiều khối giả lập ngoài OSM | **P0** |
+| Mật độ nhà phố | Đồ họa thực vùng nội thị khi có building coverage | 42 facade giả định, khoảng trống rất lớn | **P0** |
+| Số tầng/chiều cao | Có hiệu ứng nâng khối tùy coverage; không export chiều cao | 0/16 chiều cao đo thật, mẫu 8–18,4 m | **P0** |
+| Đường/công viên | Google nền hiển thị tương quan giao lộ/công viên | 159 OSM segments, 8 park polygons; chiều rộng đường là công thức | P1 |
+| Cây lớn/bóng đổ | Vệ tinh/3D mesh tùy vùng phủ cho cảm nhận tán cây | Procedural spaced-every-N trees | P1 |
+| Chi tiết mặt tiền | Raised buildings không đảm bảo có mặt tiền thật; photorealistic 3D mới có texture khi vùng phủ hỗ trợ | Khối nhà màu trơn, cửa sổ giả | P1 sau footprint |
+| Đài phun và tượng | Ảnh hiện trường có tính thời điểm, Google imagery có thể cũ | Đã có mesh proxy chưa verified as-built | P1 |
+
+### Hướng sửa có dữ liệu, tránh sao chép Google Content
+- **Không scrape/trace/digitize Google Maps basemap, imagery, elevations hay 3D building geometry** vào SQLite hoặc WebGL: điều khoản Google Maps Platform hạn chế rõ việc tái tạo dữ liệu này. Nguồn tham khảo: https://cloud.google.com/maps-platform/terms
+- Đối chiếu Google bằng việc mở ứng dụng gốc: [Google Maps Terrain](https://www.google.com/maps/@10.23861,106.37814,18z/data=!5m1!1e4), [Google Maps Satellite/3D](https://www.google.com/maps/@10.23861,106.37814,19z/data=!3m1!1e3) (bật Globe/3D nếu hỗ trợ), [Google Earth](https://earth.google.com/web/search/Ho+Truc+Giang+Ben+Tre).
+- Bảo vệ tính pháp lý của dữ liệu dựng: footprint từ OSM/khảo sát gốc/ảnh flycam có quyền sử dụng, số tầng từ nguồn được cấp phép và quan sát thực địa; lưu \`source\`, \`date\`, \`license\`, \`confidence\`.
+- **P0-1:** bổ sung footprint nhà thực hoặc đánh dấu \`missing\`, tuyệt đối không hiển thị 42 căn procedural như tòa nhà có vị trí thật; cho phép bật/tắt lớp \`illustrative\` để kiểm tra.
+- **P0-2:** nhập chiều cao/số tầng và hướng trục từ đo ngoài thực địa hoặc nguồn được phép; giữ NULL thay vì mặc định 7,5m như thể là giá trị đo.
+- **P1:** chỉnh đường, vỉa hè, bóng cây, công viên và mốc kiến trúc theo ảnh hiện trường có georeference; link photo hotspots vào đúng các đối tượng.
+- **QA:** so bảng coverage và ảnh người dùng cung cấp theo cùng ROI/orientation (north-up / camera tilt), tách rõ vấn đề dữ liệu khỏi khác biệt phong cách render.
+
+**Giới hạn xác minh:** chưa có ảnh chụp trực tiếp của Google Maps tại đúng tọa độ với lớp Raised buildings đã bật; không khẳng định mức độ phủ mô hình 3D của Google trong Bến Tre. Các giá trị thực đo được ở đây là kiểm toán scene hiện tại, không phải trích xuất geometry từ Google.
