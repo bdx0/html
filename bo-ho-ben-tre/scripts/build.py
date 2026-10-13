@@ -241,6 +241,48 @@ def fetch_osm():
                              "properties":properties,"accuracy":"osm_crowdsourced"})
     return url,features
 
+def export_sqlite_inspector(db, filename):
+    """Portable read-only SQLite mirror for static GitHub Pages, generated from DB.
+
+    Only built tables are exported, never inferred from the browser scene.
+    This is not a live SQL connection and can't write back to catalog.sqlite.
+    """
+    import base64
+    tables = []
+    for name, ddl in db.execute(
+        "SELECT name, sql FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name"
+    ).fetchall():
+        safe_name = '"' + name.replace('"', '""') + '"'
+        cols = [
+            {"name": c[1], "type": c[2], "not_null": bool(c[3]),
+             "default": c[4], "pk": bool(c[5])}
+            for c in db.execute("PRAGMA table_info(" + safe_name + ")").fetchall()
+        ]
+        fk = [
+            {"from": c[3], "table": c[2], "to": c[4]}
+            for c in db.execute("PRAGMA foreign_key_list(" + safe_name + ")").fetchall()
+        ]
+        raw = db.execute("SELECT * FROM " + safe_name).fetchall()
+        def json_value(v):
+            if isinstance(v, bytes):
+                return {"_type": "blob", "base64": base64.b64encode(v).decode("ascii")}
+            return v
+        tables.append({
+            "name": name, "sql": ddl, "columns": cols, "foreign_keys": fk,
+            "count": len(raw),
+            "rows": [[json_value(v) for v in row] for row in raw]
+        })
+    payload = {
+        "format": "bdx0-sqlite-inspector-v1",
+        "source": "data/catalog.sqlite",
+        "generated_on": TODAY,
+        "read_only": True,
+        "tables": tables
+    }
+    filename.write_text(json.dumps(payload, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+    return {t["name"]: t["count"] for t in tables}
+
+
 def build(outdir, use_osm=False):
     d=json.loads(BLUEPRINT.read_text(encoding="utf-8"))
     assert len(d["requirements"])==305 and len(d["proposed_photo_shots"])==90,"Baseline catalog integrity failure"
@@ -386,6 +428,9 @@ def build(outdir, use_osm=False):
           "is_camera_location":False,
           "photos":[{"photo_id":row[0],"relation":row[1],"caption":row[2]} for row in photo_rows]
         })
+    inspector_counts = export_sqlite_inspector(db, outdir/"sqlite-explorer.json")
+    assert inspector_counts["requirements"] == counts["requirements"]
+    assert inspector_counts["osm_features"] == counts["osm_features"]
     db.close()
     scene={
       "schemaVersion":4,"title":"Hồ Trúc Giang — Bờ Hồ Bến Tre","origin":{"lon":ORIGIN[0],"lat":ORIGIN[1],"crs":"EPSG:4326"},
