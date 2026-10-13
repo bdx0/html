@@ -164,6 +164,54 @@ try {
     if(!planState.width||!planState.height)
       errors.push(name+' floorplan canvas not rendered '+JSON.stringify(planState));
     if(name==='desktop'||name==='mobile-390')await page.screenshot({path:'ben-tre-floorplan-'+name+'.png'});
+    // User-authored Floor Plan error pins are local feedback, not GIS edits.
+    if(name==='desktop'||name==='mobile-390'){
+      if(!(await page.locator('#wbAnnotationToggle').isVisible()))
+        errors.push(name+' annotation button not reachable');
+      await page.locator('#wbAnnotationToggle').click();
+      if(!(await page.evaluate(()=>window.TrucGiangAnnotations?.getInfo().placing)))
+        errors.push(name+' annotation placement mode not enabled');
+      const planBox=await page.locator('#wbPlanCanvas').boundingBox();
+      await page.mouse.click(planBox.x+planBox.width*.5,planBox.y+planBox.height*.5);
+      if(!(await page.locator('#wbAnnFormPage').isVisible()))
+        errors.push(name+' tapping Floor Plan did not open annotation editor');
+      else{
+        await page.locator('#wbAnnType').selectOption('shore');
+        await page.locator('#wbAnnTitle').fill('Bờ hồ bị lệch góc');
+        await page.locator('#wbAnnDescription').fill('Bờ nam trong hình bị ngang; thực tế nghiêng và có điểm lõm cần kiểm chứng.');
+        await page.locator('#wbAnnSave').click();
+        if((await page.evaluate(()=>window.TrucGiangAnnotations.getInfo().count))!==1)
+          errors.push(name+' annotation not saved locally');
+        const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem('bdx0:truc-giang:visual-annotations-v1')||'[]'));
+        if(saved.length!==1||saved[0].title!=='Bờ hồ bị lệch góc')
+          errors.push(name+' annotation localStorage missing user report');
+        await page.locator('#wbAnnotationList').click();
+        if(!(await page.locator('#wbAnnItems').innerText()).includes('Bờ hồ bị lệch góc'))
+          errors.push(name+' annotation list cannot show saved location');
+        const exported=page.waitForEvent('download',{timeout:15000});
+        await page.locator('#wbAnnExportJSON').click();
+        const download=await exported;
+        const json=JSON.parse(fs.readFileSync(await download.path(),'utf8'));
+        if(json.schema!=='truc-giang-visual-annotations-v1'||
+           json.status!=='USER_VISUAL_FEEDBACK_NOT_VERIFIED'||
+           json.annotations.length!==1||
+           json.annotations[0].verification_status!=='user_visual_observation_not_surveyed'||
+           !Number.isFinite(json.annotations[0].x)||
+           !Number.isFinite(json.annotations[0].z))
+          errors.push(name+' annotation JSON missing coordinates or unverified provenance');
+        const snapshot=page.waitForEvent('download',{timeout:15000});
+        await page.locator('#wbAnnExportPNG').click();
+        const png=await snapshot;
+        const magic=fs.readFileSync(await png.path()).subarray(0,8).toString('hex');
+        if(magic!=='89504e470d0a1a0a')
+          errors.push(name+' annotation PNG export invalid');
+        await page.locator('#wbAnnClose').click();
+        const sceneAfter=await page.evaluate(async()=>await (await fetch('data/scene.json')).json());
+        if(JSON.stringify(sceneAfter.features.find(f=>f.osm_id===217484891)?.geometry)!==
+           JSON.stringify(sceneData.features.find(f=>f.osm_id===217484891)?.geometry))
+          errors.push(name+' user annotations changed OSM source geometry');
+      }
+    }
     await page.locator('[data-wb-mode="split"]').click();await page.waitForTimeout(120);
     const split=await page.evaluate(()=>({
       active:document.getElementById('stage').classList.contains('wb-split'),
