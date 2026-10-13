@@ -77,6 +77,7 @@ function setMode(mode){
  stage.querySelectorAll("[data-wb-mode]").forEach(function(b){b.classList.toggle("selected",b.dataset.wbMode===mode);b.setAttribute("aria-pressed",String(b.dataset.wbMode===mode))});
  if(W.host&&W.host.resize3D)W.host.resize3D(mode);
  resize();updatePins();
+ if(window.TrucGiangAnnotations)TrucGiangAnnotations.onModeChanged(mode);
 }
 function setShape(shape){
  if(shape!=="raw")return;
@@ -210,6 +211,7 @@ function drawPlan(){
   c.strokeStyle="#286aff";c.lineWidth=2;c.beginPath();c.arc(v.x,v.y,7,0,Math.PI*2);c.stroke();
   c.beginPath();c.moveTo(v.x,v.y);c.lineTo(v.x+dx,v.y-dz);c.stroke()
  }
+ if(window.TrucGiangAnnotations)TrucGiangAnnotations.draw(c,function(p){return screen(p,w,h,k)});
  c.fillStyle="#2c4469";c.font="bold 11px system-ui";c.fillText("N ↑",14,19);
  // 50-metre scalable ruler
  var ruler=50*k;
@@ -251,6 +253,8 @@ function attachPlanInteraction(){
  function up(e){e.stopPropagation();if(!W.mouse)return;var moved=W.mouse.moved;W.mouse=null;
   if(moved)return;
   var r=canvas.getBoundingClientRect(),px=e.clientX-r.left,py=e.clientY-r.top;
+  var notePoint=screenToLocal(px,py);
+  if(notePoint&&window.TrucGiangAnnotations&&TrucGiangAnnotations.handleTap(notePoint,function(p){return screen(p,W.metrics.plan.w,W.metrics.plan.h,W.metrics.plan.scale)}))return;
   if(W.metrics&&W.metrics.plan&&W.issues.length){
    var m=W.metrics.plan,scale=m.scale;
    var clicked=W.issues.find(function(issue){
@@ -274,9 +278,11 @@ function update(){
 function init(data,host){
  W.data=data;W.host=host;
  if(!W.ready){build();W.ready=true}
+ if(window.TrucGiangAnnotations)TrucGiangAnnotations.init({origin:data.origin,setMode:setMode,redraw:drawPlan,
+   capturePlan:function(done){setMode("floor");requestAnimationFrame(function(){drawPlan();done(W.planCanvas)})}});
  setMode(W.mode);setShape(W.shape);setView("iso");loadIssues();
 }
 window.TrucGiangWorkbench={init:init,update:update,setMode:setMode,setShape:setShape,setView:setView,
- getInfo:function(){return {mode:W.mode,shape:W.shape,view:W.view,planReady:!!W.planCanvas,shoreIssues:W.issues.length,reviewLoaded:W.reviewLoaded}},
+ getInfo:function(){return {mode:W.mode,shape:W.shape,view:W.view,planReady:!!W.planCanvas,shoreIssues:W.issues.length,reviewLoaded:W.reviewLoaded,annotations:window.TrucGiangAnnotations?TrucGiangAnnotations.getInfo().count:0}},
  refresh:resize};
 })();
