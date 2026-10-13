@@ -35,6 +35,8 @@ jobs:
           python3 bo-ho-ben-tre/scripts/build.py --osm --output _site/bo-ho-ben-tre/data
           test -s _site/bo-ho-ben-tre/data/catalog.sqlite
           test -s _site/bo-ho-ben-tre/data/scene.json
+          test -s _site/bo-ho-ben-tre/data/sqlite-explorer.json
+          test -s _site/bo-ho-ben-tre/sqlite.html
           python3 scripts/build_catalog.py --root . --output _site/catalog.json
           touch _site/.nojekyll
           test -s _site/index.html
