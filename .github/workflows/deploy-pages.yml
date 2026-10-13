@@ -36,6 +36,8 @@ jobs:
           test -s _site/bo-ho-ben-tre/data/catalog.sqlite
           test -s _site/bo-ho-ben-tre/data/scene.json
           test -s _site/bo-ho-ben-tre/data/sqlite-explorer.json
+          test -s _site/bo-ho-ben-tre/data/model-view.json
+          test -s _site/bo-ho-ben-tre/model.html
           test -s _site/bo-ho-ben-tre/sqlite.html
           python3 scripts/build_catalog.py --root . --output _site/catalog.json
           touch _site/.nojekyll
