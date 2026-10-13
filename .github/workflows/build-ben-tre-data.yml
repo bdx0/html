@@ -76,6 +76,7 @@ jobs:
           node --check bo-ho-ben-tre/workbench.js
           node --check bo-ho-ben-tre/lake-shape.js
           node --check bo-ho-ben-tre/shoreline-controls.js
+          node --check bo-ho-ben-tre/shoreline-review.js
           python3 - <<'PY'
           import pathlib,re
           html=pathlib.Path('bo-ho-ben-tre/model.html').read_text()
