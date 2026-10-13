@@ -75,6 +75,15 @@ jobs:
           node --check bo-ho-ben-tre/survey.js
           node --check bo-ho-ben-tre/workbench.js
           node --check bo-ho-ben-tre/lake-shape.js
+          node --check bo-ho-ben-tre/shoreline-controls.js
+          python3 - <<'PY'
+          import pathlib,re
+          html=pathlib.Path('bo-ho-ben-tre/model.html').read_text()
+          s=re.findall(r'<script>(.*?)</script>',html,re.S)
+          assert len(s)==1
+          pathlib.Path('/tmp/ben-tre-model-ui.js').write_text(s[0])
+          PY
+          node --check /tmp/ben-tre-model-ui.js
       - name: Commit generated database snapshot
         run: |
           git config user.name "github-actions[bot]"
