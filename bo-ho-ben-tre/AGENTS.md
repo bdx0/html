@@ -1,4 +1,11 @@
 # AGENTS.md — Hồ Trúc Giang / Bờ Hồ Bến Tre Digital Twin
+## Current correction (2026-10-13): rejected shoreline + SQLite Explorer
+- The user's assessment is that the **candidate shoreline shape is severely wrong**. Never enable it by default or present it as an accurate alternative. The viewer loads with \`lakeShapeMode="raw"\` and Workbench \`shape="raw"\`, and the candidate control is **disabled**. This is not a claim that raw OSM is correct; it remains explicitly unverified.
+- Remove any UI assertion or acceptance test claiming B01–B12 are actual observed lake shoreline control points. The previous hand-authored local-meter candidate was not georeferenced. Preserve original \`scene.json\` and SQLite \`osm_features\` provenance.
+- SQLite Explorer is at \`bo-ho-ben-tre/sqlite.html\` and is linked from main desktop top bar, mobile sheet and SQLite inspector tab. It loads \`data/sqlite-explorer.json\`, built using Python sqlite3 by \`scripts/build.py\` alongside \`data/catalog.sqlite\`; it is a **read-only serialized mirror** of every table, not an in-browser database engine or SQL write interface.
+- Changes to SQLite viewer data must be reflected by rebuilding/exporting from the same DB. It shows all columns, rows, CREATE TABLE, FK definitions, filter/sort/pagination, detail drawer and CSV export. CI must validate table counts against actual sqlite3 and check browser interaction on desktop/mobile.
+- Update both \`deploy-pages.yml\` and \`build-ben-tre-data.yml\` to publish the explorer JSON on any relevant change. For GitHub Pages use the local generated SQLite and viewer exported together in the same site build.
+
 ## Goal
 Build a progressively verifiable geographically anchored 3D Digital Twin of Hồ Trúc Giang and the surrounding streets, park, civic buildings and urban fabric. Reference UI patterns from `../warestack-3d.html`. Prioritize actual positioning and traceability over imaginary details.
 
