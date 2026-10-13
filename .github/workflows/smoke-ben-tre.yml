@@ -25,6 +25,24 @@ jobs:
           npx playwright install --with-deps chromium
       - name: Export SQLite explorer snapshot for browser
         run: python3 bo-ho-ben-tre/scripts/build.py --osm
+      - name: Validate modeled-data graph and lake evidence
+        run: |
+          python3 - <<'PY'
+          import json,sqlite3
+          from pathlib import Path
+          p=Path('bo-ho-ben-tre/data')
+          m=json.loads((p/'model-view.json').read_text())
+          db=sqlite3.connect(p/'catalog.sqlite')
+          for table,number in m['table_counts'].items():
+              assert db.execute('SELECT COUNT(*) FROM "'+table+'"').fetchone()[0] == number, table
+          assert m['lake_audit']['verified_corrections']==0
+          assert m['lake_audit']['status']=='conflict_unresolved'
+          ids={n['id'] for n in m['nodes']}
+          assert len(ids)==len(m['nodes'])
+          for n in m['nodes']:
+              for e in n['relations']: assert e['target'] in ids
+          print('Verified modeled entities:',len(ids),'relations:',sum(len(n['relations']) for n in m['nodes']))
+          PY
       - name: Run browser test for desktop and mobile
         run: node scripts/test_ben_tre.mjs
       - name: Archive screenshots and diagnostic
