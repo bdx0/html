@@ -1,0 +1,62 @@
+/* Visual annotations: private issue pins over the unchanged OSM Floor Plan. */
+.wb-annotation-shortcut{font-size:11px;font-weight:800;padding:9px;border:1px solid #edb3b3;background:#fff4f4;color:#ae3838;text-align:center}
+.wb-annotation-shortcut.active{background:#c83337;color:#fff;border-color:#c83337}
+.wb-plan-head{flex-wrap:wrap}
+.wb-annotation-bar{order:3;display:flex;align-items:center;gap:5px;flex:1 1 100%;min-width:0}
+.wb-annotation-bar button{padding:7px 9px;font-size:11px;min-height:31px;white-space:nowrap}
+.wb-annotation-bar button:first-child{background:#fff2f1;border-color:#eab6b3;color:#ae3233}
+.wb-annotation-bar button:first-child.active{background:#bb3036;color:#fff;border-color:#bb3036}
+.wb-annotation-bar button:last-child{margin-left:auto}
+.wb-annotation-bar span{font-variant-numeric:tabular-nums}
+.wb-ann-hint{position:absolute;z-index:6;bottom:54px;left:12px;right:12px;margin:auto;width:max-content;max-width:calc(100% - 24px);pointer-events:none;background:#fff7e3;border:1px solid #f2cf9e;border-radius:9px;padding:9px 12px;color:#895218;font-size:11px;font-weight:750;box-shadow:0 6px 18px #543c2125;text-align:center}
+.wb-ann-hint[hidden]{display:none!important}
+.wb-annotation-overlay[hidden]{display:none!important}
+.wb-annotation-overlay{position:fixed;inset:0;z-index:100;display:grid;place-items:center;font-family:Inter,system-ui,-apple-system,"Segoe UI",Arial,sans-serif;color:#233c5b}
+.wb-ann-backdrop{position:absolute;inset:0;background:rgba(14,31,51,.66)}
+.wb-ann-dialog{position:relative;width:min(520px,calc(100vw - 22px));max-height:min(88dvh,840px);display:flex;flex-direction:column;overflow:hidden;border-radius:16px;border:1px solid #c9d7ed;background:#fff;box-shadow:0 22px 70px #0a203b66}
+.wb-ann-dialog>header{display:flex;align-items:center;gap:12px;justify-content:space-between;flex:0 0 auto;padding:14px 16px;border-bottom:1px solid #e2e9f3;background:#f7faff}
+.wb-ann-dialog>header strong{font-size:15px}
+.wb-ann-dialog>header button{font-size:25px;line-height:1;width:38px;height:38px}
+.wb-ann-content{min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:14px 17px 18px;-webkit-overflow-scrolling:touch}
+.wb-ann-content label:not(.wb-ann-import){display:block;font-size:12px;font-weight:750;line-height:1.45;margin-top:14px;color:#46607d}
+.wb-ann-content input:not([type=file]),.wb-ann-content select,.wb-ann-content textarea{display:block;width:100%;min-height:42px;margin-top:6px;padding:10px;background:#fff;color:#213c5a;border:1px solid #cfdced;border-radius:9px;font:13px/1.4 system-ui,sans-serif;box-sizing:border-box}
+.wb-ann-content textarea{min-height:100px;resize:vertical}
+.wb-ann-coords{font-size:12px;font-weight:800;background:#edf4ff;color:#28569a;border-radius:7px;padding:9px;margin:0 0 5px}
+.wb-ann-approx{font-size:11px;color:#6f849f;margin:5px 0}
+.wb-ann-warning{background:#fff5e6;border:1px solid #f1d6ab;color:#926534;padding:9px;border-radius:7px;font-size:11px;line-height:1.4}
+.wb-ann-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:14px}
+.wb-ann-actions button,.wb-ann-import{min-height:40px;display:inline-flex;align-items:center;justify-content:center;gap:4px;padding:9px 12px;border:1px solid #cddbec;border-radius:8px;background:#f4f8ff;color:#315880;font-size:11px;font-weight:750;cursor:pointer;box-sizing:border-box}
+.wb-ann-actions button:hover,.wb-ann-import:hover{background:#eaf2ff}
+.wb-ann-actions .wb-ann-primary{background:#2569dc;border-color:#2569dc;color:#fff}
+.wb-ann-actions #wbAnnDelete:not([hidden]){color:#b02a32;background:#fff0ef;border-color:#f0c6c6}
+.wb-ann-import input[type=file]{display:none}
+#wbAnnMessage{color:#587391;background:#f4f8fd;padding:10px 12px;border-radius:8px;font-size:11px;line-height:1.5;min-height:36px;margin:14px 0 0}
+#wbAnnItems{display:flex;flex-direction:column;gap:7px;max-height:45dvh;overflow-y:auto;overscroll-behavior:contain}
+.wb-ann-empty{color:#647c98;line-height:1.6;font-size:12px;padding:17px;background:#f5f8ff;border-radius:8px}
+.wb-ann-list-item{display:flex;align-items:center;gap:10px;text-align:left;background:#fff;border:1px solid #dfebf6;border-radius:9px;padding:11px;width:100%;min-height:60px}
+.wb-ann-list-item>b{border-radius:50%;width:32px;height:32px;display:grid;place-items:center;color:#fff;background:#c43238;flex:0 0 auto;font-size:12px}
+.wb-ann-list-copy{min-width:0;flex:1;display:flex;flex-direction:column;gap:3px}
+.wb-ann-list-copy strong{font-size:12px;color:#274468;overflow-wrap:anywhere}
+.wb-ann-list-copy small{font-size:10px;color:#7d90a9;overflow-wrap:anywhere}
+@media(max-width:860px){
+ .wb-annotation-shortcut{font-size:9px;line-height:1.2;padding:6px 3px}
+ .wb-annotation-bar{gap:3px;flex-wrap:nowrap}
+ .wb-annotation-bar button{min-height:31px;padding:6px 6px;font-size:10px}
+ .wb-plan-head{min-height:92px}
+ .wb-split .wb-annotation-bar button{font-size:9px;padding:5px 3px}
+ .wb-split .wb-annotation-bar{gap:2px}
+ .wb-ann-dialog{position:absolute;left:0;right:0;bottom:0;width:100vw;max-height:min(79dvh,680px);border-radius:16px 16px 0 0;padding-bottom:env(safe-area-inset-bottom,0px)}
+ .wb-ann-content{padding:12px 14px 18px}
+ .wb-ann-dialog>header{padding:8px 13px}
+ .wb-ann-hint{bottom:calc(58px + var(--sheet-rest,58px))}
+}
+@media(max-width:370px){
+ .wb-floor .wb-plan-head{padding-right:110px;min-height:107px}
+ .wb-annotation-bar button{font-size:9px;padding:5px 4px}
+ .wb-shape-control .wb-annotation-shortcut{font-size:9px}
+}
+@media(max-width:860px) and (orientation:landscape){
+ .wb-ann-dialog{left:50%;right:auto;bottom:5px;transform:translateX(-50%);width:min(530px,95vw);max-height:calc(100dvh - 10px);border-radius:13px}
+ .wb-plan-head{min-height:70px}
+ .wb-ann-content textarea{min-height:70px}
+}
