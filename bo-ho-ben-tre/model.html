@@ -202,7 +202,7 @@ let sec=el("section",undefined,"water-audit");
 sec.append(el("div","KIỂM TRA HÌNH HỒ","eyebrow"));
 let h=el("h3","Đường bao chưa đạt xác minh","detail-title");h.style.fontSize="16px";sec.append(h);
 sec.append(el("p","①–④ trên mặt bằng tô đúng các ĐOẠN OSM cần xem lại. Chạm số để biết sẽ điều chỉnh đoạn nào; kéo thanh xem trước để thấy nét cũ màu cam và nét dịch thử màu xanh. Đó vẫn chưa phải ranh đã xác minh.","description"));
-if(window.TrucGiangReview)TrucGiangReview.mount(sec,redraw);
+if(window.TrucGiangReview)TrucGiangReview.mount(sec,focusShoreReview);
 let m=a.metrics;
 if(m){
 let fs=addSection(sec,"Chỉ số đường bao OSM, không phải diện tích khảo sát");
@@ -343,6 +343,18 @@ let priority={water:0,building:1,park:2,road:3};
 items.sort((a,b)=>a.d-b.d||(priority[a.n.kind]||9)-(priority[b.n.kind]||9));
 if(items.length)select(items[0].n.id,true);
 }
+function focusShoreReview(){
+ const review=window.TrucGiangReview?.state();
+ const selected=review?.items.find(x=>x.id===review.selected);
+ const lake=state.byId.get("osm-way-217484891");
+ const coordsRing=lake?.geometry?.coordinates?.[0];
+ if(window.innerWidth<=760&&selected?.ring_indices?.length&&coordsRing){
+  const id=selected.ring_indices[Math.floor(selected.ring_indices.length/2)];
+  const pt=coordsRing[id];
+  if(pt){let m=coords(pt);state.map.panX=m.x;state.map.panZ=m.z}
+ }
+ redraw()
+}
 function initializeMap(){
 let canvas=state.canvas=$("map"),drag=null;
 canvas.addEventListener("pointerdown",e=>{canvas.setPointerCapture(e.pointerId);drag={x:e.clientX,y:e.clientY,startX:e.clientX,startY:e.clientY,dragged:false}});
@@ -377,7 +389,7 @@ let roadsInRaw=d.table_counts.osm_features-
 $("nRoad").textContent=roadsInRaw;
 initializeMap();
 if(window.TrucGiangReview){
- TrucGiangReview.init(d,redraw,function(){
+ TrucGiangReview.init(d,focusShoreReview,function(){
   if(state.selected!=="osm-way-217484891")select("osm-way-217484891",false);
   if(window.innerWidth<=760){$("details").classList.add("open");$("details").classList.add("review-open");$("details").scrollTop=0}
  });
