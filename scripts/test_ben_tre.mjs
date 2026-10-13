@@ -226,6 +226,48 @@ try {
       errors.push(name+' tapping record-close position failed');
     if(name==='desktop'||name==='mobile-390')await explorer.screenshot({path:'ben-tre-sqlite-'+name+'.png'});
     await explorer.close();
+    // Domain-oriented human-readable model (not a raw SQL table browser).
+    const model=await ctx.newPage();
+    model.on('pageerror',e=>errors.push(name+' Model JS '+e.message));
+    model.on('console',e=>{if(e.type()==='error')errors.push(name+' Model console '+e.text())});
+    await model.goto('http://127.0.0.1:8765/bo-ho-ben-tre/model.html',{waitUntil:'load',timeout:30000});
+    await model.waitForFunction(()=>document.getElementById('loading').hidden,{timeout:30000});
+    if(!(await model.locator('#detailContent').innerText()).includes('Hồ Trúc Giang'))
+      errors.push(name+' semantic lake entity not displayed');
+    if(!(await model.locator('#detailContent').innerText()).includes('Đường bao chưa đạt xác minh'))
+      errors.push(name+' disputed shoreline verification warning hidden');
+    if((await model.locator('#nRoad').innerText())!=='159'||
+       (await model.locator('#nRequirement').innerText())!=='305')
+      errors.push(name+' incorrect semantic category counts');
+    let modelMap=await model.locator('#map').evaluate(e=>({width:e.width,height:e.height}));
+    if(modelMap.width<100||modelMap.height<80)
+      errors.push(name+' model floorplan not rendered '+JSON.stringify(modelMap));
+    const firstRelation=model.locator('#detailContent .related button').first();
+    if(await firstRelation.count()){
+      await firstRelation.focus();
+      await model.keyboard.press('Enter');
+      if(!(await model.locator('#detailContent').innerText()).includes('OpenStreetMap'))
+        warnings.push(name+' selecting related geometry changed detail but label not OSM');
+    }else errors.push(name+' domain entity relationship not displayed');
+    await model.locator('#search').fill('Bến Tre');
+    if((await model.locator('#listCount').innerText()).includes('đối tượng')===false)
+      errors.push(name+' modeled entities search not responding');
+    await model.locator('#search').fill('');
+    await model.locator('#kinds button').filter({hasText:'Nhà'}).click();
+    if(!(await model.locator('#listCount').innerText()).includes('16 đối tượng'))
+      errors.push(name+' modeled building object group not readable');
+    await model.locator('#kinds button').filter({hasText:'Hồ nước'}).click();
+    if(!(await model.locator('#listCount').innerText()).includes('1 đối tượng'))
+      errors.push(name+' lake filtered map item not visible');
+    const stats=await model.evaluate(()=>({
+      scrollWidth:document.documentElement.scrollWidth,innerWidth:window.innerWidth,
+      screenHeight:document.documentElement.scrollHeight,innerHeight:window.innerHeight
+    }));
+    if(stats.scrollWidth>stats.innerWidth+1||stats.screenHeight>stats.innerHeight+1)
+      errors.push(name+' semantic model viewport overflow '+JSON.stringify(stats));
+    if(name==='desktop'||name==='mobile-390')
+      await model.screenshot({path:'ben-tre-model-'+name+'.png'});
+    await model.close();
     await ctx.close();
   }
 }finally{
