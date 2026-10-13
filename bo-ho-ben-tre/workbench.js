@@ -118,7 +118,7 @@ function reviewUrl(issue){return "model.html?sector="+encodeURIComponent(issue.i
 function loadIssues(){
  fetch("data/model-view.json",{cache:"no-store"}).then(function(r){if(!r.ok)throw Error("HTTP "+r.status);return r.json()}).then(function(d){
   W.issues=(d.lake_audit&&Array.isArray(d.lake_audit.unresolved)?d.lake_audit.unresolved:[]).filter(function(x){return x.ring_indices&&x.ring_indices.length>=2}).slice(0,4);
-  W.reviewLoaded=true;W.pinLayer.textContent="";
+  W.reviewLoaded=true;if(W.host&&W.host.setReviewSegments)W.host.setReviewSegments(W.issues);W.pinLayer.textContent="";
   W.issues.forEach(function(issue){
    var b=el("a","wb-review-pin",String(issue.number||"!") );
    b.href=reviewUrl(issue);b.title="Kiểm tra "+issue.title+": "+issue.question;
