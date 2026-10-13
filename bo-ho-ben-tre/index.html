@@ -208,7 +208,7 @@ linesAroundLake(147,106,58);putBuildingsIllustrative();fountain(0,0);
 /* TRÚC GIANG V2 — verified water boundary; PHOTO-INSPIRED detail proxies.
    OSM provides plan geometry. Decorative objects and façade heights are illustrative,
    not survey-grade measurements. All within shoreline +300m scene area. */
-var landmarks=[],lakeWaterMaterial=null;
+var landmarks=[],lakeWaterMaterial=null,lakeGeometryStats=null;
 function osmRing(g){return (g.coordinates[0]||[]).slice(0,-1).map(function(p){var q=geoXY(p);return {x:q[0],z:q[1]}})}
 function polygonArea2(p){var a=0;for(var i=0;i<p.length;i++){var n=p[(i+1)%p.length];a+=p[i].x*n.z-n.x*p[i].z}return a}
 function ringOffset(poly,d){var ccw=polygonArea2(poly)>0;
@@ -431,6 +431,10 @@ function drawOSM(features){var countsLocal={water:0,building:0,road:0,park:0,tre
 var lakeFeature=features.find(function(f){return f.kind==="water"&&f.osm_id===217484891});
 if(!lakeFeature){say("Không tìm thấy biên Hồ Trúc Giang từ OSM, chuyển bản minh họa");drawIllustrative();return}
 var rawRing=osmRing(lakeFeature.geometry),ring=smoothLakeOutline(rawRing);
+var sourceArea=Math.abs(polygonArea2(rawRing))*.5,visualArea=Math.abs(polygonArea2(ring))*.5;
+if(sourceArea>0&&Math.abs(visualArea/sourceArea-1)>.035){say("Lake visual smoothing exceeded area tolerance, using original OSM ring");ring=rawRing;visualArea=sourceArea}
+lakeGeometryStats={source:"OSM way 217484891",sourceVertices:rawRing.length,visualVertices:ring.length,originalAreaM2:Math.round(sourceArea),visualAreaM2:Math.round(visualArea),
+  visualDeviationPct:sourceArea?Number((Math.abs(visualArea-sourceArea)/sourceArea*100).toFixed(2)):0,style:"softly smoothed boundary; reference-based calm water and simulated shore reflections"};
 features.filter(function(f){return f.kind==="park"}).forEach(function(f){var m=fillPolygon(f.geometry,"#598b5c",.09);if(m&&/Trần Văn Ơn/i.test((f.properties||{}).name||"")){m.userData.hotspotId="HS-WEST-PARK";pickables.push(m)}countsLocal.park++});
 features.filter(function(f){return f.kind==="road"}).forEach(function(f){var p=f.properties||{},coords=f.geometry.coordinates.map(geoXY);
 roadLine(coords,/primary|secondary/.test(p.highway)?9: /residential|tertiary/.test(p.highway)?6.8:3.4);countsLocal.road++});
@@ -617,7 +621,7 @@ a+='<p class="sub">Bảng gốc: cost_items + cost_quotes trong <a href="data/ca
 function updateDebug(){if(!$("debug").classList.contains("open"))return;var gl=renderer&&renderer.getContext&&renderer.getContext();var info=renderer&&renderer.info;
 var d={engine:mode,webgl:webglOK,three:window.THREE&&THREE.REVISION,viewport:stage.clientWidth+" x "+stage.clientHeight,devicePixelRatio:window.devicePixelRatio,webglVersion:gl?gl.getParameter(gl.VERSION):"n/a",
 frame:frame,sceneMeshes:counts.mesh,sceneTrianglesApprox:counts.tri,hotspots:hotspotEls.size,selectedHotspot:selectedHotspot,drawCalls:info&&info.render.calls,renderTriangles:info&&info.render.triangles,zoomDistance:Math.round(dist),
-pointerCount:controlPointers.size,osmElements:data&&data.stats.osm_features,modelMode:data&&data.mode,errors:errors.slice(-8)};$("report").textContent=JSON.stringify(d,null,2)}
+pointerCount:controlPointers.size,osmElements:data&&data.stats.osm_features,modelMode:data&&data.mode,lakeGeometry:lakeGeometryStats,errors:errors.slice(-8)};$("report").textContent=JSON.stringify(d,null,2)}
 $("home").onclick=reset;$("day").onclick=function(){night=!night;if(lakeWaterMaterial)lakeWaterMaterial.uniforms.uNight.value=night?1:0;$("dayIcon").textContent=night?"☀":"☾";$("dayLabel").textContent=night?" Ban ngày":" Ban đêm";if(scene){scene.background=color(night?"#071528":"#9acbd9");scene.fog.color=scene.background;scene.children.forEach(function(c){if(c.type==="DirectionalLight")c.intensity=night?.35:.9;if(c.type==="HemisphereLight")c.intensity=night?.5:1.12})}};
 $("layers").onclick=function(){layers.trees=!layers.trees;$("layers").classList.toggle("active",!layers.trees);if(world)world.traverse(function(o){if(o.userData&&o.userData.tree)o.visible=layers.trees})};
 $("dbg").onclick=function(){$("debug").classList.toggle("open");updateDebug()};$("debugclose").onclick=function(){$("debug").classList.remove("open")};
