@@ -7,6 +7,16 @@ Build a progressively verifiable geographically anchored 3D Digital Twin of Hồ
 - Clip road segments at the 300m lakeshore buffer; import polygon features only when fully contained. Do not publish out-of-scope road/building geometry. Record the source, import timestamp and buffer rule in SQLite and `scene.json`.
 - Keep the full 305-item catalog for traceability, but prioritize photographs and LOD in this 300m zone. Never use the legacy 750m context design for rendering without an explicit scope change.
 
+## Map comparison policy — Google Terrain and raised buildings
+- Google Maps Terrain map type is a physical relief basemap, *not* a raw DEM nor the source of 3D building mesh. Google vector basemaps at close zoom may display raised/extruded building forms; photorealistic 3D has separate, location-dependent coverage.
+- As of 2026-10-13 scene contains 159 OSM road segments, 8 park polygons, one lakeshore water polygon (OSM way 217484891), 16 building-tag polygons with *zero independently verified OSM heights*, and **42 synthetic frontage buildings** produced by `populateFrontages` (14 north, 14 south, 8 east, 6 west). Never identify these 42 as actual surveyed real estate.
+- Highest priority fidelity correction is replacing 42 synthetic facades with real verifiable building footprints / measured heights. Preserve missing data as NULL, label estimated heights. Maintain illustrative/verified layer toggle.
+- Background plane is a flat 990 m x 990 m mesh, not terrain data. Do not misrepresent that as Google Terrain or surveyed elevation. Terrain elevation work only from independent, licensed DEM or authorized local survey.
+- Google Maps Platform Terms restrict scraping and creating 3D building, road, terrain or other derivative datasets from Google Maps imagery/tiles. **Do not extract or trace Google's raised buildings into repo SQLite or mesh**. The Google map UI can be opened as an interactive visual reference; use OSM, independently licensed imagery and permitted field photographs for actual source material.
+- Do not claim that photorealistic 3D or even vector raised-building coverage has been verified at Hồ Trúc Giang unless a location-specific check was actually performed. Google Maps 3D coverage changes over time.
+- Full audit, stage counts, and prioritized gap table: read `COMPARISON.md` subsection "Đối chiếu bổ sung — Google Maps Terrain / Raised Buildings".
+- When users provide screenshots, compare **same heading, pitch, center, visible area**. Flag Google imagery acquisition dates when unknown; never treat recent changes as historically verified.
+
 ## Visual fidelity and lake recognition (v2)
 - **Never replace the verified lake outline with an ellipse** when OSM water way 217484891 is available. Center and bounds roughly 200m East-West and 105m North-South in local projected metres.
 - The signature shape is a softly curved trapezoid with small concavities; visually validate the entire water polygon. Prevent green wedge overlap, triangulation artifacts and road geometry tilted off the ground.
