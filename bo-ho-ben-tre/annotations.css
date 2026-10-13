@@ -10,7 +10,7 @@
 .wb-annotation-bar span{font-variant-numeric:tabular-nums}
 .wb-ann-hint{position:absolute;z-index:6;bottom:54px;left:12px;right:12px;margin:auto;width:max-content;max-width:calc(100% - 24px);pointer-events:none;background:#fff7e3;border:1px solid #f2cf9e;border-radius:9px;padding:9px 12px;color:#895218;font-size:11px;font-weight:750;box-shadow:0 6px 18px #543c2125;text-align:center}
 .wb-ann-hint[hidden]{display:none!important}
-.wb-annotation-overlay[hidden]{display:none!important}
+.wb-annotation-overlay[hidden],.wb-annotation-overlay [hidden]{display:none!important}
 .wb-annotation-overlay{position:fixed;inset:0;z-index:100;display:grid;place-items:center;font-family:Inter,system-ui,-apple-system,"Segoe UI",Arial,sans-serif;color:#233c5b}
 .wb-ann-backdrop{position:absolute;inset:0;background:rgba(14,31,51,.66)}
 .wb-ann-dialog{position:relative;width:min(520px,calc(100vw - 22px));max-height:min(88dvh,840px);display:flex;flex-direction:column;overflow:hidden;border-radius:16px;border:1px solid #c9d7ed;background:#fff;box-shadow:0 22px 70px #0a203b66}
