@@ -213,7 +213,8 @@ function init(options){
  document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!dialog.hidden)close()});
  const hint=document.createElement("div");hint.id="wbAnnHint";hint.className="wb-ann-hint";hint.hidden=true;
  hint.textContent="✎ Chạm điểm sai để ghim. Kéo để dịch bản đồ, +/− để phóng to."; $("wbPlanDock")?.appendChild(hint);
- refresh();setPlacing(false)
+ refresh();setPlacing(false);
+ if(new URLSearchParams(location.search).get("annotate")==="1")requestAnimationFrame(()=>setPlacing(true))
 }
 window.TrucGiangAnnotations={init,draw,handleTap,openList,setPlacing,onModeChanged:mode=>{if(mode==="3d"&&placing)setPlacing(false)},
  exportJSON,exportPNG,getInfo:()=>({schema:SCHEMA,count:records.length,placing,selected,storage_error:storageError,source_modified:false}),
