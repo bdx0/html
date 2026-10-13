@@ -83,6 +83,13 @@ Giữ `data/catalog-blueprint-v1.json` và `scripts/build.py` trong commit để
 - Nếu có tọa độ thực địa, tiếp tục dùng **＋ Nhập mốc tọa độ** (ghi nguồn, ngày đo và sai số); file điểm đo xuất riêng. Mọi điểm tự nhập \`self_reported_unreviewed\` tới khi kiểm chứng chính thức.
 - Model Data Viewer đã tăng zoom mặc định vào nước hồ trên mobile, dùng panel dưới tối đa 53dvh khi duyệt để không che hoàn toàn hình; smoke test Chromium kiểm 4 overlay, ± preview, điều hướng vùng, lưu/xuất nhận xét.
 
+## Duyệt sửa hình hồ trực quan (4 đoạn OSM)
+- **Trên 3D:** bốn đoạn bờ nghi vấn tô **cam** trực tiếp dọc biên nước, mỗi đoạn có chấm **1, 2, 3, 4**. Bấm chấm mở đúng phần cần bạn đối chiếu tại \`model.html?sector=...#osm-way-217484891\`.
+- **Trên PLAN / SPLIT:** các cạnh OSM tương ứng được đánh cam cùng số mốc. Chạm số để mở form xác minh. Mốc 1=mũi đất bờ bắc, 2=bờ nam chéo, 3=cung bờ đông, 4=khúc bờ tây.
+- **Trên Model Data View:** màu CAM = đường bao OSM hiện tại, màu XANH đứt nét = xem thử bờ dịch theo slider để hình dung nước nở/thu; chọn nhận xét và xuất JSON. Đây là **sơ đồ so sánh chưa được đo**, không thay SQLite/scene/OSM.
+- Mốc GPS có nguồn và sai số được nhập riêng tại tab **Mốc kiểm chứng bờ hồ**; thông tin đánh giá, dữ liệu GPS và sửa polygon là ba tầng nghiệp vụ khác nhau.
+- Hướng dẫn chi tiết: [SHORELINE_REVIEW_GUIDE.md](SHORELINE_REVIEW_GUIDE.md). Ảnh ngoài cửa hàng ven hồ do người dùng gửi trong chat không có GPS/hướng la bàn trong EXIF; chưa gắn điểm ảnh vào mô hình do thiếu thông tin vị trí.
+
 ## Model Data View (mô hình dữ liệu dễ hiểu) — cập nhật 13/10/2026
 - **Mở trực tiếp:** https://bdx0.github.io/html/bo-ho-ben-tre/model.html
 - Đây là chế độ dành cho người đọc hiểu đối tượng, không phải trình xem hàng/cột SQL: mặt bằng OSM North-up, danh sách hồ, đường phố đã **gộp các đoạn cùng tên**, công trình, công viên, 5 mốc địa điểm; chọn một đối tượng để thấy dữ liệu địa lý, tên, nguồn, mức tin cậy, ảnh liên quan, mức khảo sát và liên kết với đối tượng khác.
