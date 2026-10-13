@@ -30,7 +30,8 @@ function init(modelData,draw,open){
   return Object.assign({number:ind+1,ring_indices:indices,center:centroid},item);
  });
  byId=Object.fromEntries(items.map(t=>[t.id,t]));
- selected=items[0]?.id||null;
+ const incoming=new URLSearchParams(location.search).get("sector");
+ selected=byId[incoming]?incoming:(items[0]?.id||null);
  addStyles();buildToolbar();
 }
 function safeReview(id){
