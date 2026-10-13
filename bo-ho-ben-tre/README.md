@@ -75,6 +75,15 @@ Giữ `data/catalog-blueprint-v1.json` và `scripts/build.py` trong commit để
 - Snapshot screenshot desktop/mobile là yêu cầu nghiệm thu; không chỉ dựa vào report FPS.
 - Nguồn đối chiếu ảnh: https://addflag.com/ho_truc_giang__4361 và https://triphunter.vn/places/ben-tre/items/ho-truc-giang; ảnh nguồn chỉ để xem tham chiếu.
  
+## Model Data View (mô hình dữ liệu dễ hiểu) — cập nhật 13/10/2026
+- **Mở trực tiếp:** https://bdx0.github.io/html/bo-ho-ben-tre/model.html
+- Đây là chế độ dành cho người đọc hiểu đối tượng, không phải trình xem hàng/cột SQL: mặt bằng OSM North-up, danh sách hồ, đường phố đã **gộp các đoạn cùng tên**, công trình, công viên, 5 mốc địa điểm; chọn một đối tượng để thấy dữ liệu địa lý, tên, nguồn, mức tin cậy, ảnh liên quan, mức khảo sát và liên kết với đối tượng khác.
+- Tải dữ liệu: \`catalog.sqlite\` → \`scripts/model_export.py\` → \`data/model-view.json\` → \`model.html\`. Dữ liệu schema \`ben-tre-semantic-model-v1\` chứa 535 thực thể, 857 liên kết tại snapshot hiện tại (con số thay đổi theo dữ liệu). **Không tạo geometry mới từ ảnh Google**. Tất cả thuộc tính thiếu được để là "Chưa có", không lấy chiều cao suy đoán làm chiều cao đo.
+- Ghi rõ hai lớp: đối tượng vật lý OSM (bản đồ cộng đồng) và đối tượng logic dự án (mốc hồ, công viên, tượng, đài phun, hạng mục cần thu thập). Các liên kết ảnh là tài liệu **tham chiếu**, không khẳng định vị trí camera gốc.
+- Đường bao hồ OSM way 217484891 **chưa đúng so với ảnh do người dùng cung cấp**, được gắn trạng thái \`conflict_unresolved\`; 4 hạng mục bờ bắc/mũi đất, bờ nam chéo, bờ đông cong, bờ tây chưa chứng minh đều hiển thị riêng. Bản đề xuất dựng sai đã bị loại, **0 bản sửa đường bao đã được kiểm chứng**.
+- Trong chi tiết hồ có chức năng **＋ Nhập mốc tọa độ** để ghi tọa độ GPS/WGS84 từ đo thực địa hoặc dữ liệu GIS độc lập, sai số, nguồn, ngày đo, ghi chú; lưu **chỉ trên thiết bị** và có **⇩ Xuất mốc JSON**. Dữ liệu chưa xác minh không tự sửa SQLite/scene. Sau này maintainer cần xác minh giấy phép, độ chính xác, thứ tự đường bờ và kiểm tra tự giao polygon trước khi nhập geometry mới.
+- Các nguồn tham khảo gồm OSM, ảnh người dùng chỉ để so sánh trực quan và Copernicus Browser (ảnh vệ tinh Sentinel-2 10m thường quá thô để đo đường kè/mũi đất nhỏ chính xác); Overture Maps Base water phần lớn dẫn xuất từ OSM nên không phải nguồn xác minh độc lập. Không khẳng định hiện đã sửa đúng mép nước.
+
 ## SQLite Explorer — xem dữ liệu database
 **[Mở SQLite Explorer](sqlite.html)** để xem toàn bộ dữ liệu trực tiếp theo bảng của bản xuất SQLite. Giao diện mobile/desktop hỗ trợ: danh sách bảng cùng số dòng, duyệt cột, tìm kiếm, sort, phân trang, xem record đầy đủ, **SCHEMA (CREATE TABLE, PRIMARY KEY, FK)** và tải CSV theo bảng.
 
