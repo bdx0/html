@@ -5,7 +5,7 @@
 (function(){
 "use strict";
 var $=function(id){return document.getElementById(id)};
-var W={ready:false,mode:"3d",shape:"candidate",view:"iso",data:null,host:null,
+var W={ready:false,mode:"3d",shape:"raw",view:"iso",data:null,host:null,
   planCanvas:null,axisCanvas:null,planZoom:1,panX:0,panZ:0,mouse:null,metrics:null};
 function local(p){var o=W.data.origin;return[(p[0]-o.lon)*111320*Math.cos(o.lat*Math.PI/180),(p[1]-o.lat)*111320]}
 function rawPoints(){var f=(W.data.features||[]).find(function(q){return q.kind==="water"&&q.osm_id===217484891});
@@ -22,21 +22,21 @@ function build(){
  stage.append(modes);
  var shapes=el("section","wb-shape-control");shapes.id="wbShapes";shapes.innerHTML=
  '<strong>LAKE SHORELINE</strong><div class="wb-shape-buttons">'+
- '<button type="button" data-wb-shape="candidate" class="selected">◆ Đề xuất</button>'+
- '<button type="button" data-wb-shape="raw">◇ OSM gốc</button></div>'+
- '<small id="wbShapeStatus">Dáng hồ đề xuất · chưa khảo sát</small>';
+ '<button type="button" data-wb-shape="candidate" disabled title="Hình đề xuất bị loại do sai hình học">Đề xuất sai · tắt</button>'+
+ '<button type="button" data-wb-shape="raw" class="selected">◇ OSM gốc</button></div>'+
+ '<small id="wbShapeStatus">Dữ liệu OSM gốc · chưa khảo sát thực tế</small>';
  stage.append(shapes);
  var dock=el("section","wb-plan-dock");dock.id="wbPlanDock";
  dock.setAttribute("aria-label","Floor plan mặt bằng Hồ Trúc Giang");
  dock.innerHTML='<div class="wb-plan-head"><span class="wb-plan-label">⌗ FLOOR PLAN <em>LOCAL XY · NORTH UP</em></span>'+
  '<div class="wb-plan-actions">'+
- '<label title="Hiện OSM để đối chiếu"><input id="wbCompare" type="checkbox" checked> OSM</label>'+
- '<label title="Mốc hình dạng"><input id="wbAnchors" type="checkbox" checked> MỐC</label>'+
+ '<label title="So sánh (khi có hình hợp lệ)" hidden><input id="wbCompare" type="checkbox"> Overlay</label>'+
+ '<label title="Mốc đề xuất sai đã loại" hidden><input id="wbAnchors" type="checkbox"> MỐC</label>'+
  '<button type="button" id="wbPlanMinus" aria-label="Thu nhỏ Floor Plan">−</button>'+
  '<button type="button" id="wbPlanPlus" aria-label="Phóng to Floor Plan">+</button></div></div>'+
  '<canvas id="wbPlanCanvas" aria-label="Bản vẽ mặt bằng nước hồ, đường, nhà và mốc đặc trưng"></canvas>'+
- '<div class="wb-plan-footer"><span><i class="wb-dot proposed"></i> DÁNG ĐỀ XUẤT</span>'+
- '<span><i class="wb-dot raw"></i> OSM 217484891</span><small>Chạm mặt bằng để tập trung camera 3D</small></div>';
+ '<div class="wb-plan-footer"><span><i class="wb-dot proposed"></i> ĐƯỜNG BỜ OSM</span>'+
+ '<span><i class="wb-dot raw"></i> CHƯA KIỂM CHỨNG</span><small>Chạm mặt bằng để tập trung camera 3D</small></div>';
  stage.append(dock);
  var axis=el("div","wb-axis");axis.id="wbAxis";axis.innerHTML=
  '<div class="wb-axis-title">AXIS · XYZ</div>'+
@@ -46,7 +46,7 @@ function build(){
  '<button data-wb-view="east" aria-label="Nhìn từ Đông">E</button>'+
  '<button data-wb-view="iso" aria-label="Phối cảnh isometric" class="selected">ISO</button></div>';
  stage.append(axis);
- var status=el("div","wb-status");status.id="wbStatus";status.textContent="SHAPE CANDIDATE · PLAN (X EAST / Z NORTH) · METERS";
+ var status=el("div","wb-status");status.id="wbStatus";status.textContent="OSM SOURCE · NOT VERIFIED · METERS";
  stage.append(status);
  W.planCanvas=$("wbPlanCanvas");W.axisCanvas=$("wbAxisCanvas");
  stage.querySelectorAll("[data-wb-mode]").forEach(function(b){b.addEventListener("click",function(e){e.stopPropagation();setMode(b.dataset.wbMode)})});
@@ -75,10 +75,10 @@ function setMode(mode){
  resize();
 }
 function setShape(shape){
- if(!["candidate","raw"].includes(shape))return;
+ if(shape!=="raw")return;
  W.shape=shape;
  document.querySelectorAll("[data-wb-shape]").forEach(function(b){b.classList.toggle("selected",b.dataset.wbShape===shape);b.setAttribute("aria-pressed",String(b.dataset.wbShape===shape))});
- $("wbShapeStatus").textContent=shape==="raw"?"OSM gốc 217484891 · dữ liệu có nguồn":"Hình dáng đề xuất · cần đo xác minh";
+ $("wbShapeStatus").textContent=shape==="raw"?"OSM way 217484891 · cần đo kiểm chứng":"Hình dáng đề xuất · cần đo xác minh";
  if(W.host&&W.host.updateShape)W.host.updateShape(shape);
  W.planZoom=1;drawPlan();
 }
@@ -122,7 +122,7 @@ function drawPlan(){
    var pts=f.geometry.coordinates.map(function(p){var a=local(p);return{x:a[0],z:a[1]}});
    if(pts.length<2)return;c.beginPath();pts.forEach(function(p,i){var v=screen(p,w,h,k);if(!i)c.moveTo(v.x,v.y);else c.lineTo(v.x,v.y)});c.stroke();
  });
- var raw=rawPoints(),candidate=activePoints();
+ var raw=rawPoints(),candidate=raw;
  trace(c,candidate,w,h,k);c.fillStyle="rgba(47,140,219,.15)";c.fill();c.lineWidth=3.8;c.strokeStyle=W.shape==="candidate"?"#256dce":"#1685ca";c.stroke();
  if($("wbCompare").checked&&W.shape!=="raw"&&raw.length>0){
    c.save();c.setLineDash([6,4]);c.strokeStyle="#fb9c48";c.lineWidth=2;trace(c,raw,w,h,k);c.stroke();c.restore()
@@ -132,7 +132,7 @@ function drawPlan(){
   if(v.x<0||v.x>w||v.y<0||v.y>h)return;
   c.fillStyle="#f3a846";c.beginPath();c.arc(v.x,v.y,3.2,0,7);c.fill()
  });
- if($("wbAnchors").checked&&window.TrucGiangLake&&W.shape==="candidate"){
+ if(false&&$("wbAnchors").checked&&window.TrucGiangLake&&W.shape==="candidate"){
   var pts=TrucGiangLake.points();
   pts.forEach(function(p){
    var xy=screen(p,w,h,k);
@@ -151,7 +151,7 @@ function drawPlan(){
  var ruler=50*k;
  c.strokeStyle="#1e3860";c.lineWidth=2;c.beginPath();c.moveTo(17,h-21);c.lineTo(17+ruler,h-21);c.moveTo(17,h-26);c.lineTo(17,h-16);c.moveTo(17+ruler,h-26);c.lineTo(17+ruler,h-16);c.stroke();
  c.font="10px system-ui";c.fillText("50 m",19,h-29);
- $("wbStatus").textContent=(W.shape==="candidate"?"CANDIDATE / NOT SURVEYED":"OSM SOURCE / UNMODIFIED")+
+ $("wbStatus").textContent="OSM SOURCE / NOT VERIFIED"+
  " · "+(W.mode==="floor"?"FLOOR PLAN":"SPLIT VIEW")+" · "+Math.round(1/k*100)+" cm/pixel (visual)";
 }
 function drawAxis(){
