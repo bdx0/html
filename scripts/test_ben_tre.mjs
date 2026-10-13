@@ -213,7 +213,10 @@ try {
     await explorer.locator('#rowsTab').click();
     const tableScroll=explorer.locator('#gridScroll');
     await tableScroll.evaluate(el=>{el.scrollTop=0;el.scrollLeft=0});
-    await explorer.locator('#dataGrid tbody tr').nth(3).locator('td').first().click();
+    // Keyboard row activation stays reliable on 320px / landscape, where the sticky
+    // table header overlaps some scroll-into-view click targets.
+    await explorer.locator('#dataGrid tbody tr').first().focus();
+    await explorer.keyboard.press('Enter');
     if(!(await explorer.locator('#recordBackdrop').evaluate(el=>el.classList.contains('open'))))
       errors.push(name+' row detail drawer did not open');
     const closeRect=await explorer.locator('#closeRecord').boundingBox();
