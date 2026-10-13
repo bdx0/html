@@ -107,6 +107,14 @@ footer{display:flex;justify-content:space-between;align-items:center;gap:9px;pad
  .record-panel{width:100%;height:min(88dvh,890px);border-radius:17px 17px 0 0}
  .record-field{grid-template-columns:100px minmax(0,1fr)}
 }
+
+/* This close control is a sibling of the modal, not a descendant of its stacking context.
+   The drawer header/backdrop can never intercept pointer hits. */
+#closeRecord.floating-close{position:fixed;top:14px;right:14px;z-index:99;
+ width:47px;height:47px;padding:0;display:grid;place-items:center;border-radius:11px;
+ border:2px solid #aacbf6;background:#fff;color:#275dbb;box-shadow:0 6px 24px #091b3a55;font-size:20px}
+#closeRecord.floating-close[hidden]{display:none!important}
+@media(max-width:880px){#closeRecord.floating-close{top:calc(12dvh + 10px);right:11px}}
 </style>
 </head>
 <body>
@@ -141,11 +149,12 @@ footer{display:flex;justify-content:space-between;align-items:center;gap:9px;pad
 </div>
 <div id="recordBackdrop" class="record-backdrop" role="presentation">
  <div class="record-panel" role="dialog" aria-modal="true" aria-label="Chi tiết bản ghi">
-  <div class="record-head"><strong id="recordHeading">Chi tiết bản ghi</strong><button id="closeRecord" aria-label="Đóng chi tiết">✕</button></div>
+  <div class="record-head"><strong id="recordHeading">Chi tiết bản ghi</strong></div>
   <div class="record-rows" id="recordBody"></div>
   <div class="record-actions"><button id="copyRow" class="primary">Sao chép JSON</button><button id="closeRecordFoot">Đóng</button></div>
  </div>
 </div>
+<button id="closeRecord" class="floating-close" aria-label="Đóng chi tiết bản ghi" hidden>✕</button>
 <div id="loading" role="status">Đang tải cấu trúc và dữ liệu từ bản xuất SQLite…</div>
 <script>
 (function(){
@@ -251,9 +260,9 @@ Object.entries(state.opened).forEach(([key,v])=>{
  else{var code=h("code",typeof v==="object"&&v!==null?JSON.stringify(v,null,2):value(v));box.append(code)}
  body.append(box)
 });
-$("recordBackdrop").classList.add("open")
+$("recordBackdrop").classList.add("open");$("closeRecord").hidden=false
 }
-function close(){state.opened=null;$("recordBackdrop").classList.remove("open")}
+function close(){state.opened=null;$("recordBackdrop").classList.remove("open");$("closeRecord").hidden=true}
 function csvCell(v){var s=value(v);if(v===null)s="";return'"'+s.replace(/"/g,'""')+'"'}
 function exportCsv(){
 var t=table();if(!t)return;
