@@ -49,7 +49,8 @@ main{min-width:0;min-height:0;display:flex;flex-direction:column}
 .toolbar .db-save{margin-left:auto}
 .mobile-table-select{display:none}
 .surface{margin:0 20px 12px;background:#fff;border:1px solid #dfe7f3;border-radius:11px;box-shadow:0 4px 22px #315a9d0a;display:flex;flex-direction:column;min-height:0;flex:1;overflow:hidden}
-#gridScroll{overflow:auto;flex:1;min-height:0;overscroll-behavior:contain}
+#gridScroll{overflow:auto;flex:1;min-height:0;overscroll-behavior:contain;scroll-padding-top:55px}
+tbody tr,tbody td{scroll-margin-top:55px}
 table{border-collapse:collapse;min-width:100%;font-size:11px;white-space:nowrap}
 thead th{position:sticky;top:0;z-index:1;text-align:left;color:#567294;background:#f1f5fc;border-bottom:1px solid #d8e5f4;cursor:pointer;user-select:none}
 th,td{padding:12px 13px;border-bottom:1px solid #eff2f7;max-width:345px}
@@ -184,7 +185,7 @@ sel.value=state.table;$("navTotal").textContent=String(state.db.tables.length)
 }
 function selectTable(name){
 if(!byName(name))return;
-state.table=name;state.query="";state.sortIndex=-1;state.sortDir=1;state.offset=0;
+state.table=name;state.query="";state.sortIndex=-1;state.sortDir=1;state.offset=0;$("gridScroll").scrollTop=0;
 $("search").value="";nav();render();location.hash=encodeURIComponent(name)
 }
 function filter(){
@@ -247,7 +248,7 @@ var t=table();if(!t)return;
 $("currentTable").textContent=t.name;
 $("recordsBadge").textContent=t.count.toLocaleString("vi-VN")+" rows";
 $("colsBadge").textContent=t.columns.length+" columns";
-$("gridScroll").hidden=state.view!=="rows";$("schemaView").hidden=state.view!=="schema";$("paging").hidden=state.view!=="rows";
+$("gridScroll").hidden=state.view!=="rows";if(state.view==="rows")$("gridScroll").scrollTop=0;$("schemaView").hidden=state.view!=="schema";$("paging").hidden=state.view!=="rows";
 $("rowsTab").classList.toggle("selected",state.view==="rows");$("schemaTab").classList.toggle("selected",state.view==="schema");
 $("rowsTab").setAttribute("aria-pressed",String(state.view==="rows"));$("schemaTab").setAttribute("aria-pressed",String(state.view==="schema"));
 $("search").disabled=state.view!=="rows";$("sizeSelect").disabled=state.view!=="rows";
