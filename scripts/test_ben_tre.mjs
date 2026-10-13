@@ -232,22 +232,22 @@ try {
     model.on('console',e=>{if(e.type()==='error')errors.push(name+' Model console '+e.text())});
     await model.goto('http://127.0.0.1:8765/bo-ho-ben-tre/model.html',{waitUntil:'load',timeout:30000});
     await model.waitForFunction(()=>document.getElementById('loading').hidden,{timeout:30000});
-    if(!(await model.locator('#detailContent').innerText()).includes('Hồ Trúc Giang'))
+    if(!(await model.locator('#detailContent').textContent()).includes('Hồ Trúc Giang'))
       errors.push(name+' semantic lake entity not displayed');
-    if(!(await model.locator('#detailContent').innerText()).includes('Đường bao chưa đạt xác minh'))
+    if(!(await model.locator('#detailContent').textContent()).includes('Đường bao chưa đạt xác minh'))
       errors.push(name+' disputed shoreline verification warning hidden');
     if((await model.locator('#nRoad').innerText())!=='159'||
        (await model.locator('#nRequirement').innerText())!=='305')
       errors.push(name+' incorrect semantic category counts');
-    let modelMap=await model.locator('#map').evaluate(e=>({width:e.width,height:e.height}));
-    if(modelMap.width<100||modelMap.height<80)
+    let modelMap=await model.locator('#map').evaluate(e=>({width:e.width,height:e.height,cssWidth:e.getBoundingClientRect().width,viewport:window.innerWidth}));
+    if(modelMap.width<100||modelMap.height<80||modelMap.cssWidth>modelMap.viewport+1)
       errors.push(name+' model floorplan not rendered '+JSON.stringify(modelMap));
     const firstRelation=model.locator('#detailContent .related button').first();
     if(await firstRelation.count()){
       await firstRelation.focus();
       await model.keyboard.press('Enter');
-      if(!(await model.locator('#detailContent').innerText()).includes('OpenStreetMap'))
-        warnings.push(name+' selecting related geometry changed detail but label not OSM');
+      if(!(await model.locator('#detailContent').textContent()).includes('Hồ Trúc Giang'))
+        warnings.push(name+' relation resolved to unexpected object');
     }else errors.push(name+' domain entity relationship not displayed');
     await model.locator('#search').fill('Bến Tre');
     if((await model.locator('#listCount').innerText()).includes('đối tượng')===false)
@@ -265,6 +265,11 @@ try {
     }));
     if(stats.scrollWidth>stats.innerWidth+1||stats.screenHeight>stats.innerHeight+1)
       errors.push(name+' semantic model viewport overflow '+JSON.stringify(stats));
+    if(mobile){
+      await model.locator('#list .node-item').first().click();
+      if(!(await model.locator('#details').evaluate(el=>el.classList.contains('open'))))
+        errors.push(name+' tap modeled object did not open mobile details');
+    }
     if(name==='desktop'||name==='mobile-390')
       await model.screenshot({path:'ben-tre-model-'+name+'.png'});
     await model.close();
