@@ -141,6 +141,7 @@ header nav a{white-space:nowrap;border-radius:8px;border:1px solid #d8e4f3;backg
 </div>
 <div id="loading" role="status">Đang xây dựng các thực thể và quan hệ từ bản xuất SQLite…</div>
 <script src="shoreline-controls.js"></script>
+<script src="shoreline-review.js"></script>
 <script>
 (function(){
 "use strict";
@@ -211,6 +212,7 @@ for(let [k,v,unit] of [["Diện tích",m.area_m2,"m²"],["Chu vi",m.perimeter_m,
 let refs=addSection(sec,"Nguồn đối chiếu");
 for(let l of a.comparison_links)link(refs,l.url,l.title);
 sec.append(el("p","Không tự chuyển pixel ảnh Google Maps thành GPS. Muốn cập nhật ranh thực phải có tọa độ đo hoặc dữ liệu địa lý được cấp phép.","note"));
+if(window.TrucGiangReview)TrucGiangReview.mount(sec,redraw);
 host.append(sec);if(window.TrucGiangShoreControls)TrucGiangShoreControls.attach(host,redraw)
 }
 function renderDetail(){
@@ -222,8 +224,8 @@ host.append(el("p",n.subtitle,"subtitle"));
 let st=el("span",status(n.status),"status");if(n.status==="unverified"||n.kind==="water")st.classList.add("problem");else if(n.status==="community")st.classList.add("reference");
 host.append(st);
 if(n.description)host.append(el("p",n.description,"description"));
-if(n.facts&&n.facts.length){let sec=addSection(host,"THUỘC TÍNH ĐÃ BIẾT");n.facts.forEach(f=>addFact(sec,f))}
 if(n.kind==="water")addAudit(host);
+if(n.facts&&n.facts.length){let sec=addSection(host,"THUỘC TÍNH ĐÃ BIẾT");n.facts.forEach(f=>addFact(sec,f))}
 if(n.relations?.length){let sec=addSection(host,"LIÊN KẾT DỮ LIỆU · "+n.relations.length),list=el("div",undefined,"related");
 n.relations.slice(0,40).forEach(rel=>{let linked=state.byId.get(rel.target);if(!linked)return;
 let b=el("button");b.append(el("span",icon(linked.kind),"node-icon"));let t=el("strong",linked.title);
@@ -235,8 +237,13 @@ addFact(footer,{label:"ID trong mô hình",value:n.id});
 if(n.geometry)addFact(footer,{label:"Kiểu hình học",value:n.geometry.type});
 footer.append(el("p","Các trường chưa có dữ liệu không được thay bằng chiều cao, vị trí hay diện tích tự đoán.","note"));
 }
-function select(id,openMobile){if(!state.byId.has(id))return;state.selected=id;renderList();renderDetail();redraw();
-if(openMobile&&window.innerWidth<=760){$("details").classList.add("open");$("detailContent").parentNode.scrollTop=0}
+function select(id,openMobile){if(!state.byId.has(id))return;state.selected=id;renderList();renderDetail();
+if(window.TrucGiangReview)TrucGiangReview.toolbarVisible(id==="osm-way-217484891");
+redraw();
+if(openMobile&&window.innerWidth<=760){
+ $("details").classList.add("open");$("details").classList.toggle("review-open",id==="osm-way-217484891");
+ $("details").scrollTop=0;
+}
 location.hash=encodeURIComponent(id)
 }
 function resizeCanvas(){
@@ -298,6 +305,8 @@ if(s?.geometry){
  if(s.geometry.type==="Point"){let p=project(s.geometry.coordinates);g.beginPath();g.arc(p.x,p.y,11,0,7);g.lineWidth=2.5;g.strokeStyle="#286aff";g.stroke()}
  else drawGeom(g,s,"#1b58df",false,3.5)
 }
+if(window.TrucGiangReview&&state.selected==="osm-way-217484891")
+ TrucGiangReview.draw(g,project,k);
 g.font="bold 11px system-ui";g.fillStyle="#3264a2";g.fillText("N ↑",16,22);
 let meter=50*k;g.lineWidth=2;g.strokeStyle="#375b83";g.beginPath();g.moveTo(20,h-25);g.lineTo(20+meter,h-25);
 g.moveTo(20,h-30);g.lineTo(20,h-20);g.moveTo(20+meter,h-30);g.lineTo(20+meter,h-20);g.stroke();
@@ -324,7 +333,12 @@ for(let i=1;i<pts.length;i++)best=Math.min(best,distanceLine(p,pts[i-1],pts[i]))
 return best
 }
 function onMapClick(x,y){
-let loc=invert(x,y);if(!loc)return;let threshold=12/state.last.scale;
+let loc=invert(x,y);if(!loc)return;
+if(window.TrucGiangReview&&state.selected==="osm-way-217484891"){
+ let reviewHit=TrucGiangReview.hitTest(loc,state.last.scale);
+ if(reviewHit){TrucGiangReview.changeIssue(reviewHit,false);return}
+}
+let threshold=12/state.last.scale;
 let items=state.nodes.filter(n=>GEO.has(n.kind)&&n.geometry&&n.kind!=="landmark"&&n.kind!=="hotspot");
 items=items.map(n=>({n,d:containsClick(n,loc)})).filter(v=>v.d<threshold);
 let priority={water:0,building:1,park:2,road:3};
@@ -363,7 +377,16 @@ $("nRequirement").textContent=d.table_counts.requirements;
 let roadsInRaw=d.table_counts.osm_features-
  d.nodes.filter(n=>["water","building","park"].includes(n.kind)).length;
 $("nRoad").textContent=roadsInRaw;
-initializeMap();renderKinds();renderList();
+initializeMap();
+if(window.TrucGiangReview){
+ TrucGiangReview.init(d,redraw,function(){
+  if(state.selected!=="osm-way-217484891")select("osm-way-217484891",false);
+  if(window.innerWidth<=760){$("details").classList.add("open");$("details").classList.add("review-open");$("details").scrollTop=0}
+ });
+}
+renderKinds();renderList();
+if(window.innerWidth<=760)state.map.zoom=2.8;
+else state.map.zoom=1.65;
 let selectId=decodeURIComponent(location.hash.slice(1));
 if(!state.byId.has(selectId))selectId="osm-way-217484891";
 select(selectId,false);$("loading").hidden=true;redraw()
