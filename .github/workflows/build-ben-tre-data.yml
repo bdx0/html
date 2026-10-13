@@ -7,6 +7,10 @@ on:
       - "bo-ho-ben-tre/index.html"
       - "bo-ho-ben-tre/survey.js"
       - "bo-ho-ben-tre/survey.css"
+      - "bo-ho-ben-tre/sqlite.html"
+      - "bo-ho-ben-tre/workbench.js"
+      - "bo-ho-ben-tre/workbench.css"
+      - "bo-ho-ben-tre/lake-shape.js"
       - "bo-ho-ben-tre/data/catalog-blueprint-v1.json"
       - "bo-ho-ben-tre/data/surveys/**"
       - "bo-ho-ben-tre/assets/surveys/**"
@@ -45,6 +49,14 @@ jobs:
           assert db.execute('select count(*) from field_surveys').fetchone()[0]>=0
           assert db.execute('select count(*) from photo_hotspot_items').fetchone()[0]>=15
           d=json.loads((p/'scene.json').read_text())
+          viewer=json.loads((p/'sqlite-explorer.json').read_text(encoding='utf-8'))
+          assert viewer['read_only'] is True
+          counts={t['name']:t['count'] for t in viewer['tables']}
+          assert counts['requirements']==db.execute('SELECT COUNT(*) FROM requirements').fetchone()[0]
+          assert counts['osm_features']==db.execute('SELECT COUNT(*) FROM osm_features').fetchone()[0]
+          assert counts['photo_hotspots']==db.execute('SELECT COUNT(*) FROM photo_hotspots').fetchone()[0]
+          assert len(viewer['tables'])>=14
+          assert all(len(t['rows'])==t['count'] and len(t['columns'])>0 for t in viewer['tables'])
           assert d['stats']['requirements']==305
           html=pathlib.Path('bo-ho-ben-tre/index.html').read_text()
           js=re.findall(r'<script>(.*?)</script>',html,re.S)[-1]
@@ -53,11 +65,13 @@ jobs:
           PY
           node --check /tmp/ben-tre-client-check.js
           node --check bo-ho-ben-tre/survey.js
+          node --check bo-ho-ben-tre/workbench.js
+          node --check bo-ho-ben-tre/lake-shape.js
       - name: Commit generated database snapshot
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add bo-ho-ben-tre/data/catalog.sqlite bo-ho-ben-tre/data/scene.json
+          git add bo-ho-ben-tre/data/catalog.sqlite bo-ho-ben-tre/data/scene.json bo-ho-ben-tre/data/sqlite-explorer.json
           if ! git diff --cached --quiet; then
             git commit -m "build(ben-tre): refresh SQLite and static GIS scene [skip ci]"
             git push origin HEAD:main
