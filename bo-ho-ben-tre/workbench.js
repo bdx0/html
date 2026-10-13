@@ -58,7 +58,7 @@ function build(){
  $("wbAnchors").addEventListener("change",drawPlan);
  attachPlanInteraction();
  W.axisCanvas.addEventListener("click",function(e){
-   var r=W.axisCanvas.getBoundingClientRect(),x=(e.clientX-r.left)*110/r.width,y=(e.clientY-r.top)*100/r.height;
+   var r=W.axisCanvas.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;
    if(W.metrics&&W.metrics.ends){var near=null,d=Infinity;
     W.metrics.ends.forEach(function(q){var dist=Math.hypot(x-q.x,y-q.y);if(dist<d){d=dist;near=q}});
     if(near&&d<24){setView(near.key);return}
@@ -128,7 +128,7 @@ function drawPlan(){
    c.save();c.setLineDash([6,4]);c.strokeStyle="#fb9c48";c.lineWidth=2;trace(c,raw,w,h,k);c.stroke();c.restore()
  }
  var hotspots=W.data.photo_hotspots||[];
- hotspots.forEach(function(p){var v=screen({x:p.position.x,z:p.position.z},w,h,k);
+ hotspots.forEach(function(p){var pt=p.id==="HS-FOUNTAIN"&&W.shape==="candidate"?{x:54,z:-1}:p.position;var v=screen({x:pt.x,z:pt.z},w,h,k);
   if(v.x<0||v.x>w||v.y<0||v.y>h)return;
   c.fillStyle="#f3a846";c.beginPath();c.arc(v.x,v.y,3.2,0,7);c.fill()
  });
