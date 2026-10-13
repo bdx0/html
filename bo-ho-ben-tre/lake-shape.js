@@ -34,7 +34,7 @@ function clone(points){return points.map(function(p){return{x:p[0],z:p[1]}})}
 var proposal=clone(anchors);
 function area(r){var a=0;for(var i=0;i<r.length;i++){var p=r[i],q=r[(i+1)%r.length];a+=p.x*q.z-q.x*p.z}return Math.abs(a*.5)}
 function bounds(r){return r.reduce(function(b,p){b.minX=Math.min(b.minX,p.x);b.maxX=Math.max(b.maxX,p.x);b.minZ=Math.min(b.minZ,p.z);b.maxZ=Math.max(b.maxZ,p.z);return b},{minX:Infinity,maxX:-Infinity,minZ:Infinity,maxZ:-Infinity})}
-function ring(source,mode){return mode==="raw"?source.map(function(p){return{x:p.x,z:p.z}}):proposal.map(function(p){return{x:p.x,z:p.z}})}
+function ring(source,mode){if(mode==="raw")return source.map(function(p){return{x:p.x,z:p.z}});var dense=[];for(var i=0;i<proposal.length;i++){var p=proposal[i],q=proposal[(i+1)%proposal.length];for(var t=0;t<6;t++){var u=t/6;dense.push({x:p.x+(q.x-p.x)*u,z:p.z+(q.z-p.z)*u})}}return dense}
 function points(){return named.map(function(p){return {id:p.id,label:p.label,type:p.type,index:p.index,x:proposal[p.index].x,z:proposal[p.index].z}})}
 window.TrucGiangLake={
  proposal:ring,
