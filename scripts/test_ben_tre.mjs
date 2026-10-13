@@ -265,6 +265,24 @@ try {
     }));
     if(stats.scrollWidth>stats.innerWidth+1||stats.screenHeight>stats.innerHeight+1)
       errors.push(name+' semantic model viewport overflow '+JSON.stringify(stats));
+    if(name==='desktop'||name==='mobile-390'){
+      await model.goto('http://127.0.0.1:8765/bo-ho-ben-tre/model.html#osm-way-217484891',{waitUntil:'load'});
+      await model.waitForFunction(()=>document.getElementById('loading').hidden);
+      const add= model.locator('.shore-actions button').filter({hasText:'Nhập mốc tọa độ'}).first();
+      await add.click();
+      await model.locator('.shore-form input[name="lat"]').fill('10.23861');
+      await model.locator('.shore-form input[name="lon"]').fill('106.37814');
+      await model.locator('.shore-form textarea[name="notes"]').fill('Mốc thử nghiệm từ máy GPS, chưa xác minh');
+      await model.locator('.shore-form button[type="submit"]').click();
+      if(!(await model.locator('.shore-results').innerText()).includes('1 điểm tọa độ'))
+        errors.push(name+' independent shoreline control not retained locally');
+      const exportWait=model.waitForEvent('download',{timeout:10000});
+      await model.locator('.shore-actions button').filter({hasText:'Xuất mốc JSON'}).first().click();
+      const file=await exportWait;
+      const points=JSON.parse(fs.readFileSync(await file.path(),'utf8'));
+      if(points.schema!=='truc-giang-shoreline-ground-controls-v1'||points.points[0].verification_status!=='self_reported_unreviewed')
+        errors.push(name+' shoreline ground control JSON mislabels verification status');
+    }
     if(mobile){
       await model.locator('#list .node-item').first().click();
       if(!(await model.locator('#details').evaluate(el=>el.classList.contains('open'))))
