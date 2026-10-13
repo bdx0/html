@@ -75,6 +75,13 @@ Giữ `data/catalog-blueprint-v1.json` và `scripts/build.py` trong commit để
 - Snapshot screenshot desktop/mobile là yêu cầu nghiệm thu; không chỉ dựa vào report FPS.
 - Nguồn đối chiếu ảnh: https://addflag.com/ho_truc_giang__4361 và https://triphunter.vn/places/ben-tre/items/ho-truc-giang; ảnh nguồn chỉ để xem tham chiếu.
  
+## SQLite Explorer — xem dữ liệu database
+**[Mở SQLite Explorer](sqlite.html)** để xem toàn bộ dữ liệu trực tiếp theo bảng của bản xuất SQLite. Giao diện mobile/desktop hỗ trợ: danh sách bảng cùng số dòng, duyệt cột, tìm kiếm, sort, phân trang, xem record đầy đủ, **SCHEMA (CREATE TABLE, PRIMARY KEY, FK)** và tải CSV theo bảng.
+
+Nguồn dữ liệu: \`data/catalog.sqlite\` → Python \`scripts/build.py\` → \`data/sqlite-explorer.json\` → \`sqlite.html\`. Đây là **bản xuất read-only từ SQLite**, không phải kết nối SQLite trực tiếp trong trình duyệt, không hỗ trợ chạy SQL tùy ý hoặc chỉnh dữ liệu live. Có nút tải \`catalog.sqlite\` gốc để làm việc bằng công cụ SQLite riêng.
+
+**Lưu ý về hình hồ:** Bản hình dáng "đề xuất" do AI dựng trước đó đã bị đánh giá sai nghiêm trọng và hiện **không còn được sử dụng**. Chế độ mặc định trở lại OSM way 217484891 và vẫn ghi rõ chưa xác minh. Floor Plan / Split / Axis vẫn hoạt động. Không nên lấy polygon OSM như bản khảo sát chính xác; cần điểm kiểm tra độc lập trước khi chỉnh lại.
+
 ## Floor Plan, trục tọa độ và hình dạng hồ — cập nhật trực tiếp
 Bản HTML đã có **3D / PLAN / SPLIT** theo style Warestack 3D (trắng – xanh dương, panel kỹ thuật). \`PLAN\` là hình chiếu mặt bằng nhìn từ trên cao, bắc hướng lên, với đường phố/công viên/tòa nhà OSM và các mốc cạnh nước. \`SPLIT\` đặt mặt bằng bên cạnh renderer 3D; chạm mặt bằng để focus camera 3D.
 
