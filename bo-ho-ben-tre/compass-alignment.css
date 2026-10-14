@@ -1,0 +1,35 @@
+/* 2026-10-14 · true north overlay. North is WGS84/true (NOT
+ * device magnetic bearing). TOP: geographic North is up, East is right.
+ */
+#stage .wb-true-compass{
+  position:absolute;z-index:11;right:13px;top:239px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-width:61px;width:61px;height:69px;gap:0;padding:5px 4px;
+  border:1px solid #b4cce2;border-radius:13px;
+  background:#fffffff0;color:#204363;box-shadow:0 4px 17px #112e4a33;
+  font-family:system-ui;cursor:pointer;pointer-events:auto;touch-action:manipulation
+}
+#stage .wb-true-compass:hover,#stage .wb-true-compass:focus-visible{
+  background:#eaf3ff;border-color:#477fbd;outline-offset:2px
+}
+.wb-compass-n{font-size:11px;line-height:12px;font-weight:950;color:#bb2933}
+.wb-compass-needle{display:block;font-size:27px;line-height:28px;font-weight:900;
+  color:#c62b39;transform-origin:50% 50%;transition:transform .12s linear;will-change:transform}
+.wb-compass-caption{font-size:9px;line-height:12px;font-weight:850;letter-spacing:-.01em;white-space:nowrap}
+#stage.wb-floor .wb-true-compass{top:61px}
+#stage.wb-split .wb-true-compass{right:calc(45% + 13px);top:239px}
+@media(max-width:860px){
+  #stage .wb-true-compass{top:61px;right:9px;min-width:55px;width:55px;height:64px;padding:3px}
+  #stage.wb-floor .wb-true-compass{top:57px}
+  #stage.wb-split .wb-true-compass{top:61px;right:9px}
+  #stage.axis-open .wb-true-compass{visibility:hidden}
+  body.sheet-open #stage .wb-true-compass{visibility:hidden}
+}
+@media(max-width:860px) and (orientation:landscape){
+  #stage .wb-true-compass{top:54px;right:8px;width:48px;min-width:48px;height:53px}
+  #stage.wb-floor .wb-true-compass{top:51px}
+  #stage.wb-split .wb-true-compass{top:54px;right:calc(48% + 8px)}
+  .wb-compass-needle{font-size:22px;line-height:23px}
+  .wb-compass-n{font-size:9px;line-height:10px}
+  .wb-compass-caption{font-size:8px;line-height:10px}
+}
