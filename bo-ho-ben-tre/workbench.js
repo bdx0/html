@@ -48,7 +48,7 @@ function build(){
  stage.append(dock);
  var axis=el("div","wb-axis");axis.id="wbAxis";axis.innerHTML=
  '<div class="wb-axis-title">AXIS · XYZ</div>'+
- '<canvas id="wbAxisCanvas" width="110" height="100" aria-label="Axis gizmo: X Đông, Y Cao, Z Bắc" title="Chạm đầu trục để chọn góc nhìn"></canvas>'+
+ '<canvas id="wbAxisCanvas" width="110" height="100" aria-label="Axis gizmo: E Đông +X, U Cao +Y, N Bắc -Z" title="Chạm đầu trục để chọn góc nhìn"></canvas>'+
  '<div class="wb-preset-row"><button data-wb-view="top" aria-label="Nhìn từ trên xuống">TOP</button>'+
  '<button data-wb-view="north" aria-label="Nhìn từ Bắc">N</button>'+
  '<button data-wb-view="east" aria-label="Nhìn từ Đông">E</button>'+
@@ -66,6 +66,13 @@ function build(){
  });
  var status=el("div","wb-status");status.id="wbStatus";status.textContent="OSM SOURCE · NOT VERIFIED · METERS";
  stage.append(status);
+ var compass=el("button","wb-true-compass");
+ compass.id="wbTrueCompass";compass.type="button";
+ compass.setAttribute("aria-label","Nhìn từ trên: Bắc lên trên, Đông sang phải (True North WGS84)");
+ compass.title="La bàn Bắc địa lý. Chạm để về TOP: Bắc lên, Đông sang phải.";
+ compass.innerHTML='<span class="wb-compass-n">N</span><span class="wb-compass-needle" id="wbCompassNeedle">↑</span><span class="wb-compass-caption" id="wbCompassCaption">TRUE NORTH</span>';
+ stage.append(compass);
+ compass.addEventListener("click",function(e){e.stopPropagation();setView("top")});
  W.planCanvas=$("wbPlanCanvas");W.axisCanvas=$("wbAxisCanvas");W.pinLayer=$("wbReviewPins");
  stage.querySelectorAll("[data-wb-mode]").forEach(function(b){b.addEventListener("click",function(e){e.stopPropagation();setMode(b.dataset.wbMode)})});
  stage.querySelectorAll("[data-wb-shape]").forEach(function(b){b.addEventListener("click",function(e){e.stopPropagation();setShape(b.dataset.wbShape)})});
@@ -106,9 +113,9 @@ function setView(view){
  if(!["top","north","south","east","west","iso"].includes(view))return;
  W.view=view;W.host.setView(view);
  document.querySelectorAll("[data-wb-view]").forEach(function(b){b.classList.toggle("selected",b.dataset.wbView===view)});
- drawAxis();
+ drawAxis();drawCompass();
 }
-function resize(){if(!W.ready)return;drawPlan();drawAxis();updatePins()}
+function resize(){if(!W.ready)return;drawPlan();drawAxis();drawCompass();updatePins()}
 function setupCanvas(canvas){var rect=canvas.getBoundingClientRect();if(rect.width<1||rect.height<1)return null;
  var scale=Math.min(window.devicePixelRatio||1,2),w=rect.width,h=rect.height;
  var pxw=Math.round(w*scale),pxh=Math.round(h*scale);
@@ -170,7 +177,7 @@ function updatePins(){
  var hidden=W.mode==="floor";
  W.reviewPins.forEach(function(rec){
   var p=issuePoint(rec.issue),button=rec.element;if(hidden||!p){button.hidden=true;return}
-  var vec=new THREE.Vector3(p.x,5.5,p.z).project(camera);
+  var vec=new THREE.Vector3(p.x,5.5,-p.z).project(camera);
   var x=(vec.x*.5+.5)*visibleW,y=(1-(vec.y*.5+.5))*visibleH;
   var inside=vec.z>=-1&&vec.z<=1&&x>14&&y>30&&x<visibleW-14&&y<visibleH-45;
   button.hidden=!inside;
@@ -242,9 +249,9 @@ function drawAxis(){
  if(!s||!s.camera)return;
  s.camera.updateMatrixWorld();
  var q=s.camera.quaternion.clone().invert();
- var a=[{v:new THREE.Vector3(1,0,0),name:"X",key:"east",color:"#ec7064"},
-        {v:new THREE.Vector3(0,1,0),name:"Y",key:"top",color:"#2ea979"},
-        {v:new THREE.Vector3(0,0,1),name:"Z",key:"north",color:"#3579ee"}];
+ var a=[{v:new THREE.Vector3(1,0,0),name:"E",key:"east",color:"#ec7064"},
+        {v:new THREE.Vector3(0,1,0),name:"U",key:"top",color:"#2ea979"},
+        {v:new THREE.Vector3(0,0,-1),name:"N",key:"north",color:"#3579ee"}];
  var cx=w/2,cy=h/2+1,ends=[];
  a.forEach(function(x){var v=x.v.applyQuaternion(q),px=cx+v.x*34,py=cy-v.y*34;
  c.strokeStyle=x.color;c.lineWidth=3;c.beginPath();c.moveTo(cx,cy);c.lineTo(px,py);c.stroke();
@@ -253,6 +260,26 @@ function drawAxis(){
  ends.push({x:px,y:py,key:x.key})
  });
  W.metrics=W.metrics||{};W.metrics.ends=ends;
+}
+function drawCompass(){
+ if(!W.ready)return;
+ var needle=$("wbCompassNeedle"),caption=$("wbCompassCaption"),compass=$("wbTrueCompass");
+ if(!needle||!caption||!compass)return;
+ var angle=0;
+ if(W.mode!=="floor"&&W.host){
+  var info=W.host.getCameraInfo(),camera=info&&info.camera;
+  if(camera){
+   // World ENU for Three: +X East, +Y Up, -Z geographic North.
+   // Camera-space x/y determine the on-screen True North arrow orientation.
+   var north=new THREE.Vector3(0,0,-1).applyQuaternion(camera.quaternion.clone().invert());
+   angle=Math.atan2(north.x,north.y)*180/Math.PI;
+   if(!Number.isFinite(angle))angle=0;
+  }
+ }
+ needle.style.transform="rotate("+angle.toFixed(2)+"deg)";
+ caption.textContent=W.mode==="floor"?"N · 0°":"N · "+Math.round((angle+360)%360)+"°";
+ compass.dataset.mode=W.mode;
+ compass.dataset.northScreenDeg=angle.toFixed(2);
 }
 function attachPlanInteraction(){
  var canvas=W.planCanvas,hit=$("wbGoogleHitarea");
@@ -279,7 +306,7 @@ function attachPlanInteraction(){
 function update(){
  if(!W.ready)return;
  if(W.mode!=="3d"&&W.metrics&&W.metrics.plan)drawPlan();
- drawAxis();updatePins();
+ drawAxis();drawCompass();updatePins();
 }
 function init(data,host){
  W.data=data;W.host=host;
