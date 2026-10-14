@@ -193,9 +193,13 @@ function drawPlan(){
  c.clearRect(0,0,w,h);if(imagery){BoHoOpenImagery.drawPlan(c,function(p){return screen(p,w,h,k)})}else if(!satellite){c.fillStyle="#f8fbff";c.fillRect(0,0,w,h)}
  var step=25;
  var halfX=w/k/2+step,halfZ=h/k/2+step;
- c.strokeStyle=raster?"rgba(255,255,255,.07)":"#e6ecf6";c.lineWidth=1;
- for(var x=Math.floor((W.panX-halfX)/step)*step;x<=W.panX+halfX;x+=step){var xx=w/2+(x-W.panX)*k;c.beginPath();c.moveTo(xx,0);c.lineTo(xx,h);c.stroke()}
- for(var z=Math.floor((W.panZ-halfZ)/step)*step;z<=W.panZ+halfZ;z+=step){var yy=h/2-(z-W.panZ)*k;c.beginPath();c.moveTo(0,yy);c.lineTo(w,yy);c.stroke()}
+ // Never draw the local grid with stale W.pan when a Google map has been panned.
+ // Google projection drives all OSM geometry; hiding the legacy grid avoids visual misregistration.
+ if(!satellite){
+  c.strokeStyle=raster?"rgba(255,255,255,.07)":"#e6ecf6";c.lineWidth=1;
+  for(var x=Math.floor((W.panX-halfX)/step)*step;x<=W.panX+halfX;x+=step){var xx=w/2+(x-W.panX)*k;c.beginPath();c.moveTo(xx,0);c.lineTo(xx,h);c.stroke()}
+  for(var z=Math.floor((W.panZ-halfZ)/step)*step;z<=W.panZ+halfZ;z+=step){var yy=h/2-(z-W.panZ)*k;c.beginPath();c.moveTo(0,yy);c.lineTo(w,yy);c.stroke()}
+ }
  var features=W.data.features||[];
  features.filter(function(f){return f.kind==="park"||f.kind==="building"}).forEach(function(f){
   if(!f.geometry||f.geometry.type!=="Polygon")return;
