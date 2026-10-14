@@ -153,7 +153,8 @@ updateMarkers()
 }
 function updateMarkers(){
 if(!S.camera||!S.stage)return;
-var w=S.stage.clientWidth,h=S.stage.clientHeight;
+var webgl=document.getElementById("webgl"),r=webgl?webgl.getBoundingClientRect():S.stage.getBoundingClientRect();
+var w=r.width,h=r.height;
 var fw=new THREE.Vector3();S.camera.getWorldDirection(fw);
 S.records.forEach(function(item){
 var b=S.elements.get(item.id);if(!b)return;
@@ -216,7 +217,9 @@ img.src=ESP;
 function onSceneTap(e,camera,stage){
 if(!S.mode)return false;
 if(!S.db){alert("Bộ nhớ cục bộ chưa sẵn sàng");return true}
-var r=stage.getBoundingClientRect();
+var gl=document.getElementById("webgl");var r=gl?gl.getBoundingClientRect():stage.getBoundingClientRect();
+// Match the actual camera viewport, especially portrait/landscape SPLIT.
+if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)return false;
 var ndc=new THREE.Vector2((e.clientX-r.left)/r.width*2-1,1-(e.clientY-r.top)/r.height*2);
 var cast=new THREE.Raycaster();cast.setFromCamera(ndc,camera);
 var plane=new THREE.Plane(new THREE.Vector3(0,1,0),0),point=new THREE.Vector3();
