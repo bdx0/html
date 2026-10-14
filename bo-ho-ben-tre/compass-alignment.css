@@ -12,9 +12,9 @@
 #stage .wb-true-compass:hover,#stage .wb-true-compass:focus-visible{
   background:#eaf3ff;border-color:#477fbd;outline-offset:2px
 }
+.wb-compass-rose{display:flex;flex-direction:column;align-items:center;justify-content:center;transform-origin:50% 50%;transition:transform .12s linear;will-change:transform}
 .wb-compass-n{font-size:11px;line-height:12px;font-weight:950;color:#bb2933}
-.wb-compass-needle{display:block;font-size:27px;line-height:28px;font-weight:900;
-  color:#c62b39;transform-origin:50% 50%;transition:transform .12s linear;will-change:transform}
+.wb-compass-needle{display:block;font-size:27px;line-height:28px;font-weight:900;color:#c62b39}
 .wb-compass-caption{font-size:9px;line-height:12px;font-weight:850;letter-spacing:-.01em;white-space:nowrap}
 #stage.wb-floor .wb-true-compass{top:61px}
 #stage.wb-split .wb-true-compass{right:calc(45% + 13px);top:239px}
