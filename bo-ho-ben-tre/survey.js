@@ -157,7 +157,7 @@ var w=S.stage.clientWidth,h=S.stage.clientHeight;
 var fw=new THREE.Vector3();S.camera.getWorldDirection(fw);
 S.records.forEach(function(item){
 var b=S.elements.get(item.id);if(!b)return;
-var pos=new THREE.Vector3(item.x_m,1.7,item.z_m);
+var pos=new THREE.Vector3(item.x_m,1.7,-item.z_m);
 var ahead=pos.clone().sub(S.camera.position).dot(fw)>0;pos.project(S.camera);
 var x=(pos.x*.5+.5)*w,y=(-pos.y*.5+.5)*h;
 var visible=ahead&&pos.z<1&&pos.z>-1&&x>=20&&x<w-20&&y>=25&&y<h-70;
@@ -221,8 +221,10 @@ var ndc=new THREE.Vector2((e.clientX-r.left)/r.width*2-1,1-(e.clientY-r.top)/r.h
 var cast=new THREE.Raycaster();cast.setFromCamera(ndc,camera);
 var plane=new THREE.Plane(new THREE.Vector3(0,1,0),0),point=new THREE.Vector3();
 if(!cast.ray.intersectPlane(plane,point)){alert("Không chọn được mặt đất trong góc nhìn này.");return true}
-if(shorelineDistance(point.x,point.z)>300){alert("Điểm nằm ngoài phạm vi 300 m tính từ mép hồ. Hãy chọn gần hồ hơn.");return true}
-openEditor(point.x,point.z);return true;
+// Camera rays return right-handed world z=South; GIS keeps z=North.
+var gisNorth=-point.z;
+if(shorelineDistance(point.x,gisNorth)>300){alert("Điểm nằm ngoài phạm vi 300 m tính từ mép hồ. Hãy chọn gần hồ hơn.");return true}
+openEditor(point.x,gisNorth);return true;
 }
 function init(data,camera,stage){
 S.data=data;S.camera=camera;S.stage=stage;
