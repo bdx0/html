@@ -3,10 +3,26 @@
  */
 (function(){
 "use strict";
-var I={manifest:null,img:null,loaded:false,ready:false,plan:false,model:false,mesh:null,scene:null,origin:null,reason:"Đang đọc nguồn ảnh mở…",redraw:null};
+var I={manifest:null,img:null,loaded:false,ready:false,plan:false,model:false,mesh:null,scene:null,origin:null,reason:"Đang đọc nguồn ảnh mở…",redraw:null,mode:"3d",credit:null};
 var $=function(id){return document.getElementById(id)};
 function local(lon,lat){var o=I.origin;return{x:(lon-o.lon)*111320*Math.cos(o.lat*Math.PI/180),z:(lat-o.lat)*111320}}
+function updateCredit(){
+ if(!I.credit)return;
+ var active=I.ready&&(I.model&&I.mode!=="floor"||I.plan&&I.mode==="floor");
+ I.credit.hidden=!active;
+ if(!active)return;
+ I.credit.textContent="";
+ var label=document.createElement("span");
+ label.textContent=I.manifest.attribution+" · "+(I.manifest.native_resolution_m||"?")+" m/pixel native · không dùng để xác minh bờ";
+ I.credit.appendChild(label);
+ var url=I.manifest.source_url;
+ if(typeof url==="string"&&url.startsWith("https://")){
+  var link=document.createElement("a");
+  link.href=url;link.rel="noopener noreferrer";link.target="_blank";link.textContent="Nguồn ↗";I.credit.appendChild(link);
+ }
+}
 function notify(){
+ updateCredit();
  var status=$("wbOpenStatus");if(status)status.textContent=I.reason;
  ["wbOpenToggle","open3DToggle"].forEach(function(id){var e=$(id);if(!e)return;
   e.classList.toggle("selected",id==="wbOpenToggle"?I.plan:I.model);
@@ -62,12 +78,15 @@ function drawPlan(ctx,screen){
  if(w>0&&h>0){ctx.drawImage(I.img,p.x,p.y,w,h);return true}return false
 }
 function init(origin,redraw){I.origin=origin;I.redraw=redraw;
+ if(!I.credit){I.credit=document.createElement("div");I.credit.id="openImageryCredit";I.credit.hidden=true;I.credit.setAttribute("role","note");
+ var stage=$("stage");if(stage)stage.appendChild(I.credit)}
  var plan=$("wbOpenToggle"),model=$("open3DToggle");
  if(plan)plan.addEventListener("click",function(e){e.stopPropagation();togglePlan()});
  if(model)model.addEventListener("click",function(e){e.stopPropagation();toggle3D()});
  notify();load()
 }
-window.BoHoOpenImagery={init:init,setScene:function(scene){I.scene=scene;makeMesh();notify()},togglePlan:togglePlan,toggle3D:toggle3D,
+window.BoHoOpenImagery={init:init,setScene:function(scene){if(I.scene!==scene){if(I.mesh&&I.scene)I.scene.remove(I.mesh);I.mesh=null}I.scene=scene;makeMesh();notify()},
+ setMode:function(mode){I.mode=mode;notify()},togglePlan:togglePlan,toggle3D:toggle3D,
  isPlanActive:function(){return I.ready&&I.plan},
  isModelActive:function(){return I.ready&&I.model},drawPlan:drawPlan,
  status:function(){return {ready:I.ready,plan:I.plan,model:I.model,source:I.manifest&&I.manifest.source,reason:I.reason}}};
