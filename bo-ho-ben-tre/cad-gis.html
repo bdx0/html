@@ -1,0 +1,93 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>CAD / GIS | Hồ Trúc Giang</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font:13px/1.5 system-ui,sans-serif;background:#eaf0f6;color:#1e3854}a{color:#2862ba}button{font:inherit;font-weight:700;border:1px solid #d4dfea;background:white;border-radius:8px;color:#2b5078;padding:8px;cursor:pointer}button.selected,button.primary{background:#2863d9;color:white;border-color:#2863d9}
+header{height:60px;background:white;display:flex;align-items:center;padding:8px 16px;gap:14px;border-bottom:1px solid #dbe5ee}header strong{font-size:15px}header small{display:block;color:#7889a1;font-size:10px}header nav{margin-left:auto;display:flex;gap:12px;white-space:nowrap}
+main{height:calc(100dvh - 60px);display:grid;grid-template-columns:220px minmax(0,1fr) 250px}aside{background:white;overflow:auto;padding:13px;border-right:1px solid #dce6f0}#inspector{border-right:0;border-left:1px solid #dce6f0}h2{font-size:13px;margin:0 0 10px}.layer{display:flex;gap:7px;align-items:center;padding:8px 0;border-bottom:1px solid #edf0f5}.layer input{accent-color:#2665db}.layer b{flex:1;font-size:11px}.layer small{color:#8a99ac}.swatch{width:12px;height:12px;border-radius:3px}
+.warning{background:#fff5e6;color:#825728;border:1px solid #f1d6ae;border-radius:9px;padding:10px;font-size:11px;margin-top:14px}.panel{background:#f2f6fd;border:1px solid #dce7f5;border-radius:8px;padding:9px;font-size:11px;margin:9px 0}.buttons{display:flex;flex-wrap:wrap;gap:5px;margin:9px 0}.buttons button{font-size:11px}textarea{width:100%;height:78px;border-radius:8px;border:1px solid #cbd9e8;padding:8px;font:inherit}
+#viewport{position:relative;overflow:hidden;touch-action:none;background:#e5efe9}#map{width:100%;height:100%;touch-action:none;cursor:grab}#map.editing{cursor:crosshair}#handles circle{fill:#fff;stroke:#d32d66;stroke-width:3;cursor:grab;vector-effect:non-scaling-stroke}#handles circle.active{fill:#ffdc4e}
+#map text{paint-order:stroke;stroke:#fff;stroke-width:4;stroke-linejoin:round;pointer-events:none}
+#tools{position:absolute;left:8px;right:8px;top:8px;display:flex;gap:5px;flex-wrap:wrap;pointer-events:none}#tools>*{pointer-events:auto}#tools .grow{flex:1}#tools span{background:#fff;padding:7px;border-radius:8px;font-size:11px}#tools button{padding:7px 9px}
+#legend{position:absolute;bottom:10px;left:10px;background:#ffffffec;padding:7px 10px;border:1px solid #d7e5ee;border-radius:8px;font-size:10px;color:#516e87}
+#status{font-size:11px;color:#526f8f;margin:5px 0}
+@media(max-width:800px){main{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) auto}header{height:57px;padding:7px 9px}header strong{font-size:12px}header nav{gap:5px;font-size:10px}main{height:calc(100dvh - 57px)}#viewport{grid-row:1;grid-column:1;min-height:200px}#layersSide{grid-row:2;grid-column:1;max-height:26dvh;border:0;overflow:auto;border-top:1px solid #dce6f0}#layerList{display:grid;grid-template-columns:1fr 1fr;column-gap:8px}#inspector{position:fixed;z-index:9;bottom:0;left:0;right:0;height:min(68dvh,600px);transform:translateY(105%);transition:transform .2s ease;border-radius:14px 14px 0 0;box-shadow:0 -10px 30px #182d4144}#inspector.open{transform:none}#closeInfo{display:inline-block!important}#tools button{font-size:10px;padding:6px}}
+</style></head><body>
+<header><div><strong>▧ Hồ Trúc Giang / CAD · GIS</strong><small>FLOOR PLAN · VECTOR TÁCH LỚP</small></div><nav><a href="./">3D</a><a href="model.html">Model</a><a href="sqlite.html">SQLite</a></nav></header>
+<main><aside id="layersSide"><h2>11 lớp CAD/GIS · nháp</h2><div id="layerList"></div><div class="buttons"><button id="all">Hiện tất cả</button><button id="core">Đường bờ</button></div><div class="warning">Vector số hóa từ ảnh minh họa AI, chưa được khảo sát hoặc căn chỉnh tọa độ chuẩn. Lớp OSM chỉ dùng so sánh; không thay đổi dữ liệu SQLite gốc.</div></aside>
+<section id="viewport"><svg id="map" viewBox="0 0 1448 1086" xmlns="http://www.w3.org/2000/svg" aria-label="Bản vẽ vector Hồ Trúc Giang"><defs><linearGradient id="sea" x2="1" y2="1"><stop stop-color="#9bdde3"/><stop offset=".6" stop-color="#63b6c7"/><stop offset="1" stop-color="#277e9e"/></linearGradient><pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse"><path d="M50 0H0V50" fill="none" stroke="#dbe6df" stroke-width="1"/></pattern></defs><rect width="1448" height="1086" fill="#edf3e8"/><rect width="1448" height="1086" fill="url(#grid)"/><g id="drawing"></g><g id="labels"></g><g id="handles"></g></svg>
+<div id="tools"><button id="edit">✎ Chỉnh đường bờ</button><button id="undo">↶</button><button id="redo">↷</button><div class="grow"></div><button id="minus">−</button><span id="zoom">100%</span><button id="plus">+</button><button id="reset">⌂</button><button id="openInfo">☷</button></div><div id="legend">Hồng: đường bờ nháp · Tím nét đứt: OSM · Đỏ: điểm cần duyệt</div></section>
+<aside id="inspector"><div style="display:flex;gap:8px;align-items:center"><h2 style="flex:1">Kiểm tra CAD/GIS</h2><button id="closeInfo" style="display:none">Đóng ×</button></div><div id="info" class="panel">Chạm vào một đối tượng trên sơ đồ để đọc thông tin nguồn/lớp.</div>
+<h2>Vị trí cần duyệt</h2><div id="review" class="buttons"></div><h2>Xuất bản vẽ</h2><p style="font-size:11px">Bật Chỉnh đường bờ, kéo đỉnh trắng; nhấp đúp lên mép nước để thêm đỉnh. Gửi JSON đã chỉnh cho mình.</p><div class="buttons"><button id="candidate" class="primary">⇩ JSON chỉnh bờ</button><button id="geojson">⇩ GIS GeoJSON</button><button id="dxf">⇩ CAD DXF</button><button id="svgOut">⇩ SVG</button><button id="restore">Khôi phục</button></div><p style="font-size:11px">Nhận xét bổ sung:</p><textarea id="note" placeholder="Nhận xét hình dạng hồ cần chỉnh..."></textarea><p id="status">Đang tải vector...</p><p class="warning">Đơn vị DXF: mét danh nghĩa, không đo đạc. GeoJSON: WGS84 suy diễn từ phép đặt ảnh chưa xác minh. Bản nháp này không tự cập nhật OSM/SQLite.</p></aside></main>
+<script src="cad-gis-vector-data.js"></script><script>
+(async()=>{
+'use strict';
+const $=id=>document.getElementById(id),svg=$('map'),NS='http://www.w3.org/2000/svg',order=['roads','parks','buildings','waterfront_walk','water','trees','plazas','fountain','osm_reference','shoreline','review_points'];
+const label={roads:'Giao thông',parks:'Công viên',buildings:'Công trình',waterfront_walk:'Đường dạo ven hồ',water:'Mặt nước',trees:'Cây xanh',plazas:'Quảng trường',fountain:'Đài phun nước',osm_reference:'OSM gốc (đối chiếu)',shoreline:'Đường bờ',review_points:'Ghim cần duyệt'};
+const col={roads:'#89949c',parks:'#a1ce9b',buildings:'#dbcbb3',waterfront_walk:'#e7d3af',water:'#55a9bb',trees:'#428b4d',plazas:'#bdad96',fountain:'#466da4',osm_reference:'#8452b5',shoreline:'#f03775',review_points:'#d63d3d'};
+let F=[],R=[],original=[],vis={},edit=false,selected=-1,pid=null,pan=null,V=[0,0,1448,1086],undo=[],redo=[];
+const e=(tag,a,p)=>{let n=document.createElementNS(NS,tag);Object.entries(a||{}).forEach(([k,v])=>n.setAttribute(k,String(v)));if(p)p.append(n);return n};
+const line=q=>q.map((p,i)=>(i?'L':'M')+p.join(' ')).join(' ');
+const path=g=>g.map(q=>line(q)+'Z').join(' ');
+const drawing=$('drawing'),handles=$('handles');
+function paint(){
+ drawing.textContent='';const groups={};order.forEach(l=>{groups[l]=e('g',{},drawing);groups[l].style.display=vis[l]?'':'none'});
+ F.forEach((f,i)=>{let [l,t,g,n]=f,p=groups[l],at={'data-i':i,stroke:col[l],'stroke-width':1.2},s;
+ if(t==='t')s=e('circle',{...at,cx:g[0],cy:g[1],r:l==='trees'?8:l==='fountain'?18:12,fill:col[l]},p);
+ else {let d=t==='l'?line(g):t==='p'?path(g):g.map(path).join(' ');s=e('path',{...at,d,fill:t==='l'?'none':col[l],'fill-rule':'evenodd'},p)}
+ if(l==='water'){s.setAttribute('fill','url(#sea)');s.setAttribute('stroke','#24809c');s.setAttribute('stroke-width',2)}
+ if(l==='shoreline'){s.setAttribute('stroke-width',3.7)}
+ if(l==='osm_reference'){s.setAttribute('stroke-width',3);s.setAttribute('stroke-dasharray','10 8');s.setAttribute('opacity','.85')}
+ if(l==='trees')s.setAttribute('opacity','.8');
+ if(l==='parks')s.setAttribute('opacity','.62');
+ });
+ updateRing();
+ const g=$('labels');g.textContent='';
+ const txt=(x,y,s,rotation=0,size=22)=>{let a=e('text',{x,y,'font-size':size,'font-weight':'bold','text-anchor':'middle',fill:'#284b69',transform:'rotate('+rotation+' '+x+' '+y+')'},g);a.textContent=s};
+ txt(740,530,'Hồ Trúc Giang',30);txt(1010,485,'Đài phun nước',17);txt(580,183,'Hai Bà Trưng',21,0);txt(175,465,'Trần Quốc Tuấn',-90,18);txt(1375,510,'Nguyễn Trung Trực',-90,18);txt(760,936,'Lê Quí Đôn',15,22);
+}
+function updateRing(){
+ let d=line(R)+'Z',w=drawing.querySelector('g:nth-child(5) path'),s=drawing.querySelector('g:nth-child(10) path');
+ if(w)w.setAttribute('d',d);if(s)s.setAttribute('d',d);drawHandles()
+}
+function drawHandles(){handles.textContent='';if(edit)R.forEach((p,i)=>e('circle',{cx:p[0],cy:p[1],r:6.4,'data-h':i,class:i===selected?'active':''},handles))}
+function mouse(e){let p=svg.createSVGPoint();p.x=e.clientX;p.y=e.clientY;return p.matrixTransform(svg.getScreenCTM().inverse())}
+function setView(){svg.setAttribute('viewBox',V.join(' '));$('zoom').textContent=Math.round(100*1448/V[2])+'%'}
+function zoom(k,x=V[0]+V[2]/2,y=V[1]+V[3]/2){let w=Math.max(150,Math.min(3700,V[2]/k)),h=w*1086/1448;V=[x-w*(x-V[0])/V[2],y-h*(y-V[1])/V[3],w,h];setView()}
+function history(){undo.push(R.map(p=>p.slice()));if(undo.length>70)undo.shift();redo=[]}
+function save(){try{localStorage.setItem('bdx0:truc-giang:cad-gis-candidate',JSON.stringify(R))}catch{}}
+function download(file,text,mime){let u=URL.createObjectURL(new Blob([text],{type:mime})),a=document.createElement('a');a.href=u;a.download=file;a.click();setTimeout(()=>URL.revokeObjectURL(u),2000)}
+function local(p){return [(p[0]-795)*200/968,(542-p[1])*107/574]}
+function gps(p){let [x,y]=local(p);return [+(106.37814+x/(111320*Math.cos(10.23861*Math.PI/180))).toFixed(7),+(10.23861+y/111320).toFixed(7)]}
+function geo(){return {type:'FeatureCollection',name:'truc_giang_illustration_UNVERIFIED',metadata:{warning:'Approximated from AI illustration; NOT survey or authoritative GIS'},features:F.map((f,i)=>{let [layer,t,g,name]=f;if(layer==='water')t='p',g=[[...R,R[0]]];if(layer==='shoreline')t='l',g=[...R,R[0]];let x=t==='t'?gps(g):t==='l'?g.map(gps):t==='p'?g.map(q=>q.map(gps)):g.map(poly=>poly.map(q=>q.map(gps)));return {type:'Feature',properties:{id:i+1,layer,name:name||'',verification_status:'UNVERIFIED_VISUAL'},geometry:{type:{t:'Point',l:'LineString',p:'Polygon',m:'MultiPolygon'}[t],coordinates:x}}})}}
+function dxf(){let a=[],add=(...v)=>a.push(...v.map(String)),poly=(q,k,closed)=>{if(q.length>1&&q[0][0]===q[q.length-1][0]&&q[0][1]===q[q.length-1][1])q=q.slice(0,-1);add(0,'LWPOLYLINE',8,k,90,q.length,70,closed?1:0);q.forEach(p=>{let [x,y]=local(p);add(10,x.toFixed(3),20,y.toFixed(3))})};
+ add(0,'SECTION',2,'HEADER',9,'$ACADVER',1,'AC1015',9,'$INSUNITS',70,6,0,'ENDSEC',0,'SECTION',2,'ENTITIES');
+ F.forEach(f=>{let [k,t,g]=f;k=k.toUpperCase();if(f[0]==='water')t='p',g=[[...R,R[0]]];if(f[0]==='shoreline')t='l',g=R;if(t==='t'){let [x,y]=local(g);add(0,'CIRCLE',8,k,10,x.toFixed(3),20,y.toFixed(3),40,f[0]==='trees'?1.7:3)}else if(t==='l')poly(g,k,false);else if(t==='p')g.forEach(q=>poly(q,k,true));else if(t==='m')g.forEach(z=>z.forEach(q=>poly(q,k,true)))});add(0,'ENDSEC',0,'EOF');return a.join('\n')+'\n'}
+function detail(i){let f=F[i];if(!f)return;$('info').textContent=(label[f[0]]||f[0])+' · '+(f[3]||'#'+(i+1))+' · số hóa từ ảnh minh họa, chưa khảo sát';if(innerWidth<=800)$('inspector').classList.add('open')}
+try{
+ let z=window.TrucGiangCadGisPacked;if(!z)throw Error('Thiếu cad-gis-vector-data.js');
+ let bytes=Uint8Array.from(atob(z),x=>x.charCodeAt(0));
+ let data=JSON.parse(await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate'))).text());
+ F=data.features;original=F.find(f=>f[0]==='water')[2][0].slice(0,-1);R=original.map(p=>p.slice());
+ try{let stored=JSON.parse(localStorage.getItem('bdx0:truc-giang:cad-gis-candidate')||'null');if(Array.isArray(stored)&&stored.length>=5&&stored.length<4000&&stored.every(p=>Array.isArray(p)&&p.length===2&&p.every(Number.isFinite)))R=stored}catch{}
+ for(const l of order){vis[l]=l!=='osm_reference';let row=document.createElement('label');row.className='layer',cb=document.createElement('input');cb.type='checkbox';cb.checked=vis[l];cb.dataset.l=l;let sw=document.createElement('span');sw.className='swatch';sw.style.background=col[l];let b=document.createElement('b');b.textContent=label[l];let n=document.createElement('small');n.textContent=F.filter(f=>f[0]===l).length;row.append(cb,sw,b,n);$('layerList').append(row);cb.onchange=()=>{vis[l]=cb.checked;paint()}}
+ paint();setView();$('status').textContent=F.length+' đối tượng nháp · '+R.length+' đỉnh bờ · không thay đổi SQLite/OSM';
+ for(const [x,y,s] of [[37,61,'Bờ Tây Nam: giảm lồi'],[61,25,'Bờ Bắc phải: lồi nhiều hơn'],[51,25,'Bờ Bắc trái: lồi ít hơn'],[50,70,'Bờ Nam giữa: không lồi'],[68,73,'Đông Nam: giảm phần lồi']]){let b=document.createElement('button');b.textContent=s;b.onclick=()=>{zoom(2,1448*x/100,1086*y/100);$('info').textContent=s+' · X='+x+'%, Y='+y+'%';$('inspector').classList.add('open')};$('review').append(b)}
+}catch(ex){$('status').textContent='Lỗi tải dữ liệu: '+ex.message;console.error(ex)}
+svg.addEventListener('pointerdown',ev=>{let h=ev.target.closest('[data-h]');if(edit&&h){history();selected=+h.dataset.h;pid=ev.pointerId;svg.setPointerCapture(pid);drawHandles();ev.preventDefault();return}if(!edit&&ev.target.closest('[data-i]'))detail(+ev.target.closest('[data-i]').dataset.i);pan={id:ev.pointerId,start:mouse(ev),v:V.slice()};svg.setPointerCapture(ev.pointerId);ev.preventDefault()});
+svg.addEventListener('pointermove',ev=>{if(pid===ev.pointerId&&selected>=0){let p=mouse(ev);R[selected]=[+p.x.toFixed(1),+p.y.toFixed(1)];updateRing()}else if(pan&&pan.id===ev.pointerId){let q=mouse(ev);V=[pan.v[0]-(q.x-pan.start.x),pan.v[1]-(q.y-pan.start.y),pan.v[2],pan.v[3]];setView()}});
+const end=ev=>{if(pid===ev.pointerId){pid=null;save()}if(pan&&pan.id===ev.pointerId)pan=null};svg.addEventListener('pointerup',end);svg.addEventListener('pointercancel',end);
+svg.addEventListener('dblclick',ev=>{if(!edit)return;let p=mouse(ev),idx=-1,dmin=15;R.forEach((a,i)=>{let b=R[(i+1)%R.length],dx=b[0]-a[0],dy=b[1]-a[1],t=Math.max(0,Math.min(1,((p.x-a[0])*dx+(p.y-a[1])*dy)/(dx*dx+dy*dy))),d=Math.hypot(p.x-(a[0]+t*dx),p.y-(a[1]+t*dy));if(d<dmin)dmin=d,idx=i});if(idx>=0){history();R.splice(idx+1,0,[+p.x.toFixed(1),+p.y.toFixed(1)]);updateRing();save()}});
+svg.addEventListener('wheel',ev=>{ev.preventDefault();let p=mouse(ev);zoom(ev.deltaY<0?1.18:1/1.18,p.x,p.y)},{passive:false});
+$('edit').onclick=()=>{edit=!edit;$('edit').classList.toggle('selected',edit);svg.classList.toggle('editing',edit);drawHandles()};
+$('undo').onclick=()=>{if(!undo.length)return;redo.push(R.map(p=>p.slice()));R=undo.pop();updateRing();save()};$('redo').onclick=()=>{if(!redo.length)return;undo.push(R.map(p=>p.slice()));R=redo.pop();updateRing();save()};
+$('plus').onclick=()=>zoom(1.3);$('minus').onclick=()=>zoom(1/1.3);$('reset').onclick=()=>{V=[0,0,1448,1086];setView()};
+$('all').onclick=()=>{order.forEach(k=>vis[k]=true);document.querySelectorAll('[data-l]').forEach(n=>n.checked=true);paint()};
+$('core').onclick=()=>{order.forEach(k=>vis[k]=['water','shoreline','review_points','osm_reference'].includes(k));document.querySelectorAll('[data-l]').forEach(n=>n.checked=vis[n.dataset.l]);paint()};
+$('candidate').onclick=()=>download('truc-giang-cad-gis-candidate.json',JSON.stringify({schema:'truc-giang-cad-gis-candidate-v1',ring_image_pixels:R,annotation:$('note').value,source:'AI illustration; NOT SURVEYED',verified:false,modified_osm:false,exported_at:new Date().toISOString()},null,2),'application/json');
+$('geojson').onclick=()=>download('truc-giang-draft.geojson',JSON.stringify(geo()),'application/geo+json');
+$('dxf').onclick=()=>download('truc-giang-draft.dxf',dxf(),'application/dxf');
+$('svgOut').onclick=()=>download('truc-giang-draft.svg',new XMLSerializer().serializeToString(svg),'image/svg+xml');
+$('restore').onclick=()=>{if(confirm('Khôi phục về hình bờ được số hóa từ ảnh?')){history();R=original.map(p=>p.slice());updateRing();save()}};
+$('openInfo').onclick=()=>$('inspector').classList.add('open');$('closeInfo').onclick=()=>$('inspector').classList.remove('open');
+window.TrucGiangCadGis={getInfo:()=>({count:F.length,shoreVertices:R.length,sourceChanged:false}),candidateRing:()=>R.map(p=>p.slice()),geojson:geo,dxf};
+})();
+</script></body></html>
