@@ -45,7 +45,8 @@ function makeMesh(){
  var texture=new THREE.Texture(I.img);texture.needsUpdate=true;
  if(THREE.sRGBEncoding)texture.encoding=THREE.sRGBEncoding;
  texture.minFilter=THREE.LinearFilter;
- // +pi/2 maps image top to geographic North (+local z); double-sided material.
+ // Raster NW pixel is geographic north-left. +pi/2 maps image top -> GIS local +z (North),
+ // and scene.scale.z=-1 maps it to right-handed Three world -Z (North), +X (East).
  var material=new THREE.MeshBasicMaterial({map:texture,side:THREE.DoubleSide,depthWrite:true});
  I.mesh=new THREE.Mesh(geometry,material);
  I.mesh.name="OPEN_IMAGERY_GEOREFERENCED_UNDERLAY";
