@@ -1,5 +1,15 @@
 # Hồ Trúc Giang / Bờ Hồ Bến Tre — Digital Twin (vùng 300m)
 
+## Fix zoom-out · giữ hướng Bắc và tọa độ (2026-10-15)
+
+- Khi zoom out bằng **hai ngón**, cờ `pinchGestureActive` duy trì cho đến khi nhả hết ngón. Ngón tay còn lại sau pinch không được âm thầm chuyển `viewPreset="top"` thành `orbit`. Chạm la bàn **N** trở về TOP Bắc lên trên, Đông sang phải.
+- Thu phóng quanh vị trí chạm/midpoint bằng **raycast mặt đất y=0** trên camera Three.js, lấy hiệu giữa điểm thế giới trước/sau zoom; target GIS vẫn giữ `x=East,z=North`. Mỗi lần raycast buộc `camera.updateMatrixWorld(true)` vì sự kiện zoom có thể chạy trước render tiếp theo. Không cộng pan theo azimuth cũ, vốn không tương thích với chuyển đổi `scene.scale.z=-1`.
+- Camera cho phép xa tới 1.250m nhưng fog cũ bắt đầu ở 690m và kết thúc ở 1.440m, khiến scene bị mờ/mất khi thu nhỏ: tăng fog lên **2.200–5.200m**, mặt đất mô phỏng lên **3.600×3.600m**. Không phóng to/biến dạng raster tự host; ranh giới nguồn ảnh vẫn theo bbox địa lý.
+- Google Satellite Floor Plan thêm listener `bounds_changed` để vector OSM luôn dùng phép chiếu cập nhật khi Google zoom-out có animation.
+- CI browser smoke kiểm tra zoom out/in nhiều vòng bằng wheel và nút +/-; PLAN zoom-out vẫn Bắc lên/Đông phải; mobile Chromium kích hoạt touch pinch thực và xác nhận chế độ TOP không bị mất. Chưa coi kiểm thử được xác nhận thành công khi chưa nhìn thấy GitHub Actions job hoàn tất.
+- Chẩn đoán Debug: `cameraViewPreset`, `pinchGestureActive`, `sceneFogNear`, `geographicAlignment` để đối chiếu ảnh/screenshots lỗi.
+
+
 ## True North — canh la bàn GIS / 3D / Floor Plan / Satellite (2026-10-14)
 
 **Đã sửa tận gốc lỗi hiển thị soi gương Đông–Tây trong chế độ TOP.** GIS/OSM/SQLite/annotation/field survey vẫn giữ nguyên hệ WGS84 và local GIS `x = East, z = North` (mét), không xoay dịch dữ liệu gốc. Three.js cần hệ thuận tay phải nên `scene.scale.z = -1`: `world X = East, Y = Up, Z = South` (`North = -Z`). Camera TOP dùng `camera.up = (0,0,-1)`, và toàn bộ vị trí camera/tâm nhìn/projection hotspots/review pins/field survey được chuyển chính xác qua dấu trừ ở Z. Do đó **TOP = Bắc địa lý lên trên, Đông sang phải** giống Floor Plan và ảnh vệ tinh thực, không phải la bàn từ cảm biến từ trường điện thoại.
