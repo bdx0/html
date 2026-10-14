@@ -70,7 +70,7 @@ function build(){
  compass.id="wbTrueCompass";compass.type="button";
  compass.setAttribute("aria-label","Nhìn từ trên: Bắc lên trên, Đông sang phải (True North WGS84)");
  compass.title="La bàn Bắc địa lý. Chạm để về TOP: Bắc lên, Đông sang phải.";
- compass.innerHTML='<span class="wb-compass-n">N</span><span class="wb-compass-needle" id="wbCompassNeedle">↑</span><span class="wb-compass-caption" id="wbCompassCaption">TRUE NORTH</span>';
+ compass.innerHTML='<span class="wb-compass-rose" id="wbCompassNeedle"><span class="wb-compass-n">N</span><span class="wb-compass-needle">↑</span></span><span class="wb-compass-caption" id="wbCompassCaption">TRUE NORTH</span>';
  stage.append(compass);
  compass.addEventListener("click",function(e){e.stopPropagation();setView("top")});
  W.planCanvas=$("wbPlanCanvas");W.axisCanvas=$("wbAxisCanvas");W.pinLayer=$("wbReviewPins");
