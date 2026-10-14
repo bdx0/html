@@ -534,7 +534,7 @@ var workbenchHost={
  updateShape:function(shape){if(shape===lakeShapeMode)return;lakeShapeMode=shape;rebuildWorld()},
  resize3D:function(kind){workbenchMode=kind;resize()},
  focus:function(x,z){target.x=clamp(x,-420,420);target.z=clamp(z,-420,420);updateCamera();updateHotspots()},
- getCameraInfo:function(){return {camera:camera,az:az,el:el,dist:dist,target:target,sceneScaleZ:scene?scene.scale.z:null}},
+ getCameraInfo:function(){return {camera:camera,az:az,el:el,dist:dist,target:target,viewPreset:viewPreset,sceneScaleZ:scene?scene.scale.z:null}},
  getLakeInfo:function(){return lakeGeometryStats},
  setReviewSegments:setShoreAuditLines
 };
@@ -572,6 +572,9 @@ function groundAtClient(clientX,clientY){
  if(!r.width||!r.height||!Number.isFinite(clientX)||!Number.isFinite(clientY))return null;
  var u=(clientX-r.left)/r.width,v=(clientY-r.top)/r.height;
  if(u<-.1||u>1.1||v<-.1||v>1.1)return null;
+ // Raycaster reads matrixWorld, but zoom runs before the next render frame.
+ // Without this refresh, pinch OUT uses the previous camera matrix and drifts.
+ camera.updateMatrixWorld(true);
  var cast=new THREE.Raycaster();
  cast.setFromCamera(new THREE.Vector2(u*2-1,1-v*2),camera);
  return cast.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0,1,0),0),new THREE.Vector3());
