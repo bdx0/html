@@ -241,6 +241,40 @@ try {
     report.push(snapshot);
     await page.locator('#dbg').click();
     await page.screenshot({path:'ben-tre-'+name+'.png',fullPage:true});
+    // Visual CAD/GIS digitization is a separate review layer; source SQLite stays immutable.
+    const cad=await ctx.newPage();
+    cad.on('pageerror',e=>errors.push(name+' CAD/GIS JS '+e.message));
+    cad.on('console',m=>{if(m.type()==='error')errors.push(name+' CAD/GIS console '+m.text())});
+    await cad.goto('http://127.0.0.1:8765/bo-ho-ben-tre/cad-gis.html',{waitUntil:'load',timeout:30000});
+    await cad.waitForFunction(()=>window.TrucGiangCadGis?.getInfo().count===311,{timeout:30000});
+    const cadState=await cad.evaluate(()=>window.TrucGiangCadGis.getInfo());
+    if(cadState.sourceChanged||cadState.shoreVertices<70||cadState.count!==311)
+      errors.push(name+' CAD/GIS digitization missing or marked authoritative '+JSON.stringify(cadState));
+    if(await cad.locator('#layerList input[type=checkbox]').count()!==11)
+      errors.push(name+' CAD/GIS must have 11 toggleable layers');
+    await cad.locator('#edit').click();
+    if((await cad.locator('#handles circle').count())<70)
+      errors.push(name+' CAD/GIS editable shoreline vertices missing');
+    if(name==='desktop'||name==='mobile-390'){
+      const candidateWait=cad.waitForEvent('download',{timeout:12000});
+      await cad.locator('#candidate').click();
+      const exported=JSON.parse(fs.readFileSync(await (await candidateWait).path(),'utf8'));
+      if(exported.schema!=='truc-giang-cad-gis-candidate-v1'||exported.verified!==false||
+         exported.ring_image_pixels.length<70)
+        errors.push(name+' CAD/GIS export must be unverified valid shoreline candidate');
+      const geoWait=cad.waitForEvent('download',{timeout:12000});
+      await cad.locator('#geojson').click();
+      const geo=JSON.parse(fs.readFileSync(await (await geoWait).path(),'utf8'));
+      if(geo.type!=='FeatureCollection'||geo.features.length!==311)
+        errors.push(name+' GIS export has lost source visual features');
+      const cadWait=cad.waitForEvent('download',{timeout:12000});
+      await cad.locator('#dxf').click();
+      const dxf=fs.readFileSync(await (await cadWait).path(),'utf8');
+      if(!dxf.includes('LWPOLYLINE')||!dxf.includes('SHORELINE')||!dxf.includes('EOF'))
+        errors.push(name+' CAD DXF export missing expected vectors');
+      await cad.screenshot({path:'ben-tre-cad-gis-'+name+'.png'});
+    }
+    await cad.close();
     // Open independent SQL browser and validate the snapshot against the real DB counts.
     const explorer=await ctx.newPage();
     explorer.on('pageerror',e=>errors.push(name+' SQLite JS '+e.message));
