@@ -87,7 +87,7 @@ function build(){
 }
 function setMode(mode){
  if(!["3d","floor","split"].includes(mode))return;
- W.mode=mode;var stage=$("stage");stage.classList.remove("wb-3d","wb-floor","wb-split","axis-open");stage.classList.add("wb-"+mode);if(window.BoHoGoogleSatellite)BoHoGoogleSatellite.setMode(mode);
+ W.mode=mode;var stage=$("stage");stage.classList.remove("wb-3d","wb-floor","wb-split","axis-open");stage.classList.add("wb-"+mode);if(window.BoHoGoogleSatellite)BoHoGoogleSatellite.setMode(mode);if(window.BoHoOpenImagery)BoHoOpenImagery.setMode(mode);
   var axisButton=$("wbAxisToggle");if(axisButton)axisButton.setAttribute("aria-expanded","false");
  stage.querySelectorAll("[data-wb-mode]").forEach(function(b){b.classList.toggle("selected",b.dataset.wbMode===mode);b.setAttribute("aria-pressed",String(b.dataset.wbMode===mode))});
  if(W.host&&W.host.resize3D)W.host.resize3D(mode);
