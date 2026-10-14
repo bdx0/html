@@ -334,7 +334,7 @@ shadow.rotation.x=-Math.PI/2;shadow.position.y=-1.15;scene.add(shadow);
 const cameraState={yaw:.50,pitch:.53,zoom:1},ideal={yaw:.50,pitch:.53,zoom:1};
 let target=new T.Vector3(0,8.1,0),desired=new T.Vector3(0,8.1,0),width=0,height=0,pointerStart=null,pinchDist=0,moved=false;
 const pointMap=new Map();const canvas=renderer.domElement;
-function normalizedDist(){let a=Math.max(.33,width/Math.max(1,height));return a<.6?59:a<.82?51:44;}
+function normalizedDist(){let a=Math.max(.33,width/Math.max(1,height));return a<.6?105:a<.82?72:44;}
 function updateCamera(dt){
  let damp=Math.min(1,dt*9);
  cameraState.yaw+=((ideal.yaw-cameraState.yaw))*damp;
