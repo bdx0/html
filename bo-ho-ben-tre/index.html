@@ -143,6 +143,7 @@ button{border:1px solid #38536a;background:#1a3047;border-radius:9px;padding:8px
 <link rel="stylesheet" href="workbench.css">
 <link rel="stylesheet" href="annotations.css">
 <link rel="stylesheet" href="mobile-layout.css">
+<link rel="stylesheet" href="google-satellite.css">
 </head>
 <body>
 <div id="app"><header class="top">
@@ -171,6 +172,7 @@ button{border:1px solid #38536a;background:#1a3047;border-radius:9px;padding:8px
  <h2>Góc nhìn 3D</h2>
  <div class="mobile-tools-grid"><button type="button" data-mobile-view="top">TOP · Từ trên</button><button type="button" data-mobile-view="iso">ISO · Phối cảnh</button><button type="button" data-mobile-view="north">N · Nhìn từ Bắc</button><button type="button" data-mobile-view="east">E · Nhìn từ Đông</button></div>
  <h2>Khám phá dữ liệu</h2>
+ <div class="mobile-tools-grid"><button type="button" data-mobile-action="wbGoogleToggle">🛰 Nền Google Satellite (PLAN)</button><a href="https://www.google.com/maps/@10.23861,106.37814,19z/data=!3m1!1e3" target="_blank" rel="noopener noreferrer">Mở Google Maps ↗</a></div>
  <div class="mobile-tools-grid"><a href="model.html">◫ Mô hình dữ liệu</a><a href="cad-gis.html">▧ Bản vẽ CAD / GIS</a><a href="sqlite.html">▦ SQLite Explorer</a><a href="model.html?sector=north_notch#osm-way-217484891">◉ Duyệt 4 đoạn bờ</a><button type="button" data-mobile-action="dbg">⚙ Chẩn đoán WebGL</button><a href="data/catalog.sqlite" download>↓ Tải SQLite</a></div>
  <p class="mobile-tools-note">Đường bao OSM chưa được đo xác minh. Bản xem CAD/GIS và nhận xét trên màn hình không tự sửa nguồn SQLite.</p>
  <p class="mobile-tools-tip">Một ngón để xoay 3D, hai ngón để zoom. Chọn PLAN để ghi annotation. Chạm thanh “Xem dữ liệu” ở dưới để mở ảnh và danh mục.</p>
@@ -179,6 +181,7 @@ button{border:1px solid #38536a;background:#1a3047;border-radius:9px;padding:8px
 <script src="survey.js"></script>
 <script src="lake-shape.js"></script>
 <script src="workbench.js"></script>
+<script src="google-satellite.js"></script>
 <script src="annotations.js"></script>
 <script>
 (function(){
