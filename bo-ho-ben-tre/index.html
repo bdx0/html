@@ -534,7 +534,7 @@ var workbenchHost={
  updateShape:function(shape){if(shape===lakeShapeMode)return;lakeShapeMode=shape;rebuildWorld()},
  resize3D:function(kind){workbenchMode=kind;resize()},
  focus:function(x,z){target.x=clamp(x,-420,420);target.z=clamp(z,-420,420);updateCamera();updateHotspots()},
- getCameraInfo:function(){return {camera:camera,az:az,el:el,dist:dist,target:target}},
+ getCameraInfo:function(){return {camera:camera,az:az,el:el,dist:dist,target:target,sceneScaleZ:scene?scene.scale.z:null}},
  getLakeInfo:function(){return lakeGeometryStats},
  setReviewSegments:setShoreAuditLines
 };
@@ -732,7 +732,7 @@ a+='<p class="sub">Bảng gốc: cost_items + cost_quotes trong <a href="data/ca
 function updateDebug(){if(!$("debug").classList.contains("open"))return;var gl=renderer&&renderer.getContext&&renderer.getContext();var info=renderer&&renderer.info;
 var d={engine:mode,webgl:webglOK,three:window.THREE&&THREE.REVISION,viewport:stage.clientWidth+" x "+stage.clientHeight,devicePixelRatio:window.devicePixelRatio,webglVersion:gl?gl.getParameter(gl.VERSION):"n/a",
 frame:frame,sceneMeshes:counts.mesh,sceneTrianglesApprox:counts.tri,hotspots:hotspotEls.size,selectedHotspot:selectedHotspot,drawCalls:info&&info.render.calls,renderTriangles:info&&info.render.triangles,zoomDistance:Math.round(dist),
-pointerCount:controlPointers.size,osmElements:data&&data.stats.osm_features,modelMode:data&&data.mode,lakeGeometry:lakeGeometryStats,openImagery:window.BoHoOpenImagery?BoHoOpenImagery.status():null,errors:errors.slice(-8)};$("report").textContent=JSON.stringify(d,null,2)}
+pointerCount:controlPointers.size,osmElements:data&&data.stats.osm_features,modelMode:data&&data.mode,lakeGeometry:lakeGeometryStats,openImagery:window.BoHoOpenImagery?BoHoOpenImagery.status():null,geographicAlignment:window.TrucGiangWorkbench?TrucGiangWorkbench.getAlignment():null,errors:errors.slice(-8)};$("report").textContent=JSON.stringify(d,null,2)}
 $("openSqlite").onclick=function(){location.href="model.html"};$("mobileSqlite").onclick=function(){location.href="model.html"};$("home").onclick=reset;$("day").onclick=function(){night=!night;if(lakeWaterMaterial)lakeWaterMaterial.uniforms.uNight.value=night?1:0;$("dayIcon").textContent=night?"☀":"☾";$("dayLabel").textContent=night?" Ban ngày":" Ban đêm";if(scene){scene.background=color(night?"#071528":"#9acbd9");scene.fog.color=scene.background;scene.children.forEach(function(c){if(c.type==="DirectionalLight")c.intensity=night?.35:.9;if(c.type==="HemisphereLight")c.intensity=night?.5:1.12})}};
 $("layers").onclick=function(){layers.trees=!layers.trees;$("layers").classList.toggle("active",!layers.trees);if(world)world.traverse(function(o){if(o.userData&&o.userData.tree)o.visible=layers.trees})};
 $("dbg").onclick=function(){$("debug").classList.toggle("open");updateDebug()};$("debugclose").onclick=function(){$("debug").classList.remove("open")};
