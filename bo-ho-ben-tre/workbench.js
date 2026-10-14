@@ -25,7 +25,8 @@ function build(){
  '<button type="button" data-wb-shape="candidate" disabled title="Hình đề xuất bị loại do sai hình học">Đề xuất sai · tắt</button>'+
  '<button type="button" data-wb-shape="raw" class="selected">◇ OSM gốc</button></div>'+
  '<small id="wbShapeStatus">Dữ liệu OSM gốc · chưa khảo sát thực tế</small>'+
- '<a class="wb-review-open" href="model.html?sector=north_notch#osm-way-217484891">🟠 Xem 4 đoạn bờ cần sửa ↗</a>';
+ '<a class="wb-review-open" href="model.html?sector=north_notch#osm-way-217484891">🟠 Xem 4 đoạn bờ cần sửa ↗</a>'+
+ '<a class="wb-review-open" href="cad-gis.html" style="border-color:#a6c9ef;background:#eef7ff;color:#1d5cba!important">▧ Mở CAD / GIS · sửa vector ↗</a>';
  stage.append(shapes);
  var pins=el("div","wb-review-pins");pins.id="wbReviewPins";
  pins.setAttribute("aria-label","Các vùng bờ hồ OSM đang cần đối chiếu");
