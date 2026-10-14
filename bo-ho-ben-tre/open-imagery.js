@@ -8,7 +8,7 @@ var $=function(id){return document.getElementById(id)};
 function local(lon,lat){var o=I.origin;return{x:(lon-o.lon)*111320*Math.cos(o.lat*Math.PI/180),z:(lat-o.lat)*111320}}
 function updateCredit(){
  if(!I.credit)return;
- var active=I.ready&&(I.model&&I.mode!=="floor"||I.plan&&I.mode==="floor");
+ var active=I.ready&&(I.model&&I.mode!=="floor"||I.plan&&I.mode!=="3d");
  I.credit.hidden=!active;
  if(!active)return;
  I.credit.textContent="";
@@ -23,7 +23,7 @@ function updateCredit(){
 }
 function notify(){
  updateCredit();
- var status=$("wbOpenStatus");if(status)status.textContent=I.reason;
+ var status=$("wbOpenStatus");if(status)status.textContent=I.reason;var mobileStatus=$("mobileOpenStatus");if(mobileStatus)mobileStatus.textContent=I.reason;
  ["wbOpenToggle","open3DToggle"].forEach(function(id){var e=$(id);if(!e)return;
   e.classList.toggle("selected",id==="wbOpenToggle"?I.plan:I.model);
   e.setAttribute("aria-pressed",String(id==="wbOpenToggle"?I.plan:I.model));
@@ -60,7 +60,7 @@ function load(){
  I.manifest=d;
  if(!fit(d)){I.reason=d.status==="unavailable"?"Chưa có ảnh mở phù hợp · "+(d.reason||"kiểm tra nguồn ảnh"):"Chưa có ảnh được tự host · cần chạy workflow Build Open Imagery";notify();return}
  I.reason="Đang tải ảnh "+(d.source||"mở")+"…";notify();
- var img=new Image();img.onload=function(){I.img=img;I.loaded=I.ready=true;
+ var img=new Image();img.onload=function(){I.img=img;I.loaded=I.ready=true;I.plan=true;I.model=true;
  I.reason=(d.source||"Open imagery")+" · "+(d.acquired||"không rõ ngày")+" · "+(d.native_resolution_m||"?")+" m/pixel thực · "+d.attribution;
  makeMesh();notify()};
  img.onerror=function(){I.reason="Lỗi tải ảnh đã xuất bản: "+d.image;notify()};
