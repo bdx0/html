@@ -6,7 +6,7 @@
 (function(){
 "use strict";
 var G={origin:null,base:null,dock:null,onDraw:null,setFloor:null,enabled:false,mode:"3d",
- key:"",map:null,overlay:null,projection:null,loading:false,scheduled:false,setup:null};
+ key:"",map:null,overlay:null,projection:null,loading:false,scheduled:false,setup:null,getView:null};
 try{G.key=sessionStorage.getItem("bdx0:google-maps-js-key")||""}catch(e){}
 function $(id){return document.getElementById(id)}
 function redraw(){
@@ -91,7 +91,7 @@ function loadAPI(key){
 }
 function fitZoom(){
  var rect=$("wbPlanCanvas").getBoundingClientRect();
- var k=Math.min(rect.width/450,rect.height/390)||.5;
+ var k=(G.getView&&G.getView().scale)||Math.min(rect.width/450,rect.height/390)||.5;
  return Math.min(21,Math.max(14,Math.log2(k*(2*Math.PI*6378137*Math.cos(G.origin.lat*Math.PI/180))/256)));
 }
 function makeMap(){
@@ -116,6 +116,7 @@ function makeMap(){
 function enable(){
  if(G.loading||G.enabled)return;
  if(!G.key){openSetup();return}
+ if(G.getView&&!G.map)G.lastPan=G.getView().pan;
  if(G.setFloor&&G.mode!=="floor")G.setFloor();
  G.loading=true;showMessage("Đang kết nối Google Maps Satellite…");
  loadAPI(G.key).then(function(){
@@ -133,7 +134,7 @@ function disable(){
 function toggle(){if(G.enabled)disable();else enable()}
 function init(options){
  G.origin=options.origin;G.base=$("wbGoogleBase");G.dock=$("wbPlanDock");
- G.onDraw=options.redraw;G.setFloor=options.setFloor;G.lastPan={x:0,z:0};
+ G.onDraw=options.redraw;G.setFloor=options.setFloor;G.getView=options.getView;G.lastPan={x:0,z:0};
  var button=$("wbGoogleToggle");
  if(button)button.addEventListener("click",function(e){e.stopPropagation();toggle()});
  var dialog=document.createElement("section");dialog.id="wbGoogleConfig";dialog.className="wb-google-config";
