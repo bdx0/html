@@ -1,0 +1,36 @@
+name: Smoke test Little Tokyo Rare3D-inspired
+on:
+  push:
+    branches: [main]
+    paths:
+      - little-tokyo-rare3d-inspired.html
+      - assets/three.min.js
+      - scripts/test_tokyo_diorama.mjs
+      - .github/workflows/smoke-tokyo-diorama.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install Chromium
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Smoke-test actual WebGL rendering on desktop and mobile
+        run: node scripts/test_tokyo_diorama.mjs
+      - name: Upload diagnostics and screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: little-tokyo-rare3d-desktop-mobile
+          path: |
+            tokyo-diorama-*.png
+            tokyo-diorama-smoke.json
+          if-no-files-found: ignore
