@@ -322,6 +322,59 @@ try {
     const tapAlignment=await page.evaluate(()=>window.TrucGiangWorkbench.getAlignment());
     if(!tapAlignment?.topNorthUpEastRight||!tapAlignment?.topMode)
       errors.push(name+' tapping True North compass did not restore georeferenced TOP '+JSON.stringify(tapAlignment));
+    // Regression: the geographic 3D frame and compass must survive repeated
+    // zoom-OUT followed by zoom-IN, not just the initial TOP camera preset.
+    const zoomOutState=await page.evaluate(()=>{
+      const stage=document.getElementById('stage'),r=document.getElementById('webgl').getBoundingClientRect();
+      const cx=r.left+r.width*.5,cy=r.top+r.height*.5;
+      for(let i=0;i<12;i++)stage.dispatchEvent(new WheelEvent('wheel',{
+        bubbles:true,cancelable:true,deltaY:150,clientX:cx,clientY:cy
+      }));
+      return {alignment:TrucGiangWorkbench.getAlignment(),compass:document.getElementById('wbTrueCompass').dataset.northScreenDeg}
+    });
+    const zoomOut=zoomOutState.alignment;
+    if(!zoomOut?.topNorthUpEastRight||zoomOut?.cameraViewPreset!=='top'||
+       !(zoomOut.cameraDistance>700)||Math.abs(Number(zoomOutState.compass))>1||
+       zoomOut.eastScreenDx<=0||zoomOut.northScreenDy<=0)
+      errors.push(name+' repeated zoom-out lost True North orientation '+JSON.stringify(zoomOutState));
+    if(name==='desktop'||name==='mobile-390')await page.screenshot({path:'ben-tre-zoom-out-'+name+'.png'});
+    const zoomBack=await page.evaluate(()=>{
+      const stage=document.getElementById('stage'),r=document.getElementById('webgl').getBoundingClientRect();
+      const cx=r.left+r.width*.5,cy=r.top+r.height*.5;
+      for(let i=0;i<12;i++)stage.dispatchEvent(new WheelEvent('wheel',{
+        bubbles:true,cancelable:true,deltaY:-150,clientX:cx,clientY:cy
+      }));
+      return TrucGiangWorkbench.getAlignment()
+    });
+    if(!zoomBack?.topNorthUpEastRight||zoomBack?.cameraViewPreset!=='top'||
+       Math.abs(zoomBack.eastScreenDy)>0.005||Math.abs(zoomBack.northScreenDx)>0.005)
+      errors.push(name+' zoom-out then zoom-in did not restore North-up East-right '+JSON.stringify(zoomBack));
+    // Exercise a real pinch zoom-OUT on mobile: the surviving finger must NOT
+    // silently switch TOP to orbit as one touch leaves the screen.
+    if(mobile){
+      await page.evaluate(()=>TrucGiangWorkbench.setView('top'));
+      const r=await page.locator('#webgl').boundingBox();
+      const x=Math.round(r.x+r.width*.5),y=Math.round(r.y+r.height*.57);
+      const cd=await ctx.newCDPSession(page);
+      await cd.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[
+        {x:x-68,y,id:11},{x:x+68,y,id:12}
+      ]});
+      for(const spread of [58,48,38]){
+        await cd.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[
+          {x:x-spread,y,id:11},{x:x+spread,y,id:12}
+        ]});
+      }
+      await cd.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+      await page.waitForTimeout(100);
+      const afterPinch=await page.evaluate(()=>({
+        alignment:TrucGiangWorkbench.getAlignment(),
+        debugCamera:document.getElementById('wbTrueCompass').dataset.northScreenDeg
+      }));
+      if(!afterPinch.alignment?.topNorthUpEastRight||
+         afterPinch.alignment.cameraViewPreset!=='top'||
+         Math.abs(Number(afterPinch.debugCamera))>1)
+        errors.push(name+' real touch pinch zoom-out rotated the TOP compass '+JSON.stringify(afterPinch));
+    }
     await page.locator('[data-wb-view="iso"]').first().evaluate(el=>el.click());
     if(mobile){await page.locator('#mobileMenuToggle').click();await page.locator('[data-mobile-action="dbg"]').click()}
     else await page.locator('#dbg').click();
