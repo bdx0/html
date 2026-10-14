@@ -381,8 +381,12 @@ try {
       const r=await page.locator('#webgl').boundingBox();
       const x=Math.round(r.x+r.width*.5),y=Math.round(r.y+r.height*.57);
       const cd=await ctx.newCDPSession(page);
+      // First finger jitters a few pixels before the second touches:
+      // it must NOT switch the top-down geographic view into orbit.
+      await cd.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:x-68,y,id:11}]});
+      await cd.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:x-65,y:y+2,id:11}]});
       await cd.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[
-        {x:x-68,y,id:11},{x:x+68,y,id:12}
+        {x:x-65,y:y+2,id:11},{x:x+68,y,id:12}
       ]});
       for(const spread of [58,48,38]){
         await cd.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[
