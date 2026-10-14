@@ -306,7 +306,8 @@ try {
        Math.abs(orientation.eastScreenDy)>0.005||Math.abs(orientation.northScreenDx)>0.005||
        Math.abs(orientation.compassNorthScreenDeg)>0.5)
       errors.push(name+' true north top view mirrored, rotated or camera/OSM mismatched '+JSON.stringify(orientation));
-    if(!(await page.locator('#wbTrueCompass').isVisible()))
+    // On mobile the axis drawer intentionally obscures the compass until closed.
+    if(!mobile&&!(await page.locator('#wbTrueCompass').isVisible()))
       errors.push(name+' True North compass not visible in split mode');
     if(name==='desktop'){
       const rasterMetadata=await page.evaluate(()=>window.BoHoOpenImagery.status());
@@ -316,7 +317,8 @@ try {
     await page.locator('[data-wb-mode="3d"]').click();
     await page.waitForTimeout(180);
     const northControl=page.locator('#wbTrueCompass');
-    await northControl.click();
+    if(!(await northControl.isVisible()))errors.push(name+' True North compass not visible after leaving axis drawer');
+    else await northControl.click();
     const tapAlignment=await page.evaluate(()=>window.TrucGiangWorkbench.getAlignment());
     if(!tapAlignment?.topNorthUpEastRight||!tapAlignment?.topMode)
       errors.push(name+' tapping True North compass did not restore georeferenced TOP '+JSON.stringify(tapAlignment));
