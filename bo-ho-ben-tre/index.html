@@ -144,12 +144,13 @@ button{border:1px solid #38536a;background:#1a3047;border-radius:9px;padding:8px
 <link rel="stylesheet" href="annotations.css">
 <link rel="stylesheet" href="mobile-layout.css">
 <link rel="stylesheet" href="google-satellite.css">
+<link rel="stylesheet" href="open-imagery.css">
 </head>
 <body>
 <div id="app"><header class="top">
 <div class="brand"><span class="brand-title">🏞️ Bờ Hồ Bến Tre</span><small>TRÚC GIANG · PHẠM VI 300 M</small></div><span class="tag">WebGL + SQLite + GIS</span><span class="grow"></span>
 <div class="toolbar">
-<button id="home" title="Toàn cảnh" aria-label="Đặt lại camera"><span class="tool-icon">⌂</span><span class="tool-label"> Toàn cảnh</span></button><button id="day" title="Ngày và đêm" aria-label="Đổi chế độ ngày đêm"><span class="tool-icon" id="dayIcon">☾</span><span class="tool-label" id="dayLabel"> Ban đêm</span></button><button id="layers" title="Bật tắt cây xanh" aria-label="Bật hoặc tắt cây xanh"><span class="tool-icon">♧</span><span class="tool-label"> Cây xanh</span></button><a id="openCadGis" href="cad-gis.html" style="display:inline-flex;align-items:center;justify-content:center;padding:7px 9px;border-radius:8px;background:#e8f3ff;color:#1f5abf;border:1px solid #b8d4f8;text-decoration:none;font-weight:850" title="Floor Plan CAD và GIS có thể chỉnh sửa">▧ CAD/GIS</a><button id="openSqlite" title="Xem mô hình dữ liệu" aria-label="Mở Model Data View"><span class="tool-icon">◫</span><span class="tool-label"> Mô hình dữ liệu</span></button><button id="dbg" title="Bảng kiểm tra" aria-label="Mở bảng debug"><span class="tool-icon">⚙</span><span class="tool-label"> Debug</span></button>
+<button id="home" title="Toàn cảnh" aria-label="Đặt lại camera"><span class="tool-icon">⌂</span><span class="tool-label"> Toàn cảnh</span></button><button id="day" title="Ngày và đêm" aria-label="Đổi chế độ ngày đêm"><span class="tool-icon" id="dayIcon">☾</span><span class="tool-label" id="dayLabel"> Ban đêm</span></button><button type="button" id="open3DToggle" title="Ảnh nền mở tự host trong mô hình 3D" aria-pressed="false">🌍 Nền 3D</button><button id="layers" title="Bật tắt cây xanh" aria-label="Bật hoặc tắt cây xanh"><span class="tool-icon">♧</span><span class="tool-label"> Cây xanh</span></button><a id="openCadGis" href="cad-gis.html" style="display:inline-flex;align-items:center;justify-content:center;padding:7px 9px;border-radius:8px;background:#e8f3ff;color:#1f5abf;border:1px solid #b8d4f8;text-decoration:none;font-weight:850" title="Floor Plan CAD và GIS có thể chỉnh sửa">▧ CAD/GIS</a><button id="openSqlite" title="Xem mô hình dữ liệu" aria-label="Mở Model Data View"><span class="tool-icon">◫</span><span class="tool-label"> Mô hình dữ liệu</span></button><button id="dbg" title="Bảng kiểm tra" aria-label="Mở bảng debug"><span class="tool-icon">⚙</span><span class="tool-label"> Debug</span></button>
 </div><button type="button" class="mobile-menu-toggle" id="mobileMenuToggle" aria-controls="mobileTools" aria-expanded="false" aria-label="Mở menu công cụ">☰ <span>Công cụ</span></button></header>
 <main class="main">
 <div id="stage" aria-label="Cảnh 3D tương tác Hồ Trúc Giang"><canvas id="fallback"></canvas><div id="photoHotspotLayer" aria-label="Các vị trí ảnh trên mô hình 3D"></div>
@@ -168,6 +169,7 @@ button{border:1px solid #38536a;background:#1a3047;border-radius:9px;padding:8px
  <div class="mobile-tools-head"><strong>☷ Công cụ Bờ Hồ</strong><button type="button" id="mobileToolsClose" aria-label="Đóng menu">✕</button></div>
  <h2>Điều khiển cảnh</h2>
  <div class="mobile-tools-grid"><button type="button" data-mobile-action="surveyToggle">📍 Ghim ảnh hiện trường</button><button type="button" data-mobile-action="satelliteToggle">🛰 Ảnh vệ tinh</button></div>
+ <div class="mobile-tools-grid"><button type="button" data-mobile-action="open3DToggle">🌍 Nền ảnh mở 3D</button><button type="button" data-mobile-action="wbOpenToggle">🌍 Ảnh mở Floor Plan</button></div>
  <div class="mobile-tools-grid"><button type="button" data-mobile-action="home">⌂ Về toàn cảnh</button><button type="button" data-mobile-action="day">☀ Chế độ ngày / đêm</button><button type="button" data-mobile-action="layers">♧ Bật / tắt cây</button><button type="button" data-mobile-action="minimap">▧ Hiện / ẩn minimap</button></div>
  <h2>Góc nhìn 3D</h2>
  <div class="mobile-tools-grid"><button type="button" data-mobile-view="top">TOP · Từ trên</button><button type="button" data-mobile-view="iso">ISO · Phối cảnh</button><button type="button" data-mobile-view="north">N · Nhìn từ Bắc</button><button type="button" data-mobile-view="east">E · Nhìn từ Đông</button></div>
@@ -182,6 +184,7 @@ button{border:1px solid #38536a;background:#1a3047;border-radius:9px;padding:8px
 <script src="lake-shape.js"></script>
 <script src="workbench.js"></script>
 <script src="google-satellite.js"></script>
+<script src="open-imagery.js"></script>
 <script src="annotations.js"></script>
 <script>
 (function(){
@@ -546,6 +549,7 @@ if(data&&data.features&&data.features.length>0){drawOSM(data.features);mode="B�
 dist=window.innerWidth<860?420:305;el=window.innerWidth<860?1.00:.89;
 renderer=new THREE.WebGLRenderer({antialias:true,alpha:false,powerPreference:"high-performance",preserveDrawingBuffer:false});renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.5));renderer.setSize(stage.clientWidth,stage.clientHeight,false);renderer.domElement.id="webgl";renderer.domElement.style.cssText="position:absolute;inset:0";renderer.domElement.style.touchAction="none";stage.insertBefore(renderer.domElement,$("fallback"));
 camera=new THREE.PerspectiveCamera(54,Math.max(1,stage.clientWidth)/Math.max(1,stage.clientHeight),.7,6000);raycaster=new THREE.Raycaster();updateCamera();initHotspots();if(window.BenTreSurvey)BenTreSurvey.init(data,camera,stage);webglOK=true;if(window.TrucGiangWorkbench)TrucGiangWorkbench.init(data,workbenchHost);
+if(window.BoHoOpenImagery){BoHoOpenImagery.init(data.origin,function(){if(window.TrucGiangWorkbench)TrucGiangWorkbench.refresh()});BoHoOpenImagery.setScene(scene)}
 renderer.domElement.addEventListener("webglcontextlost",function(e){e.preventDefault();webglOK=false;say("WebGL context lost. Canvas fallback enabled.");showFallback();});
 renderer.domElement.addEventListener("webglcontextrestored",function(){say("WebGL context restored");try{renderer.dispose();renderer.domElement.remove();renderer=null;initialize()}catch(e){say(e.message);showFallback()}});
 resize();updateStatus();renderLoop();
@@ -721,7 +725,7 @@ a+='<p class="sub">Bảng gốc: cost_items + cost_quotes trong <a href="data/ca
 function updateDebug(){if(!$("debug").classList.contains("open"))return;var gl=renderer&&renderer.getContext&&renderer.getContext();var info=renderer&&renderer.info;
 var d={engine:mode,webgl:webglOK,three:window.THREE&&THREE.REVISION,viewport:stage.clientWidth+" x "+stage.clientHeight,devicePixelRatio:window.devicePixelRatio,webglVersion:gl?gl.getParameter(gl.VERSION):"n/a",
 frame:frame,sceneMeshes:counts.mesh,sceneTrianglesApprox:counts.tri,hotspots:hotspotEls.size,selectedHotspot:selectedHotspot,drawCalls:info&&info.render.calls,renderTriangles:info&&info.render.triangles,zoomDistance:Math.round(dist),
-pointerCount:controlPointers.size,osmElements:data&&data.stats.osm_features,modelMode:data&&data.mode,lakeGeometry:lakeGeometryStats,errors:errors.slice(-8)};$("report").textContent=JSON.stringify(d,null,2)}
+pointerCount:controlPointers.size,osmElements:data&&data.stats.osm_features,modelMode:data&&data.mode,lakeGeometry:lakeGeometryStats,openImagery:window.BoHoOpenImagery?BoHoOpenImagery.status():null,errors:errors.slice(-8)};$("report").textContent=JSON.stringify(d,null,2)}
 $("openSqlite").onclick=function(){location.href="model.html"};$("mobileSqlite").onclick=function(){location.href="model.html"};$("home").onclick=reset;$("day").onclick=function(){night=!night;if(lakeWaterMaterial)lakeWaterMaterial.uniforms.uNight.value=night?1:0;$("dayIcon").textContent=night?"☀":"☾";$("dayLabel").textContent=night?" Ban ngày":" Ban đêm";if(scene){scene.background=color(night?"#071528":"#9acbd9");scene.fog.color=scene.background;scene.children.forEach(function(c){if(c.type==="DirectionalLight")c.intensity=night?.35:.9;if(c.type==="HemisphereLight")c.intensity=night?.5:1.12})}};
 $("layers").onclick=function(){layers.trees=!layers.trees;$("layers").classList.toggle("active",!layers.trees);if(world)world.traverse(function(o){if(o.userData&&o.userData.tree)o.visible=layers.trees})};
 $("dbg").onclick=function(){$("debug").classList.toggle("open");updateDebug()};$("debugclose").onclick=function(){$("debug").classList.remove("open")};
