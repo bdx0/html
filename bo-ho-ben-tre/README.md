@@ -1,3 +1,12 @@
+## Ảnh vệ tinh Google Maps trong Floor Plan (tùy chọn · 2026-10-14)
+
+- Trên trang 3D, chuyển sang **PLAN** rồi chọn **🛰 Google Satellite**. Trên điện thoại có thêm lối tắt trong **☰ Công cụ**.
+- Lần bật đầu tiên, nhập **Google Maps JavaScript API key** của bạn. Bật **Maps JavaScript API** và **Billing** trên Google Cloud; giới hạn API key bằng HTTP referrer `https://bdx0.github.io/html/*` (và các môi trường dev cho phép). Không đưa API key thực vào GitHub. Trong trình duyệt, key được giữ tại `sessionStorage` của tab hiện tại.
+- Ảnh Google hiển thị bằng `google.maps.Map({mapTypeId:'satellite'})` chính thức, **không** tải tile về, không ghép Google imagery thành texture Three.js. Lớp `wbPlanCanvas` vẽ dữ liệu OSM độc lập theo GPS nhờ `OverlayView.getProjection().fromLatLngToContainerPixel`, và đồng bộ zoom/kéo. Giữ nguyên Google copyright/branding và vùng bấm ở cuối khung.
+- **Chỉ ở chế độ PLAN**: khi 3D hoặc SPLIT, hiển thị bản kỹ thuật OSM hiện có, tránh việc dùng ảnh Google như một non-Google-map texture/sai góc phối cảnh. Bật/tắt trở lại không thay đổi file SQLite, scene.json hay annotation.
+- Khi chưa có key, khi Google API bị lỗi hoặc khi không có kết nối, Floor Plan vẫn hoạt động bình thường. Nút **🛰 Vệ tinh** cũ dùng Esri World Imagery trong hộp tham chiếu độc lập vẫn giữ nguyên. Đây không phải ảnh vệ tinh trực tiếp theo thời gian thực.
+- Chưa kiểm chứng màu/tile Google trên tài khoản có key thực: test browser mặc định xác nhận UI opt-in, không tải Maps API trước khi người dùng đồng ý; QA cần thử key hợp lệ với giới hạn HTTP referrer rồi xem trực quan độ khớp lớp OSM và các ghim ở nhiều mức zoom.
+
 # Hồ Trúc Giang / Bờ Hồ Bến Tre — Digital Twin (vùng 300m)
 
 ## Mobile-first interface · 2026-10-14
