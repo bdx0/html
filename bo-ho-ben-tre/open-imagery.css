@@ -1,0 +1,15 @@
+/* Local, licensed imagery is an optional layer; no hidden API tokens.
+ * The actual asset/credit metadata live in data/imagery/manifest.json.
+ */
+#open3DToggle{min-height:36px;display:inline-flex;align-items:center;font-size:11px;padding:8px 10px}
+#open3DToggle.selected{background:#e1f9eb!important;border-color:#9acdae!important;color:#146e43!important}
+#open3DToggle[aria-disabled="true"]{opacity:.6}
+#stage .wb-plan-actions #wbOpenToggle{width:auto;min-width:0;min-height:32px;height:32px;padding:4px 9px;font-size:10px;white-space:nowrap;background:#f2f9f5;border:1px solid #bfe6cd;color:#176043}
+#stage .wb-plan-actions #wbOpenToggle.selected{background:#14855b;border-color:#14855b;color:white}
+#stage .wb-plan-actions #wbOpenToggle[aria-disabled="true"]{opacity:.62}
+#wbOpenStatus{font-size:9px;color:#667d90;line-height:1.25;max-width:360px;white-space:normal;overflow-wrap:anywhere}
+@media(max-width:860px){
+ #stage .wb-plan-actions #wbOpenToggle{padding:4px 7px;font-size:9px}
+ #wbOpenStatus{display:none}
+}
+@media(max-width:380px){#stage .wb-plan-actions #wbOpenToggle{padding:4px 5px;font-size:9px}}
