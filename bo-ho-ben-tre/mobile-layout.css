@@ -18,6 +18,8 @@
   .pill .scope-chip{font-size:8px;padding:2px 5px}
   .pill p{margin:2px 0 0;max-width:min(66vw,290px);font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .foot{display:none!important}
+  #hud .survey-actions{display:none!important}
+  #hud #surveyHint:not([hidden]){display:block;font-size:10px;max-width:80vw}
   .minimap{display:none;right:9px;bottom:calc(var(--sheet-rest) + 108px);max-width:38vw}
   body.show-minimap:not(.sheet-open) .minimap{display:block}
   .minimap canvas{width:112px!important;height:76px!important}
