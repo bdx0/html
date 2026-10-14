@@ -73,6 +73,11 @@ try {
       }
     }
     if(mobile){
+      if(!(await page.locator('#mobileMenuToggle').isVisible()))errors.push(name+' unified mobile menu missing');
+      await page.locator('#mobileMenuToggle').click();
+      if(!(await page.locator('#mobileTools').isVisible()))errors.push(name+' mobile tools panel did not open');
+      await page.locator('#mobileToolsClose').click();
+      if(await page.locator('#wbAxis').isVisible())errors.push(name+' XYZ axis should be collapsed by default');
       if(!viewport.collapsed||viewport.drawer>110)errors.push(name+' default drawer obstructs scene '+viewport.drawer);
       await page.locator('#zoomIn').click();
       await page.locator('#zoomOut').click();
@@ -227,7 +232,7 @@ try {
       planH:document.getElementById('wbPlanDock').getBoundingClientRect().height,
       stageH:document.getElementById('stage').getBoundingClientRect().height
     }));
-    if(!split.active||split.dock<=0||(mobile ? (split.model<split.stage*.95||split.planH<45||Math.abs(split.modelH-split.stageH*.5)>3) : split.model>=split.stage*.9))
+    if(!split.active||split.dock<=0||(mobile&&width<=height ? (split.model<split.stage*.95||split.planH<45||Math.abs(split.modelH-split.stageH*.5)>3) : (split.model>=split.stage*.9||split.planH<45)))
       errors.push(name+' split layout incorrect '+JSON.stringify(split));
     if(name==='desktop'||name==='mobile-390')await page.screenshot({path:'ben-tre-split-'+name+'.png'});
     if(mobile)await page.locator('#wbAxisToggle').click();
