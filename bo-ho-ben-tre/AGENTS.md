@@ -1,3 +1,5 @@
+# AGENTS.md — Hồ Trúc Giang / Bờ Hồ Bến Tre Digital Twin
+
 ## Ảnh vệ tinh Google Maps trong Floor Plan (tùy chọn · 2026-10-14)
 
 - Trên trang 3D, chuyển sang **PLAN** rồi chọn **🛰 Google Satellite**. Trên điện thoại có thêm lối tắt trong **☰ Công cụ**.
@@ -7,7 +9,6 @@
 - Khi chưa có key, khi Google API bị lỗi hoặc khi không có kết nối, Floor Plan vẫn hoạt động bình thường. Nút **🛰 Vệ tinh** cũ dùng Esri World Imagery trong hộp tham chiếu độc lập vẫn giữ nguyên. Đây không phải ảnh vệ tinh trực tiếp theo thời gian thực.
 - Chưa kiểm chứng màu/tile Google trên tài khoản có key thực: test browser mặc định xác nhận UI opt-in, không tải Maps API trước khi người dùng đồng ý; QA cần thử key hợp lệ với giới hạn HTTP referrer rồi xem trực quan độ khớp lớp OSM và các ghim ở nhiều mức zoom.
 
-# AGENTS.md — Hồ Trúc Giang / Bờ Hồ Bến Tre Digital Twin
 ## Mobile-first interface · 2026-10-14
 - Main page `index.html` loads `mobile-layout.css` and `mobile-layout.js`: a compact header, one accessible menu for survey/satellite/scene controls/model/CAD/SQLite, and an opt-in inspector sheet. These files are **UI only**, not GIS source data.
 - Mobile default: full 3D scene, bottom sheet collapsed, minimap hidden, axis gizmo collapsed. The three visible mode buttons remain 3D / PLAN / SPLIT; tapping `⌖ Góc nhìn` reveals the XYZ gizmo and TOP/N/E/ISO presets. Survey/satellite entry points remain accessible in the menu, even when their older HUD buttons are hidden.
