@@ -27,6 +27,21 @@ try {
       const msg=name+' HTTP '+response.status()+' '+response.url();
       if(response.url().startsWith('http://127.0.0.1:8765/'))errors.push(msg);else warnings.push(msg);
     });
+    // Test client-side georegistration with a synthetic fixture only.
+    // This image is never committed as a real satellite source or displayed in production.
+    if(name==='desktop'){
+      await page.route('**/data/imagery/manifest.json',route=>route.fulfill({
+        status:200,contentType:'application/json',body:JSON.stringify({
+          status:'ready',image:'qa-fixture.png',bbox:[106.3722,10.23277,106.38408,10.24445],
+          source:'QA fixture (not an aerial image)',acquired:'2026-10-14',
+          native_resolution_m:1000,attribution:'Synthetic test fixture',license:'QA-only',
+          source_url:'https://example.org/fixture'
+        })}));
+      await page.route('**/data/imagery/qa-fixture.png',route=>route.fulfill({
+        status:200,contentType:'image/png',body:Buffer.from(
+          'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4z8DwHwAFgAI/ScL/nwAAAABJRU5ErkJggg==','base64')
+      }));
+    }
     await page.goto('http://127.0.0.1:8765/bo-ho-ben-tre/',{waitUntil:'load',timeout:45000});
     await page.waitForFunction(()=>document.getElementById('status')?.textContent.includes('300 m'),{timeout:30000});
     await page.waitForTimeout(1500);
@@ -166,6 +181,23 @@ try {
     if(!sectors.some(n=>n.id==='north_notch'&&n.href.includes('sector=north_notch'))||
        !sectors.some(n=>n.id==='south_slope'))
       errors.push(name+' 3D marker deep links do not resolve disputed bờ bắc/nam '+JSON.stringify(sectors));
+    const openImagery=await page.evaluate(()=>window.BoHoOpenImagery?.status());
+    if(!openImagery||!(await page.locator('#open3DToggle').count()))
+      errors.push(name+' self-hosted open imagery controller missing');
+    if(name==='desktop'){
+      await page.waitForFunction(()=>window.BoHoOpenImagery?.status().ready===true,{timeout:12000});
+      await page.locator('#open3DToggle').click();
+      const openMesh=await page.evaluate(()=>({
+        active:BoHoOpenImagery.status().model,
+        mesh:!!window.THREE&&!!document.getElementById('webgl'),
+        credit:document.getElementById('openImageryCredit')?.textContent.includes('Synthetic test fixture')
+      }));
+      if(!openMesh.active||!openMesh.mesh||!openMesh.credit)
+        errors.push(name+' open 3D georeferenced image/attribution did not activate '+JSON.stringify(openMesh));
+      await page.locator('#open3DToggle').click();
+    }else if(openImagery.ready){
+      errors.push(name+' repo must not contain a fabricated real imagery asset');
+    }
     const planButton=page.locator('[data-wb-mode="floor"]');
     await planButton.click();await page.waitForTimeout(150);
     if(!(await page.locator('#wbPlanDock').isVisible()))
@@ -174,6 +206,18 @@ try {
     if(!planState.width||!planState.height)
       errors.push(name+' floorplan canvas not rendered '+JSON.stringify(planState));
     if(name==='desktop'||name==='mobile-390')await page.screenshot({path:'ben-tre-floorplan-'+name+'.png'});
+    if(!(await page.locator('#wbOpenToggle').count()))errors.push(name+' open imagery Floor Plan toggle missing');
+    if(name==='desktop'){
+      await page.locator('#wbOpenToggle').click();
+      const planOpen=await page.evaluate(()=>({
+        enabled:BoHoOpenImagery.status().plan,
+        credit:!document.getElementById('openImageryCredit').hidden,
+        width:document.getElementById('wbPlanCanvas').width
+      }));
+      if(!planOpen.enabled||!planOpen.credit||!planOpen.width)
+        errors.push(name+' open imagery geo Plan overlay not active '+JSON.stringify(planOpen));
+      await page.locator('#wbOpenToggle').click();
+    }
     // Google Satellite stays opt-in; no API request or key is shipped by default.
     const googleButton=page.locator('#wbGoogleToggle');
     if(!(await googleButton.count()))errors.push(name+' Google Satellite Floor Plan toggle missing');
