@@ -166,6 +166,7 @@ button{border:1px solid #38536a;background:#1a3047;border-radius:9px;padding:8px
 <aside id="mobileTools" class="mobile-tools" aria-label="Công cụ Bờ Hồ 3D trên điện thoại" hidden>
  <div class="mobile-tools-head"><strong>☷ Công cụ Bờ Hồ</strong><button type="button" id="mobileToolsClose" aria-label="Đóng menu">✕</button></div>
  <h2>Điều khiển cảnh</h2>
+ <div class="mobile-tools-grid"><button type="button" data-mobile-action="surveyToggle">📍 Ghim ảnh hiện trường</button><button type="button" data-mobile-action="satelliteToggle">🛰 Ảnh vệ tinh</button></div>
  <div class="mobile-tools-grid"><button type="button" data-mobile-action="home">⌂ Về toàn cảnh</button><button type="button" data-mobile-action="day">☀ Chế độ ngày / đêm</button><button type="button" data-mobile-action="layers">♧ Bật / tắt cây</button><button type="button" data-mobile-action="minimap">▧ Hiện / ẩn minimap</button></div>
  <h2>Góc nhìn 3D</h2>
  <div class="mobile-tools-grid"><button type="button" data-mobile-view="top">TOP · Từ trên</button><button type="button" data-mobile-view="iso">ISO · Phối cảnh</button><button type="button" data-mobile-view="north">N · Nhìn từ Bắc</button><button type="button" data-mobile-view="east">E · Nhìn từ Đông</button></div>
@@ -584,7 +585,7 @@ if(pinchCenter){var mx=mid.x-pinchCenter.x,my=mid.y-pinchCenter.y,panScale=dist*
 target.x=clamp(target.x+(-mx*Math.cos(az)-my*Math.sin(az))*panScale,-430,430);
 target.z=clamp(target.z+(mx*Math.sin(az)-my*Math.cos(az))*panScale,-430,430)}
 touchPinch=pd;pinchCenter=mid;updateCamera()}});
-function end(e){var first=tapOrigin.get(e.pointerId),isTap=first&&!first.wasMulti&&controlPointers.size===1&&Math.hypot(e.clientX-first.x,e.clientY-first.y)<7;controlPointers.delete(e.pointerId);tapOrigin.delete(e.pointerId);touchPinch=0;pinchCenter=null;if(controlPointers.size===0)stage.classList.remove("grabbing");if(isTap&&(!e.target.closest||!e.target.closest(".minimap,.zoom-controls,.debug,.photo-hotspot,.field-marker,.survey-actions,.wb-modes,.wb-shape-control,.wb-axis,.wb-plan-dock")))pick3D(e)}stage.addEventListener("pointerup",end);stage.addEventListener("pointercancel",end);
+function end(e){var first=tapOrigin.get(e.pointerId),isTap=first&&!first.wasMulti&&controlPointers.size===1&&Math.hypot(e.clientX-first.x,e.clientY-first.y)<7;controlPointers.delete(e.pointerId);tapOrigin.delete(e.pointerId);touchPinch=0;pinchCenter=null;if(controlPointers.size===0)stage.classList.remove("grabbing");if(isTap&&(!e.target.closest||!e.target.closest(".minimap,.zoom-controls,.debug,.photo-hotspot,.field-marker,.survey-actions,.wb-modes,.wb-shape-control,.wb-axis,.wb-axis-toggle,.wb-plan-dock")))pick3D(e)}stage.addEventListener("pointerup",end);stage.addEventListener("pointercancel",end);
 stage.addEventListener("wheel",function(e){e.preventDefault();dist=clamp(dist*Math.exp(clamp(e.deltaY,-150,150)*.002),48,1250);updateCamera()},{passive:false});
 mini.addEventListener("click",function(e){var r=mini.getBoundingClientRect();target.x=clamp(((e.clientX-r.left)/r.width-.5)*930,-450,450);target.z=clamp((.5-(e.clientY-r.top)/r.height)*820,-400,400);updateCamera()});
 }
