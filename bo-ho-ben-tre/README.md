@@ -127,6 +127,15 @@ Bản HTML đã có **3D / PLAN / SPLIT** theo style Warestack 3D (trắng – x
 - Đối chiếu thật–giả và danh sách sai lệch: [COMPARISON.md](COMPARISON.md).
 
 
+## CAD / GIS Floor Plan có thể chỉnh sửa (14/10/2026)
+
+**[Mở CAD / GIS trực tiếp trên GitHub Pages](cad-gis.html)**. Trang này đã tích hợp vào thanh công cụ 3D, khung Workbench và Model Data View.
+
+- 11 nhóm lớp nháp gồm: mặt nước, đường bờ, đường dạo, đường phố, công viên, khối mái công trình, tán cây, đài phun, quảng trường, điểm cần duyệt và OSM so sánh. Có 311 đối tượng được số hóa từ **ảnh floor plan AI được người dùng xem và chỉnh sửa**, gồm 259 ghim tán cây và 32 mái công trình chỉ mang tính minh họa, không phải đo thực địa.
+- Chạm lớp để bật/tắt; bật **Chỉnh đường bờ** để kéo từng đỉnh hoặc nhấp đúp cạnh thêm đỉnh; Undo / Redo, lưu localStorage và khôi phục đường bao nháp.
+- Xuất JSON candidate tương thích công cụ `build_cad_gis.py --candidate`, GIS GeoJSON, CAD DXF và SVG ngay trên trình duyệt.
+- Vector truyền đến viewer dưới dạng dữ liệu JS nén ở `cad-gis-vector-data.js` (gồm 311 đối tượng), hoàn toàn riêng khỏi SQLite canonical, `scene.json` và OSM. GeoJSON và DXF xuất từ trang chỉ có tọa độ **xấp xỉ**, không phải lớp GIS có độ chính xác kiểm định. Khi người dùng duyệt xong mới cập nhật bản nháp CAD/GIS, còn địa hình chính thức cần GCP/nguồn đo có quyền sử dụng.
+
 ## Annotation: ghim trực tiếp những chi tiết 3D đang sai (13/10/2026)
 - **Vào thẳng chế độ ghim:** https://bdx0.github.io/html/bo-ho-ben-tre/?annotate=1
 - Hoặc vào 3D, nhấn **✎ Ghim lỗi trên Floor Plan**; trình xem chuyển sang PLAN. Chạm vị trí cần sửa; kéo ngón/chuột chỉ di chuyển mặt bằng, không tạo ghim.
