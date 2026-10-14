@@ -20,13 +20,13 @@
   }
   M.box = function (p, w,h,d, x,y,z, color) {
     var o = new T.Mesh(boxGeo(w,h,d), typeof color === "string" || typeof color === "number" ? M.mat(color) : color);
-    o.position.set(x,y,z); o.receiveShadow = true; p.add(o); return o;
+    o.position.set(x,y,z); o.receiveShadow = true; o.castShadow = h > .65 && w > 1 && d > 1; p.add(o); return o;
   };
   M.sphere = function (p, rad,x,y,z,color, scale) {
     var k = rad;
     if (!spheres.has(k)) spheres.set(k, new T.IcosahedronGeometry(rad,1));
     var o = new T.Mesh(spheres.get(k), M.mat(color));
-    o.position.set(x,y,z);
+    o.position.set(x,y,z); o.castShadow = true;
     if(scale) o.scale.set(scale[0],scale[1],scale[2]);
     p.add(o); return o;
   };
@@ -35,7 +35,7 @@
     var key = [r1,r2,h,sides].join(":");
     if (!cylinders.has(key)) cylinders.set(key,new T.CylinderGeometry(r1,r2,h,sides));
     var o = new T.Mesh(cylinders.get(key),M.mat(color));
-    o.position.set(x,y,z); o.receiveShadow=true; p.add(o); return o;
+    o.position.set(x,y,z); o.receiveShadow=true; o.castShadow=h>1; p.add(o); return o;
   };
   M.text = function(p,str,x,y,z,w,h,rot,fg,bg) {
     var canvas=document.createElement("canvas"); canvas.width=512; canvas.height=128;
@@ -47,7 +47,7 @@
     g.fillText(str,256,67,470);
     var tex=new T.CanvasTexture(canvas); tex.anisotropy=2; tex.colorSpace=T.SRGBColorSpace || "";
     var mesh=new T.Mesh(new T.PlaneGeometry(w,h),new T.MeshBasicMaterial({map:tex,transparent:false,side:T.DoubleSide}));
-    mesh.position.set(x,y,z); mesh.rotation.y=rot || 0; p.add(mesh); return mesh;
+    mesh.position.set(x,y,z); mesh.rotation.y=rot || 0; mesh.userData.disposeGeo=true; mesh.userData.disposeMat=true; p.add(mesh); return mesh;
   };
   M.roof = function (p,w,d,x,y,z,color, slope) {
     var g=new T.Group(); g.position.set(x,y,z); p.add(g);
@@ -55,7 +55,7 @@
     var shape=new T.Shape(); shape.moveTo(-w/2,0); shape.lineTo(0,ridge); shape.lineTo(w/2,0); shape.lineTo(-w/2,0);
     var geo=new T.ExtrudeGeometry(shape,{depth:d,bevelEnabled:false});
     geo.translate(0,0,-d/2);
-    var roof=new T.Mesh(geo,M.mat(color)); roof.receiveShadow=true; g.add(roof);
+    var roof=new T.Mesh(geo,M.mat(color)); roof.receiveShadow=true; roof.castShadow=true;roof.userData.disposeGeo=true; g.add(roof);
     M.box(g,w+.42,.16,d+.42,0,-.04,0,color);
     return g;
   };
@@ -116,7 +116,7 @@
     if(!T){ if(fault)fault.textContent="Không tải được Three.js cục bộ (assets/three.min.js).";return null; }
     var renderer,scene,camera,sun,fill,world,raycaster,clock;
     var anims=[], selectable=[], selected=null, api, disposed=false;
-    var angle=-.68,elevation=.85,distance=opts.distance||65, target=new T.Vector3(0,2,0);
+    var angle=-.68,elevation=.85,distance=opts.distance||65, baseDistance=distance, viewportScale=1, target=new T.Vector3(0,2,0);
     var initial={angle:angle,elevation:elevation,distance:distance};
     var pointers=new Map(),startX=0,startY=0,gesture=false, pinchStart=0;
     var moving=true, night=false, labels=true, fpsCounter=0,lastFPS=performance.now(),lastFrame=performance.now();
@@ -145,13 +145,15 @@
     }catch(e){fail(e);return null;}
     function cameraUpdate(){
       elevation=Math.min(1.43,Math.max(.16,elevation));
-      distance=Math.min(140,Math.max(17,distance));
+      distance=Math.min(240,Math.max(17,distance));
       camera.position.set(target.x+distance*Math.cos(elevation)*Math.sin(angle),target.y+distance*Math.sin(elevation),target.z+distance*Math.cos(elevation)*Math.cos(angle));
       camera.lookAt(target);
     }
     function resize(){
-      var w=Math.max(1,el.clientWidth),h=Math.max(1,el.clientHeight);
-      renderer.setSize(w,h,false);camera.aspect=w/h;camera.fov=h<480?48:39;camera.updateProjectionMatrix();
+      var w=Math.max(1,el.clientWidth),h=Math.max(1,el.clientHeight),a=w/h;
+      var scale=a<.7?1.7:a<1?1.28:1;
+      distance=distance*scale/viewportScale; viewportScale=scale; initial.distance=baseDistance*scale;
+      renderer.setSize(w,h,false);camera.aspect=a;camera.fov=a<.7?57:a<1?48:39;camera.updateProjectionMatrix();
     }
     function move(e){
       if(!pointers.has(e.pointerId))return;
@@ -216,6 +218,7 @@
     }
     function clear(){
       anims.length=0;selectable.length=0;selected=null;
+      world.traverse(function(o){if(o.userData.disposeGeo&&o.geometry)o.geometry.dispose(); if(o.userData.disposeMat&&o.material){if(o.material.map)o.material.map.dispose();o.material.dispose();}});
       world.clear();
       if(opts.select)opts.select(null);
     }
