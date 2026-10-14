@@ -1,5 +1,16 @@
 # AGENTS.md — Hồ Trúc Giang / Bờ Hồ Bến Tre Digital Twin
 
+## Ảnh nền OPEN DATA tự host · PLAN + Three.js (2026-10-14)
+
+- Bấm **🌍 Ảnh mở** trên Floor Plan để bật/tắt raster địa tham chiếu; bấm **🌍 Nền 3D** ở thanh công cụ (hoặc vào **☰ Công cụ** trên điện thoại) để phủ raster lên mặt đất Three.js. Đây là ảnh nền thật có tọa độ, không phải ảnh tạo sinh hay dữ liệu GIS được "verified". Các đối tượng và đoạn bờ OSM không đổi.
+- Nguồn ưu tiên **OpenAerialMap v2 STAC** (\`https://api.imagery.hotosm.org/stac/search\`): xét ảnh bao đủ ô địa lý, asset RGB thực, chỉ nhận giấy phép **CC-BY-4.0 / CC-BY-SA-4.0 / CC0**, yêu cầu ít nhất 95% pixel hợp lệ. Chưa có chứng cứ một ảnh như vậy tồn tại tại Hồ Trúc Giang cho đến khi pipeline chạy; trường \`oam_intersecting\` và metadata ghi kết quả truy vấn.
+- Nếu không tìm được ảnh OAM phù hợp, lấy **Copernicus Sentinel-2 L2A** từ Earth Search STAC, chọn granule mây thấp và ba dải red/green/blue, hiệu chỉnh biểu diễn RGB. **Độ phân giải Sentinel-2 thực 10m**, dù raster web 1024×1024; không suy luận bờ lồi/lõm centimet từ ảnh này. Ghi nguyên văn \`Contains modified Copernicus Sentinel data [year]\`, ngày chụp và giấy phép.
+- \`bo-ho-ben-tre/scripts/build_open_imagery.py\` tạo \`data/imagery/basemap.webp\` và \`manifest.json\` (bbox \`[west,south,east,north]\`, source, acquired, native_resolution_m, license, source_url, attribution). **GitHub Pages deploy workflow** tạo **file ảnh trong \`_site\`**; ảnh được **host trên chính GitHub Pages**, không gọi tile Google/Esri khi xem, không chứa API key. Binary không được commit trong Git: file trong repository \`data/imagery/manifest.json\` chỉ là placeholder pending; bản triển khai là sản phẩm pipeline. Có thể chạy script tại máy của bạn với \`pip install rasterio numpy pillow requests\` rồi \`python3 bo-ho-ben-tre/scripts/build_open_imagery.py\`.
+- Nếu API ảnh bị chặn hoặc không tìm được scene đủ hợp lệ, hiển thị trạng thái \`unavailable\` và giữ nền mô hình kỹ thuật OSM. Không lấy ảnh từ nguồn thương mại đóng hoặc giả lập ảnh vệ tinh. Trạng thái thực tế chỉ có thể xác nhận sau khi kiểm tra manifest tại URL GitHub Pages và ảnh đã tải.
+- Hai tọa độ phải thống nhất: WGS84 geobounds → hệ XYZ local của dự án; North-up khi xem PLAN và Three.js (mặt phẳng x/+z). Luôn hiện ghi nguồn + độ phân giải thật khi bật ảnh. Ảnh không xác minh đường bờ OSM way 217484891 hoặc thay đổi dữ liệu SQLite.
+- QA: smoke script có bộ ảnh **synthetic fixture chỉ trong Playwright** để thử zoom/pan/raster trong 3D và PLAN; fixture không được đưa vào dữ liệu thực. Thử trên màn hình 320, 390 và landscape.
+
+
 ## Ảnh vệ tinh Google Maps trong Floor Plan (tùy chọn · 2026-10-14)
 
 - Trên trang 3D, chuyển sang **PLAN** rồi chọn **🛰 Google Satellite**. Trên điện thoại có thêm lối tắt trong **☰ Công cụ**.
