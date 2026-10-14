@@ -554,8 +554,9 @@ camera.lookAt(target.x,0,target.z)}
 function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
 function resize(){var totalW=Math.max(1,stage.clientWidth),h=Math.max(1,stage.clientHeight);
 var mobileSplit=workbenchMode==="split"&&window.innerWidth<=860;
-var w=workbenchMode==="split"&&!mobileSplit?Math.round(totalW*.55):totalW;
-var viewH=mobileSplit?Math.max(1,Math.round(h*.5)):h;
+var verticalSplit=mobileSplit&&window.innerWidth<=window.innerHeight;
+var w=workbenchMode==="split"?(verticalSplit?totalW:Math.round(totalW*(mobileSplit?.52:.55))):totalW;
+var viewH=verticalSplit?Math.max(1,Math.round(h*.5)):h;
 if(renderer){renderer.setSize(w,viewH,false);renderer.domElement.style.width=w+"px";renderer.domElement.style.height=viewH+"px"}
 if(camera){camera.aspect=w/viewH;camera.updateProjectionMatrix();updateCamera()}
 var c=$("fallback");c.width=w;c.height=viewH;drawMini();updateHotspots();
