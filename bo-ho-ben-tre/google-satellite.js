@@ -27,7 +27,7 @@ function visible(){
 }
 function updateSurface(){
  if(!G.dock)return;
- G.dock.classList.toggle("wb-google-active",visible());
+ G.dock.classList.toggle("wb-google-active",G.enabled&&G.mode==="floor");
  setButton();redraw();
  if(visible())requestAnimationFrame(function(){redraw()});
 }
@@ -119,8 +119,9 @@ function enable(){
  if(G.setFloor&&G.mode!=="floor")G.setFloor();
  G.loading=true;showMessage("Đang kết nối Google Maps Satellite…");
  loadAPI(G.key).then(function(){
+  G.enabled=true;updateSurface();
   if(!G.map)makeMap();
-  G.loading=false;G.enabled=true;updateSurface();
+  G.loading=false;updateSurface();
   showMessage("Google Satellite · lớp OSM chỉ tham chiếu, chưa khảo sát");
   redraw();
  }).catch(function(e){googleError(e.message)});
