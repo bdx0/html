@@ -1,0 +1,38 @@
+name: Smoke test MiniWorld 3D
+on:
+  push:
+    branches: [main]
+    paths:
+      - little-tokyo.html
+      - tiny-town.html
+      - assets/miniworld.js
+      - assets/three.min.js
+      - scripts/test_miniworld.mjs
+      - .github/workflows/smoke-miniworld.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Browser test desktop and mobile
+        run: node scripts/test_miniworld.mjs
+      - name: Upload browser screenshots and diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: miniworld-desktop-mobile
+          path: |
+            miniworld-*.png
+            miniworld-smoke.json
+          if-no-files-found: ignore
