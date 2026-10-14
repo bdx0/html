@@ -43,6 +43,19 @@ jobs:
               for e in n['relations']: assert e['target'] in ids
           print('Verified modeled entities:',len(ids),'relations:',sum(len(n['relations']) for n in m['nodes']))
           PY
+      - name: Lint open imagery Python and georeferencing manifest
+        run: |
+          python3 -m py_compile bo-ho-ben-tre/scripts/build_open_imagery.py
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path("bo-ho-ben-tre/data/imagery/manifest.json").read_text())
+          assert d["status"] in ("pending","unavailable","ready")
+          b=d["bbox"]
+          assert len(b)==4 and b[0]<106.37814<b[2] and b[1]<10.23861<b[3]
+          print("Open imagery manifest:",d["status"],b)
+          PY
+
       - name: Run browser test for desktop and mobile
         run: node scripts/test_ben_tre.mjs
       - name: Archive screenshots and diagnostic
