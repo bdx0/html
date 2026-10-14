@@ -116,6 +116,7 @@ function makeMap(){
 function enable(){
  if(G.loading||G.enabled)return;
  if(!G.key){openSetup();return}
+ if(window.BoHoOpenImagery&&BoHoOpenImagery.isPlanActive())BoHoOpenImagery.togglePlan();
  if(G.getView&&!G.map)G.lastPan=G.getView().pan;
  if(G.setFloor&&G.mode!=="floor")G.setFloor();
  G.loading=true;showMessage("Đang kết nối Google Maps Satellite…");
