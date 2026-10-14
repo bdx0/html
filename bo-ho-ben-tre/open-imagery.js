@@ -34,7 +34,7 @@ function notify(){
  if(I.redraw)I.redraw();
 }
 function fit(data){
- return !!(data&&data.status==="ready"&&typeof data.image==="string"&&/^[\w.-]+\.(?:png|jpe?g|webp)$/.test(data.image)&&
+ return !!(data&&data.status==="ready"&&data.crs==="EPSG:4326"&&data.north_up===true&&data.pixel_origin==="NW"&&typeof data.image==="string"&&/^[\w.-]+\.(?:png|jpe?g|webp)$/.test(data.image)&&
   Array.isArray(data.bbox)&&data.bbox.length===4&&data.bbox.every(Number.isFinite)&&data.bbox[0]<data.bbox[2]&&data.bbox[1]<data.bbox[3]&&
   typeof data.attribution==="string"&&data.attribution.trim());
 }
@@ -58,7 +58,7 @@ function makeMesh(){
 function load(){
  fetch("data/imagery/manifest.json",{cache:"no-store"}).then(function(r){if(!r.ok)throw Error("HTTP "+r.status);return r.json()}).then(function(d){
  I.manifest=d;
- if(!fit(d)){I.reason=d.status==="unavailable"?"Chưa có ảnh mở phù hợp · "+(d.reason||"kiểm tra nguồn ảnh"):"Chưa có ảnh được tự host · cần chạy workflow Build Open Imagery";notify();return}
+ if(!fit(d)){I.reason=d.status==="unavailable"?"Chưa có ảnh mở phù hợp · "+(d.reason||"kiểm tra nguồn ảnh"):d.status==="ready"?"Ảnh thiếu EPSG:4326 / True North (north-up); không hiển thị để tránh lệch hướng":"Chưa có ảnh được tự host · cần chạy workflow Build Open Imagery";notify();return}
  I.reason="Đang tải ảnh "+(d.source||"mở")+"…";notify();
  var img=new Image();img.onload=function(){I.img=img;I.loaded=I.ready=true;I.plan=true;I.model=true;
  I.reason=(d.source||"Open imagery")+" · "+(d.acquired||"không rõ ngày")+" · "+(d.native_resolution_m||"?")+" m/pixel thực · "+d.attribution;
