@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#352d42">
+<meta name="description" content="Little Tokyo Diorama — phố Nhật thu nhỏ 3D phong cách Rare 3D với mèo maneki-neko, tàu điện, mái ngói, bảng hiệu và camera cinematic. Mô hình gốc độc lập.">
+<meta name="catalog:category" content="Mô phỏng 3D">
+<meta name="catalog:tags" content="Three.js,WebGL,Miniature,Rare 3D,Diorama,Japan,3D">
+<meta name="catalog:icon" content="🏮">
+<title>Little Tokyo Diorama — Rare 3D Inspired</title>
+<style>
+:root{color-scheme:dark;--text:#fff9f3;--dim:#ead7d2;--panel:#292537d9;--border:#ffffff2d;--hot:#ffc4a9;--shadow:0 18px 60px #24172845}
+*{box-sizing:border-box}html,body{height:100%;margin:0;overflow:hidden;overscroll-behavior:none}body{font:13px/1.5 ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;background:#aa8c92;color:var(--text)}button,a{font:inherit}button{cursor:pointer}button:focus-visible,a:focus-visible{outline:3px solid #f5c8a2;outline-offset:3px}a{color:inherit;text-decoration:none}
+#stage{position:relative;height:100dvh;min-height:320px;overflow:hidden;background:radial-gradient(ellipse at 48% 31%,#f9dfc8 0%,#ebc3b8 39%,#b899aa 77%,#887d9b 100%)}body.night #stage{background:radial-gradient(ellipse at 45% 40%,#64667b 0%,#393f62 55%,#212c4b 100%)}
+#stage:after{content:"";position:absolute;inset:auto 0 0;height:20%;pointer-events:none;background:linear-gradient(transparent,#7f628a13)}
+#stage canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:grab}#stage canvas:active{cursor:grabbing}
+.head{position:absolute;top:22px;left:25px;z-index:5;pointer-events:none}.head>*{pointer-events:auto}.over{font-size:10px;letter-spacing:.2em;font-weight:850;text-transform:uppercase;color:#4c3448;background:#fff1e5a8;display:inline-flex;gap:7px;padding:5px 9px;border-radius:20px;backdrop-filter:blur(7px)}.over i{background:#d16d62;width:6px;height:6px;border-radius:50%;display:inline-block;margin-top:5px}.head h1{font-family:Georgia,serif;line-height:.88;font-size:clamp(39px,4.5vw,72px);font-weight:650;letter-spacing:-.055em;text-shadow:0 4px 23px #61445355;margin:16px 0 12px;color:#fff9ee}.head h1 em{font-style:italic;color:#ffe1c2}.head p{margin:0;font-weight:560;color:#fcf4e8;text-shadow:0 2px 10px #4f465e9c;font-size:12px;letter-spacing:.035em}.head p span{font-size:10px;opacity:.86;letter-spacing:.11em;text-transform:uppercase}
+.nav{position:absolute;z-index:5;right:22px;top:22px;display:flex;gap:8px}.nav a{background:#282438aa;color:#fff7f0;border:1px solid var(--border);border-radius:99px;padding:9px 13px;font-weight:720;font-size:11px;backdrop-filter:blur(13px)}.nav a:hover{background:#40364fcf}
+.corner{position:absolute;z-index:4;bottom:23px;left:25px;pointer-events:none}.corner small{font-weight:700;letter-spacing:.16em;color:#fff2eb;text-shadow:0 3px 9px #5748608a}.corner p{font-size:11px;color:#fff2e8;margin:4px 0 0;text-shadow:0 2px 7px #54455b8a}
+.tools{position:absolute;z-index:5;bottom:18px;left:50%;transform:translateX(-50%);border:1px solid #ffffff44;border-radius:999px;background:#312b3ccf;box-shadow:var(--shadow);padding:6px;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);display:flex;align-items:center;gap:3px;max-width:calc(100% - 14px)}.tools button{color:#fff4e9;background:transparent;border:0;border-radius:99px;padding:10px 12px;font-weight:760;font-size:11px;min-height:39px;white-space:nowrap}.tools button:hover,.tools button[aria-pressed="true"]{background:#fff4dd2b}.tools .hero{color:#39303b;background:#ffceb5}.tools .hero:hover{background:#ffdecb}.tools .div{height:21px;width:1px;background:#ffffff3d;margin:0 3px}.tools .icon{font-size:15px;margin-right:4px}
+.status{position:absolute;z-index:5;right:20px;bottom:22px;display:flex;gap:8px;align-items:center;color:#fff7f3;font-size:10px;text-shadow:0 2px 8px #69586699}.status .dot{width:6px;height:6px;border-radius:50%;background:#c7ffd7;box-shadow:0 0 0 4px #327b6255}
+#info{position:absolute;z-index:7;right:20px;top:71px;width:min(276px,calc(100vw - 40px));border:1px solid var(--border);border-radius:17px;padding:17px;background:var(--panel);backdrop-filter:blur(17px);box-shadow:var(--shadow);transition:opacity .2s,transform .2s}#info[hidden]{display:none}#info .close{position:absolute;top:8px;right:9px;color:#fff;border:0;border-radius:9px;background:#ffffff17;font-size:18px;padding:4px 10px}#info small{color:#ffceac;text-transform:uppercase;font-weight:800;letter-spacing:.14em}#info h2{font-size:18px;letter-spacing:-.025em;margin:7px 0}#info p{color:#eee0da;font-size:12px;line-height:1.65;margin:0}
+#debug{position:absolute;z-index:9;right:14px;bottom:82px;width:min(380px,calc(100vw - 28px));max-height:50dvh;overflow:auto;background:#161b2df2;color:#eaf7fc;border:1px solid #b6d0d380;border-radius:14px;padding:13px;font:11px/1.6 ui-monospace,Consolas,monospace;white-space:pre-wrap;overflow-wrap:anywhere}#debug[hidden]{display:none}
+#error{position:absolute;z-index:12;top:50%;left:50%;transform:translate(-50%,-50%);max-width:560px;width:calc(100% - 40px);background:#6d253c;color:#fff;border:1px solid #ffc3bd;border-radius:14px;padding:18px;white-space:pre-wrap;overflow-wrap:anywhere}#error[hidden]{display:none}
+@media(max-width:840px){.corner{display:none}.status{bottom:76px;right:12px}.head{top:15px;left:15px}.head h1{font-size:clamp(37px,7vw,55px)}.nav{right:13px;top:15px}}
+@media(max-width:560px){.head{top:12px;left:12px}.head h1{font-size:37px;margin:11px 0 6px}.head p{font-size:10px}.head p span{display:none}.over{font-size:8px}.nav{right:9px;top:11px;gap:4px;flex-direction:column;align-items:flex-end}.nav a{font-size:9px;padding:6px 8px}.tools{bottom:max(9px,env(safe-area-inset-bottom));width:calc(100% - 12px);justify-content:space-between;border-radius:15px;padding:5px;gap:0}.tools button{font-size:10px;padding:8px 5px;min-width:0;flex:1;min-height:43px}.tools .icon{display:block;margin:0;font-size:16px;line-height:19px}.tools .div{margin:0 1px}.status{bottom:79px;right:10px;font-size:9px}#info{top:auto;bottom:86px;left:9px;right:9px;width:auto;padding:11px}#info h2{font-size:15px;margin:4px 0}#info p{font-size:10px}#debug{bottom:78px}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+</style>
+</head>
+<body>
+<main id="stage" aria-label="Little Tokyo diorama 3D. Kéo để xoay, chụm để phóng to hoặc thu nhỏ, chạm công trình để khám phá.">
+<div class="head"><span class="over"><i></i> A pocket-sized Tokyo</span><h1>Little<br><em>Tokyo.</em></h1><p>小さな東京 · A miniature street corner <span>— Rare 3D inspired</span></p></div>
+<nav class="nav"><a href="./" aria-label="Về HTML Lab">← HTML Lab</a><a href="./little-tokyo.html">Bản v1 ↗</a></nav>
+<aside id="info" hidden><button class="close" type="button" id="closeInfo" aria-label="Đóng thông tin">×</button><small id="infoCategory">LANDMARK</small><h2 id="infoName"></h2><p id="infoDesc"></p></aside>
+<div class="corner"><small>01 / COLLECTIBLE WORLD</small><p>Drag to orbit · Pinch to zoom · Tap to discover</p></div>
+<div class="status"><span class="dot"></span><span id="runtime">Đang khởi tạo 3D…</span></div>
+<div class="tools" aria-label="Điều khiển diorama"><button id="orbit" aria-pressed="true" title="Bật tắt góc quay tự động"><span class="icon">◉</span> Cinema</button><button id="dayNight" aria-pressed="false" title="Chuyển ngày đêm"><span class="icon">☾</span> Night</button><button id="front" title="Về góc nhìn chính"><span class="icon">⌂</span> Góc chính</button><span class="div"></span><button id="zoomOut" title="Thu nhỏ"><span class="icon">−</span> Zoom</button><button id="zoomIn" title="Phóng to"><span class="icon">+</span> Zoom</button><span class="div"></span><button class="hero" id="capture" title="Chụp ảnh PNG"><span class="icon">↧</span> Lưu ảnh</button><button id="debugButton" title="Trạng thái WebGL" aria-label="Chẩn đoán WebGL"><span class="icon">ⓘ</span></button></div>
+<pre id="debug" hidden></pre><div id="error" hidden role="alert"></div>
+</main>
+<script src="./assets/three.min.js"></script>
+<script>
+(function(){
+'use strict';
+const T=window.THREE,host=document.getElementById('stage'),status=document.getElementById('runtime');
+const errorBox=document.getElementById('error');
+function fail(err){console.error('[Tokyo Diorama]',err);errorBox.hidden=false;errorBox.textContent='Không thể dựng mô hình 3D: '+String(err.stack||err)+'\nHãy kiểm tra WebGL, sau đó gửi nội dung chẩn đoán.';status.textContent='Lỗi WebGL';}
+if(!T){fail('Không tải được assets/three.min.js');return;}
+let renderer,scene,camera,hemi,sun,ambient,ground;
+try{
+  renderer=new T.WebGLRenderer({antialias:true,alpha:true,powerPreference:'high-performance',preserveDrawingBuffer:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio||1,innerWidth<650?1.4:1.8));
+  renderer.shadowMap.enabled=innerWidth>750;renderer.shadowMap.type=T.PCFSoftShadowMap;
+  renderer.setClearColor(0x000000,0);renderer.toneMapping=T.ACESFilmicToneMapping;
+  renderer.toneMappingExposure=1.35;
+  if('outputColorSpace' in renderer)renderer.outputColorSpace=T.SRGBColorSpace;else renderer.outputEncoding=T.sRGBEncoding;
+  host.insertBefore(renderer.domElement,host.firstChild);
+  scene=new T.Scene();camera=new T.PerspectiveCamera(38,1,.1,260);
+  hemi=new T.HemisphereLight(0xeaf1ff,0xb68c80,2.15);scene.add(hemi);
+  ambient=new T.AmbientLight(0xffeee2,.12);scene.add(ambient);
+  sun=new T.DirectionalLight(0xffdbaf,3.15);sun.position.set(-22,40,32);sun.castShadow=renderer.shadowMap.enabled;
+  sun.shadow.mapSize.set(2048,2048);sun.shadow.camera.left=-37;sun.shadow.camera.right=37;
+  sun.shadow.camera.top=37;sun.shadow.camera.bottom=-37;sun.shadow.camera.near=1;sun.shadow.camera.far=110;sun.shadow.bias=-.0003;sun.shadow.normalBias=.03;scene.add(sun);
+}catch(e){fail(e);return;}
+// All geometry, signs and materials are original, generated inside this file.
+const mats=new Map(),geos=new Map(),pickables=[],updaters=[],lit=[],world=new T.Group();scene.add(world);
+let boxCount=0,night=false,spin=true,lastInteraction=0,frames=0,lastStats=performance.now();
+function mat(hex,roughness=.79,emissive){let key=hex+'|'+roughness+'|'+(emissive||'');if(!mats.has(key))mats.set(key,new T.MeshStandardMaterial({color:hex,roughness,metalness:.03,emissive:emissive||0x000000,emissiveIntensity:emissive?.42:0}));return mats.get(key);}
+function cube(p,w,h,d,x,y,z,c,cast=false){let key=[w,h,d].join(',');if(!geos.has(key))geos.set(key,new T.BoxGeometry(w,h,d));let m=new T.Mesh(geos.get(key),typeof c==='string'?mat(c):c);m.position.set(x,y,z);m.receiveShadow=true;m.castShadow=cast&&renderer.shadowMap.enabled;p.add(m);boxCount++;return m;}
+function ball(p,r,x,y,z,color,sx=1,sy=1,sz=1){let key='s'+r;if(!geos.has(key))geos.set(key,new T.SphereGeometry(r,14,11));let b=new T.Mesh(geos.get(key),mat(color));b.position.set(x,y,z);b.scale.set(sx,sy,sz);b.castShadow=renderer.shadowMap.enabled;p.add(b);return b;}
+function cyl(p,rt,rb,h,x,y,z,color,sides=12){let key='c'+[rt,rb,h,sides].join(',');if(!geos.has(key))geos.set(key,new T.CylinderGeometry(rt,rb,h,sides));let b=new T.Mesh(geos.get(key),mat(color));b.position.set(x,y,z);b.castShadow=h>1&&renderer.shadowMap.enabled;p.add(b);return b;}
+function sign(p,word,w,h,x,y,z,rot=0,back='#52636b',ink='#fff2d9',edge='#b88b68',glow=false){
+ let cvs=document.createElement('canvas');cvs.width=512;cvs.height=256;let c=cvs.getContext('2d');
+ c.fillStyle=edge;c.fillRect(0,0,512,256);c.fillStyle=back;c.fillRect(13,13,486,230);
+ c.fillStyle='rgba(255,255,255,.10)';c.fillRect(25,22,459,9);c.textAlign='center';c.textBaseline='middle';c.fillStyle=ink;
+ let size=word.length>12?40:word.length>8?52:word.length>5?68:word.length>3?86:110;
+ c.font='800 '+size+'px sans-serif';c.fillText(word,256,137,466);
+ const tex=new T.CanvasTexture(cvs);tex.anisotropy=2;if('colorSpace' in tex)tex.colorSpace=T.SRGBColorSpace;
+ const mesh=new T.Mesh(new T.PlaneGeometry(w,h),new T.MeshBasicMaterial({map:tex,side:T.DoubleSide,transparent:false,toneMapped:!glow}));
+ mesh.position.set(x,y,z);mesh.rotation.y=rot;p.add(mesh);return mesh;
+}
+function info(mesh,name,category,desc){mesh.userData.point={name,category,desc};pickables.push(mesh);return mesh;}
+function roof(p,w,d,x,y,z,color,rise=.95){
+ const shape=new T.Shape();shape.moveTo(-w/2,0);shape.lineTo(0,rise);shape.lineTo(w/2,0);shape.closePath();
+ const geo=new T.ExtrudeGeometry(shape,{depth:d,bevelEnabled:false});geo.translate(0,0,-d/2);
+ let mesh=new T.Mesh(geo,mat(color));mesh.position.set(x,y,z);mesh.castShadow=renderer.shadowMap.enabled;mesh.receiveShadow=true;p.add(mesh);
+ cube(p,w+.45,.16,d+.25,x,y-.015,z,color);
+ for(let i=0;i<9;i++){
+   const zz=z-d/2+(i+.4)*d/9;
+   let v=cube(p,w+.34,.065,.09,x,y+.01,zz,'#836c69');v.rotation.z=0;
+ }
+ return mesh;
+}
+function windowFront(p,x,y,z,w=1.2,h=1.24,glow=false){
+ cube(p,w+.18,h+.2,.14,x,y,z,'#684f46');cube(p,w,h,.16,x,y,z+.09,glow?'#ffe0a4':'#678387');
+ cube(p,.08,h+.07,.2,x,y,z+.18,'#b79b7a');cube(p,w+.15,.11,.28,x,y-h/2,z+.17,'#c5a88a');
+ if(glow)cube(p,w-.08,.09,.04,x,y-h/2+.2,z+.22,'#e5c58a');
+}
+function windowSide(p,x,y,z){
+ const g=new T.Group();g.position.set(x,y,z);g.rotation.y=Math.PI/2;p.add(g);windowFront(g,0,0,0,.83,.9);
+}
+function awning(p,width,z,y,scheme){
+ let count=8,band=width/count;
+ for(let i=0;i<count;i++)cube(p,band+.02,.14,1.23,-width/2+band*(i+.5),y,z+.48,i%2?scheme:'#efe5d0');
+ cube(p,width+.2,.15,.16,0,y-.17,z+1.04,'#a99177');
+}
+function lantern(p,x,y,z,label='福'){
+ cyl(p,.29,.3,.57,x,y,z,'#d37f63',12);cube(p,.38,.08,.38,x,y+.31,z,'#5b484b');cube(p,.38,.08,.38,x,y-.30,z,'#5b484b');
+ sign(p,label,.42,.35,x,y,z+.3,0,'#d77f63','#fff8d7','#d77f63',true);
+ lit.push({obj:ball(p,.11,x,y,z+.28,'#f4ba80')});
+}
+function plant(p,x,z,s=1){
+ const a=new T.Group();a.position.set(x,0,z);a.scale.setScalar(s);p.add(a);
+ cyl(a,.29,.22,.5,0,.28,0,'#9e7063');cyl(a,.08,.11,.72,0,.83,0,'#7c7053');
+ ball(a,.55,0,1.18,0,'#678b69',1,.75,.8);ball(a,.43,.34,1.23,.08,'#799a6d');ball(a,.33,-.3,1.28,.1,'#6d9e73');return a;
+}
+function ac(p,x,y,z){
+ cube(p,1.2,.66,.45,x,y,z,'#c1c2b8');cube(p,.56,.52,.02,x,y,z+.24,'#7a898b');
+ for(let t=-1;t<=1;t++)cube(p,.035,.5,.05,x+t*.17,y,z+.27,'#bac6c2');
+ cube(p,1.32,.11,.52,x,y-.4,z,'#80685e');
+}
+function addBuilding(name,cfg){
+ const {x,z,w,d,h,wall,frame,roofColor,logo,signColor,accent,levels}=cfg;let g=new T.Group();g.position.set(x,0,z);world.add(g);
+ cube(g,w,h,d,0,h/2,0,wall,true);cube(g,w+.16,.19,d+.16,0,.13,0,'#ab8c79');
+ const front=d/2+.085;
+ // Architectural layers, uneven timber and story bands.
+ for(let k=1;k<levels;k++){
+   let yy=h*k/levels;
+   cube(g,w+.2,.18,d+.18,0,yy,0,frame);
+   cube(g,w+.32,.22,.55,0,yy+.02,front+.16,accent);
+   cube(g,w+.36,.13,.58,0,yy+.28,front+.13,roofColor);
+ }
+ for(let col=-1;col<=1;col++){
+   const xx=col*(w*.33);
+   cube(g,.13,h-.32,.25,xx,h/2,front+.04,frame);
+ }
+ // Window grids only on upper levels, avoid excessively uniform repetition.
+ for(let floor=1;floor<levels;floor++){
+   const yy=h*(floor+.45)/levels;
+   for(let col=-1;col<=1;col++)windowFront(g,col*w*.29,yy,front,w*.21,1.25,(col+floor)%4===0);
+   cube(g,w*.75,.13,.65,0,yy-.89,front+.24,'#85675b');
+   for(let col=-1;col<=1;col++)cube(g,.11,.64,.12,col*w*.30,yy-.53,front+.58,'#684e4a');
+ }
+ // Shop ground floor: glowing interior, timber sliding doors, shop banner and canopy.
+ cube(g,w-.55,2.22,.16,0,1.26,front,'#3d4b4d');cube(g,w-.74,1.96,.19,0,1.25,front+.11,'#9bb0a4');
+ for(let col=-2;col<=2;col++)cube(g,.12,2.0,.23,col*(w-.8)/5,1.26,front+.23,'#71564a');
+ cube(g,w+.2,.35,.9,0,2.5,front+.42,accent);awning(g,w-.3,front+.75,2.27,signColor);
+ sign(g,logo,Math.min(w*.8,4.1),.76,0,2.92,front+.56,0,signColor,'#fce8c5','#bb906c',true);
+ for(let i=-1;i<=1;i+=2){lantern(g,i*w*.35,2.2,front+1.14,i<0?'福':'店');}
+ if(levels>=3)roof(g,w+.45,d+.4,0,h+.11,0,roofColor,.75);
+ else roof(g,w+.35,d+.3,0,h+.1,0,roofColor,1.10);
+ // Roof tiles and utility stacks in silhouette.
+ for(let k=0;k<3;k++){
+  cube(g,.36,.3,.45,-w*.3+k*w*.30,h+.92,.05,'#876e67');
+ }
+ for(let side=-1;side<=1;side+=2){
+  windowSide(g,side*(w/2+.08),h*.57,-d*.15);
+  windowSide(g,side*(w/2+.08),h*.77,d*.2);
+ }
+ if(cfg.special==='left'){
+   // Rooftop house extension, eaves, slatted balcony.
+   cube(g,w*.53,2.15,d*.56,-w*.15,h+1.1,-d*.2,'#96735f',true);
+   roof(g,w*.57,d*.60,-w*.15,h+2.22,-d*.2,'#754c43',1.2);
+   for(let i=-2;i<=2;i++)cube(g,.11,1.06,.12,i*.57,h*.67,front+.81,'#634b42');
+   ac(g,w*.25,h*.68,front+.26);
+ }
+ if(cfg.special==='center'){
+   // Towered upper facade with projecting vertical sign and roof parapet.
+   cube(g,w*.55,2.0,d*.43,w*.13,h+1.0,-d*.20,'#b78e76',true);
+   roof(g,w*.57,d*.49,w*.13,h+2.1,-d*.2,'#925f50',.87);
+   sign(g,'山の湯',.9,2.45,w/2+.27,h*.70,front+.52,Math.PI/2,'#455f62','#fff3d7','#c49c70',true);
+   cube(g,.30,1.1,.29,w/2+.1,h*.65,front+.08,'#b7a6a0');
+ }
+ if(cfg.special==='right'){
+   cube(g,w*.6,2.4,d*.53,-w*.12,h+1.2,-d*.12,'#b5a084',true);
+   roof(g,w*.66,d*.58,-w*.12,h+2.47,-d*.12,'#5b595b',.65);
+   ac(g,-w*.22,h*.62,front+.32);
+ }
+ const proxy=cube(g,w,h*.89,d,0,h*.51,0,mat(wall));proxy.visible=false;
+ // Invisible helper for ray-casting; keep raycasts on visible body instead.
+ const body=g.children.find(o=>o.isMesh&&o.visible&&o.geometry.type==='BoxGeometry');
+ info(body||g,name,'TOKYO / ARCHITECTURE',cfg.desc);
+ return g;
+}
+// A precise floating street-corner footprint, not a repeated city grid.
+cube(world,35,.68,25,0,-.65,0,'#81676d',true);
+cube(world,34.6,.16,24.6,0,-.22,0,'#af9a87');
+cube(world,34.2,.14,24.0,0,-.11,0,'#847771');
+cube(world,34.4,.14,7.7,0,-.01,8.25,'#46464e');
+cube(world,3.9,.15,24.0,15.1,-.01,0,'#46464e');
+// Curbs, paving slabs, rails and painted Japanese street markings.
+cube(world,34.5,.18,1.13,0,.13,4.25,'#b7a897');
+cube(world,1.1,.18,23.5,12.65,.13,0,'#b7a897');
+for(let i=-16;i<=16;i+=1.3)cube(world,.045,.014,1.05,i,.238,4.24,'#9e8b7c');
+for(let i=-9;i<=9;i+=1.3)cube(world,1.05,.015,.045,12.65,.238,i,'#9e8b7c');
+for(let z=6.65;z<=9.7;z+=1.85)cube(world,32,.016,.075,0,.085,z,'#8f8a83');
+for(let x=-15.8;x<=15.8;x+=1.05)cube(world,.15,.015,4.1,x,.1,8.1,'#5e5a59');
+for(let z=6.88;z<=9.3;z+=2.2)cube(world,31.2,.045,.095,0,.12,z,'#c6bca6');
+for(let x=-7;x<10;x+=2.5)cube(world,1.1,.025,.12,x,.12,10.85,'#d6c7a9');
+for(let t=0;t<7;t++)cube(world,.82,.027,.17,9.9,.13,5.8+t*.6,'#f0e8d6');
+sign(world,'止まれ',1.4,.62,13.0,.08,6.2,0,'#a06a62','#fff2e7','#a06a62');
+const left=addBuilding('石井酒店 · Ishii Shop',{x:-8.0,z:-3.4,w:7.5,d:8.7,h:10.9,wall:'#ba9b80',frame:'#715047',roofColor:'#76554d',logo:'石井酒店',signColor:'#667d6a',accent:'#9b705a',levels:3,special:'left',desc:'Tiệm tạp hóa phong cách Showa với ban công gỗ, mái ngói đỏ, biển hiệu nhiều lớp và cục nóng điều hòa.'});
+const center=addBuilding('山の湯 · Townhouse',{x:.9,z:-3.9,w:8.3,d:9.0,h:12.8,wall:'#cfaa8d',frame:'#7a5549',roofColor:'#996a5a',logo:'山の湯',signColor:'#9b7660',accent:'#b47f68',levels:4,special:'center',desc:'Khối nhà trung tâm kiểu Nhật xếp tầng, nhiều biển đứng, cửa gỗ và mái tôn/đất nung. Điểm nhấn là tượng mèo may mắn trên mái.'});
+const right=addBuilding('珈琲と喫茶 · Kissaten',{x:9.4,z:-4.4,w:6.2,d:7.9,h:10.7,wall:'#a79888',frame:'#5b615d',roofColor:'#69736c',logo:'喫 茶',signColor:'#60796d',accent:'#9f806b',levels:3,special:'right',desc:'Quán cà phê cổ điển với tấm bạt che nắng, mái mái chồng lớp, thiết bị kỹ thuật và bảng hiệu kiểu cũ.'});
+// Irregular back alleys and rooftop add-ons for the recognizable dense silhouette.
+function rearAnnex(x,z,w,h,d,wall){let g=new T.Group();g.position.set(x,0,z);world.add(g);cube(g,w,h,d,0,h/2,0,wall,true);roof(g,w+.24,d+.3,0,h,0,'#695858',.72);for(let a=-1;a<=1;a+=2)cube(g,.9,.9,.17,a*w*.22,h*.7,d/2+.08,'#94a6a2');return g;}
+rearAnnex(-12.9,-8.5,3.1,8.9,3.5,'#a58872');rearAnnex(12.1,-8.8,3.3,12.0,3.9,'#8f827b');
+// A narrow street-corner annex, breaking the repeated symmetrical frontage.
+let kiosk=new T.Group();kiosk.position.set(6.5,0,2.0);world.add(kiosk);
+cube(kiosk,4.3,2.5,3.1,0,1.25,0,'#b78973',true);roof(kiosk,4.6,3.5,0,2.55,0,'#775756',.58);
+cube(kiosk,3.4,1.55,.15,0,1.2,1.63,'#4c5958');cube(kiosk,3.2,1.4,.16,0,1.3,1.73,'#a9beba');
+awning(kiosk,4.2,1.65,2.2,'#ba735d');sign(kiosk,'だんご',2.6,.51,0,2.48,1.98,0,'#a65e55','#ffefd4','#c19d7e');
+for(let k=-1;k<=1;k+=2)lantern(kiosk,k*1.38,2.0,2.47,'茶');
+info(kiosk.children[0],'だんご · Street kiosk','SMALL BUSINESS','Quầy hàng thấp sát mặt đường giúp phá sự đồng đều của dãy phố và tạo chiều sâu cho tiểu cảnh.');
+// Central beckoning cat on upper roof: original parametric sculpture.
+let cat=new T.Group();cat.position.set(2.15,15.2,-4.45);world.add(cat);
+cyl(cat,2.6,2.65,.56,0,.28,0,'#9d655c',24);cyl(cat,2.30,2.38,.16,0,.65,0,'#ccae8d',24);
+ball(cat,1.65,0,2.56,0,'#e9d9bd',1,1.35,.87);ball(cat,1.75,0,4.92,.15,'#efdfc5',1.12,.95,.92);
+let earL= new T.Mesh(new T.ConeGeometry(.59,1.27,4),mat('#e5c6a9'));earL.position.set(-1.17,6.33,.15);earL.rotation.z=.15;cat.add(earL);
+let earR= new T.Mesh(new T.ConeGeometry(.59,1.27,4),mat('#e5c6a9'));earR.position.set(1.17,6.33,.15);earR.rotation.z=-.15;cat.add(earR);
+ball(cat,.25,-.55,5.03,1.60,'#755552',1,.78,.32);ball(cat,.25,.55,5.03,1.60,'#755552',1,.78,.32);
+ball(cat,.23,0,4.59,1.74,'#c27b74',.92,.55,.38);
+for(let s=-1;s<=1;s+=2){for(let i=0;i<3;i++){let whisker=cube(cat,.54,.032,.035,s*1.12,4.38+i*.15,1.34,'#866961');whisker.rotation.z=s*(i-1)*.17;}}
+ball(cat,.37,1.5,3.19,1.08,'#f0dec0',.8,1.15,.65);ball(cat,.47,-1.24,2.03,1.18,'#f0dec0',.9,.8,.7);
+ball(cat,.5,1.03,1.56,1.12,'#e6d2b7',1,.7,.72);
+const coin=cyl(cat,.79,.79,.18,0,2.38,1.53,'#cda45d',28);coin.rotation.x=Math.PI/2;
+sign(cat,'招 福',1.19,.5,0,2.35,1.67,0,'#b78b4c','#fff1b7','#b78b4c');
+info(cat.children[2],'招き猫 · Maneki-neko','ROOFTOP ICON','Mèo vẫy tay mang ý nghĩa cầu may. Khối tượng lớn trên mái tạo silhouette đặc trưng của một diorama Tokyo phong cách sưu tầm.');
+// Neon signs in deep layers and projecting from corners.
+sign(world,'つり堀',1.6,2.4,4.94,9.05,2.12,Math.PI/2,'#aa775a','#ffe5b0','#b58b70',true);
+sign(world,'鍋物料理',1.45,2.5,-4.12,8.53,1.65,-Math.PI/2,'#6b7970','#ffefc6','#cfac81',true);
+sign(world,'ラーメン',.68,2.3,12.65,6.6,.9,Math.PI/2,'#b9514e','#f6e9c4','#d6a27b',true);
+sign(world,'駅 前',2.4,.74,-11.2,5.3,2.3,0,'#546760','#ffe8c9','#b99e7e');
+// External piping and AC units in irregular clusters.
+for(const x of [-12,-10,-1.1,5.5,11.7]){
+ cyl(world,.09,.10,4.4,x,3.5,-.22,'#7b796e');
+ cyl(world,.13,.14,1.2,x,6.1,-.22,'#a49b85');
+}
+for(let i=0;i<2;i++)ac(world,-3.8+i*1.65,5.25,.90);
+// Elevated gallery railings and side staircases.
+for(let i=0;i<10;i++)cube(world,.08,1.06,.08,-11.1+i*.45,5.2,1.4,'#63514e');
+cube(world,4.5,.10,.14,-9.1,5.78,1.4,'#66534e');
+for(let i=0;i<7;i++)cube(world,.63,.13,.95,12.4-i*.28,1.1+i*.36,-1.5-i*.47,'#786b61');
+// Vending machine and lots of ground-level micro-props.
+function vending(x,z,angle=0){let g=new T.Group();g.position.set(x,0,z);g.rotation.y=angle;world.add(g);
+ cube(g,1.03,2.07,.67,0,1.05,0,'#cd5d53',true);cube(g,.81,1.1,.06,0,1.44,.38,'#ede6dc');
+ for(let j=0;j<4;j++)for(let k=0;k<3;k++)cube(g,.14,.21,.08,(j-1.5)*.20,1.76-k*.3,.43,['#83b4c2','#b6cfa0','#eec49a'][k]);
+ cube(g,.76,.21,.07,0,.47,.39,'#563e40');cube(g,.28,.23,.07,.23,.9,.39,'#aaabb0');return g;}
+vending(11.36,2.55,-.22);vending(-12.8,2.1,.18);
+function cone(x,z){cyl(world,.05,.40,.76,x,.38,z,'#ce7e60',10);cube(world,.85,.075,.85,x,.04,z,'#d0c5ab');}
+for(let i=0;i<5;i++)cone(-3.15+i*.76,4.1);
+for(let i=0;i<7;i++){plant(world,-14.2+i*2.2,2.48,.54+(i%3)*.16);}
+for(let i=0;i<5;i++)plant(world,8.0+i*1.33,3.25,.47);
+for(let i=0;i<6;i++){
+  const x=-14+i*1.3;
+  cube(world,.22,.62,.23,x,.31,4.7,'#696a64');ball(world,.13,x,.74,4.7,'#d6b89b');
+}
+// Bicycle with real spoked wheels (rings and thin tubes).
+function bike(x,z,angle=0){let g=new T.Group();g.position.set(x,.43,z);g.rotation.y=angle;world.add(g);
+ const metal=mat('#515d62');for(const ox of [-.55,.55]){
+   let wheel=new T.Mesh(new T.TorusGeometry(.39,.055,6,16),mat('#323a42'));wheel.rotation.y=Math.PI/2;wheel.position.set(ox,0,0);g.add(wheel);
+   for(let i=0;i<6;i++){let sp=cube(g,.75,.017,.019,ox,0,0,'#bec8b5');sp.rotation.z=i*Math.PI/6;}
+ }
+ function tube(a,b,rad=.035){let v1=new T.Vector3(...a),v2=new T.Vector3(...b);let geom=new T.CylinderGeometry(rad,rad,v1.distanceTo(v2),6);let ob=new T.Mesh(geom,metal);ob.position.copy(v1).add(v2).multiplyScalar(.5);ob.quaternion.setFromUnitVectors(new T.Vector3(0,1,0),v2.clone().sub(v1).normalize());g.add(ob);}
+ tube([-.55,0,0],[-.10,.59,0]);tube([-.10,.59,0],[.22,.02,0]);tube([.22,.02,0],[-.55,0,0]);tube([.22,.02,0],[.55,0,0]);tube([-.10,.59,0],[.32,.65,0]);tube([.32,.65,0],[.55,0,0]);tube([.32,.65,0],[.52,.90,0]);tube([-.10,.59,0],[-.20,.76,0]);
+ cube(g,.38,.06,.23,-.22,.78,0,'#4b4242');cube(g,.36,.05,.06,.53,.93,0,'#3e4448');return g;}
+bike(10.25,4.23,.16);bike(-10.3,3.5,-.28);
+// Posters, utility boxes and tiny railings.
+for(let i=0;i<9;i++){
+  let x=-11+i*2.3;
+  cube(world,.34,.14,.24,x,.05,3.7,'#b5b0a2');
+}
+for(let i=0;i<12;i++){
+ let x=-14+i*1.9; if(x>-6&&x<8)continue;
+ cube(world,.14,.55,.14,x,.31,5.0,'#6e6660');
+}
+// Telephone poles with true sagging overhead catenary cables.
+function pole(x,z,height=12){const group=new T.Group();group.position.set(x,0,z);world.add(group);
+ cyl(group,.15,.21,height,0,height/2,0,'#77675f',12);
+ cube(group,2.75,.21,.21,0,height-1.35,0,'#635651');cube(group,2.0,.17,.2,0,height-3.4,0,'#635651');
+ for(let i=-1;i<=1;i++){
+  ball(group,.12,i*.97,height-1.25,0,'#cdc5ac');
+  cube(group,.12,.44,.16,i*.97,height-1.05,0,'#5f5049');
+ }
+ for(let i=0;i<2;i++){cube(group,.76,.45,.48,0,height-2.2-i*.4,-.31,'#9f9a8e');}
+ return group;}
+const poles=[[-14.7,4.2,11.2],[11.6,4.2,12.3],[-5.2,-.6,13.5],[6.8,-1.0,14]];
+poles.forEach(a=>pole(...a));
+function wire(path,color='#4b4346',radius=.034){let geom=new T.TubeGeometry(new T.CatmullRomCurve3(path.map(p=>new T.Vector3(...p))),18,radius,4,false);let obj=new T.Mesh(geom,mat(color));world.add(obj);}
+for(let k=-1;k<=1;k++){
+ wire([[-14.7+k*.85,9.9,4.2],[-7,8.9+k*.10,4.2],[2,9.0+k*.1,4.2],[11.6+k*.85,10.8,4.2]],'#56454a',.028);
+ wire([[-5.2+k*.7,12.1,-.6],[-.1,10.7,-.82],[4.4,11.1,-1],[6.8+k*.7,12.7,-1]],'#53484d',.029);
+}
+for(let k=0;k<2;k++)wire([[-14.8,8.6+k*.7,3.8],[-10.3,8.0+k*.7,.3],[-7.2,8.9+k*.7,-2]],'#766263',.019);
+// Rooftop antenna and water tank.
+function antenna(x,y,z){cyl(world,.034,.043,2.9,x,y+1.4,z,'#655d5e');for(let i=0;i<4;i++)cube(world,.72,.035,.035,x,y+.8+i*.5,z,'#696669');}
+antenna(-13.0,9.1,-7.0);antenna(12.0,13.2,-7.2);
+cyl(world,.67,.71,1.32,-10,10.6,-6,'#7e817d',12);
+// Rails and moving streetcar in front of the scene.
+let tram=new T.Group();tram.position.set(-10.1,.12,8.08);tram.rotation.y=Math.PI/2;world.add(tram);
+cube(tram,2.5,1.9,6.1,0,1.09,0,'#d9b474',true);
+cube(tram,2.55,.5,6.17,0,.51,0,'#87645d');cube(tram,2.7,.29,6.25,0,2.16,0,'#e6d4af');
+cube(tram,2.67,.19,6.1,0,1.49,0,'#b27658');
+for(let side=-1;side<=1;side+=2){for(let i=-2;i<=2;i++){
+ cube(tram,.04,.78,.70,side*1.29,1.83,i*1.08,'#4f555c');
+ cube(tram,.047,.63,.54,side*1.32,1.82,i*1.08,'#a6c0bb');
+ }}
+for(let i=-1;i<=1;i+=2){
+ cube(tram,1.84,.83,.075,0,1.81,i*3.07,'#718d8b');
+ for(let k=-1;k<=1;k+=2)cube(tram,.35,.18,.08,k*.78,.63,i*3.09,'#e7d5a2');
+}
+for(let k=-1;k<=1;k+=2)for(let i=-1;i<=1;i+=2){let wh=cyl(tram,.23,.23,.18,k*.98,.35,i*2.14,'#3d4149');wh.rotation.z=Math.PI/2;}
+cube(tram,.25,.5,.75,0,2.49,0,'#8b8176');cube(tram,1.15,.13,.13,0,2.8,0,'#706b67');
+sign(tram,'東京',1.05,.36,0,1.03,3.14,0,'#916c5c','#fef2d4','#9c7565',true);
+info(tram.children[0],'東京電車 · Tokyo Tram','STREET TRANSIT','Xe điện cổ điển mô phỏng trên đường ray, tạo cảm giác chuyển động ở chân khối kiến trúc.');
+updaters.push(t=>{tram.position.x=-10.1+Math.sin(t*.28)*1.5;tram.position.y=.12+Math.sin(t*2)*.014;});
+// Street lamp silhouette and signage.
+function streetLamp(x,z){cyl(world,.07,.11,4.0,x,2.0,z,'#525252');cube(world,1.65,.12,.18,x-.76,3.88,z,'#525252');
+cube(world,.7,.25,.45,x-1.45,3.67,z,'#f3d8ad');cube(world,.83,.14,.54,x-1.45,3.89,z,'#5d6060');}
+streetLamp(-4.5,4.62);streetLamp(14.4,3.24);
+// Paper lantern strings, subtle hanging motion.
+for(let j=0;j<6;j++)lantern(world,-5.2+j*.78,3.76,2.8,j%2?'祭':'福');
+for(let i=0;i<5;i++)plant(world,13.45,1.45-i*2.4,.58+i%2*.12);
+// Compact figures with real 3D silhouettes.
+function person(x,z,tint){let p=new T.Group();p.position.set(x,0,z);world.add(p);cyl(p,.23,.21,.86,0,1.09,0,tint,8);ball(p,.28,0,1.78,0,'#d3ad92');cube(p,.17,.6,.20,-.14,.35,0,'#514b55');cube(p,.17,.6,.20,.14,.35,0,'#514b55');return p;}
+const figures=[person(-3.6,3.5,'#587b75'),person(4.9,4.12,'#ac6d66'),person(11.3,4.5,'#807382')];
+updaters.push(t=>{figures.forEach((p,i)=>p.position.y=Math.sin(t*4+i)*.028);});
+// Floating stage shadow to ground the entire 'collectible' model.
+let shadowCv=document.createElement('canvas');shadowCv.width=256;shadowCv.height=256;
+const sx=shadowCv.getContext('2d'),rad=sx.createRadialGradient(128,128,20,128,128,126);
+rad.addColorStop(0,'rgba(47,38,53,0.25)');rad.addColorStop(1,'rgba(47,38,53,0)');sx.fillStyle=rad;sx.fillRect(0,0,256,256);
+const shadow=new T.Mesh(new T.PlaneGeometry(53,41),new T.MeshBasicMaterial({map:new T.CanvasTexture(shadowCv),transparent:true,opacity:.8,depthWrite:false}));
+shadow.rotation.x=-Math.PI/2;shadow.position.y=-1.15;scene.add(shadow);
+const cameraState={yaw:.50,pitch:.53,zoom:1},ideal={yaw:.50,pitch:.53,zoom:1};
+let target=new T.Vector3(0,8.1,0),desired=new T.Vector3(0,8.1,0),width=0,height=0,pointerStart=null,pinchDist=0,moved=false;
+const pointMap=new Map();const canvas=renderer.domElement;
+function normalizedDist(){let a=Math.max(.33,width/Math.max(1,height));return a<.6?59:a<.82?51:44;}
+function updateCamera(dt){
+ let damp=Math.min(1,dt*9);
+ cameraState.yaw+=((ideal.yaw-cameraState.yaw))*damp;
+ cameraState.pitch+=((ideal.pitch-cameraState.pitch))*damp;
+ cameraState.zoom+=((ideal.zoom-cameraState.zoom))*damp;
+ const dist=normalizedDist()*cameraState.zoom;
+ camera.position.set(target.x+Math.sin(cameraState.yaw)*Math.cos(cameraState.pitch)*dist,target.y+Math.sin(cameraState.pitch)*dist,target.z+Math.cos(cameraState.yaw)*Math.cos(cameraState.pitch)*dist);
+ camera.lookAt(target);
+}
+function resize(){width=Math.max(1,host.clientWidth);height=Math.max(1,host.clientHeight);
+ renderer.setSize(width,height,false);camera.aspect=width/height;camera.fov=width/height<.69?45:width/height<1?40:35;camera.updateProjectionMatrix();
+}
+function userMoved(){lastInteraction=performance.now();}
+function endPointers(e){
+ if(!pointMap.has(e.pointerId))return;
+ const tapping=pointMap.size===1&&!moved&&e.type==='pointerup';pointMap.delete(e.pointerId);pinchDist=0;
+ if(tapping){const rc=canvas.getBoundingClientRect(),p=new T.Vector2((e.clientX-rc.left)/rc.width*2-1,-((e.clientY-rc.top)/rc.height*2-1));
+ const ray=new T.Raycaster();ray.setFromCamera(p,camera);
+ const hits=ray.intersectObjects(pickables,false);const info=hits[0]?.object?.userData?.point;
+ if(info){document.getElementById('infoCategory').textContent=info.category;document.getElementById('infoName').textContent=info.name;document.getElementById('infoDesc').textContent=info.desc;document.getElementById('info').hidden=false;}
+ else document.getElementById('info').hidden=true;
+ }
+}
+canvas.addEventListener('pointerdown',e=>{if(e.button!==0&&e.pointerType!=='touch')return;e.preventDefault();pointMap.set(e.pointerId,{x:e.clientX,y:e.clientY});moved=false;userMoved();try{canvas.setPointerCapture(e.pointerId)}catch(_){};});
+canvas.addEventListener('pointermove',e=>{
+ if(!pointMap.has(e.pointerId))return;const p=pointMap.get(e.pointerId),dx=e.clientX-p.x,dy=e.clientY-p.y;
+ p.x=e.clientX;p.y=e.clientY;if(Math.abs(dx)+Math.abs(dy)>1)moved=true;userMoved();
+ if(pointMap.size===1){ideal.yaw-=dx*.008;ideal.pitch=Math.max(.16,Math.min(1.30,ideal.pitch+dy*.0065));}
+ else{const arr=[...pointMap.values()],d=Math.hypot(arr[0].x-arr[1].x,arr[0].y-arr[1].y);if(pinchDist>0)ideal.zoom=Math.max(.57,Math.min(2.3,ideal.zoom*pinchDist/Math.max(20,d)));pinchDist=d;moved=true;}
+});
+['pointerup','pointercancel','lostpointercapture'].forEach(n=>canvas.addEventListener(n,endPointers));
+canvas.addEventListener('wheel',e=>{e.preventDefault();userMoved();ideal.zoom=Math.max(.57,Math.min(2.3,ideal.zoom*Math.exp(e.deltaY*.001)));},{passive:false});
+canvas.addEventListener('contextmenu',e=>e.preventDefault());
+canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();fail('WebGL context lost. Hãy tải lại trang.');});
+window.addEventListener('keydown',e=>{if(e.key==='ArrowLeft')ideal.yaw-=.08;else if(e.key==='ArrowRight')ideal.yaw+=.08;else if(e.key==='+'||e.key==='=')ideal.zoom*=.89;else if(e.key==='-')ideal.zoom*=1.12;else return;userMoved();});
+window.addEventListener('resize',resize);
+function setNight(on){night=on;document.body.classList.toggle('night',night);sun.intensity=night?.35:3.15;hemi.intensity=night?.77:2.15;
+ sun.color.set(night?0x9dabff:0xffdbaf);renderer.toneMappingExposure=night?1.4:1.35;
+ lit.forEach(x=>{x.obj.material=mat(night?'#ffe3af':'#f4ba80',.8,night?'#ffcb91':null);});
+ document.getElementById('dayNight').setAttribute('aria-pressed',String(night));document.getElementById('dayNight').innerHTML=night?'<span class="icon">☀</span> Day':'<span class="icon">☾</span> Night';}
+const orbitButton=document.getElementById('orbit');orbitButton.addEventListener('click',()=>{spin=!spin;orbitButton.setAttribute('aria-pressed',String(spin));userMoved();});
+document.getElementById('dayNight').addEventListener('click',()=>setNight(!night));
+document.getElementById('front').addEventListener('click',()=>{ideal.yaw=.50;ideal.pitch=.53;ideal.zoom=1;userMoved();});
+document.getElementById('zoomIn').addEventListener('click',()=>{ideal.zoom=Math.max(.57,ideal.zoom*.83);userMoved();});
+document.getElementById('zoomOut').addEventListener('click',()=>{ideal.zoom=Math.min(2.3,ideal.zoom*1.2);userMoved();});
+document.getElementById('closeInfo').addEventListener('click',()=>document.getElementById('info').hidden=true);
+document.getElementById('capture').addEventListener('click',()=>{try{renderer.render(scene,camera);let a=document.createElement('a');a.href=canvas.toDataURL('image/png');a.download='little-tokyo-rare3d-inspired.png';a.click();}catch(e){fail(e);}});
+document.getElementById('debugButton').addEventListener('click',()=>{const e=document.getElementById('debug');e.hidden=!e.hidden;});
+if(matchMedia('(prefers-reduced-motion: reduce)').matches){spin=false;orbitButton.setAttribute('aria-pressed','false');}
+window.__tokyoDiorama={renderer,scene,camera,reset:()=>{ideal.yaw=.50;ideal.pitch=.53;ideal.zoom=1;},setNight,stats:()=>({drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,boxes:boxCount,night,spin,yaw:cameraState.yaw,zoom:cameraState.zoom,viewport:[width,height]})};
+let last=performance.now(),t=0;resize();
+function animate(now){requestAnimationFrame(animate);if(document.hidden){last=now;return;}
+ let dt=Math.min(.05,(now-last)/1000);last=now;
+ if(spin&&now-lastInteraction>6500)ideal.yaw+=dt*.045;
+ t+=dt;updaters.forEach(f=>f(t));updateCamera(dt);
+ try{renderer.render(scene,camera);}catch(e){fail(e);return;}
+ frames++;
+ if(now-lastStats>1300){let fps=Math.round(frames*1000/(now-lastStats));status.textContent=`3D live · ${fps} FPS`;
+ const dbg=document.getElementById('debug');dbg.textContent=`Three.js r${T.REVISION}\n${width} × ${height} px\n${fps} FPS\n${renderer.info.render.calls} draw calls\n${renderer.info.render.triangles} triangles\n${boxCount} structural boxes\nNight: ${night}\nOrbit: ${spin}\nWebGL: ${renderer.capabilities.isWebGL2?'2':'1'}\nSource: original procedural geometry`;
+ frames=0;lastStats=now;}
+}
+requestAnimationFrame(animate);
+})();
+</script>
+</body>
+</html>
