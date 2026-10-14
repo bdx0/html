@@ -186,7 +186,6 @@ try {
       errors.push(name+' self-hosted open imagery controller missing');
     if(name==='desktop'){
       await page.waitForFunction(()=>window.BoHoOpenImagery?.status().ready===true,{timeout:12000});
-      await page.locator('#open3DToggle').click();
       const openMesh=await page.evaluate(()=>({
         active:BoHoOpenImagery.status().model,
         mesh:!!window.THREE&&!!document.getElementById('webgl'),
@@ -194,6 +193,9 @@ try {
       }));
       if(!openMesh.active||!openMesh.mesh||!openMesh.credit)
         errors.push(name+' open 3D georeferenced image/attribution did not activate '+JSON.stringify(openMesh));
+      await page.locator('#open3DToggle').click();
+      if((await page.evaluate(()=>BoHoOpenImagery.status().model))!==false)
+        errors.push(name+' open 3D layer cannot be toggled off');
       await page.locator('#open3DToggle').click();
     }else if(openImagery.ready){
       errors.push(name+' repo must not contain a fabricated real imagery asset');
@@ -208,7 +210,6 @@ try {
     if(name==='desktop'||name==='mobile-390')await page.screenshot({path:'ben-tre-floorplan-'+name+'.png'});
     if(!(await page.locator('#wbOpenToggle').count()))errors.push(name+' open imagery Floor Plan toggle missing');
     if(name==='desktop'){
-      await page.locator('#wbOpenToggle').click();
       const planOpen=await page.evaluate(()=>({
         enabled:BoHoOpenImagery.status().plan,
         credit:!document.getElementById('openImageryCredit').hidden,
@@ -217,6 +218,8 @@ try {
       if(!planOpen.enabled||!planOpen.credit||!planOpen.width)
         errors.push(name+' open imagery geo Plan overlay not active '+JSON.stringify(planOpen));
       await page.locator('#wbOpenToggle').click();
+      if((await page.evaluate(()=>BoHoOpenImagery.status().plan))!==false)
+        errors.push(name+' open PLAN raster cannot be toggled off');
     }
     // Google Satellite stays opt-in; no API request or key is shipped by default.
     const googleButton=page.locator('#wbGoogleToggle');
