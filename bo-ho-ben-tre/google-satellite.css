@@ -1,0 +1,36 @@
+/* Google Maps official satellite base beneath the separately drawn OSM review plan.
+   Google logo/copyright stay visible and clickable at the unobstructed bottom. */
+.wb-plan-surface{position:relative;flex:1;min-height:0;min-width:0;overflow:hidden;background:#f8fbff}
+#stage .wb-plan-surface #wbPlanCanvas{position:absolute;inset:0;display:block;width:100%!important;height:100%!important;min-height:0;min-width:0;touch-action:none;z-index:2}
+.wb-google-base{position:absolute;inset:0;z-index:1;display:none;background:#e6edf3}
+.wb-google-active .wb-google-base{display:block}
+.wb-google-hitarea{position:absolute;inset:0 0 42px;z-index:3;display:none;touch-action:none;cursor:grab}
+.wb-google-active #wbPlanCanvas{pointer-events:none}
+.wb-google-active .wb-google-hitarea{display:block}
+.wb-google-active .wb-plan-surface{background:#dce2e7}
+.wb-google-active .wb-plan-footer{background:#fff}
+.wb-plan-actions #wbGoogleToggle{width:auto;min-width:0;height:32px;min-height:32px;padding:4px 9px;font-size:10px;white-space:nowrap;background:#f4f8ff;color:#285b95;border:1px solid #cbdff1}
+.wb-plan-actions #wbGoogleToggle.selected{background:#246ad2;color:#fff;border-color:#246ad2}
+#wbGoogleStatus{font-size:9px;color:#677f99;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:210px}
+.wb-google-config[hidden]{display:none!important}
+.wb-google-config{position:fixed;z-index:100;inset:0;display:grid;place-items:center;padding:15px;background:#091d35ad;backdrop-filter:blur(2px);color:#233d60}
+.wb-google-card{width:min(480px,100%);max-height:90dvh;overflow:auto;overscroll-behavior:contain;background:white;padding:22px;border-radius:16px;border:1px solid #d9e4f0;box-shadow:0 18px 80px #071d385c}
+.wb-google-card h2{font-size:18px;margin:0 0 10px}
+.wb-google-card p{font-size:12px;line-height:1.55;color:#657993;margin:8px 0 12px}
+.wb-google-card label{display:block;font-weight:750;font-size:12px;margin:12px 0 6px}
+.wb-google-card input{width:100%;min-height:44px;padding:10px 12px;font:12px system-ui;border:1px solid #bdcddd;color:#243d60;background:#f7faff;border-radius:9px}
+.wb-google-card .wb-google-caution{background:#fff8e9;color:#83592c;padding:11px;border:1px solid #f2dfb9;border-radius:9px;font-size:11px}
+.wb-google-actions{display:flex;gap:10px;justify-content:flex-end;margin:14px 0}
+.wb-google-actions button{min-height:43px;padding:9px 14px}
+.wb-google-actions button.primary{background:#286aff;color:white;border-color:#286aff}
+@media(max-width:860px){
+ .wb-plan-actions{flex-wrap:wrap;gap:4px}
+ #stage .wb-plan-dock .wb-plan-head{padding:6px 9px;gap:6px}
+ #stage .wb-plan-dock .wb-plan-head .wb-plan-label{min-width:0}
+ #wbGoogleStatus{max-width:130px;font-size:8px}
+ .wb-google-card{padding:17px 15px;border-radius:15px}
+ .wb-google-config{align-items:end;padding:8px 8px max(8px,env(safe-area-inset-bottom,0px))}
+ .wb-google-card{max-height:85dvh}
+ .wb-split #wbGoogleToggle{display:none}
+}
+@media(max-width:370px){.wb-plan-actions #wbGoogleToggle{font-size:9px;padding:4px 7px}}
