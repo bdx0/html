@@ -299,9 +299,23 @@ try {
     await page.locator('[data-wb-view="top"]').click();
     if((await page.evaluate(()=>window.TrucGiangWorkbench.getInfo().view))!=='top')
       errors.push(name+' axis top view incorrect');
+    const orientation=await page.evaluate(()=>window.TrucGiangWorkbench.getAlignment());
+    if(!orientation||orientation.sceneMirrorZ!==-1||!orientation.topNorthUpEastRight||
+       orientation.eastScreenDx<=0.01||orientation.northScreenDy<=0.01||
+       Math.abs(orientation.eastScreenDy)>0.005||Math.abs(orientation.northScreenDx)>0.005||
+       Math.abs(orientation.compassNorthScreenDeg)>0.5)
+      errors.push(name+' true north top view mirrored, rotated or camera/OSM mismatched '+JSON.stringify(orientation));
+    if(!(await page.locator('#wbTrueCompass').isVisible()))
+      errors.push(name+' True North compass not visible in split mode');
     await page.locator('[data-wb-view="iso"]').click();
     await page.locator('[data-wb-mode="3d"]').click();
     await page.waitForTimeout(180);
+    const northControl=page.locator('#wbTrueCompass');
+    await northControl.click();
+    const tapAlignment=await page.evaluate(()=>window.TrucGiangWorkbench.getAlignment());
+    if(!tapAlignment?.topNorthUpEastRight||!tapAlignment?.topMode)
+      errors.push(name+' tapping True North compass did not restore georeferenced TOP '+JSON.stringify(tapAlignment));
+    await page.locator('[data-wb-view="iso"]').first().evaluate(el=>el.click());
     if(mobile){await page.locator('#mobileMenuToggle').click();await page.locator('[data-mobile-action="dbg"]').click()}
     else await page.locator('#dbg').click();
     const diagnosis=await page.locator('#report').innerText();
