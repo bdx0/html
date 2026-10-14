@@ -111,6 +111,10 @@ function makeMap(){
  G.overlay.setMap(G.map);
  G.map.addListener("center_changed",redraw);
  G.map.addListener("zoom_changed",redraw);
+ // During zoom-out the Web Mercator transform animates between levels.
+ // Project OSM on every changed bound instead of leaving an earlier canvas
+ // overlay over a newer Google tile frame until zoom animation completes.
+ G.map.addListener("bounds_changed",redraw);
  G.map.addListener("idle",redraw);
 }
 function enable(){
