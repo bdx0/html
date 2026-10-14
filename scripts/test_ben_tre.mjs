@@ -174,6 +174,19 @@ try {
     if(!planState.width||!planState.height)
       errors.push(name+' floorplan canvas not rendered '+JSON.stringify(planState));
     if(name==='desktop'||name==='mobile-390')await page.screenshot({path:'ben-tre-floorplan-'+name+'.png'});
+    // Google Satellite stays opt-in; no API request or key is shipped by default.
+    const googleButton=page.locator('#wbGoogleToggle');
+    if(!(await googleButton.count()))errors.push(name+' Google Satellite Floor Plan toggle missing');
+    else{
+      await googleButton.click();
+      if(!(await page.locator('#wbGoogleConfig').isVisible()))errors.push(name+' Google setup dialog did not open without key');
+      if(await page.locator('script[src^="https://maps.googleapis.com/maps/api/js"]').count())
+        errors.push(name+' Google Maps API loaded before user supplied a key');
+      await page.locator('#wbGoogleCancel').click();
+      if(await page.locator('#wbGoogleConfig').isVisible())errors.push(name+' Google setup dialog cannot close');
+      if((await page.evaluate(()=>window.BoHoGoogleSatellite?.getInfo().enabled))!==false)
+        errors.push(name+' native Google satellite must stay disabled without key');
+    }
     // User-authored Floor Plan error pins are local feedback, not GIS edits.
     if(name==='desktop'||name==='mobile-390'){
       if(!(await page.locator('#wbAnnotationToggle').isVisible()))
