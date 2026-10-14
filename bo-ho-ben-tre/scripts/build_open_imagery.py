@@ -44,8 +44,22 @@ def post_search(url, collection, max_items=80, extra=None):
     payload = {"collections": [collection], "bbox": list(BBOX), "limit": max_items}
     if extra:
         payload.update(extra)
-    response = HTTP.post(url, json=payload, timeout=TIMEOUT)
-    response.raise_for_status()
+    try:
+        response = HTTP.post(url, json=payload, timeout=TIMEOUT)
+        response.raise_for_status()
+    except requests.RequestException as error:
+        LOG.warning("STAC POST with filters failed; retrying simpler request: %s", error)
+        payload.pop("query", None)
+        try:
+            response = HTTP.post(url, json=payload, timeout=TIMEOUT)
+            response.raise_for_status()
+        except requests.RequestException:
+            response = HTTP.get(url, params={
+                "collections": collection,
+                "bbox": ",".join(map(str, BBOX)),
+                "limit": max_items,
+            }, timeout=TIMEOUT)
+            response.raise_for_status()
     data = response.json()
     return data.get("features", [])
 
