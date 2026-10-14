@@ -37,13 +37,14 @@ function build(){
  '<div class="wb-plan-actions">'+
  '<label title="So sánh (khi có hình hợp lệ)" hidden><input id="wbCompare" type="checkbox"> Overlay</label>'+
  '<label title="Mốc đề xuất sai đã loại" hidden><input id="wbAnchors" type="checkbox"> MỐC</label>'+
+ '<button type="button" id="wbOpenToggle" aria-label="Nền ảnh mở tự host cho Floor Plan" aria-pressed="false">🌍 Ảnh mở</button>'+
  '<button type="button" id="wbGoogleToggle" aria-label="Google Maps Satellite trong Floor Plan" aria-pressed="false">🛰 Google Satellite</button>'+ '<button type="button" id="wbPlanMinus" aria-label="Thu nhỏ Floor Plan">−</button>'+
  '<button type="button" id="wbPlanPlus" aria-label="Phóng to Floor Plan">+</button></div></div>'+
  '<div class="wb-plan-surface"><div id="wbGoogleBase" class="wb-google-base" aria-label="Google Maps Satellite"></div>'+
  '<canvas id="wbPlanCanvas" aria-label="Bản vẽ mặt bằng nước hồ, đường, nhà và mốc đặc trưng"></canvas>'+
  '<div id="wbGoogleHitarea" class="wb-google-hitarea" aria-label="Di chuyển và chú thích bản đồ"></div></div>'+
  '<div class="wb-plan-footer"><span><i class="wb-dot proposed"></i> ĐƯỜNG BỜ OSM</span>'+
- '<span><i class="wb-dot raw"></i> CHƯA KIỂM CHỨNG</span><small id="wbGoogleStatus">Mặt bằng OSM · chưa kiểm chứng</small></div>';
+ '<span><i class="wb-dot raw"></i> CHƯA KIỂM CHỨNG</span><small id="wbOpenStatus">Ảnh nền mở: đang kiểm tra</small><small id="wbGoogleStatus">Mặt bằng OSM · chưa kiểm chứng</small></div>';
  stage.append(dock);
  var axis=el("div","wb-axis");axis.id="wbAxis";axis.innerHTML=
  '<div class="wb-axis-title">AXIS · XYZ</div>'+
@@ -180,27 +181,27 @@ function updatePins(){
 function drawPlan(){
  if(!W.ready||W.mode==="3d")return;
  var obj=setupCanvas(W.planCanvas);if(!obj)return;
- var c=obj.ctx,w=obj.w,h=obj.h,k=Math.min(w/450,h/390)*W.planZoom;var satellite=window.BoHoGoogleSatellite&&BoHoGoogleSatellite.isVisible();if(satellite)k=BoHoGoogleSatellite.scale()||k;
+ var c=obj.ctx,w=obj.w,h=obj.h,k=Math.min(w/450,h/390)*W.planZoom;var satellite=window.BoHoGoogleSatellite&&BoHoGoogleSatellite.isVisible();if(satellite)k=BoHoGoogleSatellite.scale()||k;var imagery=window.BoHoOpenImagery&&BoHoOpenImagery.isPlanActive()&&!satellite;var raster=satellite||imagery;
  W.metrics=W.metrics||{};W.metrics.plan={w:w,h:h,scale:k};
- c.clearRect(0,0,w,h);if(!satellite){c.fillStyle="#f8fbff";c.fillRect(0,0,w,h)}
+ c.clearRect(0,0,w,h);if(imagery){BoHoOpenImagery.drawPlan(c,function(p){return screen(p,w,h,k)})}else if(!satellite){c.fillStyle="#f8fbff";c.fillRect(0,0,w,h)}
  var step=25;
  var halfX=w/k/2+step,halfZ=h/k/2+step;
- c.strokeStyle=satellite?"rgba(255,255,255,.07)":"#e6ecf6";c.lineWidth=1;
+ c.strokeStyle=raster?"rgba(255,255,255,.07)":"#e6ecf6";c.lineWidth=1;
  for(var x=Math.floor((W.panX-halfX)/step)*step;x<=W.panX+halfX;x+=step){var xx=w/2+(x-W.panX)*k;c.beginPath();c.moveTo(xx,0);c.lineTo(xx,h);c.stroke()}
  for(var z=Math.floor((W.panZ-halfZ)/step)*step;z<=W.panZ+halfZ;z+=step){var yy=h/2-(z-W.panZ)*k;c.beginPath();c.moveTo(0,yy);c.lineTo(w,yy);c.stroke()}
  var features=W.data.features||[];
  features.filter(function(f){return f.kind==="park"||f.kind==="building"}).forEach(function(f){
   if(!f.geometry||f.geometry.type!=="Polygon")return;
   var pts=f.geometry.coordinates[0].map(function(p){var a=local(p);return{x:a[0],z:a[1]}});
-  trace(c,pts,w,h,k);c.fillStyle=satellite?(f.kind==="park"?"rgba(65,205,120,.11)":"rgba(85,126,177,.09)"):(f.kind==="park"?"#d7f2e5":"#d5dde9");c.strokeStyle=f.kind==="park"?"#9acdb0":"#afbfd3";c.lineWidth=.8;c.fill();c.stroke()
+  trace(c,pts,w,h,k);c.fillStyle=raster?(f.kind==="park"?"rgba(65,205,120,.11)":"rgba(85,126,177,.09)"):(f.kind==="park"?"#d7f2e5":"#d5dde9");c.strokeStyle=f.kind==="park"?"#9acdb0":"#afbfd3";c.lineWidth=.8;c.fill();c.stroke()
  });
- c.strokeStyle=satellite?"rgba(255,255,255,.45)":"#afbecf";c.lineWidth=satellite?1.8:3.3;
+ c.strokeStyle=raster?"rgba(255,255,255,.45)":"#afbecf";c.lineWidth=raster?1.8:3.3;
  features.filter(function(f){return f.kind==="road"&&f.geometry.type==="LineString"}).forEach(function(f){
    var pts=f.geometry.coordinates.map(function(p){var a=local(p);return{x:a[0],z:a[1]}});
    if(pts.length<2)return;c.beginPath();pts.forEach(function(p,i){var v=screen(p,w,h,k);if(!i)c.moveTo(v.x,v.y);else c.lineTo(v.x,v.y)});c.stroke();
  });
  var raw=rawPoints(),candidate=raw;
- trace(c,candidate,w,h,k);c.fillStyle=satellite?"rgba(47,140,219,.07)":"rgba(47,140,219,.15)";c.fill();c.lineWidth=3.8;c.strokeStyle=W.shape==="candidate"?"#256dce":"#1685ca";c.stroke();
+ trace(c,candidate,w,h,k);c.fillStyle=raster?"rgba(47,140,219,.07)":"rgba(47,140,219,.15)";c.fill();c.lineWidth=3.8;c.strokeStyle=W.shape==="candidate"?"#256dce":"#1685ca";c.stroke();
  drawIssueSegments(c,w,h,k);
  if($("wbCompare").checked&&W.shape!=="raw"&&raw.length>0){
    c.save();c.setLineDash([6,4]);c.strokeStyle="#fb9c48";c.lineWidth=2;trace(c,raw,w,h,k);c.stroke();c.restore()
