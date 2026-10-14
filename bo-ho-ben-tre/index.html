@@ -142,13 +142,14 @@ button{border:1px solid #38536a;background:#1a3047;border-radius:9px;padding:8px
 </style>
 <link rel="stylesheet" href="workbench.css">
 <link rel="stylesheet" href="annotations.css">
+<link rel="stylesheet" href="mobile-layout.css">
 </head>
 <body>
 <div id="app"><header class="top">
 <div class="brand"><span class="brand-title">🏞️ Bờ Hồ Bến Tre</span><small>TRÚC GIANG · PHẠM VI 300 M</small></div><span class="tag">WebGL + SQLite + GIS</span><span class="grow"></span>
 <div class="toolbar">
 <button id="home" title="Toàn cảnh" aria-label="Đặt lại camera"><span class="tool-icon">⌂</span><span class="tool-label"> Toàn cảnh</span></button><button id="day" title="Ngày và đêm" aria-label="Đổi chế độ ngày đêm"><span class="tool-icon" id="dayIcon">☾</span><span class="tool-label" id="dayLabel"> Ban đêm</span></button><button id="layers" title="Bật tắt cây xanh" aria-label="Bật hoặc tắt cây xanh"><span class="tool-icon">♧</span><span class="tool-label"> Cây xanh</span></button><a id="openCadGis" href="cad-gis.html" style="display:inline-flex;align-items:center;justify-content:center;padding:7px 9px;border-radius:8px;background:#e8f3ff;color:#1f5abf;border:1px solid #b8d4f8;text-decoration:none;font-weight:850" title="Floor Plan CAD và GIS có thể chỉnh sửa">▧ CAD/GIS</a><button id="openSqlite" title="Xem mô hình dữ liệu" aria-label="Mở Model Data View"><span class="tool-icon">◫</span><span class="tool-label"> Mô hình dữ liệu</span></button><button id="dbg" title="Bảng kiểm tra" aria-label="Mở bảng debug"><span class="tool-icon">⚙</span><span class="tool-label"> Debug</span></button>
-</div></header>
+</div><button type="button" class="mobile-menu-toggle" id="mobileMenuToggle" aria-controls="mobileTools" aria-expanded="false" aria-label="Mở menu công cụ">☰ <span>Công cụ</span></button></header>
 <main class="main">
 <div id="stage" aria-label="Cảnh 3D tương tác Hồ Trúc Giang"><canvas id="fallback"></canvas><div id="photoHotspotLayer" aria-label="Các vị trí ảnh trên mô hình 3D"></div>
  <div id="hud"><div class="pill"><strong>Hồ Trúc Giang <span class="scope-chip">300 m quanh bờ hồ</span></strong><p id="status">Đang đọc dữ liệu bản đồ...</p></div></div>
@@ -160,7 +161,19 @@ button{border:1px solid #38536a;background:#1a3047;border-radius:9px;padding:8px
  <nav class="tabs"><button data-tab="images" class="active">Ảnh chứng cứ</button><button data-tab="data">Dữ liệu</button><button data-tab="cost">Giá / Chi phí</button><button data-tab="sqlite">Mô hình</button><button class="close-panel" id="collapse">Thu gọn</button></nav>
  <section class="panel" id="panel"><h2>Kho tư liệu</h2><p class="sub">Đang kết nối SQLite export…</p></section>
 </aside>
-</main></div>
+</main>
+<div id="mobileToolsBackdrop" class="mobile-tools-backdrop" hidden></div>
+<aside id="mobileTools" class="mobile-tools" aria-label="Công cụ Bờ Hồ 3D trên điện thoại" hidden>
+ <div class="mobile-tools-head"><strong>☷ Công cụ Bờ Hồ</strong><button type="button" id="mobileToolsClose" aria-label="Đóng menu">✕</button></div>
+ <h2>Điều khiển cảnh</h2>
+ <div class="mobile-tools-grid"><button type="button" data-mobile-action="home">⌂ Về toàn cảnh</button><button type="button" data-mobile-action="day">☀ Chế độ ngày / đêm</button><button type="button" data-mobile-action="layers">♧ Bật / tắt cây</button><button type="button" data-mobile-action="minimap">▧ Hiện / ẩn minimap</button></div>
+ <h2>Góc nhìn 3D</h2>
+ <div class="mobile-tools-grid"><button type="button" data-mobile-view="top">TOP · Từ trên</button><button type="button" data-mobile-view="iso">ISO · Phối cảnh</button><button type="button" data-mobile-view="north">N · Nhìn từ Bắc</button><button type="button" data-mobile-view="east">E · Nhìn từ Đông</button></div>
+ <h2>Khám phá dữ liệu</h2>
+ <div class="mobile-tools-grid"><a href="model.html">◫ Mô hình dữ liệu</a><a href="cad-gis.html">▧ Bản vẽ CAD / GIS</a><a href="sqlite.html">▦ SQLite Explorer</a><a href="model.html?sector=north_notch#osm-way-217484891">◉ Duyệt 4 đoạn bờ</a><button type="button" data-mobile-action="dbg">⚙ Chẩn đoán WebGL</button><a href="data/catalog.sqlite" download>↓ Tải SQLite</a></div>
+ <p class="mobile-tools-note">Đường bao OSM chưa được đo xác minh. Bản xem CAD/GIS và nhận xét trên màn hình không tự sửa nguồn SQLite.</p>
+ <p class="mobile-tools-tip">Một ngón để xoay 3D, hai ngón để zoom. Chọn PLAN để ghi annotation. Chạm thanh “Xem dữ liệu” ở dưới để mở ảnh và danh mục.</p>
+</aside></div>
 <script src="../assets/three.min.js"></script>
 <script src="survey.js"></script>
 <script src="lake-shape.js"></script>
@@ -539,10 +552,12 @@ else{camera.up.set(0,1,0);var rr=dist*Math.cos(el);camera.position.set(target.x+
 camera.lookAt(target.x,0,target.z)}
 function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
 function resize(){var totalW=Math.max(1,stage.clientWidth),h=Math.max(1,stage.clientHeight);
-var w=workbenchMode==="split"?Math.round(totalW*(window.innerWidth<860?.48:.55)):totalW;
-if(renderer){renderer.setSize(w,h,false);renderer.domElement.style.width=w+"px";renderer.domElement.style.height=h+"px"}
-if(camera){camera.aspect=w/h;camera.updateProjectionMatrix();updateCamera()}
-var c=$("fallback");c.width=w;c.height=h;drawMini();updateHotspots();
+var mobileSplit=workbenchMode==="split"&&window.innerWidth<=860;
+var w=workbenchMode==="split"&&!mobileSplit?Math.round(totalW*.55):totalW;
+var viewH=mobileSplit?Math.max(1,Math.round(h*.5)):h;
+if(renderer){renderer.setSize(w,viewH,false);renderer.domElement.style.width=w+"px";renderer.domElement.style.height=viewH+"px"}
+if(camera){camera.aspect=w/viewH;camera.updateProjectionMatrix();updateCamera()}
+var c=$("fallback");c.width=w;c.height=viewH;drawMini();updateHotspots();
 if(window.TrucGiangWorkbench)TrucGiangWorkbench.refresh();
 if(!webglOK)showFallback()}
 function updateStatus(){var s=$("status");s.textContent=mode+" · Khu vực 300 m · "+(data?data.stats.osm_features:0)+" đối tượng";s.className=(mode.indexOf("MINH")>=0?"warn":"")}
@@ -559,7 +574,7 @@ try{if(webglOK&&renderer&&scene&&camera){renderer.render(scene,camera)}else if(f
 catch(e){say("Render: "+e.message);webglOK=false;showFallback()}}
 raf=requestAnimationFrame(tick)}
 function reset(){dist=window.innerWidth<860?420:305;az=.64;el=window.innerWidth<860?1.00:.89;viewPreset="iso";target={x:0,z:0};updateCamera();drawMini()}
-function touchHandlers(){stage.addEventListener("pointerdown",function(e){if(e.target.closest&&e.target.closest(".minimap,.zoom-controls,.debug,.photo-hotspot,.field-marker,.survey-actions,.wb-modes,.wb-shape-control,.wb-axis,.wb-plan-dock"))return;e.preventDefault();tapOrigin.set(e.pointerId,{x:e.clientX,y:e.clientY,wasMulti:controlPointers.size>0});controlPointers.set(e.pointerId,{x:e.clientX,y:e.clientY});stage.setPointerCapture&&stage.setPointerCapture(e.pointerId);stage.classList.add("grabbing");if(controlPointers.size===2){var a=Array.from(controlPointers.values());touchPinch=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);pinchCenter={x:(a[0].x+a[1].x)*.5,y:(a[0].y+a[1].y)*.5}}});
+function touchHandlers(){stage.addEventListener("pointerdown",function(e){if(e.target.closest&&e.target.closest(".minimap,.zoom-controls,.debug,.photo-hotspot,.field-marker,.survey-actions,.wb-modes,.wb-shape-control,.wb-axis,.wb-axis-toggle,.wb-plan-dock"))return;e.preventDefault();tapOrigin.set(e.pointerId,{x:e.clientX,y:e.clientY,wasMulti:controlPointers.size>0});controlPointers.set(e.pointerId,{x:e.clientX,y:e.clientY});stage.setPointerCapture&&stage.setPointerCapture(e.pointerId);stage.classList.add("grabbing");if(controlPointers.size===2){var a=Array.from(controlPointers.values());touchPinch=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);pinchCenter={x:(a[0].x+a[1].x)*.5,y:(a[0].y+a[1].y)*.5}}});
 stage.addEventListener("pointermove",function(e){var p=controlPointers.get(e.pointerId);if(!p)return;e.preventDefault();var dx=e.clientX-p.x,dy=e.clientY-p.y;p.x=e.clientX;p.y=e.clientY;
 if(controlPointers.size===1){if(viewPreset==="top")viewPreset="orbit";az-=dx*.006;el=clamp(el+dy*.005,.13,1.43);updateCamera()}
 else if(controlPointers.size===2){var ar=Array.from(controlPointers.values()),pd=Math.hypot(ar[0].x-ar[1].x,ar[0].y-ar[1].y);
@@ -723,5 +738,6 @@ window.addEventListener("resize",resize);touchHandlers();drawMini();
 fetch("data/scene.json",{cache:"no-store"}).then(function(r){if(!r.ok)throw Error("HTTP "+r.status+" scene.json");return r.json()}).then(function(d){data=d;showPanel();try{initialize()}catch(e){say("WebGL init: "+e.message);showFallback()}updateStatus()}).catch(function(e){say("Không tải được scene.json: "+e.message);data={origin:{lon:106.37814,lat:10.23861},stats:{requirements:0,photos:0,cost_items:0,osm_features:0,survey_shots:0,photo_links:0},images:[],costs:[],objects:[],features:[],mode:"illustrative_no_osm",warning:"Không có scene.json"};showPanel();try{initialize()}catch(e2){say(e2.message);showFallback()}updateStatus()});
 })();
 </script>
+<script src="mobile-layout.js"></script>
 </body>
 </html>
