@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#19162a">
+<meta name="description" content="Little Tokyo 3D — mô hình phố Nhật thu nhỏ tương tác với tàu điện, cửa hàng, biển hiệu, hoa anh đào và chế độ ngày đêm.">
+<meta name="catalog:category" content="Mô phỏng 3D">
+<meta name="catalog:tags" content="Three.js,WebGL,Nhật Bản,Miniature,Diorama,3D">
+<meta name="catalog:icon" content="🏮">
+<title>Little Tokyo — Miniature 3D World</title>
+<style>
+:root{color-scheme:dark;--ink:#f9f4ff;--muted:#b7b5ce;--glass:rgba(27,22,43,.82);--edge:#ffffff24;--accent:#ffafc0;--shadow:0 16px 50px #18102344}
+*{box-sizing:border-box}html,body{height:100%;margin:0;overflow:hidden;overscroll-behavior:none}body{font:14px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);background:#b8b7d7}button,a{font:inherit}button{cursor:pointer}a{color:inherit;text-decoration:none}button:focus-visible,a:focus-visible{outline:3px solid #fac1ce;outline-offset:3px}
+#app{height:100dvh;display:flex;flex-direction:column;overflow:hidden}
+header{height:65px;flex:none;padding:0 26px;display:flex;align-items:center;gap:16px;background:#1b182a;color:#fbf2f9;border-bottom:1px solid #ffffff15;z-index:15}
+.brand{display:flex;align-items:center;gap:10px;font-weight:830;font-size:18px;letter-spacing:-.05em;white-space:nowrap}.brand-mark{display:grid;place-items:center;border-radius:12px;background:linear-gradient(135deg,#f19bad,#cd6b83);width:37px;height:37px;font-size:21px}.brand small{font-size:9px;display:block;letter-spacing:.16em;font-weight:700;color:#b9adca;line-height:1.3}
+nav{display:flex;gap:6px;margin-left:auto}nav a{padding:9px 13px;border-radius:10px;font-size:12px;color:#cfc7d7}nav a:hover,nav a.active{background:#ffffff13;color:white}.key{border:1px solid #ffffff26;border-radius:99px;padding:6px 10px;color:#edc3d2;font-size:10px;letter-spacing:.07em}
+#viewport{position:relative;flex:1;min-height:0;overflow:hidden;touch-action:pan-x pan-y;background:radial-gradient(ellipse at 48% 38%,#f5dfd8,#c6c4dc 55%,#9aacc7)}
+#viewport canvas{position:absolute;inset:0;width:100%;height:100%;z-index:1;display:block;touch-action:none;cursor:grab}
+#viewport canvas:active{cursor:grabbing}
+.night #viewport{background:radial-gradient(ellipse at 47% 30%,#4a5074,#293353 65%,#162039)}
+.hud{position:absolute;z-index:3;pointer-events:none}.hud>*{pointer-events:auto}
+.panel{border:1px solid var(--edge);background:var(--glass);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);box-shadow:var(--shadow);border-radius:18px}
+.intro{top:22px;left:24px;width:285px;padding:20px 20px 17px}
+.eyebrow{font-size:10px;letter-spacing:.21em;font-weight:850;color:#ffacc2;text-transform:uppercase}
+h1{margin:8px 0 7px;font-size:32px;line-height:1.06;letter-spacing:-.06em;font-weight:860}
+.intro p{margin:0;color:#c5bfd1;font-size:12px;line-height:1.6}
+.stats{display:flex;gap:8px;margin-top:15px}.stat{background:#ffffff0d;border:1px solid #ffffff1a;border-radius:10px;padding:8px 11px;flex:1}.stat strong{display:block;font-size:17px;line-height:1.3}.stat small{font-size:9px;color:#bdb6c8}
+.topright{right:22px;top:22px;display:flex;align-items:center;gap:8px}.live{background:#211e30dc;border:1px solid #ffffff30;padding:10px 13px;border-radius:25px;color:#c8c5d8;font-size:11px;backdrop-filter:blur(16px)}.live i{display:inline-block;width:7px;height:7px;border-radius:50%;background:#a1edc4;margin-right:6px}.icon-btn{display:grid;place-items:center;border:1px solid #ffffff38;background:#272237d9;color:white;width:38px;height:38px;border-radius:12px;font-size:18px;backdrop-filter:blur(16px)}.icon-btn:hover{background:#49415f}
+.inspector{right:22px;top:76px;width:235px;padding:15px}.inspector .caption{color:#eeb5c2;font-size:10px;text-transform:uppercase;letter-spacing:.12em}.inspector h2{margin:5px 0 5px;font-size:17px}.inspector p{font-size:11px;color:#cac5d4;margin:0;line-height:1.6}
+.bottom{bottom:20px;left:50%;transform:translateX(-50%);width:max-content;max-width:calc(100% - 24px);padding:8px;display:flex;align-items:center;gap:6px}
+.tool{border:0;display:flex;align-items:center;gap:6px;color:#dcd5e4;background:transparent;border-radius:11px;padding:11px 12px;font-size:12px;font-weight:750;white-space:nowrap;min-height:43px}.tool:hover,.tool.active{background:#ffffff18;color:#fff}.tool.primary{background:#f4a4b8;color:#302337}.tool.primary:hover{background:#ffced8}.sep{height:27px;width:1px;background:#ffffff26;margin:0 3px}
+.help{left:24px;bottom:24px;font-size:11px;color:#3b3655;background:#ffffffb5;padding:9px 13px;border-radius:12px;box-shadow:0 5px 20px #29233919}
+#fault{position:absolute;z-index:20;top:50%;left:50%;transform:translate(-50%,-50%);width:min(540px,90vw);padding:20px;border-radius:14px;background:#5d1935;color:#fff3ee;font-size:12px;white-space:pre-wrap;overflow-wrap:anywhere;max-height:60%;overflow:auto}#fault[hidden]{display:none}
+@media(max-width:720px){header{height:55px;padding:0 12px}.brand{font-size:15px}.brand-mark{height:31px;width:31px;border-radius:9px}.brand small{font-size:8px}nav a{font-size:11px;padding:7px 9px}nav .other{display:none}.key{display:none}.intro{top:10px;left:10px;width:216px;padding:12px}.intro h1{font-size:24px}.intro p{font-size:10px}.stats{margin-top:9px}.stat{padding:5px 8px}.stat strong{font-size:13px}.stat small{font-size:8px}.topright{top:11px;right:10px}.live{font-size:9px;padding:8px}.icon-btn{width:33px;height:33px}.inspector{top:auto;bottom:87px;right:10px;left:10px;width:auto;max-width:350px;padding:10px 13px}.inspector p{font-size:10px}.inspector h2{font-size:14px}.bottom{bottom:max(12px,env(safe-area-inset-bottom));gap:0;padding:5px;justify-content:center;width:calc(100% - 16px)}.tool{flex:1;justify-content:center;gap:3px;padding:8px 2px;font-size:10px;min-width:0}.tool span{font-size:14px}.sep{margin:0 1px}.help{left:10px;bottom:152px;font-size:9px;padding:7px 10px}}
+@media(max-width:380px){.intro{width:180px}.intro h1{font-size:21px}.live{display:none}.tool{font-size:9px}.tool span{font-size:13px}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<div id="app">
+<header><a href="./" class="brand" aria-label="Về thư viện HTML"><span class="brand-mark">🏮</span><span>LITTLE TOKYO<small>MINIATURE WORLD / 3D LAB</small></span></a><nav><a href="./" class="other">← HTML Lab</a><a href="./tiny-town.html">Tiny Town ↗</a></nav><span class="key">WEBGL · ORIGINAL SCENE</span></header>
+<main id="viewport" aria-label="Cảnh 3D Little Tokyo. Kéo để xoay, chụm để zoom, chạm vào công trình để xem thông tin.">
+<div class="hud intro panel"><div class="eyebrow">日本 • A miniature journey</div><h1>Little<br>Tokyo <span style="color:#ffb6c4">3D.</span></h1><p>Góc phố Nhật Bản tí hon với tiệm ramen, tàu điện, những mái ngói và hoa anh đào.</p><div class="stats"><div class="stat"><strong id="buildingCount">24+</strong><small>Kiến trúc</small></div><div class="stat"><strong>3D</strong><small>WebGL</small></div><div class="stat"><strong id="fps">-- FPS</strong><small>Hiệu năng</small></div></div></div>
+<div class="hud topright"><span class="live"><i></i><span id="status">Khởi tạo 3D…</span></span><button id="plus" class="icon-btn" aria-label="Phóng to">+</button><button id="minus" class="icon-btn" aria-label="Thu nhỏ">−</button></div>
+<div class="hud inspector panel" id="inspector"><div class="caption">Explore the neighborhood</div><h2 id="placeTitle">Chọn một tòa nhà</h2><p id="placeDesc">Chạm vào các cửa hàng và công trình để đọc thông tin. Kéo để xoay, dùng hai ngón để thu phóng.</p></div>
+<div class="hud help">✦ Kéo: xoay · Chụm: zoom · Chạm: tìm hiểu</div>
+<div class="hud bottom panel"><button class="tool active" id="day"><span>🌙</span> <b>Ban đêm</b></button><button class="tool" id="pause"><span>⏸</span> <b>Tạm dừng</b></button><button class="tool" id="reset"><span>◎</span> <b>Đặt lại</b></button><div class="sep"></div><button class="tool primary" id="shot"><span>↧</span> <b>Lưu ảnh</b></button></div>
+<div id="fault" hidden role="alert"></div>
+</main></div>
+<script src="./assets/three.min.js"></script>
+<script src="./assets/miniworld.js"></script>
+<script>
+(function(){
+"use strict";
+var M=window.MiniWorld,T=window.THREE, tram,people=[],cars=[],lanterns=[];
+var colors=["#dfc9b3","#eacaa5","#c8c8c2","#dca79f","#b6c9ca","#d6bdcf","#c4d2b7","#f0d5ad"];
+var trims=["#4d6173","#9b574b","#665b6d","#436c74","#97785b"];
+var signs=["ラーメン","珈琲","花屋","寿司","BOOKS","焼鳥","抹茶","雑貨","喫茶","食堂","レコード","パン屋"];
+function addBuilding(api,x,z,id){
+ var w=5.25,d=5.65,side=z>0?-1:1,levels=2+((id*7)%3),h=levels*2.4;
+ var color=colors[id%colors.length],trim=trims[id%trims.length];
+ var g=new T.Group();g.position.set(x,0,z);api.group.add(g);
+ var body=M.box(g,w,h,d,0,h/2,0,color);
+ api.register(body,{title:signs[id%signs.length]+" · "+("0"+(id+1)).slice(-2),type:"Cửa hàng & nhà phố",desc:"Một tòa nhà thủ công trong khu phố mô phỏng, với mái ngói, cửa kính, ban công và bảng hiệu riêng."});
+ M.box(g,w+.25,.34,d+.35,0,.18,0,trim);
+ if(id%4!==0) M.roof(g,w+.35,d+.35,0,h+.05,0,id%2?"#38485a":"#695568",1.0);
+ else{
+   M.box(g,w+.4,.22,d+.4,0,h+.1,0,trim);
+   M.box(g,2.3,.5,2.1,-.7,h+.43,0,"#778da0");
+   M.cyl(g,.08,.08,1.1,1.6,h+.75,-.7,"#566a7a");
+ }
+ var front=side*(d/2+.07);
+ M.box(g,w-.45,1.78,.13,0,1.33,front,"#21394a");
+ M.box(g,1.05,1.85,.17,.75,.97,front+side*.03,"#c8e7e8");
+ M.box(g,.08,1.73,.2,.18,1.34,front+side*.02,"#a7bac6");
+ M.box(g,w+.3,.36,1.3,0,2.15,front+side*.46,id%2?"#c87469":"#5a8075");
+ M.text(g,signs[id%signs.length],0,2.55,front+side*.73,3.1,.66,0,"#fff9e7",id%2?"#ad5a56":"#486d68");
+ for(var lv=1;lv<levels;lv++){
+   for(var wx=-1.65;wx<=1.65;wx+=1.65){
+     M.box(g,1.02,1.23,.16,wx,lv*2.35+1.07,front,"#405a68");
+     M.box(g,.87,1.06,.18,wx,lv*2.35+1.07,front+side*.08,"#a9ced5");
+     M.box(g,.07,1.1,.2,wx,lv*2.35+1.07,front+side*.17,trim);
+     M.box(g,1.12,.14,.29,wx,lv*2.35+.42,front+side*.15,trim);
+   }
+   if(id%3===0) M.box(g,w-.38,.12,.71,0,lv*2.35+.28,front+side*.36,"#5f6470");
+ }
+ for(var dz=-1;dz<=1;dz+=2){
+  M.box(g,.5,.75,.13,-w/2-.04,1.6,dz*1.3,"#526c7a");
+  M.box(g,.31,.58,.16,-w/2-.12,1.6,dz*1.3,"#c5d9cf");
+ }
+ if(id%2===0){
+   for(var n=-1;n<=1;n+=2){
+     M.box(g,.48,.61,.48,n*(w/2-.38),.31,front+side*1.15,"#667d69");
+     M.sphere(g,.39,n*(w/2-.38),.96,front+side*1.15,"#68a571");
+   }
+ }
+ if(id%5===1){
+   M.box(g,.46,1.38,.42,w/2-.35,.71,front+side*.9,"#ca424f");
+   M.box(g,.31,.52,.09,w/2-.35,.93,front+side*1.13,"#f1eadb");
+ }
+ return g;
+}
+function shrine(api,x,z) {
+ var p=new T.Group();p.position.set(x,0,z);api.group.add(p);
+ M.box(p,9,.5,9,0,.25,0,"#c5b9a1");
+ M.box(p,4.9,2.5,4.2,0,1.5,0,"#b84643");
+ M.roof(p,6.0,5.1,0,2.85,0,"#394955",1.6);
+ M.roof(p,4.2,3.8,0,4.5,0,"#334552",1.1);
+ M.box(p,1.9,2.1,.2,0,1.48,2.2,"#312f42");
+ M.text(p,"神 社",0,2.2,2.35,2.5,.6,0,"#fceabb","#ad4441");
+ for(var j=-1;j<=1;j+=2){
+   M.cyl(p,.19,.21,3.6,j*3.3,1.8,4.7,"#ba4341");
+ }
+ M.box(p,8,.3,.34,0,3.67,4.7,"#ba4341");
+ M.box(p,7.2,.32,.4,0,3.05,4.7,"#ba4341");
+ M.box(p,1.2,.35,.25,0,3.96,4.7,"#aa8b66");
+ api.register(p,{title:"Đền thờ Shinto",type:"Điểm nhấn văn hóa",desc:"Cổng torii đỏ và mái đền nhiều tầng, được cách điệu cho tiểu cảnh Nhật Bản."});
+}
+function park(api,x,z) {
+ var p=new T.Group();p.position.set(x,0,z);api.group.add(p);
+ M.box(p,12,.14,11,0,.1,0,"#9fba88");
+ for(var i=0;i<5;i++){var a=i*2.9;M.tree(p,Math.cos(a)*4.3,Math.sin(a)*3.6,i%2?"cherry":"green",.75);}
+ M.cyl(p,2.0,2.1,.32,0,.23,0,"#b6c1bd",24);
+ M.cyl(p,1.82,1.82,.35,0,.43,0,"#81c3c7",24);
+ M.cyl(p,.24,.4,1.4,0,1.0,0,"#ded2c1");
+ M.sphere(p,.4,0,1.78,0,"#edeeed");
+ M.bench(p,-3,2.5);M.bench(p,3,2.5);
+ api.register(p,{title:"Sakura Park",type:"Công viên",desc:"Một vườn nhỏ với cây anh đào, ghế nghỉ, đài phun nước và bóng cây."});
+}
+function build(api) {
+ var p=api.group;
+ M.box(p,64,1.4,57,0,-.95,0,"#c0b9b8");
+ M.box(p,62,.09,55,0,-.2,0,"#d7d0bf");
+ M.box(p,62,.11,7.7,0,-.08,0,"#424958");
+ M.box(p,7.3,.12,55,0,-.04,0,"#48505d");
+ for(var z=-26;z<=26;z+=4.5)M.box(p,.13,.025,2.2,0,.05,z,"#f1d7a1");
+ for(var x=-29;x<=29;x+=4)if(Math.abs(x)>5)M.box(p,1.9,.025,.13,x,.04,0,"#f0d9ac");
+ for(var k=-1;k<=1;k+=2){
+   M.box(p,60,.16,1.3,0,-.04,k*4.7,"#f2ebde");
+   M.box(p,1.25,.16,53,k*5.05,-.04,0,"#e7dfd4");
+ }
+ for(var c=-4;c<=4;c++) for(var dir=-1;dir<=1;dir+=2){
+   M.box(p,.28,.018,.93,dir*4.24,.056,c*1.1,"#eee2cf");
+   M.box(p,.88,.018,.27,c*1.15,.056,dir*4.28,"#eee2cf");
+ }
+ for(var x=-27;x<=27;x+=8){
+   M.box(p,.12,.07,53,x,-.17,0,"#b8afa6");
+ }
+ var id=0;
+ for(var side=-1;side<=1;side+=2){
+   for(var row=0;row<2;row++){
+     var z=side*(row===0?9.3:19.8);
+     for(var col=-3;col<=3;col++){
+       if(col===0)continue;
+       var bx=col*8.0;
+       if(row===1 && bx===16 && side===-1){shrine(api,bx,z);id++;continue;}
+       if(row===1 && bx===-16 && side===1){park(api,bx,z);id++;continue;}
+       addBuilding(api,bx,z,id++);
+     }
+   }
+ }
+ for(var ix=-1;ix<=1;ix+=2){
+   for(var iz=-1;iz<=1;iz+=2){
+     M.tree(p,ix*5.7,iz*6.1,(ix===iz)?"cherry":"maple",.72);
+     M.lamp(p,ix*4.9,iz*4.4);
+   }
+ }
+ for(var sx=-26;sx<=26;sx+=8){
+   if(Math.abs(sx)<5)continue;
+   for(var sz=-1;sz<=1;sz+=2){
+     M.lamp(p,sx,sz*5.15,"#fce8b2");
+     if(Math.abs(sx)%16>5)M.tree(p,sx+.8,sz*6.0,sz>0?"cherry":"green",.63);
+   }
+ }
+ // Quiet canal, stone bridge and landscaping on the far edge.
+ M.box(p,59,.11,3.1,0,-.06,-26.0,"#78b7bf");
+ M.box(p,12,.28,4.7,0,.1,-25.8,"#e6d9cb");
+ for(var bx=-29;bx<29;bx+=4){
+   if(Math.abs(bx)<7)continue;
+   M.box(p,.36,.35,.28,bx,.22,-24.4,"#e9d9c8");
+ }
+ for(var lr=-1;lr<=1;lr+=2){
+   M.box(p,12,.5,.18,0,.56,-25.8+lr*2.05,"#a8a3a1");
+ }
+ for(var l=0;l<20;l++){
+   var px=-29+(l*7.75)%58;
+   if(Math.abs(px)<7)continue;
+   M.sphere(p,.12,px,.08,-25.8,"#e4f9f1");
+ }
+ // Tram runs on the central main street.
+ for(var rail=-1;rail<=1;rail+=2)M.box(p,58,.045,.08,0,.03,rail*1.2,"#d2d1be");
+ for(var s=-28;s<=28;s+=1.7)M.box(p,.3,.07,2.75,s,.015,0,"#867c78");
+ tram=new T.Group();tram.rotation.y=Math.PI/2;p.add(tram);
+ M.box(tram,2.55,1.6,5.5,0,.96,0,"#d2aa8b");
+ M.box(tram,2.57,.4,5.6,0,1.1,0,"#ab494a");
+ M.box(tram,2.6,.3,5.7,0,1.88,0,"#594f65");
+ for(var i=-2;i<=2;i++)for(var t=-1;t<=1;t+=2){
+   M.box(tram,.05,.65,.71,t*1.31,1.45,i*.92,"#b4dadf");
+ }
+ M.box(tram,2.1,.55,.06,0,1.47,2.77,"#b4dadf");
+ M.box(tram,2.1,.55,.06,0,1.47,-2.77,"#b4dadf");
+ M.text(tram,"都電",0,1.17,2.83,1.08,.35,0,"#faf3df","#b24e53");
+ api.addAnimation(function(dt,t){tram.position.set(Math.sin(t*.21)*25,.06,0);});
+ var carA=M.car(p,-1.75,-15.8,"#4e9f94",Math.PI/2);
+ var carB=M.car(p,1.65,16.8,"#e9ac75",Math.PI/2);
+ api.addAnimation(function(dt,t){
+    carA.position.x=Math.sin(t*.4)*24;carB.position.x=-Math.sin(t*.32+1)*24;
+ });
+ for(var q=0;q<22;q++){
+   var lane=q%2===0?5.4:-5.4,px=-28+(q*5.3)%57;
+   var guy=M.person(p,px,lane,q%3===0?"#a65b6c":q%3===1?"#56807c":"#c49a55");
+   people.push({o:guy,z:lane,base:px,speed:.23+q%4*.08});
+ }
+ api.addAnimation(function(dt,t){
+   people.forEach(function(v,i){v.o.position.x=((v.base+Math.sin(i)*3+t*v.speed*2+30)%60)-30;v.o.position.y=Math.sin(t*5+i)*.025;});
+ });
+ document.getElementById("buildingCount").textContent=String(id);
+}
+function selected(v){document.getElementById("placeTitle").textContent=v?v.title:"Chọn một tòa nhà";document.getElementById("placeDesc").textContent=v?v.desc:"Chạm vào các cửa hàng và công trình để đọc thông tin. Kéo để xoay, dùng hai ngón để thu phóng.";}
+var app=M&&M.init({slug:"little-tokyo",distance:70,build:build,select:selected});
+if(!app)return;
+document.getElementById("plus").onclick=function(){app.zoom(.84);};
+document.getElementById("minus").onclick=function(){app.zoom(1.2);};
+document.getElementById("reset").onclick=function(){app.reset();};
+document.getElementById("shot").onclick=function(){app.screenshot();};
+document.getElementById("day").onclick=function(){
+ var n=app.toggleNight();this.classList.toggle("active",n);
+ this.querySelector("b").textContent=n?"Ban ngày":"Ban đêm";
+ this.querySelector("span").textContent=n?"☀️":"🌙";
+};
+document.getElementById("pause").onclick=function(){
+ var n=app.toggleMotion();this.querySelector("b").textContent=n?"Tạm dừng":"Tiếp tục";
+ this.querySelector("span").textContent=n?"⏸":"▶";
+};
+})();
+</script>
+
+</body>
+</html>
