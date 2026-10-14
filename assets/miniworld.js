@@ -256,6 +256,7 @@
       }
     }
     requestAnimationFrame(loop);
+    window.__MiniWorldInstance=api;
     return api;
   };
   window.MiniWorld=M;
