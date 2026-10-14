@@ -540,7 +540,12 @@ var workbenchHost={
 
 function initialize(){
 if(!window.THREE)throw Error("Thiếu thư viện Three.js cục bộ ../assets/three.min.js");
-counts={mesh:0,tri:0};pickables=[];scene=new THREE.Scene();scene.background=color(night?"#0a1c32":"#add1dc");scene.fog=new THREE.Fog(scene.background,690,1440);
+counts={mesh:0,tri:0};pickables=[];scene=new THREE.Scene();
+ // GIS source uses x=East, z=North. Mirror the whole geospatial scene's Z once:
+ // Three.js world = x East, y Up, z South (-North), a RIGHT-HANDED frame.
+ // This preserves original OSM, survey, SQLite and annotation coordinates.
+ scene.scale.z=-1;
+ scene.background=color(night?"#0a1c32":"#add1dc");scene.fog=new THREE.Fog(scene.background,690,1440);
 world=new THREE.Group();scene.add(world);
 var hemi=new THREE.HemisphereLight(night?0x8199c9:0xe6faff,0x778572,night?.6:1.12);scene.add(hemi);
 var sun=new THREE.DirectionalLight(night?0x81a8ff:0xffebcf,night?.5:.9);sun.position.set(-200,360,130);scene.add(sun);
@@ -556,9 +561,9 @@ renderer.domElement.addEventListener("webglcontextrestored",function(){say("WebG
 resize();updateStatus();renderLoop();
 }
 function updateCamera(){if(!camera)return;
-if(viewPreset==="top"){camera.up.set(0,0,1);camera.position.set(target.x,Math.max(30,dist),target.z+.001)}
-else{camera.up.set(0,1,0);var rr=dist*Math.cos(el);camera.position.set(target.x+Math.sin(az)*rr,Math.max(12,dist*Math.sin(el)),target.z+Math.cos(az)*rr)}
-camera.lookAt(target.x,0,target.z)}
+if(viewPreset==="top"){camera.up.set(0,0,-1);camera.position.set(target.x,Math.max(30,dist),-target.z+.001)}
+else{camera.up.set(0,1,0);var rr=dist*Math.cos(el);camera.position.set(target.x+Math.sin(az)*rr,Math.max(12,dist*Math.sin(el)),-target.z-Math.cos(az)*rr)}
+camera.lookAt(target.x,0,-target.z)}
 function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
 function resize(){var totalW=Math.max(1,stage.clientWidth),h=Math.max(1,stage.clientHeight);
 var mobileSplit=workbenchMode==="split"&&window.innerWidth<=860;
@@ -615,12 +620,12 @@ function initHotspots(){
 }
 function updateHotspots(){
  if(!data||!camera)return;
- var bounds=stage.getBoundingClientRect(),w=workbenchMode==="split"&&renderer?renderer.domElement.clientWidth:bounds.width,h=bounds.height;
+ var bounds=stage.getBoundingClientRect(),w=workbenchMode==="split"&&renderer?renderer.domElement.clientWidth:bounds.width,h=workbenchMode==="split"&&renderer?renderer.domElement.clientHeight:bounds.height;
  var forward=new THREE.Vector3();camera.getWorldDirection(forward);
  (data.photo_hotspots||[]).forEach(function(hs){
    var b=hotspotEls.get(hs.id);if(!b)return;
    var visualX=hs.id==="HS-FOUNTAIN"&&lakeShapeMode==="candidate"?54:hs.position.x;var visualZ=hs.id==="HS-FOUNTAIN"&&lakeShapeMode==="candidate"?-1:hs.position.z;
-   var p=new THREE.Vector3(visualX,hs.position.y||2,visualZ);
+   var p=new THREE.Vector3(visualX,hs.position.y||2,-visualZ);
    var ahead=p.clone().sub(camera.position).dot(forward)>0;
    p.project(camera);
    var sx=(p.x*.5+.5)*w,sy=(-p.y*.5+.5)*h;
