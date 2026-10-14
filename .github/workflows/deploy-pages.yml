@@ -44,6 +44,11 @@ jobs:
           test -s _site/index.html
           test -s _site/catalog.json
 
+      - name: Prepare Python for open imagery raster build
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
       - name: Build licensed local open imagery (OAM preferred, Sentinel fallback)
         # Output is deployed on GitHub Pages; no Google/Esri tiles or API keys.
         # The original manifest is retained when remote imagery is unavailable.
