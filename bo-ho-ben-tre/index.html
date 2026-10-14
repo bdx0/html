@@ -577,7 +577,11 @@ function groundAtClient(clientX,clientY){
  camera.updateMatrixWorld(true);
  var cast=new THREE.Raycaster();
  cast.setFromCamera(new THREE.Vector2(u*2-1,1-v*2),camera);
- return cast.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0,1,0),0),new THREE.Vector3());
+ var ground=cast.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0,1,0),0),new THREE.Vector3());
+ // Avoid giant target jumps when zooming above the skyline in low oblique views.
+ // Valid survey/render area is under 2.1 km from the current geospatial center.
+ if(!ground||Math.hypot(ground.x-target.x,ground.z+target.z)>2100)return null;
+ return ground;
 }
 function zoomGeographic(factor,anchorBefore,anchorAfter){
  if(!Number.isFinite(factor)||factor<=0)return;
