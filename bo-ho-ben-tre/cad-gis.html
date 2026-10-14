@@ -42,7 +42,7 @@ function paint(){
  updateRing();
  const g=$('labels');g.textContent='';
  const txt=(x,y,s,rotation=0,size=22)=>{let a=e('text',{x,y,'font-size':size,'font-weight':'bold','text-anchor':'middle',fill:'#284b69',transform:'rotate('+rotation+' '+x+' '+y+')'},g);a.textContent=s};
- txt(740,530,'Hồ Trúc Giang',30);txt(1010,485,'Đài phun nước',17);txt(580,183,'Hai Bà Trưng',21,0);txt(175,465,'Trần Quốc Tuấn',-90,18);txt(1375,510,'Nguyễn Trung Trực',-90,18);txt(760,936,'Lê Quí Đôn',15,22);
+ txt(740,530,'Hồ Trúc Giang',30);txt(1010,485,'Đài phun nước',17);txt(580,183,'Hai Bà Trưng',0,21);txt(175,465,'Trần Quốc Tuấn',-90,18);txt(1375,510,'Nguyễn Trung Trực',-90,18);txt(760,936,'Lê Quí Đôn',15,22);
 }
 function updateRing(){
  let d=line(R)+'Z',w=drawing.querySelector('g:nth-child(5) path'),s=drawing.querySelector('g:nth-child(10) path');
