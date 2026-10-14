@@ -7,5 +7,12 @@
     10.24445
   ],
   "image": null,
-  "reason": "Ảnh nền mở sẽ được chọn và tạo trong bước build GitHub Pages. Không có ảnh giả lập."
+  "reason": "Ảnh nền mở sẽ được chọn và tạo trong bước build GitHub Pages. Không có ảnh giả lập.",
+  "crs": "EPSG:4326",
+  "north_up": true,
+  "pixel_origin": "NW",
+  "geographic_axis": {
+    "horizontal": "east",
+    "vertical": "north"
+  }
 }
