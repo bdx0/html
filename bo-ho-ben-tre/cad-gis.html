@@ -54,7 +54,7 @@ function setView(){svg.setAttribute('viewBox',V.join(' '));$('zoom').textContent
 function zoom(k,x=V[0]+V[2]/2,y=V[1]+V[3]/2){let w=Math.max(150,Math.min(3700,V[2]/k)),h=w*1086/1448;V=[x-w*(x-V[0])/V[2],y-h*(y-V[1])/V[3],w,h];setView()}
 function history(){undo.push(R.map(p=>p.slice()));if(undo.length>70)undo.shift();redo=[]}
 function save(){try{localStorage.setItem('bdx0:truc-giang:cad-gis-candidate',JSON.stringify(R))}catch{}}
-function download(file,text,mime){let u=URL.createObjectURL(new Blob([text],{type:mime})),a=document.createElement('a');a.href=u;a.download=file;a.click();setTimeout(()=>URL.revokeObjectURL(u),2000)}
+function download(file,text,mime){let u=URL.createObjectURL(new Blob([text],{type:mime})),a=document.createElement('a');a.href=u;a.download=file;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),2000)}
 function local(p){return [(p[0]-795)*200/968,(542-p[1])*107/574]}
 function gps(p){let [x,y]=local(p);return [+(106.37814+x/(111320*Math.cos(10.23861*Math.PI/180))).toFixed(7),+(10.23861+y/111320).toFixed(7)]}
 function geo(){return {type:'FeatureCollection',name:'truc_giang_illustration_UNVERIFIED',metadata:{warning:'Approximated from AI illustration; NOT survey or authoritative GIS'},features:F.map((f,i)=>{let [layer,t,g,name]=f;if(layer==='water')t='p',g=[[...R,R[0]]];if(layer==='shoreline')t='l',g=[...R,R[0]];let x=t==='t'?gps(g):t==='l'?g.map(gps):t==='p'?g.map(q=>q.map(gps)):g.map(poly=>poly.map(q=>q.map(gps)));return {type:'Feature',properties:{id:i+1,layer,name:name||'',verification_status:'UNVERIFIED_VISUAL'},geometry:{type:{t:'Point',l:'LineString',p:'Polygon',m:'MultiPolygon'}[t],coordinates:x}}})}}
