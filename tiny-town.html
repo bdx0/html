@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#101f2a">
+<meta name="description" content="Tiny Town 3D — tạo và khám phá thị trấn thu nhỏ với đường phố, nhà cửa, xe cộ, công viên, seed, mật độ, chế độ ngày đêm và bản đồ nhỏ.">
+<meta name="catalog:category" content="Mô phỏng 3D">
+<meta name="catalog:tags" content="Three.js,WebGL,City Generator,Tiny Town,Procedural,3D">
+<meta name="catalog:icon" content="🏘️">
+<title>Tiny Town — Interactive 3D City Generator</title>
+<style>
+:root{color-scheme:dark;--base:#10242e;--glass:#142b36eb;--border:#ffffff25;--mint:#a2e5ca;--muted:#abc5c4;--text:#f3fbf6}
+*{box-sizing:border-box}html,body{height:100%;margin:0;overflow:hidden;overscroll-behavior:none}body{color:var(--text);font:13px/1.5 system-ui,-apple-system,Segoe UI,sans-serif;background:#accbba}button,input,select,a{font:inherit}button{cursor:pointer}button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid #bdf0d4;outline-offset:2px}
+#app{height:100dvh;display:flex;flex-direction:column}
+header{height:61px;flex:none;display:flex;align-items:center;gap:13px;padding:0 22px;z-index:14;background:#10252f;border-bottom:1px solid #ffffff19}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;font-weight:850;font-size:17px;letter-spacing:-.04em}.brand-icon{display:grid;place-items:center;width:36px;height:36px;border-radius:12px;background:#a4e3c0;color:#1c4c3e;font-size:20px}.brand small{display:block;font-size:9px;letter-spacing:.17em;color:#a5c8c5}
+nav{display:flex;gap:6px;margin-left:auto}nav a{color:#bbd0d1;text-decoration:none;font-size:12px;padding:9px 12px;border-radius:10px}nav a:hover{background:#ffffff15;color:#fff}
+.pill{font-size:10px;letter-spacing:.05em;border:1px solid #69b8a366;border-radius:99px;color:#a3ead6;padding:6px 11px}
+#viewport{position:relative;flex:1;min-height:0;overflow:hidden;background:radial-gradient(ellipse at 51% 33%,#e6ead9,#abcabf 62%,#7da5a1)}
+#viewport canvas{position:absolute;inset:0;z-index:1;width:100%;height:100%;display:block;touch-action:none;cursor:grab}
+.night #viewport{background:radial-gradient(ellipse at 50% 31%,#586d74,#2d4854 70%,#1a3449)}
+.hud{position:absolute;z-index:4;pointer-events:none}.hud>*{pointer-events:auto}
+.glass{background:var(--glass);border:1px solid var(--border);box-shadow:0 14px 48px #173e3b33;border-radius:18px;backdrop-filter:blur(17px);-webkit-backdrop-filter:blur(17px)}
+.config{top:18px;left:20px;width:272px;padding:17px}
+.eyebrow{font-size:10px;letter-spacing:.19em;font-weight:850;text-transform:uppercase;color:var(--mint)}
+h1{font-size:30px;letter-spacing:-.06em;line-height:1.1;margin:7px 0}.sub{color:#b1c6c5;font-size:11px;line-height:1.6;margin:0 0 15px}
+.field{margin-bottom:12px}.field label{display:flex;align-items:center;justify-content:space-between;color:#d0e7df;font-weight:670;font-size:11px;margin-bottom:6px}.field output{color:#a5efd2}
+.field input[type=number],.field select{width:100%;height:37px;border:1px solid #618f8c69;border-radius:10px;background:#0d252e;color:#e9fff6;padding:0 10px;outline:none}
+.field input[type=range]{width:100%;accent-color:#a2e5ca;cursor:pointer}
+.actions{display:flex;gap:7px}.actions button{border:0;border-radius:11px;padding:11px 10px;font-size:12px;font-weight:800;flex:1}.generate{background:var(--mint);color:#133a32}.generate:hover{background:#d0ffdf}.random{background:#304a50;color:#dcf8e7}
+.legend{border-top:1px solid #ffffff20;padding-top:12px;margin-top:13px;font-size:10px;color:#a6c3bd;display:flex;gap:12px;flex-wrap:wrap}.dot{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:5px}.dot.h{background:#d6ba92}.dot.c{background:#e7a986}.dot.p{background:#83b895}
+.metricbar{right:19px;top:17px;display:flex;gap:8px}.metric{min-width:96px;text-align:center;background:#15303bde;border:1px solid #ffffff2a;border-radius:13px;padding:10px;backdrop-filter:blur(12px)}.metric strong{display:block;font-size:18px;letter-spacing:-.03em}.metric span{font-size:9px;color:#b1c9c7}
+.map{right:19px;top:90px;padding:10px;width:177px}.map h2{font-size:11px;font-weight:800;margin:0 0 8px;color:#bfeada;display:flex;justify-content:space-between}.map small{font-size:9px;font-weight:500;color:#94b3b2}#minimap{width:155px;height:155px;border-radius:8px;display:block;background:#b5cfb0}
+.select{right:19px;bottom:89px;width:245px;padding:13px 15px}.select span{font-size:10px;color:#9bdac3;letter-spacing:.14em;text-transform:uppercase}.select h2{font-size:16px;margin:3px 0}.select p{font-size:11px;color:#c2d6d3;margin:0;line-height:1.55}
+.controls{left:50%;bottom:18px;transform:translateX(-50%);display:flex;gap:5px;padding:7px;width:max-content;max-width:calc(100% - 20px)}
+.controls button{border:0;color:#e6f9f1;background:transparent;padding:10px 12px;border-radius:10px;min-height:42px;font-size:11px;font-weight:740;white-space:nowrap}.controls button:hover,.controls button.active{background:#ffffff1d}.controls .primary{background:#a2e5ca;color:#16392f}.controls .primary:hover{background:#c9fbe0}.line{height:27px;width:1px;background:#ffffff30;margin:auto 3px}
+.hint{left:22px;bottom:23px;background:#eff8e7cb;color:#344e4a;font-size:10px;padding:8px 11px;border-radius:9px}
+#fault{position:absolute;z-index:25;top:46%;left:50%;transform:translate(-50%,-50%);width:min(520px,90vw);background:#652d37;padding:19px;border:1px solid #d38b93;border-radius:14px;color:#fff8eb;white-space:pre-wrap;overflow-wrap:anywhere;max-height:55%;overflow:auto}
+#fault[hidden]{display:none}
+.mobile-toggle{display:none}
+@media(max-width:860px){.metricbar{right:10px;top:10px}.metric{min-width:72px;padding:7px}.metric strong{font-size:15px}.map{right:10px;top:79px;width:142px}.map #minimap{width:120px;height:120px}.config{width:237px;left:10px;top:10px;padding:13px}.config h1{font-size:24px}.select{right:10px;bottom:84px;width:220px}.hint{display:none}}
+@media(max-width:600px){header{height:55px;padding:0 11px}.brand{font-size:15px}.brand-icon{width:30px;height:30px}.brand small{font-size:8px}.pill,nav a:first-child{display:none}nav a{font-size:10px;padding:6px}.metricbar{top:10px;right:8px;gap:4px}.metric{min-width:60px;border-radius:9px;padding:6px}.metric strong{font-size:14px}.metric span{font-size:8px}.map{top:78px;right:8px;width:120px;padding:7px}.map #minimap{width:104px;height:104px}.map h2{font-size:9px}.config{top:11px;left:8px;width:min(248px,calc(100vw - 143px));max-height:calc(100% - 96px);overflow:auto;padding:10px}.config h1{font-size:21px}.config .sub{display:none}.config.closed .field,.config.closed .actions,.config.closed .legend{display:none}.config.closed{width:155px}.mobile-toggle{display:inline-flex;align-items:center;gap:5px;float:right;color:#afe5cd;background:#2a4b4c;border:1px solid #ffffff22;border-radius:7px;padding:5px 7px;font-size:10px}.field{margin-top:10px;margin-bottom:8px}.field label{font-size:10px}.field input[type=number],.field select{height:32px}.actions button{padding:8px 5px;font-size:10px}.select{bottom:77px;right:7px;left:7px;width:auto;max-width:310px;padding:9px 12px}.select h2{font-size:13px}.select p{font-size:10px}.controls{bottom:max(9px,env(safe-area-inset-bottom));width:calc(100% - 12px);padding:5px;gap:0}.controls button{min-width:0;flex:1;padding:8px 3px;font-size:10px}.line{margin:auto 1px}}
+@media(max-width:350px){.metric:nth-child(3){display:none}.controls button{font-size:9px}.config.closed{width:132px}.metric{min-width:54px}}
+</style>
+</head>
+<body>
+<div id="app">
+<header><a href="./" class="brand"><span class="brand-icon">🏘</span><span>TINY TOWN<small>PROCEDURAL CITY LAB</small></span></a><nav><a href="./">← HTML Lab</a><a href="./little-tokyo.html">Little Tokyo ↗</a></nav><span class="pill">100% PROCEDURAL · WEBGL</span></header>
+<main id="viewport" aria-label="Mô hình thành phố 3D tạo theo tham số. Kéo để xoay, chụm để zoom, chạm nhà để xem thông tin.">
+<section id="config" class="hud config glass closed">
+<button class="mobile-toggle" id="toggleConfig" aria-controls="configBody" aria-expanded="false">⚙ Tuỳ chỉnh</button>
+<div class="eyebrow">Craft your own city</div><h1>Build a little<br><span style="color:#a4eac9">world.</span></h1>
+<p class="sub">Một thành phố thu nhỏ sinh bằng thuật toán. Thay seed, mật độ và quy hoạch để tạo phiên bản riêng.</p>
+<div id="configBody">
+<div class="field"><label for="seed">World seed <span># tham số tái lập</span></label><input id="seed" type="number" value="2026" min="1" max="99999999"></div>
+<div class="field"><label for="density">Mật độ công trình <output id="densityValue">78%</output></label><input id="density" type="range" min="25" max="100" value="78" step="1"></div>
+<div class="field"><label for="zone">Quy hoạch</label><select id="zone"><option value="mixed">Mixed · Khu dân cư + phố</option><option value="residential">Garden · Nhà ở + công viên</option><option value="downtown">Downtown · Trung tâm cao tầng</option></select></div>
+<div class="actions"><button class="generate" id="generate">↻ Tạo thị trấn</button><button class="random" id="random">🎲 Seed</button></div>
+<div class="legend"><span><i class="dot h"></i>Nhà ở</span><span><i class="dot c"></i>Thương mại</span><span><i class="dot p"></i>Cây xanh</span></div>
+</div>
+</section>
+<div class="hud metricbar"><div class="metric"><strong id="houses">--</strong><span>Công trình</span></div><div class="metric"><strong id="trees">--</strong><span>Cây xanh</span></div><div class="metric"><strong id="fps">--</strong><span>FPS</span></div></div>
+<div class="hud map glass"><h2>TOP VIEW <small>live map</small></h2><canvas id="minimap" width="310" height="310" role="img" aria-label="Bản đồ sơ đồ đường phố và công trình"></canvas></div>
+<div class="hud select glass"><span>Object inspector</span><h2 id="selectTitle">Khám phá thị trấn</h2><p id="selectDesc">Chạm vào một ngôi nhà trên mô hình để xem loại công trình và vị trí.</p></div>
+<div class="hud hint">↻ Kéo xoay · ⇵ Cuộn zoom · Chạm để kiểm tra</div>
+<div class="hud controls glass"><button id="minus">− Zoom</button><button id="plus">+ Zoom</button><span class="line"></span><button id="night">☾ Ban đêm</button><button id="pause">⏸ Tạm dừng</button><button id="reset">◎ Đặt lại</button><button id="shot" class="primary">↓ Lưu ảnh</button></div>
+<span id="status" hidden>Đang tải…</span><div id="fault" hidden role="alert"></div>
+</main>
+</div>
+<script src="./assets/three.min.js"></script>
+<script src="./assets/miniworld.js"></script>
+<script>
+(function(){
+"use strict";
+var M=window.MiniWorld,T=window.THREE,seedEl=document.getElementById("seed");
+var densityEl=document.getElementById("density"),zoneEl=document.getElementById("zone");
+var occupancy=[],treeCount=0,buildCount=0;
+var homes=["#f0d3b2","#d8b8a5","#d3dbc7","#b7d4cb","#c5d2e3","#e6c6be","#e6d5a3"];
+var shops=["#ca8e72","#e7b795","#b58d80","#7faea8","#9ab8a7"];
+function pick(r,arr){return arr[Math.floor(r()*arr.length)];}
+function addTree(p,x,z,r,small){
+ M.tree(p,x,z,small?"green":r()>.69?"cherry":"green",small?.54:.65);
+ treeCount++;
+}
+function building(api,x,z,r,district,lot) {
+ var zone=zoneEl.value;
+ var commercial=(zone==="downtown"?(r()>.34):(zone==="residential"?r()>.88:(Math.abs(x)+Math.abs(z)<28?r()>.34:r()>.78)));
+ var tall=zone==="downtown" || (zone==="mixed"&&district<2);
+ var floors=commercial?(tall?3+Math.floor(r()*4):1+Math.floor(r()*3)):1+Math.floor(r()*(tall?4:2));
+ var w=3.6+r()*1.5,d=3.7+r()*1.4,h=floors*(commercial?2.15:2.05);
+ var c=pick(r,commercial?shops:homes);
+ var g=new T.Group();g.position.set(x,0,z);api.group.add(g);
+ var b=M.box(g,w,h,d,0,h/2,0,c);
+ var name=commercial?(floors>4?"Office Tower":"Shop & Café"):(floors>2?"Town Apartment":"Family House");
+ api.register(b,{title:name,type:commercial?"Thương mại":"Nhà ở",desc:"Lô "+(lot+1)+" · "+floors+" tầng · vị trí X "+x.toFixed(1)+", Z "+z.toFixed(1)+". Công trình tạo tự động từ world seed.",x:x,z:z});
+ M.box(g,w+.12,.24,d+.12,0,.12,0,"#9c9d93");
+ var roofColor=commercial?"#54646b":pick(r,["#5b7473","#866959","#5f7383","#aa7b73"]);
+ if(floors<=2&&!commercial){
+   M.roof(g,w+.3,d+.3,0,h,0,roofColor,.76+r()*.38);
+ }else{
+   M.box(g,w+.22,.22,d+.23,0,h+.04,0,roofColor);
+   if(commercial)M.box(g,1,.45,1.05,-w*.20,h+.36,-d*.18,"#899fa0");
+ }
+ for(var level=0;level<floors;level++){
+  var yy=.96+level*(commercial?2.15:2.05);
+  for(var f=-1;f<=1;f+=2){
+   for(var ix=-1;ix<=1;ix+=2){
+    var ww=commercial?.8:.65;
+    M.box(g,ww,.85,.06,ix*w*.245,yy,f*(d/2+.025),"#557f87");
+    M.box(g,ww*.86,.70,.075,ix*w*.245,yy,f*(d/2+.071),"#b5d6d4");
+    if(!commercial&&level>0&&ix===1)
+     M.box(g,.98,.1,.38,ix*w*.245,yy-.55,f*(d/2+.20),"#688a81");
+   }
+  }
+  for(var s=-1;s<=1;s+=2){
+   M.box(g,.065,.77,.75,s*(w/2+.03),yy,0,"#8db0b3");
+  }
+ }
+ if(!commercial){
+  M.box(g,.94,1.2,.09,0,.69,d/2+.055,"#78634f");
+  M.box(g,.14,.2,.09,.31,.82,d/2+.125,"#d2c186");
+  if(r()>.55){
+   M.box(g,.88,.22,.7,0,1.44,d/2+.46,roofColor);
+   M.box(g,.07,.44,.07,-.65,.25,d/2+.63,"#6d5a51");
+  }
+ }else{
+  M.box(g,1.38,1.32,.1,0,.74,d/2+.06,"#375660");
+  M.box(g,w+.2,.26,.75,0,2.1,d/2+.34,"#d9a377");
+  M.text(g,["COFFEE","MARKET","STORE","CAFE","BOOKS","BAKERY"][Math.floor(r()*6)],0,2.38,d/2+.17,w*.73,.42,0,"#f9fff4","#516a68");
+ }
+ if(!commercial&&r()>.37){
+  M.box(g,1.45,.55,.65,w/2+.49,.29,.4,"#8eb89c");
+  addTree(g,w/2+.72,.1,r,true);
+ }
+ occupancy.push({x:x,z:z,kind:commercial?"commercial":"home",w:w,d:d});
+ buildCount++;
+}
+function park(api,x,z,r){
+ var g=new T.Group();g.position.set(x,0,z);api.group.add(g);
+ M.box(g,13,.13,13,0,.07,0,"#9ec19a");
+ M.box(g,1.5,.035,12.4,0,.16,0,"#ddd2b9");
+ M.box(g,12.4,.035,1.45,0,.17,0,"#ddd2b9");
+ for(var i=0;i<8;i++){
+  var px=(i%4-1.5)*3.0,pz=(Math.floor(i/4)-.5)*7.2;
+  addTree(g,px,pz,r);
+ }
+ M.bench(g,-2,1.7); M.bench(g,2,-1.7);
+ M.cyl(g,.86,.9,.36,0,.31,0,"#8aaca2",20);
+ M.cyl(g,.67,.67,.42,0,.37,0,"#78bbc3",20);
+ occupancy.push({x:x,z:z,kind:"park",w:13,d:13});
+ api.register(g,{title:"Central Garden",type:"Công viên",desc:"Không gian xanh giữa khu dân cư, có đường đi bộ, cây xanh và ghế nghỉ."});
+}
+function hall(api,x,z){
+ var g=new T.Group();g.position.set(x,0,z);api.group.add(g);
+ M.box(g,13,.4,12,0,.19,0,"#d8ccb6");
+ M.box(g,10,4.4,7.5,0,2.45,-.3,"#f1dcc0");
+ M.roof(g,11,8.0,0,4.8,-.3,"#648a7f",1.22);
+ for(var i=-3;i<=3;i+=2)M.cyl(g,.28,.34,3.3,i*.97,1.65,3.7,"#e9e5d4");
+ M.box(g,9.5,.3,1.2,0,3.53,3.74,"#dfd1b9");
+ M.text(g,"TOWN HALL",0,4.01,3.95,5.5,.66,0,"#324d4d","#e5decb");
+ M.box(g,1.8,2.1,.15,0,1.36,3.57,"#648d88");
+ M.cyl(g,.13,.15,3.0,5.75,1.54,1.9,"#6a877f");
+ M.box(g,1.5,.84,1.4,5.75,3.28,1.9,"#c49b76");
+ occupancy.push({x:x,z:z,kind:"hall",w:13,d:12});
+ api.register(g,{title:"Town Hall",type:"Công trình công cộng",desc:"Tòa thị chính giả lập, đóng vai trò công trình trung tâm của đô thị."});
+ buildCount++;
+}
+function build(api){
+ occupancy=[];treeCount=0;buildCount=0;
+ var seed=Math.max(1,Math.min(99999999,Number(seedEl.value)||2026))|0;
+ seedEl.value=seed;
+ var density=Number(densityEl.value)/100,zone=zoneEl.value,r=M.rand(seed);
+ var p=api.group;
+ M.box(p,91,1.5,91,0,-.9,0,"#8baa93");
+ M.box(p,89,.08,88,0,-.12,0,"#a6c2a1");
+ // Perimeter and city road grid.
+ for(var pos=-32;pos<=32;pos+=16){
+   M.box(p,4.4,.06,76,pos,-.035,0,"#65716e");
+   M.box(p,76,.06,4.4,0,-.034,pos,"#65716e");
+   M.box(p,.08,.015,75,pos,.002,0,"#e0ddc5");
+   M.box(p,75,.015,.08,0,.003,pos,"#e0ddc5");
+   for(var ix=-37;ix<=37;ix+=6){
+     if(Math.abs(ix-pos)<2)continue;
+     M.box(p,.76,.019,.08,ix,.015,pos+.85,"#e5d3a7");
+     M.box(p,.08,.019,.76,pos+.85,.015,ix,"#e5d3a7");
+   }
+ }
+ for(var b=-24;b<=24;b+=16){
+  for(var c=-24;c<=24;c+=16){
+    var central=Math.abs(b)+Math.abs(c)<20;
+    var special=central && ((b===-8&&c===-8)||(b===8&&c===8));
+    if(special){if(b===-8)hall(api,b,c);else park(api,b,c,r);continue;}
+    var district=(Math.abs(b)+Math.abs(c))/17;
+    M.box(p,13.5,.08,13.5,b,-.005,c,"#cfccae");
+    for(var dx=-4;dx<=4;dx+=8)for(var dz=-4;dz<=4;dz+=8){
+      var xx=b+dx,zz=c+dz;
+      if(r()<density) building(api,xx,zz,r,district,buildCount);
+      else{
+        M.box(p,6,.06,6,xx,.035,zz,"#a5c198");
+        for(var k=0;k<2;k++)addTree(p,xx+(r()-.5)*3,zz+(r()-.5)*3,r,true);
+        occupancy.push({x:xx,z:zz,kind:"green",w:6,d:6});
+      }
+    }
+  }
+ }
+ for(var i=-37;i<=37;i+=6){
+   for(var s=-1;s<=1;s+=2){
+     if(Math.abs(i)%16<2.4)continue;
+     addTree(p,i,s*35.5,r,true);
+     M.lamp(p,i,s*34.15);
+     addTree(p,s*35.4,i,r,true);
+   }
+ }
+ // Urban waterline and a short pedestrian bridge.
+ M.box(p,88,.16,4.3,0,-.03,-42,"#72b0b6");
+ M.box(p,12,.19,4.9,0,.14,-42,"#d6c9ac");
+ for(var side=-1;side<=1;side+=2){
+  M.box(p,12,.44,.15,0,.53,-42+side*2.3,"#a3aba2");
+ }
+ for(var q=-43;q<=43;q+=5){
+   if(Math.abs(q)>7){
+     M.sphere(p,.1,q,.12,-42,"#d5f7ec");
+   }
+ }
+ // Traffic loops and gentle neighborhood motion.
+ var vehicles=[];
+ var carColors=["#ca846b","#6a9c98","#e0bf8e","#a9c2b6","#8892b0"];
+ for(var j=0;j<8;j++){
+   var xx=-32+j*9,zz=(j%2===0)?-16:16;
+   var car=M.car(p,xx,zz,pick(r,carColors),Math.PI/2);
+   vehicles.push({o:car,x:xx,z:zz,speed:.24+r()*.14,reverse:j%2===0});
+ }
+ api.addAnimation(function(dt,t){vehicles.forEach(function(v,i){v.o.position.x=(((v.x+(v.reverse?1:-1)*t*v.speed*11+43)%86+86)%86)-43;});});
+ var people=[];
+ for(var pi=0;pi<20;pi++){
+   var side=pi%2===0?1:-1,along=-34+r()*68;
+   var pp=M.person(p,along,side*35.1,pick(r,carColors));
+   people.push({o:pp,x:along,forward:side});
+ }
+ api.addAnimation(function(dt,t){people.forEach(function(v,i){v.o.position.x=(((v.x+t*.65*v.forward+40)%80)+80)%80-40;v.o.position.y=Math.sin(t*4+i)*.025;});});
+ document.getElementById("houses").textContent=buildCount;
+ document.getElementById("trees").textContent=treeCount;
+ drawMap();
+}
+function drawMap(){
+ var cv=document.getElementById("minimap"),cx=cv.getContext("2d");
+ var w=cv.width=310,h=cv.height=310;
+ cx.fillStyle="#abc39f";cx.fillRect(0,0,w,h);
+ function v(x){return(x+45)*w/90;}
+ cx.fillStyle="#72b6b7";cx.fillRect(0,v(-44),w,v(4)-v(0));
+ cx.fillStyle="#6a7775";
+ for(var k=-32;k<=32;k+=16){
+   cx.fillRect(v(k-2.2),v(-38),v(4.4),v(76));
+   cx.fillRect(v(-38),v(k-2.2),v(76),v(4.4));
+ }
+ occupancy.forEach(function(b){
+   cx.fillStyle=({home:"#d8c49f",commercial:"#d89a78",park:"#7aaa82",green:"#91bc89",hall:"#b6b6a1"})[b.kind];
+   cx.fillRect(v(b.x-b.w/2),v(b.z-b.d/2),v(b.w),v(b.d));
+   cx.strokeStyle="rgba(255,255,255,.54)";
+   cx.lineWidth=1;cx.strokeRect(v(b.x-b.w/2),v(b.z-b.d/2),v(b.w),v(b.d));
+ });
+ cx.strokeStyle="#fff6db";cx.lineWidth=5;cx.strokeRect(2,2,w-4,h-4);
+}
+function select(v){
+ document.getElementById("selectTitle").textContent=v?v.title:"Khám phá thị trấn";
+ document.getElementById("selectDesc").textContent=v?v.desc:"Chạm vào một ngôi nhà trên mô hình để xem loại công trình và vị trí.";
+}
+var app=M&&M.init({slug:"tiny-town",distance:103,build:build,select:select});
+if(!app)return;
+function regenerate(){app.build();}
+document.getElementById("density").addEventListener("input",function(){document.getElementById("densityValue").textContent=this.value+"%";});
+document.getElementById("generate").onclick=regenerate;
+document.getElementById("random").onclick=function(){seedEl.value=String((Math.random()*99999998+1)|0);regenerate();};
+document.getElementById("plus").onclick=function(){app.zoom(.84);};
+document.getElementById("minus").onclick=function(){app.zoom(1.2);};
+document.getElementById("reset").onclick=function(){app.reset();};
+document.getElementById("shot").onclick=function(){app.screenshot();};
+document.getElementById("night").onclick=function(){var n=app.toggleNight();this.classList.toggle("active",n);this.textContent=n?"☀ Ban ngày":"☾ Ban đêm";};
+document.getElementById("pause").onclick=function(){var m=app.toggleMotion();this.textContent=m?"⏸ Tạm dừng":"▶ Tiếp tục";};
+document.getElementById("toggleConfig").onclick=function(){
+ var panel=document.getElementById("config"),closed=panel.classList.toggle("closed");
+ this.setAttribute("aria-expanded",String(!closed));this.textContent=closed?"⚙ Tuỳ chỉnh":"× Thu gọn";
+};
+})();
+</script>
+</body>
+</html>
