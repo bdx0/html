@@ -96,6 +96,9 @@
   #stage .wb-axis{top:50px}
   .wb-floor .wb-plan-dock{padding-top:48px}
   .wb-plan-footer{display:none}
+  .wb-split .wb-plan-dock{left:52%;right:0;top:0;bottom:var(--sheet-rest);width:48%;height:auto;padding-top:0;border-top:0;border-left:2px solid #adbfde}
+  .wb-split .wb-axis-toggle{right:calc(48% + 8px)!important}
+  #stage.wb-split .wb-axis{right:calc(48% + 8px)}
   .wb-split .wb-plan-head{padding:4px 7px}
   .wb-split .wb-annotation-bar button{min-height:29px;padding:4px 6px;font-size:9px}
 }
