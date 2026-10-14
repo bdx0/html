@@ -1,5 +1,17 @@
 # Hồ Trúc Giang / Bờ Hồ Bến Tre — Digital Twin (vùng 300m)
 
+## True North — canh la bàn GIS / 3D / Floor Plan / Satellite (2026-10-14)
+
+**Đã sửa tận gốc lỗi hiển thị soi gương Đông–Tây trong chế độ TOP.** GIS/OSM/SQLite/annotation/field survey vẫn giữ nguyên hệ WGS84 và local GIS `x = East, z = North` (mét), không xoay dịch dữ liệu gốc. Three.js cần hệ thuận tay phải nên `scene.scale.z = -1`: `world X = East, Y = Up, Z = South` (`North = -Z`). Camera TOP dùng `camera.up = (0,0,-1)`, và toàn bộ vị trí camera/tâm nhìn/projection hotspots/review pins/field survey được chuyển chính xác qua dấu trừ ở Z. Do đó **TOP = Bắc địa lý lên trên, Đông sang phải** giống Floor Plan và ảnh vệ tinh thực, không phải la bàn từ cảm biến từ trường điện thoại.
+
+- La bàn `#wbTrueCompass` có mũi tên **N** xoay theo camera 3D, hiển thị 0° khi PLAN; bấm la bàn để về góc nhìn TOP đúng hướng. Ở mobile, nó nằm dưới cụm điều khiển góc, không chiếm thêm một bảng lớn.
+- PLAN giữ hệ `x = East`, `z = North`, canvas Y tăng xuống: Bắc lên trên, Đông sang phải. Raster được warp trong pipeline `EPSG:4326`, bbox `[W,S,E,N]`, góc ảnh pixel `NW` và cờ `north_up: true`; trình duyệt từ chối ảnh không có metadata định hướng đúng.
+- Google Maps Satellite (khi người dùng tự cung cấp key) khóa `heading: 0`, `tilt: 0`. Các vector OSM được vẽ trực tiếp bằng `OverlayView.fromLatLngToContainerPixel`; lớp grid địa phương cũ không còn vẽ khi Google Satellite đang bật vì phép pan hai lớp trước đây không đồng bộ.
+- Ảnh tự host OpenAerialMap/Sentinel raster: góc trên-trái là Tây-Bắc, texture dựng trên geobounds trong PLAN và 3D bằng cùng hệ tọa độ GIS, giữ nguyên attribution và độ phân giải nguồn.
+- QA tự động: `scripts/test_ben_tre.mjs` đo tọa độ màn hình khi TOP để xác nhận **North screen Y tăng và East screen X tăng**, đo sai số chéo, scene mirror Z = -1 và hướng la bàn 0° trên desktop/mobile (320/390/landscape); có thể xem phép thử bằng `window.TrucGiangWorkbench.getAlignment()` hoặc bảng Debug `geographicAlignment`.
+- Bước chưa kiểm chứng: đối chiếu thực địa hoặc bản đồ ảnh có tọa độ đo đạc để xác minh OSM shoreline và độ chính xác nguồn ảnh. Chỉ sửa phép hiển thị không chứng minh đường bờ nguồn đúng thực tế.
+
+
 ## Ảnh nền OPEN DATA tự host · PLAN + Three.js (2026-10-14)
 
 - **Khi có raster hợp lệ, nền ảnh mở tự bật trong PLAN và 3D**; bấm **🌍 Ảnh mở** trên Floor Plan hoặc **🌍 Nền 3D** ở thanh công cụ (hoặc vào **☰ Công cụ** trên điện thoại) để bật/tắt. Đây là ảnh nền thật có tọa độ, không phải ảnh tạo sinh hay dữ liệu GIS được "verified". Các đối tượng và đoạn bờ OSM không đổi.
