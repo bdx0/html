@@ -208,6 +208,20 @@ try {
     const planState=await page.evaluate(()=>({width:document.getElementById('wbPlanCanvas').width,height:document.getElementById('wbPlanCanvas').height}));
     if(!planState.width||!planState.height)
       errors.push(name+' floorplan canvas not rendered '+JSON.stringify(planState));
+    const planDirection=await page.evaluate(()=>{
+      const before=TrucGiangWorkbench.getPlanAlignment();
+      const out=document.getElementById('wbPlanMinus');
+      const back=document.getElementById('wbPlanPlus');
+      for(let i=0;i<5;i++)out.click();
+      const afterOut=TrucGiangWorkbench.getPlanAlignment();
+      for(let i=0;i<5;i++)back.click();
+      const afterBack=TrucGiangWorkbench.getPlanAlignment();
+      return {before,afterOut,afterBack};
+    });
+    if(!planDirection.before?.northUpEastRight||!planDirection.afterOut?.northUpEastRight||
+       !planDirection.afterBack?.northUpEastRight||
+       !(planDirection.afterOut.metersPerPixel>planDirection.before.metersPerPixel))
+      errors.push(name+' PLAN zoom-out changed true north / east alignment '+JSON.stringify(planDirection));
     if(name==='desktop'||name==='mobile-390')await page.screenshot({path:'ben-tre-floorplan-'+name+'.png'});
     if(!(await page.locator('#wbOpenToggle').count()))errors.push(name+' open imagery Floor Plan toggle missing');
     if(name==='desktop'){
@@ -349,6 +363,17 @@ try {
     if(!zoomBack?.topNorthUpEastRight||zoomBack?.cameraViewPreset!=='top'||
        Math.abs(zoomBack.eastScreenDy)>0.005||Math.abs(zoomBack.northScreenDx)>0.005)
       errors.push(name+' zoom-out then zoom-in did not restore North-up East-right '+JSON.stringify(zoomBack));
+    const zoomButtonState=await page.evaluate(()=>{
+      for(let i=0;i<9;i++)document.getElementById('zoomOut').click();
+      const out=TrucGiangWorkbench.getAlignment();
+      for(let i=0;i<9;i++)document.getElementById('zoomIn').click();
+      const back=TrucGiangWorkbench.getAlignment();
+      return {out,back};
+    });
+    if(!zoomButtonState.out?.topNorthUpEastRight||
+       !zoomButtonState.back?.topNorthUpEastRight||
+       zoomButtonState.out.cameraViewPreset!=='top'||zoomButtonState.back.cameraViewPreset!=='top')
+      errors.push(name+' +/- zoom buttons drifted camera away from True North '+JSON.stringify(zoomButtonState));
     // Exercise a real pinch zoom-OUT on mobile: the surviving finger must NOT
     // silently switch TOP to orbit as one touch leaves the screen.
     if(mobile){
