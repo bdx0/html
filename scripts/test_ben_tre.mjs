@@ -33,6 +33,7 @@ try {
       await page.route('**/data/imagery/manifest.json',route=>route.fulfill({
         status:200,contentType:'application/json',body:JSON.stringify({
           status:'ready',image:'qa-fixture.png',bbox:[106.3722,10.23277,106.38408,10.24445],
+          crs:'EPSG:4326',north_up:true,pixel_origin:'NW',
           source:'QA fixture (not an aerial image)',acquired:'2026-10-14',
           native_resolution_m:1000,attribution:'Synthetic test fixture',license:'QA-only',
           source_url:'https://example.org/fixture'
@@ -307,6 +308,10 @@ try {
       errors.push(name+' true north top view mirrored, rotated or camera/OSM mismatched '+JSON.stringify(orientation));
     if(!(await page.locator('#wbTrueCompass').isVisible()))
       errors.push(name+' True North compass not visible in split mode');
+    if(name==='desktop'){
+      const rasterMetadata=await page.evaluate(()=>window.BoHoOpenImagery.status());
+      if(!rasterMetadata.ready)errors.push(name+' WGS84 north-up fixture rejected');
+    }
     await page.locator('[data-wb-view="iso"]').click();
     await page.locator('[data-wb-mode="3d"]').click();
     await page.waitForTimeout(180);
