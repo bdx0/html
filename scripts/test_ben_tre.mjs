@@ -76,20 +76,23 @@ try {
       if(!viewport.collapsed||viewport.drawer>110)errors.push(name+' default drawer obstructs scene '+viewport.drawer);
       await page.locator('#zoomIn').click();
       await page.locator('#zoomOut').click();
-      await page.locator('[data-open-tab="cost"]').click();
+      await page.locator('#sheetToggle').click();
+      await page.locator('[data-tab="cost"]').click();
       if(!(await page.locator('#inspector').evaluate(el=>el.classList.contains('expanded'))))
-        errors.push(name+' quick cost button did not expand drawer');
+        errors.push(name+' cost tab did not keep drawer expanded');
       const price=await page.locator('#panel').innerText();
       if(!price.includes('Giá công trình')||!price.includes('1.698.502.090'))
         errors.push(name+' public price panel not accessible');
       await page.locator('#sheetToggle').click();
       if(await page.locator('#inspector').evaluate(el=>el.classList.contains('expanded')))
         errors.push(name+' sheet close button failed');
-      await page.locator('[data-open-tab="data"]').click();
+      await page.locator('#sheetToggle').click();
+      await page.locator('[data-tab="data"]').click();
       if(!(await page.locator('#panel').innerText()).includes('Danh mục có ảnh'))
         errors.push(name+' catalog not accessible');
       await page.locator('#sheetToggle').click();
-      await page.locator('[data-open-tab="images"]').click();
+      await page.locator('#sheetToggle').click();
+      await page.locator('[data-tab="images"]').click();
       if(!(await page.locator('#panel').innerText()).includes('16 nhóm'))
         errors.push(name+' image panel not accessible');
       await page.locator('#sheetToggle').click();
@@ -102,7 +105,8 @@ try {
     const satelliteAction=page.locator('#satelliteToggle');
     if(!(await satelliteAction.count()))errors.push(name+' satellite imagery control absent');
     else{
-      await satelliteAction.click();
+      if(mobile){await page.locator('#mobileMenuToggle').click();await page.locator('[data-mobile-action="satelliteToggle"]').click()}
+      else await satelliteAction.click();
       if(!(await page.locator('#satelliteOverlay').isVisible()))
         errors.push(name+' satellite viewer did not open');
       const esriSrc=await page.locator('#satImg').getAttribute('src');
@@ -114,7 +118,8 @@ try {
     }
     // One opt-in field-photo roundtrip in a real browser. User GPS point is a manual pin.
     if(name==='desktop'||name==='mobile-390'){
-      await page.locator('#surveyToggle').click();
+      if(mobile){await page.locator('#mobileMenuToggle').click();await page.locator('[data-mobile-action="surveyToggle"]').click()}
+      else await page.locator('#surveyToggle').click();
       if(!(await page.locator('#surveyToggle').innerText()).includes('Đang chọn điểm'))
         errors.push(name+' field survey selection not enabled');
       const stageBox=await page.locator('#stage').boundingBox();
@@ -217,18 +222,23 @@ try {
       active:document.getElementById('stage').classList.contains('wb-split'),
       dock:document.getElementById('wbPlanDock').getBoundingClientRect().width,
       model:document.getElementById('webgl').getBoundingClientRect().width,
-      stage:document.getElementById('stage').getBoundingClientRect().width
+      stage:document.getElementById('stage').getBoundingClientRect().width,
+      modelH:document.getElementById('webgl').getBoundingClientRect().height,
+      planH:document.getElementById('wbPlanDock').getBoundingClientRect().height,
+      stageH:document.getElementById('stage').getBoundingClientRect().height
     }));
-    if(!split.active||split.dock<=0||split.model>=split.stage*.9)
+    if(!split.active||split.dock<=0||(mobile ? (split.model<split.stage*.95||split.planH<45||Math.abs(split.modelH-split.stageH*.5)>3) : split.model>=split.stage*.9))
       errors.push(name+' split layout incorrect '+JSON.stringify(split));
     if(name==='desktop'||name==='mobile-390')await page.screenshot({path:'ben-tre-split-'+name+'.png'});
+    if(mobile)await page.locator('#wbAxisToggle').click();
     await page.locator('[data-wb-view="top"]').click();
     if((await page.evaluate(()=>window.TrucGiangWorkbench.getInfo().view))!=='top')
       errors.push(name+' axis top view incorrect');
     await page.locator('[data-wb-view="iso"]').click();
     await page.locator('[data-wb-mode="3d"]').click();
     await page.waitForTimeout(180);
-    await page.locator('#dbg').click();
+    if(mobile){await page.locator('#mobileMenuToggle').click();await page.locator('[data-mobile-action="dbg"]').click()}
+    else await page.locator('#dbg').click();
     const diagnosis=await page.locator('#report').innerText();
     let diag={};
     try{diag=JSON.parse(diagnosis)}catch{}
