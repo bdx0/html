@@ -256,6 +256,7 @@ try {
     if((await cad.locator('#handles circle').count())<70)
       errors.push(name+' CAD/GIS editable shoreline vertices missing');
     if(name==='desktop'||name==='mobile-390'){
+      if(mobile)await cad.locator('#openInfo').click();
       console.log('CAD debug pre-export',name,await cad.evaluate(()=>({handler:typeof document.getElementById('candidate').onclick,URL:typeof URL.createObjectURL,points:window.TrucGiangCadGis.candidateRing().length})));
       const candidateWait=cad.waitForEvent('download',{timeout:12000});
       await cad.locator('#candidate').click();
