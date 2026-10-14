@@ -24,7 +24,7 @@ try{
      await page.waitForFunction(()=>!!window.__MiniWorldInstance&&window.__MiniWorldInstance.renderer.info.render.triangles>50,null,{timeout:45000});
    }catch(e){problems.push("LOAD: "+String(e));}
    const state=await page.evaluate(()=>{
-     const c=document.querySelector("#viewport canvas");
+     const c=document.querySelector("#viewport > canvas");
      const app=window.__MiniWorldInstance;
      let pixelVar=0;
      if(c){
@@ -43,6 +43,7 @@ try{
      await page.locator("#plus").click();
      await page.locator("#minus").click();
      if(scene.regen){
+       if(mode.isMobile)await page.locator("#toggleConfig").click();
        await page.locator("#density").fill("92");
        await page.locator(scene.regen).click();
        await page.waitForTimeout(1500);
