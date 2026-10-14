@@ -169,3 +169,7 @@ body.sheet-open .inspector{box-shadow:0 -10px 30px #2b486639}
  .wb-review-pin{width:31px;height:31px;font-size:12px}
  .wb-review-pins{z-index:6}
 }
+
+/* CAD/GIS remains reachable from the shoreline Workbench card on small screens;
+   do not crowd the narrow native top toolbar. */
+@media(max-width:860px){#openCadGis{display:none!important}}
