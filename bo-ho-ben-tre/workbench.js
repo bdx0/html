@@ -306,6 +306,19 @@ function getAlignment(){
   floorNorthUp:true
  };
 }
+function getPlanAlignment(){
+ if(W.mode==="3d"||!W.metrics||!W.metrics.plan)return null;
+ var m=W.metrics.plan,w=m.w,h=m.h,k=m.scale;
+ var center=screen({x:0,z:0},w,h,k),east=screen({x:25,z:0},w,h,k),north=screen({x:0,z:25},w,h,k);
+ return {
+  mode:W.mode,zoom:W.planZoom,metersPerPixel:1/k,
+  northUpEastRight:east.x>center.x&&north.y<center.y,
+  eastScreenDx:east.x-center.x,eastScreenDy:east.y-center.y,
+  northScreenDx:north.x-center.x,northScreenDy:north.y-center.y,
+  googleSatellite:!!(window.BoHoGoogleSatellite&&BoHoGoogleSatellite.isVisible()),
+  openRaster:!!(window.BoHoOpenImagery&&BoHoOpenImagery.isPlanActive())
+ };
+}
 function attachPlanInteraction(){
  var canvas=W.planCanvas,hit=$("wbGoogleHitarea");
  function down(e){e.stopPropagation();e.preventDefault();e.currentTarget.setPointerCapture(e.pointerId);W.mouse={x:e.clientX,y:e.clientY,startX:e.clientX,startY:e.clientY,moved:false}}
@@ -341,7 +354,7 @@ function init(data,host){
  setMode(W.mode);setShape(W.shape);setView("iso");loadIssues();
 }
 window.TrucGiangWorkbench={init:init,update:update,setMode:setMode,setShape:setShape,setView:setView,
- getAlignment:getAlignment,
+ getAlignment:getAlignment,getPlanAlignment:getPlanAlignment,
   getInfo:function(){return {mode:W.mode,shape:W.shape,view:W.view,planReady:!!W.planCanvas,shoreIssues:W.issues.length,reviewLoaded:W.reviewLoaded,annotations:window.TrucGiangAnnotations?TrucGiangAnnotations.getInfo().count:0}},
  refresh:resize};
 })();
