@@ -281,6 +281,27 @@ function drawCompass(){
  compass.dataset.mode=W.mode;
  compass.dataset.northScreenDeg=angle.toFixed(2);
 }
+function getAlignment(){
+ if(!W.host)return null;
+ var info=W.host.getCameraInfo(),camera=info&&info.camera;
+ if(!camera)return null;
+ camera.updateMatrixWorld();
+ var target=info.target||{x:0,z:0};
+ function point(dx,north){var p=new THREE.Vector3(target.x+dx,0,-(target.z+north));p.project(camera);return{x:p.x,y:p.y}}
+ var center=point(0,0),east=point(25,0),north=point(0,25);
+ return {
+  sourceFrame:"WGS84 longitude East / latitude North",
+  gisLocalFrame:"x East, z North",
+  threeWorldFrame:"x East, y Up, z South",
+  topMode:W.view==="top",mode:W.mode,
+  sceneMirrorZ:info.sceneScaleZ,
+  eastScreenDx:east.x-center.x,eastScreenDy:east.y-center.y,
+  northScreenDx:north.x-center.x,northScreenDy:north.y-center.y,
+  topNorthUpEastRight:W.view==="top"&&east.x>center.x&&north.y>center.y,
+  compassNorthScreenDeg:Number($("wbTrueCompass")?.dataset.northScreenDeg||0),
+  floorNorthUp:true
+ };
+}
 function attachPlanInteraction(){
  var canvas=W.planCanvas,hit=$("wbGoogleHitarea");
  function down(e){e.stopPropagation();e.preventDefault();e.currentTarget.setPointerCapture(e.pointerId);W.mouse={x:e.clientX,y:e.clientY,startX:e.clientX,startY:e.clientY,moved:false}}
@@ -316,6 +337,7 @@ function init(data,host){
  setMode(W.mode);setShape(W.shape);setView("iso");loadIssues();
 }
 window.TrucGiangWorkbench={init:init,update:update,setMode:setMode,setShape:setShape,setView:setView,
- getInfo:function(){return {mode:W.mode,shape:W.shape,view:W.view,planReady:!!W.planCanvas,shoreIssues:W.issues.length,reviewLoaded:W.reviewLoaded,annotations:window.TrucGiangAnnotations?TrucGiangAnnotations.getInfo().count:0}},
+ getAlignment:getAlignment,
+  getInfo:function(){return {mode:W.mode,shape:W.shape,view:W.view,planReady:!!W.planCanvas,shoreIssues:W.issues.length,reviewLoaded:W.reviewLoaded,annotations:window.TrucGiangAnnotations?TrucGiangAnnotations.getInfo().count:0}},
  refresh:resize};
 })();
