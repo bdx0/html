@@ -51,6 +51,16 @@ function build(){
  '<button data-wb-view="east" aria-label="Nhìn từ Đông">E</button>'+
  '<button data-wb-view="iso" aria-label="Phối cảnh isometric" class="selected">ISO</button></div>';
  stage.append(axis);
+ var axisToggle=el("button","wb-axis-toggle","⌖ Góc nhìn");
+ axisToggle.id="wbAxisToggle";axisToggle.type="button";
+ axisToggle.setAttribute("aria-controls","wbAxis");axisToggle.setAttribute("aria-expanded","false");
+ axisToggle.setAttribute("aria-label","Mở hoặc đóng điều khiển trục XYZ và góc nhìn");
+ stage.append(axisToggle);
+ axisToggle.addEventListener("click",function(e){
+   e.stopPropagation();
+   var opened=stage.classList.toggle("axis-open");
+   axisToggle.setAttribute("aria-expanded",String(opened));
+ });
  var status=el("div","wb-status");status.id="wbStatus";status.textContent="OSM SOURCE · NOT VERIFIED · METERS";
  stage.append(status);
  W.planCanvas=$("wbPlanCanvas");W.axisCanvas=$("wbAxisCanvas");W.pinLayer=$("wbReviewPins");
@@ -74,7 +84,8 @@ function build(){
 }
 function setMode(mode){
  if(!["3d","floor","split"].includes(mode))return;
- W.mode=mode;var stage=$("stage");stage.classList.remove("wb-3d","wb-floor","wb-split");stage.classList.add("wb-"+mode);
+ W.mode=mode;var stage=$("stage");stage.classList.remove("wb-3d","wb-floor","wb-split","axis-open");stage.classList.add("wb-"+mode);
+  var axisButton=$("wbAxisToggle");if(axisButton)axisButton.setAttribute("aria-expanded","false");
  stage.querySelectorAll("[data-wb-mode]").forEach(function(b){b.classList.toggle("selected",b.dataset.wbMode===mode);b.setAttribute("aria-pressed",String(b.dataset.wbMode===mode))});
  if(W.host&&W.host.resize3D)W.host.resize3D(mode);
  resize();updatePins();
