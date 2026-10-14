@@ -282,7 +282,7 @@ function update(){
 }
 function init(data,host){
  W.data=data;W.host=host;
- if(!W.ready){build();W.ready=true;if(window.BoHoGoogleSatellite)BoHoGoogleSatellite.init({origin:data.origin,redraw:drawPlan,setFloor:function(){setMode("floor")}})}
+ if(!W.ready){build();W.ready=true;if(window.BoHoGoogleSatellite)BoHoGoogleSatellite.init({origin:data.origin,redraw:drawPlan,setFloor:function(){setMode("floor")},getView:function(){var r=W.planCanvas.getBoundingClientRect();return{pan:{x:W.panX,z:W.panZ},scale:Math.min(r.width/450,r.height/390)*W.planZoom}}})}
  if(window.TrucGiangAnnotations)TrucGiangAnnotations.init({origin:data.origin,setMode:setMode,redraw:drawPlan,
    capturePlan:function(done){setMode("floor");requestAnimationFrame(function(){drawPlan();done(W.planCanvas)})}});
  setMode(W.mode);setShape(W.shape);setView("iso");loadIssues();
