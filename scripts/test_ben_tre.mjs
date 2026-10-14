@@ -39,7 +39,7 @@ try {
         })}));
       await page.route('**/data/imagery/qa-fixture.png',route=>route.fulfill({
         status:200,contentType:'image/png',body:Buffer.from(
-          'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4z8DwHwAFgAI/ScL/nwAAAABJRU5ErkJggg==','base64')
+          'iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAFklEQVR4nGM0qohiYGBgYmBgYGBgAAAMMgEIge0dgQAAAABJRU5ErkJggg==','base64')
       }));
     }
     await page.goto('http://127.0.0.1:8765/bo-ho-ben-tre/',{waitUntil:'load',timeout:45000});
