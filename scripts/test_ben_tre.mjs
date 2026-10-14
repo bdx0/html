@@ -243,7 +243,7 @@ try {
     await page.screenshot({path:'ben-tre-'+name+'.png',fullPage:true});
     // Visual CAD/GIS digitization is a separate review layer; source SQLite stays immutable.
     const cad=await ctx.newPage();
-    cad.on('pageerror',e=>errors.push(name+' CAD/GIS JS '+e.message));
+    cad.on('pageerror',e=>{console.error('CAD/GIS pageerror '+name+' '+e.message);errors.push(name+' CAD/GIS JS '+e.message)});
     cad.on('console',m=>{if(m.type()==='error')errors.push(name+' CAD/GIS console '+m.text())});
     await cad.goto('http://127.0.0.1:8765/bo-ho-ben-tre/cad-gis.html',{waitUntil:'load',timeout:30000});
     await cad.waitForFunction(()=>window.TrucGiangCadGis?.getInfo().count===311,{timeout:30000});
@@ -256,8 +256,10 @@ try {
     if((await cad.locator('#handles circle').count())<70)
       errors.push(name+' CAD/GIS editable shoreline vertices missing');
     if(name==='desktop'||name==='mobile-390'){
+      console.log('CAD debug pre-export',name,await cad.evaluate(()=>({handler:typeof document.getElementById('candidate').onclick,URL:typeof URL.createObjectURL,points:window.TrucGiangCadGis.candidateRing().length})));
       const candidateWait=cad.waitForEvent('download',{timeout:12000});
       await cad.locator('#candidate').click();
+      console.log('CAD clicked export',name);
       const exported=JSON.parse(fs.readFileSync(await (await candidateWait).path(),'utf8'));
       if(exported.schema!=='truc-giang-cad-gis-candidate-v1'||exported.verified!==false||
          exported.ring_image_pixels.length<70)
