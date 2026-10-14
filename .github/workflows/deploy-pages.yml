@@ -44,6 +44,19 @@ jobs:
           test -s _site/index.html
           test -s _site/catalog.json
 
+      - name: Build licensed local open imagery (OAM preferred, Sentinel fallback)
+        # Output is deployed on GitHub Pages; no Google/Esri tiles or API keys.
+        # The original manifest is retained when remote imagery is unavailable.
+        timeout-minutes: 12
+        run: |
+          set -euo pipefail
+          if python3 -m pip install --quiet 'rasterio>=1.4,<2' 'numpy>=1.26,<3' 'Pillow>=10,<13' 'requests>=2.31,<3'; then
+            python3 bo-ho-ben-tre/scripts/build_open_imagery.py --output _site/bo-ho-ben-tre/data/imagery || echo 'Open imagery build was unavailable; OSM technical Floor Plan remains.'
+          else
+            echo 'Imagery dependencies unavailable; deploy technical OSM base.'
+          fi
+          test -s _site/bo-ho-ben-tre/data/imagery/manifest.json
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
