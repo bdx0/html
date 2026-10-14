@@ -1,5 +1,12 @@
 # Hồ Trúc Giang / Bờ Hồ Bến Tre — Digital Twin (vùng 300m)
 
+## Mobile-first interface · 2026-10-14
+- Main page `index.html` loads `mobile-layout.css` and `mobile-layout.js`: a compact header, one accessible menu for survey/satellite/scene controls/model/CAD/SQLite, and an opt-in inspector sheet. These files are **UI only**, not GIS source data.
+- Mobile default: full 3D scene, bottom sheet collapsed, minimap hidden, axis gizmo collapsed. The three visible mode buttons remain 3D / PLAN / SPLIT; tapping `⌖ Góc nhìn` reveals the XYZ gizmo and TOP/N/E/ISO presets. Survey/satellite entry points remain accessible in the menu, even when their older HUD buttons are hidden.
+- Mobile portrait SPLIT stacks WebGL on top and Floor Plan below; mobile landscape SPLIT places them side-by-side to keep the plan usable. Resize the Three.js drawing buffer **and the camera aspect** to match the displayed WebGL pane; CSS-only cropping makes the model seem to vanish.
+- PLAN keeps annotations, existing raw OSM geometry and CAD/GIS links working. Neither local annotations nor shoreline previews mutate authoritative SQLite/scene data. Desktop panels and `warestack-3d.html` remain untouched.
+- Mobile regression test `scripts/test_ben_tre.mjs` covers 320 px, 390 px and 844×390 landscape, responsive menu, collapsed XYZ, drawers and adaptive split. Changes to navigation/controls must update this test. Inspect screenshots before declaring visual QA complete.
+
 ## Mở và kiểm tra
 - Trực tiếp: https://bdx0.github.io/html/bo-ho-ben-tre/
 - Repo: https://github.com/bdx0/html/tree/main/bo-ho-ben-tre
