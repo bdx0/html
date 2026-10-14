@@ -117,7 +117,8 @@ def image_from_oam(item):
                     "attribution": f"Imagery: {producer} / OpenAerialMap ({license_id})",
                     "native_resolution_m": props.get("gsd") or props.get("oam:gsd") or None,
                     "acquired": str(props.get("datetime") or "")[:10] or None,
-                    "item_id": item.get("id"), "source_url": f"https://imagery.hotosm.org/",
+                    "item_id": item.get("id"),
+                    "source_url": f"https://api.imagery.hotosm.org/stac/collections/openaerialmap/items/{item.get('id')}",
                 }
 
 
