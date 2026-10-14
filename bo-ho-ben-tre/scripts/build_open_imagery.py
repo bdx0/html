@@ -211,6 +211,8 @@ def main():
     args.output.mkdir(parents=True, exist_ok=True)
     overview = {
         "status": "unavailable", "bbox": list(BBOX), "image": None,
+        "crs": "EPSG:4326", "north_up": True, "pixel_origin": "NW",
+        "geographic_axis": {"horizontal": "east", "vertical": "north"},
         "reason": "Chưa tìm được ảnh mở đầy đủ và tải được cho khu vực hồ.",
         "checked_at": dt.datetime.now(dt.timezone.utc).isoformat(),
         "oam_intersecting": None, "sentinel_intersecting": None
