@@ -297,11 +297,11 @@ function getAlignment(){
   sourceFrame:"WGS84 longitude East / latitude North",
   gisLocalFrame:"x East, z North",
   threeWorldFrame:"x East, y Up, z South",
-  topMode:W.view==="top",mode:W.mode,
+  topMode:info.viewPreset==="top",cameraViewPreset:info.viewPreset,cameraDistance:info.dist,mode:W.mode,
   sceneMirrorZ:info.sceneScaleZ,
   eastScreenDx:east.x-center.x,eastScreenDy:east.y-center.y,
   northScreenDx:north.x-center.x,northScreenDy:north.y-center.y,
-  topNorthUpEastRight:W.view==="top"&&east.x>center.x&&north.y>center.y,
+  topNorthUpEastRight:info.viewPreset==="top"&&east.x>center.x&&north.y>center.y,
   compassNorthScreenDeg:Number($("wbTrueCompass")?.dataset.northScreenDeg||0),
   floorNorthUp:true
  };
