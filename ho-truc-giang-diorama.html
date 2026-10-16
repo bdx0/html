@@ -22,8 +22,8 @@ body.night #stage{background:radial-gradient(ellipse at 50% 30%,#676581,#333957 
 .head{top:22px;left:25px;max-width:410px;text-shadow:0 3px 15px #3127368a}
 .tag{display:inline-flex;align-items:center;gap:7px;font-size:10px;font-weight:850;letter-spacing:.15em;text-transform:uppercase;background:#332a36a6;border:1px solid #ffffff40;padding:6px 10px;border-radius:40px;backdrop-filter:blur(8px)}
 .tag:before{content:"";width:7px;height:7px;background:#a5f1c8;border-radius:50%}
-.head h1{font-family:Georgia,"Times New Roman",serif;font-size:clamp(34px,3.6vw,52px);font-weight:650;line-height:.94;letter-spacing:-.05em;margin:15px 0 10px}
-.head h1 em{font-style:italic;color:#ffdfbc}.head p{font-size:12px;margin:0;font-weight:650;color:#fff4e8}
+.head h1{font-family:Georgia,"Times New Roman",serif;font-size:clamp(33px,3.4vw,47px);font-weight:650;line-height:.94;letter-spacing:-.05em;margin:15px 0 10px}
+.head h1 em{font-style:italic;color:#ffdfbc}.head p{font-size:10px;margin:0;font-weight:650;color:#fff4e8}
 .nav{top:20px;right:20px;display:flex;align-items:center;gap:8px}
 .nav a,.nav button{background:#282435a8;color:#fff7ec;border:1px solid var(--line);padding:9px 12px;border-radius:99px;font-size:11px;font-weight:750;backdrop-filter:blur(11px)}
 .nav a:hover,.nav button:hover{background:#4a384bc7}
@@ -46,9 +46,9 @@ body.night #stage{background:radial-gradient(ellipse at 50% 30%,#676581,#333957 
 body.night .pill{background:#282c43e8;color:#f9e9db;border-color:#a4abc444}
 @media(max-width:930px){.foot{display:none}.status{bottom:74px;right:11px}.head{top:13px;left:13px}.nav{top:12px;right:12px}}
 @media(max-width:650px){
-.head h1{font-size:29px;margin:8px 0 5px}.head p{font-size:9px;max-width:194px}.tag{font-size:8px;padding:5px 8px}
+.head h1{font-size:27px;margin:8px 0 5px}.head p{font-size:9px;max-width:194px}.tag{font-size:8px;padding:5px 8px}
 .nav{flex-direction:column;align-items:end;gap:4px}.nav a,.nav button{font-size:9px;padding:6px 9px}
-.pill{top:auto;bottom:66px;font-size:9px;padding:5px 9px}
+.pill{top:auto;bottom:64px;font-size:8px;padding:5px 9px}
 .tools{bottom:max(7px,env(safe-area-inset-bottom));width:calc(100% - 12px);border-radius:16px;gap:0;padding:5px;justify-content:space-between}
 .tools button{font-size:10px;padding:9px 5px;flex:1;min-width:0;min-height:40px}.sep{margin:0 1px}
 .status{right:10px;bottom:64px}.panel{top:auto;bottom:105px;left:10px;right:10px;width:min(320px,calc(100% - 20px));padding:13px}.panel h2{font-size:16px}.panel p{font-size:11px}
@@ -90,29 +90,52 @@ function fail(e){fault.hidden=false;fault.textContent="Không khởi tạo đư�
 if(!T||!M){fail("Không tìm thấy thư viện Three.js hoặc MiniWorld tại assets/.");return;}
 var renderer,scene,camera,world,sun,hemi,night=false,spin=false;
 var geometries=[],animators=[],pickables=[],lamps=[],labels=[],treeCount=0,buildingCount=0,carCount=0;
-var rng=M.rand(20261016),SIZE={w:121,d:82};
+var rng=M.rand(20261016),SIZE={w:121,d:82},treeSpecs=[];
 function rand(a,b){return a+(b-a)*rng();}
 function choose(a){return a[Math.floor(rng()*a.length)];}
 function box(w,h,d,x,y,z,color,parent){return M.box(parent||world,w,h,d,x,y,z,color);}
 function cyl(r1,r2,h,x,y,z,color,parent,n){return M.cyl(parent||world,r1,r2,h,x,y,z,color,n||12);}
 function sphere(r,x,y,z,color,parent,sc){return M.sphere(parent||world,r,x,y,z,color,sc);}
 // Layered, varied miniature foliage; larger silhouettes improve the isometric view.
+// Instanced canopy architecture: organic clustered crowns with just two draw calls.
 function tree(x,z,size,kind){
  treeCount++;
- var s=(size||1)*1.37, g=new T.Group();g.position.set(x,0,z);g.scale.setScalar(s);world.add(g);
- var palettes=kind==="cherry"?["#d98da6","#f0a4bd","#f8c8ca","#d87799"]:
- kind==="palm"?["#4a7853","#648c50","#849b53","#3d6d51"]:
- ["#386c48","#528454","#6f9657","#8caa65","#4b7e50","#a6ac57"];
- cyl(.13,.22,2.2,0,1.18,0,"#76553e",g,8);
- cyl(.65,.60,.3,0,2.5,0,"#35583c",g,8);
- var sizes=[.97,.77,.7,.62,.58,.56,.46],rot=rand(0,6.28);
- for(var j=0;j<7;j++){
-  var a=rot+j*2.3999,r=j===0?0:j<4?.62:.42;
-  var yp=3.0+(j%3)*.23;
-  sphere(sizes[j],Math.cos(a)*r,yp,Math.sin(a)*r,palettes[j%palettes.length],g,[1.1,.7,1.08]);
+ treeSpecs.push({x:x,z:z,size:(size||1),kind:kind||"green",seed:rng()});
+}
+function renderTrees(){
+ var trunks=[],leaves=[],leafColors=[];
+ for(var ti=0;ti<treeSpecs.length;ti++){
+  var t=treeSpecs[ti],r=M.rand(Math.floor(t.seed*98765431)+31),size=t.size*1.22;
+  var yHeight=(2.6+r()*.9)*size,th=.13*size;
+  trunks.push({x:t.x,y:yHeight*.47,z:t.z,sx:th,sy:yHeight*.47,sz:th});
+  // Foliage lobes form a spreading tree canopy rather than repeated spheres.
+  var num=t.kind==="cherry"?12:14,rad=(1.5+r()*.52)*size;
+  for(var j=0;j<num;j++){
+   var a=j*2.399963+ t.seed*6.28;
+   var radial=j===0?0:(.38+r()*.63)*rad;
+   var x=t.x+Math.cos(a)*radial,z=t.z+Math.sin(a)*radial;
+   var yy=yHeight+(r()-.52)*.65*size+(j%3===0?.40*size:0);
+   var spread=(.65+r()*.43)*size;
+   leaves.push({x,y:yy,z,sx:spread*1.17,sy:spread*.77,sz:spread});
+   var hex=(t.kind==="cherry"?["#e6a2b0","#eeb7c3","#d8879f","#f3c2bc"]:
+    ["#456f42","#668848","#7f9b53","#517f4c","#97a45b","#386a48","#92a365"])[Math.floor(r()* (t.kind==="cherry"?4:7))];
+   leafColors.push(new T.Color(hex));
+  }
  }
- if(rng()<.17){for(var n=0;n<3;n++)sphere(.21,rand(-1,1),rand(3.0,3.8),rand(-.7,.7),"#ddb87d",g);}
- return g;
+ function batch(parts,geometry,material,colors){
+  var mesh=new T.InstancedMesh(geometry,material,parts.length);
+  var d=new T.Object3D();
+  for(var i=0;i<parts.length;i++){
+   var p=parts[i];d.position.set(p.x,p.y,p.z);d.scale.set(p.sx,p.sy,p.sz);d.updateMatrix();mesh.setMatrixAt(i,d.matrix);
+   if(colors)mesh.setColorAt(i,colors[i]);
+  }
+  mesh.instanceMatrix.needsUpdate=true;
+  if(colors)mesh.instanceColor.needsUpdate=true;
+  mesh.castShadow=innerWidth>800;mesh.receiveShadow=true;
+  mesh.frustumCulled=false;world.add(mesh);
+ }
+ batch(trunks,new T.CylinderGeometry(1,1,2,7),new T.MeshStandardMaterial({color:"#75553e",roughness:1}));
+ batch(leaves,new T.IcosahedronGeometry(1,2),new T.MeshStandardMaterial({color:"#ffffff",roughness:.92}),leafColors);
 }
 function info(mesh,title,type,desc){mesh.userData.detail={title:title,type:type,desc:desc};pickables.push(mesh);}
 function markLine(x1,z1,x2,z2,w,color,y){
@@ -158,10 +181,10 @@ function lakeMesh(poly){
    'float r=sin(vLake.x*1.7+vLake.y*.46+uTime*.35)*sin(vLake.y*1.36-uTime*.22);',
    'float small=sin(vLake.x*5.8+vLake.y*2.1+uTime*.9)*sin(vLake.y*5.1-vLake.x*.5-uTime*.48);',
    'float sw=sin(vLake.y*.26+uTime*.25+sin(vLake.x*.21)*1.6);',
-   'float noise=hash(floor(vLake*2.1))*.035;',
+   'float noise=hash(floor(vLake*1.25))*.007;',
    'vec3 dark=vec3(.022,.195,.228),light=vec3(.057,.49,.59);',
    'vec3 color=mix(dark,light,.58+.14*r+.12*sw);',
-   'color+=vec3(.10,.22,.23)*pow(max(0.0,small*.5+.5),14.0);',
+   'color+=vec3(.022,.043,.05)*pow(max(0.0,small*.5+.5),17.0);',
    'color+=vec3(noise);',
    'color=mix(color,color*.40+vec3(.022,.04,.08),uNight*.72);',
    'gl_FragColor=vec4(color,1.0);',
@@ -178,10 +201,10 @@ function lakeMesh(poly){
   edge.position.y=n===0?0:.1;world.add(edge);geometries.push(edge.geometry);
  }
  // Glints clustered in elongated streaks (InstancedMesh to avoid hundreds of draw calls).
- var glintGeo=new T.PlaneGeometry(.35,.085),glintMat=new T.MeshBasicMaterial({color:0xc2f5fa,transparent:true,opacity:.40,depthWrite:false,side:T.DoubleSide});
- var count=450,glints=new T.InstancedMesh(glintGeo,glintMat,count),dummy=new T.Object3D();
+ var glintGeo=new T.PlaneGeometry(.35,.085),glintMat=new T.MeshBasicMaterial({color:0xc2f5fa,transparent:true,opacity:.16,depthWrite:false,side:T.DoubleSide});
+ var count=140,glints=new T.InstancedMesh(glintGeo,glintMat,count),dummy=new T.Object3D();
  for(var i=0;i<count;i++){
-  var xx=rand(-28,30),zz=rand(-10,10),sx=rand(.25,2.1);
+  var xx=rand(-28,30),zz=rand(-10,10),sx=rand(.6,2.9);
   dummy.position.set(xx,.288,zz);dummy.rotation.set(-Math.PI/2,0,rand(-.4,.4));dummy.scale.set(sx,1,1);dummy.updateMatrix();glints.setMatrixAt(i,dummy.matrix);
  }
  glints.instanceMatrix.needsUpdate=true;world.add(glints);
@@ -404,6 +427,7 @@ function sceneBuild(){
  for(var i=0;i<23;i++){var x=rand(-44,-39),z=rand(-20,19);if(Math.abs(z+1)<4)continue;tree(x,z,rand(.67,1.03),rng()<.1?"cherry":"green");}
  for(var i=0;i<12;i++){var xx=rand(-35,38),zz=rand(20,24);tree(xx,zz,rand(.67,.88),rng()<.17?"cherry":"green");}
  cars();
+ renderTrees();
  // Tiny pedestrians.
  for(var i=0;i<35;i++){
   var px=rand(-39,41),pz=i%2?-22:22+(px+40)*.10;
@@ -418,16 +442,18 @@ try{
  renderer.setPixelRatio(Math.min(devicePixelRatio||1,innerWidth<650?1.3:1.75));
  renderer.shadowMap.enabled=innerWidth>800;renderer.shadowMap.type=T.PCFSoftShadowMap;
  if("outputColorSpace" in renderer)renderer.outputColorSpace=T.SRGBColorSpace;else renderer.outputEncoding=T.sRGBEncoding;
- renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.44;
+ renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.26;
  host.insertBefore(renderer.domElement,host.firstChild);
  scene=new T.Scene();world=new T.Group();scene.add(world);
  camera=new T.PerspectiveCamera(36,1,.15,640);
- sun=new T.DirectionalLight(0xffddba,3.25);sun.position.set(-57,115,53);sun.castShadow=renderer.shadowMap.enabled;
+ sun=new T.DirectionalLight(0xffce99,3.0);sun.position.set(-57,115,53);sun.castShadow=renderer.shadowMap.enabled;
  sun.shadow.mapSize.set(2048,2048);sun.shadow.camera.left=-85;sun.shadow.camera.right=85;sun.shadow.camera.top=85;sun.shadow.camera.bottom=-85;sun.shadow.normalBias=.03;scene.add(sun);
- hemi=new T.HemisphereLight(0xe2edff,0xc4a991,1.88);scene.add(hemi);scene.add(new T.AmbientLight(0xffffff,.15));
+ hemi=new T.HemisphereLight(0xc7deef,0x8b735f,1.21);scene.add(hemi);scene.add(new T.AmbientLight(0xffffff,.15));
  sceneBuild();
 }catch(e){fail(e);return;}
-var initial={yaw:.38,pitch:.60,zoom:.93},aim={yaw:.38,pitch:.60,zoom:.93},view={yaw:.38,pitch:.60,zoom:.93};
+var portrait=innerWidth/Math.max(1,innerHeight)<.7;
+var initial=portrait?{yaw:1.53,pitch:.82,zoom:1.0}:{yaw:.41,pitch:.61,zoom:1.0};
+var aim=Object.assign({},initial),view=Object.assign({},initial);
 var w=1,h=1,last=performance.now(),t=0,lastAct=performance.now(),frame=0,lastFps=performance.now(),fps=0,points=new Map(),moved=false,pinch=0;
 function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
 function resize(){
@@ -437,7 +463,7 @@ function resize(){
 function renderCamera(dt){
  var k=Math.min(1,dt*8);
  for(var key of ["yaw","pitch","zoom"])view[key]+=(aim[key]-view[key])*k;
- var aspect=w/h,dist=(aspect<.65?198:aspect<1?161:139)*view.zoom,focus=1.0;
+ var aspect=w/h,dist=(aspect<.65?220:aspect<1?181:175)*view.zoom,focus=0.9;
  camera.position.set(Math.sin(view.yaw)*Math.cos(view.pitch)*dist,focus+Math.sin(view.pitch)*dist,Math.cos(view.yaw)*Math.cos(view.pitch)*dist);
  camera.lookAt(0,focus,0);
 }
@@ -486,8 +512,8 @@ document.getElementById("zoomIn").onclick=function(){aim.zoom=clamp(aim.zoom*.81
 document.getElementById("zoomOut").onclick=function(){aim.zoom=clamp(aim.zoom*1.2,.52,2.7);userAction();};
 document.getElementById("orbit").onclick=function(){spin=!spin;this.setAttribute("aria-pressed",String(spin));userAction();};
 document.getElementById("night").onclick=function(){
- night=!night;document.body.classList.toggle("night",night);sun.intensity=night?.55:3.25;hemi.intensity=night?.82:1.88;
- sun.color.set(night?0x9eb8ff:0xffddba);renderer.toneMappingExposure=night?1.48:1.44;
+ night=!night;document.body.classList.toggle("night",night);sun.intensity=night?.46:3.0;hemi.intensity=night?.62:1.21;
+ sun.color.set(night?0x9eb8ff:0xffce99);renderer.toneMappingExposure=night?1.35:1.26;
  lamps.forEach(function(o){o.material.emissiveIntensity=night?2.5:.14;});this.setAttribute("aria-pressed",String(night));this.textContent=night?"☀ Ngày":"☾ Đêm";
 };
 document.getElementById("shot").onclick=function(){
