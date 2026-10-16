@@ -33,5 +33,6 @@ jobs:
           name: ho-truc-giang-diorama-qa
           path: |
             truc-giang-diorama-*.png
+            truc-giang-initial-*.png
             truc-giang-diorama-smoke.json
           if-no-files-found: ignore
