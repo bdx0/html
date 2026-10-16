@@ -43,6 +43,7 @@ try {
         fault:document.getElementById('fault').textContent,
         missingImages:document.querySelectorAll('img:not([src])').length};
     });
+    await page.screenshot({path:'truc-giang-initial-'+mode.name+'.png'}).catch(e=>errors.push('INITIAL SHOT: '+e));
     if(before.stats) {
       await page.locator('#night').click();
       await page.locator('#orbit').click();
