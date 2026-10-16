@@ -1,0 +1,424 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#ae93a0">
+<meta name="description" content="Hồ Trúc Giang Bến Tre — diorama thu nhỏ 3D tương tác phong cách Little Tokyo Rare 3D. Xoay, zoom, nhìn trên cao, chế độ ngày đêm. Bản minh họa hình học, không phải khảo sát GIS.">
+<meta name="catalog:category" content="Mô phỏng 3D">
+<meta name="catalog:tags" content="Bến Tre, Hồ Trúc Giang, Diorama, Three.js, Little Tokyo, 3D">
+<meta name="catalog:icon" content="🌳">
+<title>Hồ Trúc Giang — Miniature Diorama 3D</title>
+<style>
+:root{color-scheme:dark;--ink:#fff8ed;--glass:#292533cf;--line:#ffffff44;--peach:#ffcfab}
+*{box-sizing:border-box}html,body{height:100%;margin:0;overflow:hidden;overscroll-behavior:none}
+body{font:13px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);background:#bb9ba7}
+button,a{font:inherit}a{color:inherit;text-decoration:none}button{cursor:pointer}
+button:focus-visible,a:focus-visible{outline:3px solid #fff1c2;outline-offset:3px}
+#stage{position:relative;width:100%;height:100dvh;min-height:300px;overflow:hidden;background:radial-gradient(ellipse at 48% 27%,#ffe2c5 0%,#d9b7b5 52%,#978b9f 100%)}
+body.night #stage{background:radial-gradient(ellipse at 50% 30%,#676581,#333957 60%,#20283f)}
+#stage canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:grab}#stage canvas:active{cursor:grabbing}
+.hud{position:absolute;z-index:4;pointer-events:none}.hud>*{pointer-events:auto}
+.head{top:22px;left:25px;max-width:410px;text-shadow:0 3px 15px #3127368a}
+.tag{display:inline-flex;align-items:center;gap:7px;font-size:10px;font-weight:850;letter-spacing:.15em;text-transform:uppercase;background:#332a36a6;border:1px solid #ffffff40;padding:6px 10px;border-radius:40px;backdrop-filter:blur(8px)}
+.tag:before{content:"";width:7px;height:7px;background:#a5f1c8;border-radius:50%}
+.head h1{font-family:Georgia,"Times New Roman",serif;font-size:clamp(35px,4.4vw,67px);font-weight:650;line-height:.94;letter-spacing:-.05em;margin:15px 0 10px}
+.head h1 em{font-style:italic;color:#ffdfbc}.head p{font-size:12px;margin:0;font-weight:650;color:#fff4e8}
+.nav{top:20px;right:20px;display:flex;align-items:center;gap:8px}
+.nav a,.nav button{background:#282435a8;color:#fff7ec;border:1px solid var(--line);padding:9px 12px;border-radius:99px;font-size:11px;font-weight:750;backdrop-filter:blur(11px)}
+.nav a:hover,.nav button:hover{background:#4a384bc7}
+.tools{bottom:max(18px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);padding:6px;display:flex;align-items:center;gap:3px;border-radius:99px;background:var(--glass);border:1px solid var(--line);box-shadow:0 16px 55px #24203955;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);max-width:calc(100% - 15px)}
+.tools button{background:transparent;border:0;color:#fff5e7;padding:10px 12px;border-radius:40px;white-space:nowrap;min-height:39px;font-size:11px;font-weight:780}
+.tools button:hover,.tools button[aria-pressed="true"]{background:#ffffff25}
+.tools button.primary{background:var(--peach);color:#40313d}
+.sep{height:23px;width:1px;background:#ffffff36;margin:0 2px}
+.foot{left:24px;bottom:21px;font-size:11px;color:#fff5ea;text-shadow:0 2px 8px #5d4b54c0}
+.foot strong{font-size:10px;letter-spacing:.13em;display:block;text-transform:uppercase}
+.status{right:22px;bottom:22px;font-size:10px;color:#fff4e9;text-shadow:0 2px 7px #40323b}
+.panel{top:76px;right:20px;width:min(286px,calc(100vw - 35px));padding:18px;background:var(--glass);border:1px solid var(--line);border-radius:16px;box-shadow:0 18px 56px #30243844;backdrop-filter:blur(16px)}
+.panel[hidden],#fault[hidden],#debug[hidden]{display:none}.panel .x{position:absolute;right:10px;top:9px;background:#ffffff20;color:#fff;border:0;border-radius:8px;padding:4px 10px}
+.panel small{font-size:10px;letter-spacing:.14em;color:#ffd7ae;text-transform:uppercase;font-weight:800}
+.panel h2{margin:8px 0;font-size:19px;line-height:1.15}.panel p{font-size:12px;color:#eee4e0;line-height:1.65;margin:0}
+#fault,#debug{position:absolute;z-index:12;max-width:calc(100% - 28px);color:white;font:11px/1.6 ui-monospace,monospace;white-space:pre-wrap;overflow-wrap:anywhere;padding:15px;border-radius:12px}
+#fault{width:min(480px,95vw);left:50%;top:50%;transform:translate(-50%,-50%);background:#772a3a;border:1px solid #ffbba9}
+#debug{right:12px;bottom:81px;width:300px;max-height:40dvh;overflow:auto;background:#171c2aec;border:1px solid #ffffff44}
+.pill{position:absolute;z-index:3;left:50%;top:19px;transform:translateX(-50%);background:#fcf5e4d8;border:1px solid #fff;color:#675144;border-radius:99px;padding:6px 12px;font-size:10px;font-weight:780;pointer-events:none;white-space:nowrap}
+body.night .pill{background:#282c43e8;color:#f9e9db;border-color:#a4abc444}
+@media(max-width:930px){.foot{display:none}.status{bottom:74px;right:11px}.head{top:13px;left:13px}.nav{top:12px;right:12px}}
+@media(max-width:650px){
+.head h1{font-size:35px;margin:10px 0 6px}.head p{font-size:10px;max-width:220px}.tag{font-size:8px;padding:5px 8px}
+.nav{flex-direction:column;align-items:end;gap:4px}.nav a,.nav button{font-size:9px;padding:6px 9px}
+.pill{top:auto;bottom:70px;font-size:9px;padding:5px 9px}
+.tools{bottom:max(7px,env(safe-area-inset-bottom));width:calc(100% - 12px);border-radius:16px;gap:0;padding:5px;justify-content:space-between}
+.tools button{font-size:10px;padding:9px 5px;flex:1;min-width:0;min-height:40px}.sep{margin:0 1px}
+.status{right:10px;bottom:64px}.panel{top:auto;bottom:105px;left:10px;right:10px;width:min(320px,calc(100% - 20px));padding:13px}.panel h2{font-size:16px}.panel p{font-size:11px}
+}
+</style>
+</head>
+<body>
+<main id="stage" aria-label="Diorama Hồ Trúc Giang 3D">
+ <div class="hud head">
+  <span class="tag">Bến Tre · Miniature World</span>
+  <h1>Hồ Trúc Giang<br><em>Mini Diorama</em></h1>
+  <p>Thế giới thu nhỏ tương tác · Lấy cảm hứng từ Little Tokyo</p>
+ </div>
+ <div class="hud nav"><a href="./little-tokyo-rare3d-inspired.html">🏮 Little Tokyo</a><a href="./bo-ho-ben-tre/">↗ Bờ Hồ 3D</a><button id="helpBtn" type="button">ⓘ Chi tiết</button></div>
+ <div class="pill">MINH HỌA 3D · KHÔNG PHẢI RANH GIS ĐÃ XÁC MINH</div>
+ <div class="hud tools" role="toolbar" aria-label="Điều khiển diorama">
+  <button id="reset" class="primary" type="button" title="Về góc nhìn ban đầu">⌂ Đặt lại</button>
+  <button id="top" type="button" title="Nhìn từ trên xuống">⬡ TOP</button>
+  <button id="zoomIn" type="button" aria-label="Phóng to">＋</button>
+  <button id="zoomOut" type="button" aria-label="Thu nhỏ">−</button>
+  <span class="sep" aria-hidden="true"></span>
+  <button id="night" type="button" aria-pressed="false">☾ Đêm</button>
+  <button id="orbit" type="button" aria-pressed="false">◌ Xoay</button>
+  <button id="shot" type="button" title="Lưu ảnh PNG">▣ Ảnh</button>
+ </div>
+ <div class="hud foot"><strong>Trúc Giang · Collector Edition</strong>Kéo để xoay · Chụm hai ngón để thu phóng · Chạm công trình để xem</div>
+ <div class="hud status" id="status" aria-live="polite">Đang dựng mô hình…</div>
+ <aside class="hud panel" id="info" hidden><button id="closeInfo" class="x" type="button" aria-label="Đóng">×</button><small id="infoTag">Giới thiệu</small><h2 id="infoName"></h2><p id="infoText"></p></aside>
+ <div id="fault" role="alert" hidden></div><pre id="debug" hidden></pre>
+</main>
+<script src="./assets/three.min.js"></script>
+<script src="./assets/miniworld.js"></script>
+<script>
+(function(){
+"use strict";
+var T=window.THREE,M=window.MiniWorld;
+var host=document.getElementById("stage"),fault=document.getElementById("fault"),status=document.getElementById("status");
+function fail(e){fault.hidden=false;fault.textContent="Không khởi tạo được mô hình 3D:\n"+String(e&&e.stack||e);status.textContent="Lỗi WebGL";console.error(e);}
+if(!T||!M){fail("Không tìm thấy thư viện Three.js hoặc MiniWorld tại assets/.");return;}
+var renderer,scene,camera,world,sun,hemi,night=false,spin=false;
+var geometries=[],animators=[],pickables=[],lamps=[],labels=[],treeCount=0,buildingCount=0,carCount=0;
+var rng=M.rand(20261016),SIZE={w:121,d:82};
+function rand(a,b){return a+(b-a)*rng();}
+function choose(a){return a[Math.floor(rng()*a.length)];}
+function box(w,h,d,x,y,z,color,parent){return M.box(parent||world,w,h,d,x,y,z,color);}
+function cyl(r1,r2,h,x,y,z,color,parent,n){return M.cyl(parent||world,r1,r2,h,x,y,z,color,n||12);}
+function sphere(r,x,y,z,color,parent,sc){return M.sphere(parent||world,r,x,y,z,color,sc);}
+function tree(x,z,size,kind){
+ treeCount++;return M.tree(world,x,z,kind||"green",size||1);
+}
+function info(mesh,title,type,desc){mesh.userData.detail={title:title,type:type,desc:desc};pickables.push(mesh);}
+function markLine(x1,z1,x2,z2,w,color,y){
+ var dx=x2-x1,dz=z2-z1,len=Math.hypot(dx,dz);
+ var b=box(w,.075,len,(x1+x2)/2,y||.30,(z1+z2)/2,color);
+ b.rotation.y=Math.atan2(dx,dz);return b;
+}
+function street(ax,az,bx,bz,w){
+ markLine(ax,az,bx,bz,w,"#65656a",.37);
+ var len=Math.hypot(bx-ax,bz-az),n=Math.floor(len/6.5);
+ for(var i=0;i<n;i++){
+  var u=(i+.5)/n,t=3/len;
+  var mx=ax+(bx-ax)*u,mz=az+(bz-az)*u;
+  var b=box(.13,.012,2.0,mx,.435,mz,"#d9d5c9");b.rotation.y=Math.atan2(bx-ax,bz-az);
+ }
+}
+function crossing(x,z,acrossX){
+ for(var k=-3;k<=3;k++)if(acrossX)box(.52,.014,1.05,x+k*.78,.47,z,"#e9e3d9");
+ else box(1.05,.014,.52,x,.47,z+k*.78,"#e9e3d9");
+}
+function makeRing(poly,factor,innerFactor,y,color){
+ var verts=[],indices=[];
+ for(var i=0;i<poly.length;i++){
+  var p=poly[i],q=poly[(i+1)%poly.length];
+  var a=[p[0]*factor,p[1]*factor],b=[p[0]*innerFactor,p[1]*innerFactor],c=[q[0]*factor,q[1]*factor],d=[q[0]*innerFactor,q[1]*innerFactor];
+  var k=verts.length/3;verts.push(a[0],y,a[1],b[0],y,b[1],c[0],y,c[1],d[0],y,d[1]);indices.push(k,k+1,k+2,k+1,k+3,k+2);
+ }
+ var geo=new T.BufferGeometry();geo.setAttribute("position",new T.Float32BufferAttribute(verts,3));geo.setIndex(indices);geo.computeVertexNormals();
+ var mesh=new T.Mesh(geo,new T.MeshStandardMaterial({color:color,roughness:.96,side:T.DoubleSide}));
+ mesh.receiveShadow=true;world.add(mesh);geometries.push(geo);return mesh;
+}
+function lakeMesh(poly){
+ var shape=new T.Shape();poly.forEach(function(p,i){if(i===0)shape.moveTo(p[0],-p[1]);else shape.lineTo(p[0],-p[1]);});shape.closePath();
+ var geo=new T.ShapeGeometry(shape),mat=new T.MeshPhysicalMaterial({color:"#1c7187",roughness:.23,metalness:.18,transparent:true,opacity:.96,side:T.DoubleSide,clearcoat:.85,clearcoatRoughness:.18});
+ var water=new T.Mesh(geo,mat);water.rotation.x=-Math.PI/2;water.position.y=.22;water.receiveShadow=true;world.add(water);geometries.push(geo);
+ // Narrow curb along the boundary, separate from GIS source.
+ var pts=poly.map(function(p){return new T.Vector3(p[0],.36,p[1]);});
+ var curve=new T.CatmullRomCurve3(pts,true,"centripetal",.02);
+ var edge=new T.Mesh(new T.TubeGeometry(curve,270,.17,5,true),M.mat("#efe5d3"));
+ edge.receiveShadow=true;world.add(edge);geometries.push(edge.geometry);
+ info(water,"Hồ Trúc Giang","MẶT NƯỚC","Hình dáng hồ được minh họa theo những lần bạn điều chỉnh ảnh diorama: bờ bắc có các đoạn thẳng ngắn, bờ nam xiên, phía tây nở rộng và bờ đông bo tròn. Đây KHÔNG phải polygon tọa độ đã được khảo sát.");
+}
+function disk(r,x,z,color,y){
+ var o=new T.Mesh(new T.CylinderGeometry(r,r,.13,28),M.mat(color));o.position.set(x,y||.47,z);world.add(o);return o;
+}
+function lights(x,z){
+ cyl(.045,.08,2.45,x,1.5,z,"#546264");
+ var l=box(.48,.34,.48,x,2.75,z,"#fff0bf");l.material=M.mat("#fff3cf",{emissive:"#ffb963",emissiveIntensity:.14});lamps.push(l);
+}
+function bench(x,z){M.bench(world,x,z);}
+function vacant(x,z,w,d){
+ box(w,.13,d,x,.53,z,"#a48b61");
+ for(var k=0;k<9;k++){
+  var px=x+rand(-w*.44,w*.44),pz=z+rand(-d*.40,d*.40);
+  box(rand(.3,.9),rand(.04,.11),rand(.35,.8),px,.66,pz,choose(["#ad9a70","#8e9861","#b9a17b"]));
+ }
+}
+function building(x,z,w,d,h,palette,roof){
+ buildingCount++;
+ var g=new T.Group();g.position.set(x,0,z);world.add(g);
+ var main=box(w,h,d,0,.68+h/2,0,palette,g);
+ box(w+.25,.36,d+.28,0,.70,0,"#b0a69a",g);
+ if(roof){
+  M.roof(g,w+.25,d+.3,0,h+.76,0,choose(["#bb765b","#bd7e5c","#d09a73","#8d8580"]),Math.min(1.5,w*.15));
+ }else box(w+.35,.28,d+.35,0,h+.82,0,"#e6e0d3",g);
+ var cols=Math.max(2,Math.floor(w/1.65)),rows=Math.max(1,Math.floor(h/2.25));
+ for(var j=0;j<rows;j++)for(var i=0;i<cols;i++){
+  var px=-w/2+(i+.5)*w/cols,yy=1.5+j*2.05;
+  if(yy>h+.1)continue;
+  box(Math.min(.73,w/cols*.65),.82,.065,px,yy,d/2+.048,choose(["#719198","#c2d1c8","#777d8c"]),g);
+  box(Math.min(.73,w/cols*.65),.82,.065,px,yy,-d/2-.048,"#8ca1a3",g);
+ }
+ info(main,"Nhà phố mô phỏng","KIẾN TRÚC MINH HỌA","Khối nhà và chiều cao được dựng minh họa theo phong cách Little Tokyo, chưa có số đo as-built và không đại diện cho căn nhà cụ thể ngoài thực địa.");
+ return g;
+}
+function school(){
+ // School replaces the former fictitious alley. No road cuts through these grounds.
+ box(22,.14,13,33,.53,-36.7,"#b6c8aa");
+ var a=building(29,-39,9,6,4.6,"#eed2a6",true);
+ var b=building(39,-39,8,6,4.6,"#eac99b",true);
+ box(12,.12,4.2,34,.69,-31,"#e5ba98");
+ for(var i=0;i<4;i++){disk(.34,28+i*3,-31,choose(["#f0b76c","#8cacc4","#df829c"]),.79);cyl(.08,.08,.9,28+i*3,1.25,-31,"#e2e2cc");}
+ var sign=M.text(world,"TRƯỜNG MẪU GIÁO",33,5.65,-34,10,1.55,0,"#fff7e0","#bf7159");labels.push(sign);
+ info(a.children[0],"Trường mẫu giáo","CÔNG TRÌNH THEO GHI CHÚ","Người dùng xác nhận trường mẫu giáo ở phía đông-bắc. Khu này có sân trường và không có tuyến đường nội bộ xuyên qua vị trí được đánh dấu.");
+}
+function cafe(){
+ var x=54,z=-1;
+ building(x,z,6.5,8,4,"#dfaf87",true);
+ var awn=box(8,.21,2.7,x,3.25,z-4.35,"#b8754f");
+ var sign=M.text(world,"QUÁN CÀ PHÊ",x,5.2,z-4.13,5.7,1.15,Math.PI,"#f9e8bd","#704a35");labels.push(sign);
+ for(var i=0;i<3;i++){var zz=z-4.6+i*2.5;disk(.48,48.8,zz,"#eee0c6",1.1);cyl(.07,.09,.64,48.8,.73,zz,"#866750");}
+ info(awn,"Quán cà phê","VỊ TRÍ ĐÃ GHI NHẬN","Quán cà phê ở bên ngoài đường Nguyễn Trung Trực, theo ghi chú trực tiếp của bạn. Hình thức kiến trúc vẫn mang tính minh họa.");
+}
+function monument(){
+ // A park with no buildings.
+ box(9,.1,37,-54.2,.49,-1,"#9bb486");
+ for(var z=-17;z<=17;z+=7)tree(-56+rand(-1.5,1),z,.84);
+ for(var z=-17;z<=17;z+=7)tree(-52+rand(-1.5,.8),z+rand(-2,2),.74);
+ disk(4.3,-54,5,"#ddd2c1",.63);disk(2.5,-54,5,"#aaa48d",.74);
+ cyl(1,1.3,1.7,-54,1.52,5,"#8a8073",world,10);
+ var m=cyl(.34,.55,4.2,-54,4.45,5,"#b8b3a9",world,8);
+ sphere(.62,-54,6.8,5,"#c2bfad"); info(m,"Công viên Trần Văn Ơn","KHÔNG GIAN CÔNG CỘNG","Công viên phía tây hồ, KHÔNG đặt công trình nhà trong công viên. Tượng đài chỉ là ký hiệu 3D, không phải mô hình điêu khắc chính xác.");
+}
+function fountain(){
+ var x=18,z=1;
+ disk(2.45,x,z,"#c9c9ac",.42);
+ disk(1.8,x,z,"#83a9a4",.57);
+ cyl(.75,.95,.8,x,.94,z,"#c7c2aa",world,12);
+ cyl(.48,.65,.6,x,1.63,z,"#bdc8c2",world,12);
+ var jets=[];
+ for(var i=0;i<6;i++){
+  var a=i/6*Math.PI*2,px=x+Math.cos(a)*1.8,pz=z+Math.sin(a)*1.8;
+  var c=new T.Mesh(new T.CylinderGeometry(.07,.20,2.4,7),new T.MeshBasicMaterial({color:"#dbfcff",transparent:true,opacity:.72,depthWrite:false}));
+  c.position.set(px,1.85,pz);world.add(c);jets.push(c);
+ }
+ var middle=new T.Mesh(new T.CylinderGeometry(.10,.24,4.1,8),new T.MeshBasicMaterial({color:"#e1fbff",transparent:true,opacity:.75,depthWrite:false}));
+ middle.position.set(x,2.7,z);world.add(middle);
+ for(var q=0;q<3;q++){
+  var curve=new T.EllipseCurve(x,z,3.1+q*1.0,3.1+q*1.0,0,2*Math.PI,false,0);
+  var pts=curve.getPoints(90).map(function(v){return new T.Vector3(v.x,.32,v.y);});
+  var ring=new T.Mesh(new T.BufferGeometry().setFromPoints(pts),new T.LineBasicMaterial({color:"#a7d8db",transparent:true,opacity:.34}));
+  // EllipseCurve points form a line, not a mesh; use THREE.LineLoop.
+  var line=new T.LineLoop(ring.geometry,ring.material);world.add(line);geometries.push(line.geometry);
+ }
+ animators.push(function(t){jets.forEach(function(j,i){j.scale.y=.82+.18*Math.sin(t*3+i*.65);});middle.scale.y=.91+.09*Math.sin(t*2.3);});
+ info(middle,"Đài phun nước Hồ Trúc Giang","ĐIỂM NHẤN","Đài phun được bố trí lệch về phía đông theo ảnh tham chiếu. Hình thức và số vòi phun là mô phỏng nghệ thuật, cần đối chiếu hiện trạng nếu dựng digital twin.");
+}
+function cars(){
+ var colors=["#d3cfbd","#e5b669","#a66659","#8aa7a5","#ddd7d2","#4f5c69"];
+ for(var i=0;i<12;i++){
+  var x=-42+i*7.7;
+  M.car(world,x,-28.3,choose(colors),Math.PI/2);carCount++;
+  M.car(world,x+2,-25.6,choose(colors),-Math.PI/2);carCount++;
+ }
+ for(var i=0;i<14;i++){
+  var x=-45+i*6.9,z=27.1+(x+40)*.10;
+  M.car(world,x,z,choose(colors),Math.PI/2);carCount++;
+ }
+ for(var i=0;i<7;i++){
+  M.car(world,47.5,-21+i*7,choose(colors),0);carCount++;
+ }
+}
+function sceneBuild(){
+ // Wooden collectible plinth, stone inset and grass top.
+ box(SIZE.w,3.6,SIZE.d,0,-2.25,0,"#77412e");
+ box(SIZE.w+1.2,.55,SIZE.d+1.2,0,-4.22,0,"#4e302b");
+ box(SIZE.w+.4,.55,SIZE.d+.3,0,-.26,0,"#b18a63");
+ box(SIZE.w-1.5,.24,SIZE.d-1.5,0,.13,0,"#90a783");
+ // The brass plate faces the isometric camera.
+ box(30,2.9,.22,0,-2.24,41.16,"#cc9e5d");
+ var plate=M.text(world,"HỒ TRÚC GIANG · BẾN TRE",0,-2.24,41.35,28,2.45,0,"#372e28","#dcb477");labels.push(plate);
+ // Four lake-bordering streets, top street is continuous, no roads through school.
+ street(-52,-27.5,49,-26,6.7); // Hai Bà Trưng
+ street(-48,24,48,35,6.8); // Lê Quý Đôn, diagonal
+ street(-47,-31,-47,30,6.8); // Trần Quốc Tuấn
+ street(46.3,-30,46.3,34,6.2); // Nguyễn Trung Trực
+ crossing(-47,-27,true);crossing(46,-26,true);crossing(-47,24,true);crossing(46,35,true);
+ // Lake outline is an intentionally stylized *non-georeferenced* artistic mesh.
+ // Short flattened north segments; west bay widened; diagonal southern boundary.
+ var lake=[
+  [-37,-17.4],[-29,-19.2],[-21,-19.0],[-13,-18.6],[-5,-18.0],
+  [-1,-16.9],[5,-16.7],[11,-17.3],[18,-16.9],[28,-16.5],
+  [34,-15.2],[38,-12.3],[39.6,-7],[40.0,0],[40.0,9],[38.6,13.1],
+  [35.4,16.8],[31,18.0],[24,17.2],[14,15.1],[7,14.1],
+  [1,11.1],[-3,10.5],[-9,10.4],[-16,8.8],[-23,5.8],
+  [-31,3.1],[-35.3,-.7],[-37.2,-5.5],[-35.2,-10.2],[-38,-14.2]
+ ];
+ makeRing(lake,1.19,1.105,.31,"#93ad84"); // lawn outside
+ makeRing(lake,1.105,1.035,.40,"#d9c4a6"); // promenade
+ makeRing(lake,1.035,1.012,.44,"#eee3d0"); // thin edge curb
+ lakeMesh(lake);
+ // Shoreline trees and benches placed on the *outer* walkway, never in the lake.
+ for(var i=0;i<lake.length;i++){
+  var a=lake[i],b=lake[(i+1)%lake.length],len=Math.hypot(a[0]-b[0],a[1]-b[1]),n=Math.floor(len/5);
+  for(var j=0;j<n;j++){
+   var u=(j+.45)/n,x=(a[0]+(b[0]-a[0])*u)*1.16,z=(a[1]+(b[1]-a[1])*u)*1.16;
+   tree(x,z,rand(.64,.92),rng()<.11?"cherry":"green");
+  }
+ }
+ // Street-facing shade trees and lamps.
+ for(var x=-40;x<=41;x+=5.9){
+  tree(x,-23.1,rand(.65,.9),rng()<.13?"cherry":"green");
+  tree(x,22.1+(x+40)*.10,rand(.68,.84),"green");
+ }
+ for(var i=0;i<11;i++){lights(-37+i*7.7,-22);lights(-38+i*7.7,23+(i*7.7)*.1);}
+ for(var i=0;i<14;i++)bench(-36+i*5.6,-20.6+(i%2)*.5);
+ monument();
+ // North west vacant plots, twice confirmed by user. No residences in these lots.
+ vacant(-29,-36.5,14,9);vacant(-13,-36.5,11,9);
+ // North street frontage with varied Vietnamese urban rooflines.
+ var topXs=[-53,-48,-6,1,7,13,19,24];
+ topXs.forEach(function(x,i){building(x,-36.7,rand(4.6,6.8),rand(6.0,8.0),rand(4.2,8.3),choose(["#e9dec8","#f0e7d9","#d6c7ad","#f4e3c7"]),rng()>.45);});
+ school();
+ // Houses south of diagonal road, no guaranteed cadastral footprint.
+ for(var x=-54,i=0;x<54;x+=rand(5.2,7.1),i++){
+  var z=36.1+(x+45)*.1;
+  building(x,z,rand(4.2,6.4),rand(5.0,7.3),rand(3.9,8.7),choose(["#f0e0c9","#e9e2d5","#ddcfb9","#e6dbc7"]),rng()>.5);
+ }
+ // Buildings near the eastern street, keep café landmark and continuous street.
+ for(var z=-24;z<=29;z+=8){if(Math.abs(z+1)<11)continue;building(54,z,5.7,6.3,rand(5.2,9),choose(["#e7d9c7","#ede1ce","#dfc8aa"]),rng()>.5);}
+ cafe();fountain();
+ // Extra trees in the west lakeside park, never a house.
+ for(var i=0;i<23;i++){var x=rand(-44,-39),z=rand(-20,19);if(Math.abs(z+1)<4)continue;tree(x,z,rand(.67,1.03),rng()<.1?"cherry":"green");}
+ for(var i=0;i<12;i++){var xx=rand(-35,38),zz=rand(20,24);tree(xx,zz,rand(.67,.88),rng()<.17?"cherry":"green");}
+ cars();
+ // Tiny pedestrians.
+ for(var i=0;i<35;i++){
+  var px=rand(-39,41),pz=i%2?-22:22+(px+40)*.10;
+  M.person(world,px,pz,choose(["#c87877","#7197ad","#d5aa66","#87a886"]));
+ }
+ // Ground lettering deliberately omitted: road labels are HUD to avoid visual aliasing.
+}
+try{
+ renderer=new T.WebGLRenderer({antialias:true,alpha:true,powerPreference:"high-performance",preserveDrawingBuffer:true});
+ renderer.setClearColor(0x000000,0);
+ renderer.setPixelRatio(Math.min(devicePixelRatio||1,innerWidth<650?1.3:1.75));
+ renderer.shadowMap.enabled=innerWidth>800;renderer.shadowMap.type=T.PCFSoftShadowMap;
+ if("outputColorSpace" in renderer)renderer.outputColorSpace=T.SRGBColorSpace;else renderer.outputEncoding=T.sRGBEncoding;
+ renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.28;
+ host.insertBefore(renderer.domElement,host.firstChild);
+ scene=new T.Scene();world=new T.Group();scene.add(world);
+ camera=new T.PerspectiveCamera(36,1,.15,640);
+ sun=new T.DirectionalLight(0xffddba,2.75);sun.position.set(-57,115,53);sun.castShadow=renderer.shadowMap.enabled;
+ sun.shadow.mapSize.set(2048,2048);sun.shadow.camera.left=-85;sun.shadow.camera.right=85;sun.shadow.camera.top=85;sun.shadow.camera.bottom=-85;sun.shadow.normalBias=.03;scene.add(sun);
+ hemi=new T.HemisphereLight(0xe2edff,0xc4a991,2.1);scene.add(hemi);scene.add(new T.AmbientLight(0xffffff,.15));
+ sceneBuild();
+}catch(e){fail(e);return;}
+var initial={yaw:.29,pitch:.75,zoom:1},aim={yaw:.29,pitch:.75,zoom:1},view={yaw:.29,pitch:.75,zoom:1};
+var w=1,h=1,last=performance.now(),t=0,lastAct=performance.now(),frame=0,lastFps=performance.now(),fps=0,points=new Map(),moved=false,pinch=0;
+function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
+function resize(){
+ w=Math.max(1,host.clientWidth);h=Math.max(1,host.clientHeight);
+ renderer.setSize(w,h,false);camera.aspect=w/h;camera.fov=w/h<.68?48:w/h<1?42:36;camera.updateProjectionMatrix();
+}
+function renderCamera(dt){
+ var k=Math.min(1,dt*8);
+ for(var key of ["yaw","pitch","zoom"])view[key]+=(aim[key]-view[key])*k;
+ var aspect=w/h,dist=(aspect<.65?208:aspect<1?160:143)*view.zoom,focus=1.0;
+ camera.position.set(Math.sin(view.yaw)*Math.cos(view.pitch)*dist,focus+Math.sin(view.pitch)*dist,Math.cos(view.yaw)*Math.cos(view.pitch)*dist);
+ camera.lookAt(0,focus,0);
+}
+function userAction(){lastAct=performance.now();}
+var canvas=renderer.domElement;
+canvas.addEventListener("pointerdown",function(e){
+ if(e.button!==0&&e.pointerType!=="touch")return;
+ e.preventDefault();if(!points.size)moved=false;points.set(e.pointerId,{x:e.clientX,y:e.clientY});
+ if(points.size>=2){var a=Array.from(points.values());pinch=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);}
+ userAction();try{canvas.setPointerCapture(e.pointerId);}catch(_){}
+});
+canvas.addEventListener("pointermove",function(e){
+ var p=points.get(e.pointerId);if(!p)return;
+ var dx=e.clientX-p.x,dy=e.clientY-p.y;p.x=e.clientX;p.y=e.clientY;
+ if(Math.abs(dx)+Math.abs(dy)>2)moved=true;
+ if(points.size===1){aim.yaw-=dx*.008;aim.pitch=clamp(aim.pitch+dy*.006,.22,1.52);}
+ else if(points.size>=2){var arr=Array.from(points.values()),d=Math.hypot(arr[0].x-arr[1].x,arr[0].y-arr[1].y);if(pinch)aim.zoom=clamp(aim.zoom*pinch/Math.max(10,d),.52,2.7);pinch=d;moved=true;}
+ userAction();
+});
+function pointerEnd(e){
+ if(!points.has(e.pointerId))return;
+ var tapped=points.size===1&&!moved&&e.type==="pointerup";
+ points.delete(e.pointerId);pinch=0;
+ if(!tapped)return;
+ var rect=canvas.getBoundingClientRect(),ndc=new T.Vector2((e.clientX-rect.left)/rect.width*2-1,1-(e.clientY-rect.top)/rect.height*2);
+ var ray=new T.Raycaster();ray.setFromCamera(ndc,camera);
+ var found=ray.intersectObjects(pickables,false)[0];
+ if(found&&found.object.userData.detail)showInfo(found.object.userData.detail);else document.getElementById("info").hidden=true;
+}
+["pointerup","pointercancel","lostpointercapture"].forEach(function(k){canvas.addEventListener(k,pointerEnd);});
+canvas.addEventListener("wheel",function(e){e.preventDefault();aim.zoom=clamp(aim.zoom*Math.exp(e.deltaY*.001),.52,2.7);userAction();},{passive:false});
+canvas.addEventListener("contextmenu",function(e){e.preventDefault();});
+canvas.addEventListener("webglcontextlost",function(e){e.preventDefault();fail("WebGL context lost — hãy tải lại trang.");});
+addEventListener("resize",resize);resize();
+function showInfo(i){
+ document.getElementById("infoTag").textContent=i.type;
+ document.getElementById("infoName").textContent=i.title;
+ document.getElementById("infoText").textContent=i.desc;
+ document.getElementById("info").hidden=false;
+}
+document.getElementById("helpBtn").onclick=function(){showInfo({type:"GIỚI THIỆU",title:"Hồ Trúc Giang · Diorama 3D",desc:"Trang WebGL thu nhỏ theo các ghi chú chỉnh ảnh của bạn. Bờ hồ là hình minh họa, không thay thế OSM way 217484891 hoặc scene.json của dự án Digital Twin. Kéo/chạm để xoay; cuộn hoặc chụm hai ngón để zoom; có chế độ TOP và ngày/đêm."});};
+document.getElementById("closeInfo").onclick=function(){document.getElementById("info").hidden=true;};
+document.getElementById("reset").onclick=function(){Object.assign(aim,initial);userAction();};
+document.getElementById("top").onclick=function(){aim.yaw=0;aim.pitch=1.555;aim.zoom=1.0;userAction();};
+document.getElementById("zoomIn").onclick=function(){aim.zoom=clamp(aim.zoom*.81,.52,2.7);userAction();};
+document.getElementById("zoomOut").onclick=function(){aim.zoom=clamp(aim.zoom*1.2,.52,2.7);userAction();};
+document.getElementById("orbit").onclick=function(){spin=!spin;this.setAttribute("aria-pressed",String(spin));userAction();};
+document.getElementById("night").onclick=function(){
+ night=!night;document.body.classList.toggle("night",night);sun.intensity=night?.35:2.75;hemi.intensity=night?.58:2.1;
+ sun.color.set(night?0x9eb8ff:0xffddba);renderer.toneMappingExposure=night?1.48:1.28;
+ lamps.forEach(function(o){o.material.emissiveIntensity=night?2.5:.14;});this.setAttribute("aria-pressed",String(night));this.textContent=night?"☀ Ngày":"☾ Đêm";
+};
+document.getElementById("shot").onclick=function(){
+ try{renderer.render(scene,camera);var a=document.createElement("a");a.href=canvas.toDataURL("image/png");a.download="ho-truc-giang-diorama.png";a.click();}catch(e){fail(e);}
+};
+addEventListener("keydown",function(e){
+ if(e.key==="ArrowLeft")aim.yaw-=.1;
+ else if(e.key==="ArrowRight")aim.yaw+=.1;
+ else if(e.key==="+"||e.key==="=")aim.zoom=clamp(aim.zoom*.86,.52,2.7);
+ else if(e.key==="-")aim.zoom=clamp(aim.zoom*1.13,.52,2.7);
+ else return;userAction();
+});
+if(matchMedia("(prefers-reduced-motion: reduce)").matches){spin=false;document.getElementById("orbit").disabled=true;}
+window.__trucGiangDiorama={
+ scene:scene,camera:camera,renderer:renderer,zoomIn:function(){aim.zoom=clamp(aim.zoom*.8,.52,2.7);},
+ stats:function(){return{fps:fps,drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,trees:treeCount,buildings:buildingCount,cars:carCount,night:night,spin:spin,viewport:[w,h],zoom:view.zoom,yaw:view.yaw,pitch:view.pitch,illustrative:true};}
+};
+function animate(now){
+ requestAnimationFrame(animate);
+ var dt=Math.min(.05,Math.max(.001,(now-last)/1000));last=now;
+ if(document.hidden)return;
+ t+=dt;if(spin&&now-lastAct>2500)aim.yaw+=dt*.11;
+ animators.forEach(function(fn){fn(t);});renderCamera(dt);
+ try{renderer.render(scene,camera);}catch(e){fail(e);return;}
+ frame++;
+ if(now-lastFps>1200){
+  fps=Math.round(1000*frame/(now-lastFps));frame=0;lastFps=now;
+  status.textContent="3D LIVE · "+fps+" FPS";
+  if(!document.getElementById("debug").hidden)document.getElementById("debug").textContent=JSON.stringify(window.__trucGiangDiorama.stats(),null,2);
+ }
+}
+requestAnimationFrame(animate);
+})();
+</script>
+</body>
+</html>
