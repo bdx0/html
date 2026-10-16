@@ -1,5 +1,16 @@
 # Hồ Trúc Giang / Bờ Hồ Bến Tre — Digital Twin (vùng 300m)
 
+## N/E/S/W đồng bộ cho CAD/GIS và Model View (2026-10-16)
+
+**Bốn hướng nhìn dùng chung:** `N` = Bắc ở trên (0°), `E` = Đông ở trên (90°), `S` = Nam ở trên (180°), `W` = Tây ở trên (270°). Đây là **góc xoay mặt bằng trên màn hình**, không phải camera đứng nhìn từ phía Bắc/Đông trong 3D. Nút hướng và mũi tên Bắc đều thay đổi, có thể quay về N nhanh. Bố cục mobile giữ nút bấm nhỏ gọn, không thêm drawer. Lựa chọn lưu tại localStorage `bdx0:truc-giang:view-direction-v1`; chuyển `cad-gis.html` ↔ `model.html` giữ nguyên, hai tab cập nhật thông qua `storage` event. Có thể override khi mở trang bằng query `?dir=north|east|south|west`.
+
+- `map-orientation.js` chứa định nghĩa duy nhất `rotate(x,z)` / `unrotate(x,z)`: kinh tuyến tăng = +x Đông; vĩ tuyến tăng = +z Bắc; hướng 90° làm vector Đông quay thành hướng lên. Với Model View, mọi vị trí OSM WGS84 chuyển theo projection *và* reverse-projection tương ứng; pan một ngón, wheel zoom neo vị trí, hit-test các thực thể, lớp mốc kiểm chứng, và highlight bờ đều phải giữ địa lý chuẩn.
+- `model.html`: thanh bốn hướng `#modelDirectionBar`, mũi tên `#modelNorthArrow`, `TrucGiangModelMap.getOrientation()/projectLocal()/invert()`; hình học 2D, lưới và vị trí ghim xoay cùng nhau. `shoreline-review.js` cũng xoay vector pháp tuyến để badge đoạn bờ nằm đúng phía.
+- `cad-gis.html`: `#cadDirectionBar`, `#cadNorthArrow`, một SVG group xoay **chỉ cho hiển thị** quanh tâm bản vẽ. Khi click/kéo đỉnh edit sử dụng inverse `cadRotated.getScreenCTM().inverse()`; pan/zoom dùng CTM của SVG viewBox; nhãn CAD được phản xoay cho dễ đọc. Tọa độ bản vẽ `ring_image_pixels`, GeoJSON WGS84 *suy diễn*, DXF mét *danh nghĩa* và SQLite **không bị biến đổi**.
+- **Giới hạn nguồn quan trọng:** CAD/GIS chứa vector số hóa từ **ảnh minh họa**, góc Bắc thật/GCP chưa xác minh. Bốn hướng chỉ thống nhất cách hiển thị, **không tạo ra độ chính xác georeference mà dữ liệu chưa có**. Model View dùng tọa độ OSM thực nhưng chính đường bờ OSM vẫn chưa khảo sát xác minh.
+- `scripts/test_ben_tre.mjs` kiểm từng hướng, quy luật Đông/phải – Đông/lên – Đông/trái – Đông/xuống, phép chiếu ngược, zoom out/in, tính bất biến của CAD ring/GeoJSON/DXF, và chia sẻ hướng CAD → Model trên desktop/mobile. Các tests trên GitHub Actions vẫn cần quan sát kết quả chạy.
+
+
 ## Fix zoom-out · giữ hướng Bắc và tọa độ (2026-10-15)
 
 - Khi zoom out bằng **hai ngón**, cờ `pinchGestureActive` duy trì cho đến khi nhả hết ngón. Ngón tay còn lại sau pinch không được âm thầm chuyển `viewPreset="top"` thành `orbit`. Chạm la bàn **N** trở về TOP Bắc lên trên, Đông sang phải.
