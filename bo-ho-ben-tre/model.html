@@ -101,6 +101,23 @@ header nav a{white-space:nowrap;border-radius:8px;border:1px solid #d8e4f3;backg
  #detailContent{padding:0 16px 40px}
  .detail-title{font-size:20px}.fact{grid-template-columns:39% minmax(0,1fr)}
 }
+
+/* Shared four-cardinal GIS display orientation; screen only, no OSM mutation. */
+.model-direction-bar{flex:0 0 auto;display:flex;align-items:center;gap:6px;
+  padding:6px 11px;background:#f6faff;border-bottom:1px solid #dce6f3;
+  min-width:0;overflow-x:auto;scrollbar-width:none;z-index:2}
+.model-direction-bar strong{color:#7086a1;font-size:9px;letter-spacing:.06em;white-space:nowrap;margin-right:4px}
+.model-direction-bar button{min-height:30px;white-space:nowrap;border:1px solid #d5e1ef;background:white;
+  border-radius:8px;padding:5px 9px;color:#33587f;font-weight:800;font-size:11px}
+.model-direction-bar button.selected{background:#286aff;border-color:#286aff;color:white}
+.model-direction-compass{margin-left:auto;display:grid;place-items:center;min-width:48px;font-size:11px;color:#d33b44;font-weight:900;flex:0 0 auto}
+#modelNorthArrow{display:inline-block;transform-origin:center;transition:transform .14s ease}
+@media(max-width:760px){
+ .model-direction-bar{padding:3px 7px;gap:3px}
+ .model-direction-bar strong{display:none}
+ .model-direction-bar button{min-height:28px;font-size:10px;padding:4px 7px}
+ .model-direction-compass{min-width:39px;font-size:9px}
+}
 </style>
 </head>
 <body>
@@ -127,8 +144,16 @@ header nav a{white-space:nowrap;border-radius:8px;border:1px solid #d8e4f3;backg
   <div class="listfooter"><span id="listCount">Đang tải…</span> · chọn đối tượng để xem thuộc tính và quan hệ</div>
  </aside>
  <section class="map-region" aria-label="Mặt bằng mô hình không gian">
-  <div class="map-head"><div><strong>⌖ MẶT BẰNG DỮ LIỆU</strong><small>Bắc hướng lên · Tọa độ WGS84 / hiển thị mét tương đối</small></div>
+  <div class="map-head"><div><strong>⌖ MẶT BẰNG DỮ LIỆU</strong><small id="modelDirectionSubtitle">Bắc hướng lên · Tọa độ WGS84 / hiển thị mét tương đối</small></div>
    <div class="map-controls"><button id="zoomOut" title="Thu nhỏ" aria-label="Thu nhỏ bản đồ">−</button><button id="zoomIn" title="Phóng to" aria-label="Phóng to bản đồ">+</button><button id="resetMap" title="Đặt lại" aria-label="Đặt lại mặt bằng">⌖</button></div></div>
+  <div class="model-direction-bar" id="modelDirectionBar" role="group" aria-label="Chọn hướng bản đồ theo la bàn">
+    <strong>HƯỚNG NHÌN</strong>
+    <button type="button" data-map-direction="north" aria-label="Bắc ở phía trên">N · Bắc</button>
+    <button type="button" data-map-direction="east" aria-label="Đông ở phía trên">E · Đông</button>
+    <button type="button" data-map-direction="south" aria-label="Nam ở phía trên">S · Nam</button>
+    <button type="button" data-map-direction="west" aria-label="Tây ở phía trên">W · Tây</button>
+    <span id="modelCompass" class="model-direction-compass" aria-label="Mũi tên Bắc địa lý"><b id="modelNorthArrow">↑ N</b></span>
+  </div>
   <canvas id="map" aria-label="Mặt bằng tương tác nguồn OSM, chọn hồ hoặc công trình" tabindex="0"></canvas>
   <div class="map-bottom"><div class="legend"><span><i style="background:#70b8f3"></i> MẶT NƯỚC</span><span><i style="background:#97c9a8"></i> CÔNG VIÊN</span><span><i style="background:#becada"></i> CÔNG TRÌNH</span><span><i style="background:#9caec8"></i> ĐƯỜNG</span></div>
   <span class="coords" id="coords">N ↑ · 50 m</span></div>
@@ -140,12 +165,14 @@ header nav a{white-space:nowrap;border-radius:8px;border:1px solid #d8e4f3;backg
 </div>
 </div>
 <div id="loading" role="status">Đang xây dựng các thực thể và quan hệ từ bản xuất SQLite…</div>
+<script src="map-orientation.js?v=20261016-cardinal"></script>
 <script src="shoreline-controls.js"></script>
 <script src="shoreline-review.js"></script>
 <script>
 (function(){
 "use strict";
 const $=id=>document.getElementById(id);
+const orientation=window.TrucGiangOrientation;
 const formats={water:["Hồ / nước","≈"],road:["Đường","═"],building:["Công trình","▥"],park:["Công viên","♧"],landmark:["Địa điểm","⌖"],
  hotspot:["Ghim ảnh","◉"],photo:["Ảnh chứng cứ","▧"],zone:["Phân khu","▤"],requirement:["Yêu cầu","✓"],
  shot:["Góc chụp","◎"],price:["Giá tham chiếu","₫"],cost:["Chi phí","₫"],source:["Nguồn","↗"],survey:["Khảo sát","⌾"]};
@@ -255,8 +282,17 @@ let scale=Math.min(box.width/730,box.height/650)*state.map.zoom;
 state.last={w:box.width,h:box.height,scale:scale};
 return {g:g,w:box.width,h:box.height,k:scale}
 }
-function project(lonlat){let m=coords(lonlat),p=state.last;return{x:p.w*.5+(m.x-state.map.panX)*p.scale,y:p.h*.5-(m.z-state.map.panZ)*p.scale}}
-function invert(x,y){let p=state.last;if(!p)return null;return{x:state.map.panX+(x-p.w*.5)/p.scale,z:state.map.panZ-(y-p.h*.5)/p.scale}}
+function projectLocal(x,z){
+ let p=state.last;if(!p)return null;
+ let v=orientation.rotate(x-state.map.panX,z-state.map.panZ);
+ return{x:p.w*.5+v.x*p.scale,y:p.h*.5-v.z*p.scale}
+}
+function project(lonlat){let m=coords(lonlat);return projectLocal(m.x,m.z)}
+function invert(x,y){
+ let p=state.last;if(!p)return null;
+ let v=orientation.unrotate((x-p.w*.5)/p.scale,-(y-p.h*.5)/p.scale);
+ return{x:state.map.panX+v.x,z:state.map.panZ+v.z}
+}
 function drawGeom(g,node,color,fill=false,strokeWidth=1.4){
 const geometry=node.geometry;if(!geometry)return;let polys=[];
 if(geometry.type==="Polygon")polys=[geometry.coordinates[0]];
@@ -277,9 +313,10 @@ g.fillStyle="#f8fbff";g.fillRect(0,0,w,h);
 let gridStep=50;
 g.strokeStyle="#e5edf8";g.lineWidth=1;
 for(let i=-12;i<=12;i++){
-let x=w/2+(i*gridStep-state.map.panX)*k,y=h/2-(i*gridStep-state.map.panZ)*k;
-if(x>=0&&x<w){g.beginPath();g.moveTo(x,0);g.lineTo(x,h);g.stroke()}
-if(y>=0&&y<h){g.beginPath();g.moveTo(0,y);g.lineTo(w,y);g.stroke()}
+ let x=i*gridStep,xa=projectLocal(x,-650),xb=projectLocal(x,650);
+ g.beginPath();g.moveTo(xa.x,xa.y);g.lineTo(xb.x,xb.y);g.stroke();
+ let y=i*gridStep,ya=projectLocal(-650,y),yb=projectLocal(650,y);
+ g.beginPath();g.moveTo(ya.x,ya.y);g.lineTo(yb.x,yb.y);g.stroke();
 }
 let kindColor={road:"#a7b7ce",park:"#8fc7a4",building:"#a3b3c7",water:"#4b9bdd"};
 let kindFill={park:"#d8efdf",building:"#d6dfeb",water:"#bfe3fd"};
@@ -305,11 +342,11 @@ if(s?.geometry){
 }
 if(window.TrucGiangReview&&state.selected==="osm-way-217484891")
  TrucGiangReview.draw(g,project,k);
-g.font="bold 11px system-ui";g.fillStyle="#3264a2";g.fillText("N ↑",16,22);
+g.font="bold 11px system-ui";g.fillStyle="#3264a2";g.fillText(orientation.label()+" ↑ · "+orientation.degree()+"°",16,22);
 let meter=50*k;g.lineWidth=2;g.strokeStyle="#375b83";g.beginPath();g.moveTo(20,h-25);g.lineTo(20+meter,h-25);
 g.moveTo(20,h-30);g.lineTo(20,h-20);g.moveTo(20+meter,h-30);g.lineTo(20+meter,h-20);g.stroke();
 g.font="10px system-ui";g.fillText("50 m",21,h-33);
-$("coords").textContent="X Đông · Z Bắc · "+Math.round(1/k*100)+" cm/px (minh họa)";
+$("coords").textContent=orientation.label()+" ↑ · N địa lý · "+Math.round(1/k*100)+" cm/px";
 }
 function distanceLine(p,a,b){let x=p.x,y=p.z,ax=a.x,ay=a.z,bx=b.x,by=b.z,dx=bx-ax,dy=by-ay,t=Math.max(0,Math.min(1,((x-ax)*dx+(y-ay)*dy)/(dx*dx+dy*dy||1)));return Math.hypot(x-ax-t*dx,y-ay-t*dy)}
 function pointInRing(p,pts){let inside=false;for(let i=0,j=pts.length-1;i<pts.length;j=i++){
@@ -355,21 +392,47 @@ function focusShoreReview(){
  }
  redraw()
 }
+function syncDirection(){
+ $("modelDirectionSubtitle").textContent=orientation.label()+" hướng lên · WGS84 · "+orientation.degree()+"° từ Bắc";
+ $("modelNorthArrow").style.transform="rotate("+(-orientation.degree())+"deg)";
+ if(state.data)redraw()
+}
+window.TrucGiangModelMap={
+ getOrientation:()=>({direction:orientation.get(),heading:orientation.degree(),northUp:orientation.get()==="north",
+  zoom:state.map.zoom,panX:state.map.panX,panZ:state.map.panZ}),
+ projectLocal:(x,z)=>projectLocal(x,z),
+ invert:(x,y)=>invert(x,y),
+ setDirection:v=>orientation.set(v)
+};
 function initializeMap(){
 let canvas=state.canvas=$("map"),drag=null;
 canvas.addEventListener("pointerdown",e=>{canvas.setPointerCapture(e.pointerId);drag={x:e.clientX,y:e.clientY,startX:e.clientX,startY:e.clientY,dragged:false}});
 canvas.addEventListener("pointermove",e=>{if(!drag||!state.last)return;let dx=e.clientX-drag.x,dy=e.clientY-drag.y;
 if(Math.hypot(e.clientX-drag.startX,e.clientY-drag.startY)>6)drag.dragged=true;
-if(drag.dragged){state.map.panX-=dx/state.last.scale;state.map.panZ+=dy/state.last.scale;redraw()}
+if(drag.dragged){
+ let shift=orientation.unrotate(dx/state.last.scale,-dy/state.last.scale);
+ state.map.panX-=shift.x;state.map.panZ-=shift.z;redraw()
+}
 drag.x=e.clientX;drag.y=e.clientY
 });
 canvas.addEventListener("pointerup",e=>{if(!drag)return;let was=drag.dragged;drag=null;
 if(!was){let rect=canvas.getBoundingClientRect();onMapClick(e.clientX-rect.left,e.clientY-rect.top)}});
 canvas.addEventListener("pointercancel",()=>{drag=null});
-canvas.addEventListener("wheel",e=>{e.preventDefault();state.map.zoom=Math.max(.65,Math.min(9,state.map.zoom*Math.exp(-e.deltaY*.0014)));redraw()},{passive:false});
+canvas.addEventListener("wheel",e=>{
+ e.preventDefault();
+ let rect=canvas.getBoundingClientRect(),sx=e.clientX-rect.left,sy=e.clientY-rect.top;
+ let before=invert(sx,sy);
+ state.map.zoom=Math.max(.65,Math.min(9,state.map.zoom*Math.exp(-e.deltaY*.0014)));
+ redraw();
+ let after=invert(sx,sy);
+ if(before&&after){state.map.panX+=before.x-after.x;state.map.panZ+=before.z-after.z;redraw()}
+},{passive:false});
 $("zoomIn").onclick=()=>{state.map.zoom=Math.min(9,state.map.zoom*1.28);redraw()};
 $("zoomOut").onclick=()=>{state.map.zoom=Math.max(.65,state.map.zoom/1.28);redraw()};
 $("resetMap").onclick=()=>{state.map={zoom:1,panX:0,panZ:0,gesture:null};redraw()};
+orientation.bindControls($("modelDirectionBar"));
+orientation.onChange(syncDirection);
+syncDirection();
 $("search").oninput=e=>{state.q=e.target.value;renderList()};
 $("detailClose").onclick=()=>{$("details").classList.remove("open")};
 document.addEventListener("keydown",e=>{if(e.key==="Escape")$("details").classList.remove("open")});
