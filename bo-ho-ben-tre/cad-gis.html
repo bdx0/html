@@ -10,20 +10,47 @@ main{height:calc(100dvh - 60px);display:grid;grid-template-columns:220px minmax(
 #legend{position:absolute;bottom:10px;left:10px;background:#ffffffec;padding:7px 10px;border:1px solid #d7e5ee;border-radius:8px;font-size:10px;color:#516e87}
 #status{font-size:11px;color:#526f8f;margin:5px 0}
 @media(max-width:800px){main{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) auto}header{height:57px;padding:7px 9px}header strong{font-size:12px}header nav{gap:5px;font-size:10px}main{height:calc(100dvh - 57px)}#viewport{grid-row:1;grid-column:1;min-height:200px}#layersSide{grid-row:2;grid-column:1;max-height:26dvh;border:0;overflow:auto;border-top:1px solid #dce6f0}#layerList{display:grid;grid-template-columns:1fr 1fr;column-gap:8px}#inspector{position:fixed;z-index:9;bottom:0;left:0;right:0;height:min(68dvh,600px);transform:translateY(105%);transition:transform .2s ease;border-radius:14px 14px 0 0;box-shadow:0 -10px 30px #182d4144}#inspector.open{transform:none}#closeInfo{display:inline-block!important}#tools button{font-size:10px;padding:6px}}
+
+/* Display-only 4-cardinal orientation; sketch georeference unverified. */
+#cadDirectionBar{position:absolute;z-index:5;right:9px;bottom:9px;display:flex;gap:4px;align-items:center;
+ padding:6px;background:#ffffffef;border:1px solid #cad9eb;box-shadow:0 4px 15px #1d3f6033;border-radius:11px;max-width:calc(100% - 18px)}
+#cadDirectionBar button{font-size:11px;min-width:33px;min-height:34px;padding:5px 7px}
+#cadDirectionBar button.selected{background:#286aff;color:#fff;border-color:#286aff}
+.cad-dir-hint{font-size:9px;color:#7288a4;font-weight:900;white-space:nowrap;margin-right:4px}
+.cad-dir-readout{font-size:10px;color:#456583;font-weight:750;white-space:nowrap;padding-left:4px}
+.cad-dir-arrow{min-width:37px;display:grid;place-items:center;color:#d23142;font-size:11px;font-weight:900}
+#cadNorthArrow{display:inline-block;transform-origin:center;transition:transform .14s}
+@media(max-width:800px){
+ #cadDirectionBar{bottom:7px;right:7px;padding:4px;gap:3px}
+ .cad-dir-hint{display:none}
+ .cad-dir-readout{font-size:9px}
+ #cadDirectionBar button{min-width:32px;min-height:34px;padding:5px}
+ #legend{bottom:53px;left:7px;font-size:9px;max-width:calc(100% - 14px)}
+}
+@media(max-width:380px){.cad-dir-readout{display:none}#cadDirectionBar{gap:4px}}
 </style></head><body>
 <header><div><strong>▧ Hồ Trúc Giang / CAD · GIS</strong><small>FLOOR PLAN · VECTOR TÁCH LỚP</small></div><nav><a href="./">3D</a><a href="model.html">Model</a><a href="sqlite.html">SQLite</a></nav></header>
-<main><aside id="layersSide"><h2>11 lớp CAD/GIS · nháp</h2><div id="layerList"></div><div class="buttons"><button id="all">Hiện tất cả</button><button id="core">Đường bờ</button></div><div class="warning">Vector số hóa từ ảnh minh họa AI, chưa được khảo sát hoặc căn chỉnh tọa độ chuẩn. Lớp OSM chỉ dùng so sánh; không thay đổi dữ liệu SQLite gốc.</div></aside>
-<section id="viewport"><svg id="map" viewBox="0 0 1448 1086" xmlns="http://www.w3.org/2000/svg" aria-label="Bản vẽ vector Hồ Trúc Giang"><defs><linearGradient id="sea" x2="1" y2="1"><stop stop-color="#9bdde3"/><stop offset=".6" stop-color="#63b6c7"/><stop offset="1" stop-color="#277e9e"/></linearGradient><pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse"><path d="M50 0H0V50" fill="none" stroke="#dbe6df" stroke-width="1"/></pattern></defs><rect width="1448" height="1086" fill="#edf3e8"/><rect width="1448" height="1086" fill="url(#grid)"/><g id="drawing"></g><g id="labels"></g><g id="handles"></g></svg>
-<div id="tools"><button id="edit">✎ Chỉnh đường bờ</button><button id="undo">↶</button><button id="redo">↷</button><div class="grow"></div><button id="minus">−</button><span id="zoom">100%</span><button id="plus">+</button><button id="reset">⌂</button><button id="openInfo">☷</button></div><div id="legend">Hồng: đường bờ nháp · Tím nét đứt: OSM · Đỏ: điểm cần duyệt</div></section>
+<main><aside id="layersSide"><h2>11 lớp CAD/GIS · nháp</h2><div id="layerList"></div><div class="buttons"><button id="all">Hiện tất cả</button><button id="core">Đường bờ</button></div><div class="warning">N/E/S/W chỉ xoay bản vẽ trên màn hình cùng quy tắc Model View. <b>Góc Bắc thực của ảnh minh họa chưa được xác minh</b>, nên không coi bản nháp là đã căn GPS. OSM/SQLite không đổi.</div></aside>
+<section id="viewport"><svg id="map" viewBox="0 0 1448 1086" xmlns="http://www.w3.org/2000/svg" aria-label="Bản vẽ vector Hồ Trúc Giang"><defs><linearGradient id="sea" x2="1" y2="1"><stop stop-color="#9bdde3"/><stop offset=".6" stop-color="#63b6c7"/><stop offset="1" stop-color="#277e9e"/></linearGradient><pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse"><path d="M50 0H0V50" fill="none" stroke="#dbe6df" stroke-width="1"/></pattern></defs><g id="cadRotated"><rect x="-2500" y="-2500" width="6500" height="6500" fill="#edf3e8"/><rect x="-2500" y="-2500" width="6500" height="6500" fill="url(#grid)"/><g id="drawing"></g><g id="labels"></g><g id="handles"></g></g></svg>
+<div id="tools"><button id="edit">✎ Chỉnh đường bờ</button><button id="undo">↶</button><button id="redo">↷</button><div class="grow"></div><button id="minus">−</button><span id="zoom">100%</span><button id="plus">+</button><button id="reset">⌂</button><button id="openInfo">☷</button></div><div id="legend">Hồng: đường bờ nháp · Tím nét đứt: OSM · Đỏ: điểm cần duyệt</div>
+<div id="cadDirectionBar" role="group" aria-label="Bốn hướng nhìn của mặt bằng CAD GIS">
+ <span class="cad-dir-hint">HƯỚNG NHÌN</span>
+ <button type="button" data-map-direction="north" aria-label="Bắc ở trên">N</button>
+ <button type="button" data-map-direction="east" aria-label="Đông ở trên">E</button>
+ <button type="button" data-map-direction="south" aria-label="Nam ở trên">S</button>
+ <button type="button" data-map-direction="west" aria-label="Tây ở trên">W</button>
+ <span class="cad-dir-readout" id="cadDirectionText">Bắc ↑</span>
+ <span class="cad-dir-arrow" id="cadTrueNorth" aria-label="Hướng Bắc của bản vẽ"><b id="cadNorthArrow">↑ N</b></span>
+</div></section>
 <aside id="inspector"><div style="display:flex;gap:8px;align-items:center"><h2 style="flex:1">Kiểm tra CAD/GIS</h2><button id="closeInfo" style="display:none">Đóng ×</button></div><div id="info" class="panel">Chạm vào một đối tượng trên sơ đồ để đọc thông tin nguồn/lớp.</div>
 <h2>Vị trí cần duyệt</h2><div id="review" class="buttons"></div><h2>Xuất bản vẽ</h2><p style="font-size:11px">Bật Chỉnh đường bờ, kéo đỉnh trắng; nhấp đúp lên mép nước để thêm đỉnh. Gửi JSON đã chỉnh cho mình.</p><div class="buttons"><button id="candidate" class="primary">⇩ JSON chỉnh bờ</button><button id="geojson">⇩ GIS GeoJSON</button><button id="dxf">⇩ CAD DXF</button><button id="svgOut">⇩ SVG</button><button id="restore">Khôi phục</button></div><p style="font-size:11px">Nhận xét bổ sung:</p><textarea id="note" placeholder="Nhận xét hình dạng hồ cần chỉnh..."></textarea><p id="status">Đang tải vector...</p><p class="warning">Đơn vị DXF: mét danh nghĩa, không đo đạc. GeoJSON: WGS84 suy diễn từ phép đặt ảnh chưa xác minh. Bản nháp này không tự cập nhật OSM/SQLite.</p></aside></main>
-<script src="cad-gis-vector-data.js"></script><script>
+<script src="map-orientation.js?v=20261016-cardinal"></script><script src="cad-gis-vector-data.js"></script><script>
 (async()=>{
 'use strict';
-const $=id=>document.getElementById(id),svg=$('map'),NS='http://www.w3.org/2000/svg',order=['roads','parks','buildings','waterfront_walk','water','trees','plazas','fountain','osm_reference','shoreline','review_points'];
+const $=id=>document.getElementById(id),svg=$('map'),orientation=window.TrucGiangOrientation,rotated=$('cadRotated'),NS='http://www.w3.org/2000/svg',order=['roads','parks','buildings','waterfront_walk','water','trees','plazas','fountain','osm_reference','shoreline','review_points'];
 const label={roads:'Giao thông',parks:'Công viên',buildings:'Công trình',waterfront_walk:'Đường dạo ven hồ',water:'Mặt nước',trees:'Cây xanh',plazas:'Quảng trường',fountain:'Đài phun nước',osm_reference:'OSM gốc (đối chiếu)',shoreline:'Đường bờ',review_points:'Ghim cần duyệt'};
 const col={roads:'#89949c',parks:'#a1ce9b',buildings:'#dbcbb3',waterfront_walk:'#e7d3af',water:'#55a9bb',trees:'#428b4d',plazas:'#bdad96',fountain:'#466da4',osm_reference:'#8452b5',shoreline:'#f03775',review_points:'#d63d3d'};
-let F=[],R=[],original=[],vis={},edit=false,selected=-1,pid=null,pan=null,V=[0,0,1448,1086],undo=[],redo=[];
+let F=[],R=[],original=[],vis={},edit=false,selected=-1,pid=null,pan=null,V=[0,0,1448,1086],undo=[],redo=[],currentDirection=orientation.get();
 const e=(tag,a,p)=>{let n=document.createElementNS(NS,tag);Object.entries(a||{}).forEach(([k,v])=>n.setAttribute(k,String(v)));if(p)p.append(n);return n};
 const line=q=>q.map((p,i)=>(i?'L':'M')+p.join(' ')).join(' ');
 const path=g=>g.map(q=>line(q)+'Z').join(' ');
@@ -41,7 +68,7 @@ function paint(){
  });
  updateRing();
  const g=$('labels');g.textContent='';
- const txt=(x,y,s,rotation=0,size=22)=>{let a=e('text',{x,y,'font-size':size,'font-weight':'bold','text-anchor':'middle',fill:'#284b69',transform:'rotate('+rotation+' '+x+' '+y+')'},g);a.textContent=s};
+ const txt=(x,y,s,rotation=0,size=22)=>{let a=e('text',{x,y,'font-size':size,'font-weight':'bold','text-anchor':'middle',fill:'#284b69',transform:'rotate('+(rotation+orientation.degree())+' '+x+' '+y+')'},g);a.textContent=s};
  txt(740,530,'Hồ Trúc Giang',30);txt(1010,485,'Đài phun nước',17);txt(580,183,'Hai Bà Trưng',0,21);txt(175,465,'Trần Quốc Tuấn',-90,18);txt(1375,510,'Nguyễn Trung Trực',-90,18);txt(760,936,'Lê Quí Đôn',15,22);
 }
 function updateRing(){
@@ -49,8 +76,34 @@ function updateRing(){
  if(w)w.setAttribute('d',d);if(s)s.setAttribute('d',d);drawHandles()
 }
 function drawHandles(){handles.textContent='';if(edit)R.forEach((p,i)=>e('circle',{cx:p[0],cy:p[1],r:6.4,'data-h':i,class:i===selected?'active':''},handles))}
-function mouse(e){let p=svg.createSVGPoint();p.x=e.clientX;p.y=e.clientY;return p.matrixTransform(svg.getScreenCTM().inverse())}
-function setView(){svg.setAttribute('viewBox',V.join(' '));$('zoom').textContent=Math.round(100*1448/V[2])+'%'}
+function mouse(e){let p=svg.createSVGPoint();p.x=e.clientX;p.y=e.clientY;return p.matrixTransform(rotated.getScreenCTM().inverse())}
+function mouseView(e){let p=svg.createSVGPoint();p.x=e.clientX;p.y=e.clientY;return p.matrixTransform(svg.getScreenCTM().inverse())}
+/* CAD source: X right, Y down in an unverified illustration.
+ * Only viewport rotates. GIS coordinate exports remain untouched. */
+function modelToView(p,dir=currentDirection){
+ const v=orientation.rotate(p[0]-724,543-p[1],dir);return {x:724+v.x,y:543-v.z}
+}
+function viewToModel(p,dir=currentDirection){
+ const v=orientation.unrotate(p.x-724,543-p.y,dir);return {x:724+v.x,y:543-v.z}
+}
+function setView(){
+ rotated.setAttribute('transform','rotate('+(-orientation.degree())+' 724 543)');
+ svg.setAttribute('viewBox',V.join(' '));
+ $('zoom').textContent=Math.round(100*1448/V[2])+'%'
+}
+function syncDirection(next){
+ const old=currentDirection;
+ if(old!==next){
+  const physical=viewToModel({x:V[0]+V[2]/2,y:V[1]+V[3]/2},old);
+  const mapped=modelToView([physical.x,physical.y],next);
+  V[0]=mapped.x-V[2]/2;V[1]=mapped.y-V[3]/2;
+  currentDirection=next;
+  if(F.length)paint();
+ }
+ $('cadDirectionText').textContent=orientation.label()+' ↑ · '+orientation.degree()+'°';
+ $('cadNorthArrow').style.transform='rotate('+(-orientation.degree())+'deg)';
+ setView()
+}
 function zoom(k,x=V[0]+V[2]/2,y=V[1]+V[3]/2){let w=Math.max(150,Math.min(3700,V[2]/k)),h=w*1086/1448;V=[x-w*(x-V[0])/V[2],y-h*(y-V[1])/V[3],w,h];setView()}
 function history(){undo.push(R.map(p=>p.slice()));if(undo.length>70)undo.shift();redo=[]}
 function save(){try{localStorage.setItem('bdx0:truc-giang:cad-gis-candidate',JSON.stringify(R))}catch{}}
@@ -70,13 +123,13 @@ try{
  try{let stored=JSON.parse(localStorage.getItem('bdx0:truc-giang:cad-gis-candidate')||'null');if(Array.isArray(stored)&&stored.length>=5&&stored.length<4000&&stored.every(p=>Array.isArray(p)&&p.length===2&&p.every(Number.isFinite)))R=stored}catch{}
  for(const l of order){vis[l]=l!=='osm_reference';let row=document.createElement('label');row.className='layer';let cb=document.createElement('input');cb.type='checkbox';cb.checked=vis[l];cb.dataset.l=l;let sw=document.createElement('span');sw.className='swatch';sw.style.background=col[l];let b=document.createElement('b');b.textContent=label[l];let n=document.createElement('small');n.textContent=F.filter(f=>f[0]===l).length;row.append(cb,sw,b,n);$('layerList').append(row);cb.onchange=()=>{vis[l]=cb.checked;paint()}}
  paint();setView();$('status').textContent=F.length+' đối tượng nháp · '+R.length+' đỉnh bờ · không thay đổi SQLite/OSM';
- for(const [x,y,s] of [[37,61,'Bờ Tây Nam: giảm lồi'],[61,25,'Bờ Bắc phải: lồi nhiều hơn'],[51,25,'Bờ Bắc trái: lồi ít hơn'],[50,70,'Bờ Nam giữa: không lồi'],[68,73,'Đông Nam: giảm phần lồi']]){let b=document.createElement('button');b.textContent=s;b.onclick=()=>{zoom(2,1448*x/100,1086*y/100);$('info').textContent=s+' · X='+x+'%, Y='+y+'%';$('inspector').classList.add('open')};$('review').append(b)}
+ for(const [x,y,s] of [[37,61,'Bờ Tây Nam: giảm lồi'],[61,25,'Bờ Bắc phải: lồi nhiều hơn'],[51,25,'Bờ Bắc trái: lồi ít hơn'],[50,70,'Bờ Nam giữa: không lồi'],[68,73,'Đông Nam: giảm phần lồi']]){let b=document.createElement('button');b.textContent=s;b.onclick=()=>{let p=modelToView([1448*x/100,1086*y/100]);zoom(2,p.x,p.y);$('info').textContent=s+' · X='+x+'%, Y='+y+'%';$('inspector').classList.add('open')};$('review').append(b)}
 }catch(ex){$('status').textContent='Lỗi tải dữ liệu: '+ex.message;console.error(ex)}
-svg.addEventListener('pointerdown',ev=>{let h=ev.target.closest('[data-h]');if(edit&&h){history();selected=+h.dataset.h;pid=ev.pointerId;svg.setPointerCapture(pid);drawHandles();ev.preventDefault();return}if(!edit&&ev.target.closest('[data-i]'))detail(+ev.target.closest('[data-i]').dataset.i);pan={id:ev.pointerId,start:mouse(ev),v:V.slice()};svg.setPointerCapture(ev.pointerId);ev.preventDefault()});
-svg.addEventListener('pointermove',ev=>{if(pid===ev.pointerId&&selected>=0){let p=mouse(ev);R[selected]=[+p.x.toFixed(1),+p.y.toFixed(1)];updateRing()}else if(pan&&pan.id===ev.pointerId){let q=mouse(ev);V=[pan.v[0]-(q.x-pan.start.x),pan.v[1]-(q.y-pan.start.y),pan.v[2],pan.v[3]];setView()}});
+svg.addEventListener('pointerdown',ev=>{let h=ev.target.closest('[data-h]');if(edit&&h){history();selected=+h.dataset.h;pid=ev.pointerId;svg.setPointerCapture(pid);drawHandles();ev.preventDefault();return}if(!edit&&ev.target.closest('[data-i]'))detail(+ev.target.closest('[data-i]').dataset.i);pan={id:ev.pointerId,start:mouseView(ev),v:V.slice()};svg.setPointerCapture(ev.pointerId);ev.preventDefault()});
+svg.addEventListener('pointermove',ev=>{if(pid===ev.pointerId&&selected>=0){let p=mouse(ev);R[selected]=[+p.x.toFixed(1),+p.y.toFixed(1)];updateRing()}else if(pan&&pan.id===ev.pointerId){let q=mouseView(ev);V=[pan.v[0]-(q.x-pan.start.x),pan.v[1]-(q.y-pan.start.y),pan.v[2],pan.v[3]];setView()}});
 const end=ev=>{if(pid===ev.pointerId){pid=null;save()}if(pan&&pan.id===ev.pointerId)pan=null};svg.addEventListener('pointerup',end);svg.addEventListener('pointercancel',end);
 svg.addEventListener('dblclick',ev=>{if(!edit)return;let p=mouse(ev),idx=-1,dmin=15;R.forEach((a,i)=>{let b=R[(i+1)%R.length],dx=b[0]-a[0],dy=b[1]-a[1],t=Math.max(0,Math.min(1,((p.x-a[0])*dx+(p.y-a[1])*dy)/(dx*dx+dy*dy))),d=Math.hypot(p.x-(a[0]+t*dx),p.y-(a[1]+t*dy));if(d<dmin)dmin=d,idx=i});if(idx>=0){history();R.splice(idx+1,0,[+p.x.toFixed(1),+p.y.toFixed(1)]);updateRing();save()}});
-svg.addEventListener('wheel',ev=>{ev.preventDefault();let p=mouse(ev);zoom(ev.deltaY<0?1.18:1/1.18,p.x,p.y)},{passive:false});
+svg.addEventListener('wheel',ev=>{ev.preventDefault();let p=mouseView(ev);zoom(ev.deltaY<0?1.18:1/1.18,p.x,p.y)},{passive:false});
 $('edit').onclick=()=>{edit=!edit;$('edit').classList.toggle('selected',edit);svg.classList.toggle('editing',edit);drawHandles()};
 $('undo').onclick=()=>{if(!undo.length)return;redo.push(R.map(p=>p.slice()));R=undo.pop();updateRing();save()};$('redo').onclick=()=>{if(!redo.length)return;undo.push(R.map(p=>p.slice()));R=redo.pop();updateRing();save()};
 $('plus').onclick=()=>zoom(1.3);$('minus').onclick=()=>zoom(1/1.3);$('reset').onclick=()=>{V=[0,0,1448,1086];setView()};
@@ -87,7 +140,13 @@ $('geojson').onclick=()=>download('truc-giang-draft.geojson',JSON.stringify(geo(
 $('dxf').onclick=()=>download('truc-giang-draft.dxf',dxf(),'application/dxf');
 $('svgOut').onclick=()=>download('truc-giang-draft.svg',new XMLSerializer().serializeToString(svg),'image/svg+xml');
 $('restore').onclick=()=>{if(confirm('Khôi phục về hình bờ được số hóa từ ảnh?')){history();R=original.map(p=>p.slice());updateRing();save()}};
+orientation.bindControls($('cadDirectionBar'));
+orientation.onChange(syncDirection);
+syncDirection(currentDirection);
 $('openInfo').onclick=()=>$('inspector').classList.add('open');$('closeInfo').onclick=()=>$('inspector').classList.remove('open');
-window.TrucGiangCadGis={getInfo:()=>({count:F.length,shoreVertices:R.length,sourceChanged:false}),candidateRing:()=>R.map(p=>p.slice()),geojson:geo,dxf};
+window.TrucGiangCadGis={getInfo:()=>({count:F.length,shoreVertices:R.length,sourceChanged:false,
+ direction:orientation.get(),heading:orientation.degree(),viewBox:V.slice(),trueNorthOfIllustrationVerified:false}),
+ candidateRing:()=>R.map(p=>p.slice()),geojson:geo,dxf,
+ modelToView:p=>modelToView(p),viewToModel:p=>viewToModel(p),setDirection:v=>orientation.set(v)};
 })();
 </script></body></html>
