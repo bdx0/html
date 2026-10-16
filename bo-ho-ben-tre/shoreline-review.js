@@ -117,7 +117,11 @@ function draw(ctx,project,pxPerM){
  for(let issue of items){
   let pts=issue.ring_indices,p=ring[pts[Math.floor(pts.length/2)]],v=projectLocal(p,project);
   // Badge itself sits just off the water-edge toward outside.
-  let n=normal(pts[Math.floor(pts.length/2)]),b={x:v.x-n.x*12,y:v.y+n.z*12};
+  let n=normal(pts[Math.floor(pts.length/2)]);
+  // Keep numbered review badge on the same geographic side of the shoreline
+  // after rotating the entire WGS84 Model View to E / S / W.
+  let screenN=window.TrucGiangOrientation?TrucGiangOrientation.rotate(n.x,n.z):n;
+  let b={x:v.x-screenN.x*12,y:v.y+screenN.z*12};
   let active=issue.id===selected;
   ctx.beginPath();ctx.arc(b.x,b.y,active?14:11,0,Math.PI*2);
   ctx.fillStyle=active?"#f97316":"#fff";ctx.fill();
