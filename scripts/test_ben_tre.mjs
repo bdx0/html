@@ -430,6 +430,43 @@ try {
       errors.push(name+' CAD/GIS digitization missing or marked authoritative '+JSON.stringify(cadState));
     if(await cad.locator('#layerList input[type=checkbox]').count()!==11)
       errors.push(name+' CAD/GIS must have 11 toggleable layers');
+    // Four cardinal orientations share one client-side bearing with Model View.
+    // CAD is still an unverified illustration: rotating it must not touch vertices,
+    // numeric GeoJSON coordinates or the original DXF geometry.
+    const cadOriginal=await cad.evaluate(()=>({
+      ring:JSON.stringify(TrucGiangCadGis.candidateRing()),
+      geo:JSON.stringify(TrucGiangCadGis.geojson()),
+      dxf:TrucGiangCadGis.dxf()
+    }));
+    for(const [dir,bearing,dx,dy] of [
+      ['north',0,100,0],['east',90,0,-100],['south',180,-100,0],['west',270,0,100]
+    ]){
+      await cad.locator('#cadDirectionBar [data-map-direction="'+dir+'"]').click();
+      const check=await cad.evaluate(()=>{
+        const api=TrucGiangCadGis,view=api.modelToView([824,543]),back=api.viewToModel(view);
+        return {info:api.getInfo(),view,back,
+          active:Array.from(document.querySelectorAll('#cadDirectionBar [data-map-direction].selected')).map(b=>b.dataset.mapDirection)};
+      });
+      if(check.info.direction!==dir||check.info.heading!==bearing||
+         !check.active.includes(dir)||check.active.length!==1||
+         Math.abs(check.view.x-724-dx)>0.02||Math.abs(check.view.y-543-dy)>0.02||
+         Math.abs(check.back.x-824)>0.02||Math.abs(check.back.y-543)>0.02)
+        errors.push(name+' CAD heading transform/inverse does not match '+dir+' '+JSON.stringify(check));
+      await cad.locator('#minus').click();
+      await cad.locator('#plus').click();
+      if((await cad.evaluate(()=>TrucGiangCadGis.getInfo().direction))!==dir)
+        errors.push(name+' CAD direction changed after zoom-out/in '+dir);
+    }
+    const cadAfter=await cad.evaluate(()=>({
+      ring:JSON.stringify(TrucGiangCadGis.candidateRing()),
+      geo:JSON.stringify(TrucGiangCadGis.geojson()),
+      dxf:TrucGiangCadGis.dxf(),
+      northVerified:TrucGiangCadGis.getInfo().trueNorthOfIllustrationVerified
+    }));
+    if(cadOriginal.ring!==cadAfter.ring||cadOriginal.geo!==cadAfter.geo||
+       cadOriginal.dxf!==cadAfter.dxf||cadAfter.northVerified!==false)
+      errors.push(name+' CAD display bearings changed draft source or claim GPS verification');
+
     await cad.locator('#edit').click();
     if((await cad.locator('#handles circle').count())<70)
       errors.push(name+' CAD/GIS editable shoreline vertices missing');
@@ -502,6 +539,42 @@ try {
     model.on('console',e=>{if(e.type()==='error')errors.push(name+' Model console '+e.text())});
     await model.goto('http://127.0.0.1:8765/bo-ho-ben-tre/model.html',{waitUntil:'load',timeout:30000});
     await model.waitForFunction(()=>document.getElementById('loading').hidden,{timeout:30000});
+    // CAD finished in West-up; opening Model in the same browser context must
+    // restore the matching view. These are shared visual rotations only.
+    const crossPage=await model.evaluate(()=>TrucGiangModelMap.getOrientation());
+    if(crossPage.direction!=='west'||crossPage.heading!==270)
+      errors.push(name+' CAD -> Model cardinal orientation was not shared '+JSON.stringify(crossPage));
+    for(const [dir,expectedDeg,dx,dy] of [
+      ['north',0,100,0],['east',90,0,-100],['south',180,-100,0],['west',270,0,100]
+    ]){
+      await model.locator('#modelDirectionBar [data-map-direction="'+dir+'"]').click();
+      const info=await model.evaluate(()=>{
+        const m=TrucGiangModelMap,st=m.getOrientation();
+        const center=m.projectLocal(st.panX,st.panZ),point=m.projectLocal(st.panX+100,st.panZ);
+        const inv=m.invert(point.x,point.y);
+        return {st,dx:point.x-center.x,dy:point.y-center.y,inv,
+          selected:Array.from(document.querySelectorAll('#modelDirectionBar [data-map-direction].selected')).map(b=>b.dataset.mapDirection)};
+      });
+      const k=info.dx===0?Math.abs(info.dy)/100:Math.abs(info.dx)/100;
+      if(info.st.direction!==dir||info.st.heading!==expectedDeg||
+         info.selected.length!==1||info.selected[0]!==dir||!Number.isFinite(k)||
+         Math.abs(info.dx-dx*k)>0.025||Math.abs(info.dy-dy*k)>0.025||
+         Math.abs(info.inv.x-info.st.panX-100)>0.001||
+         Math.abs(info.inv.z-info.st.panZ)>0.001)
+        errors.push(name+' Model WGS84 orientation inverse failed '+dir+' '+JSON.stringify(info));
+      await model.locator('#zoomOut').click();
+      await model.locator('#zoomIn').click();
+      if((await model.evaluate(()=>TrucGiangModelMap.getOrientation().direction))!==dir)
+        errors.push(name+' Model direction changed after zoom-out/in '+dir);
+    }
+    await model.locator('#modelDirectionBar [data-map-direction="north"]').click();
+    const compassCheck=await model.evaluate(()=>({
+      orientation:TrucGiangModelMap.getOrientation(),
+      northArrow:document.getElementById('modelNorthArrow').style.transform
+    }));
+    if(compassCheck.orientation.direction!=='north'||compassCheck.northArrow!=='rotate(0deg)')
+      errors.push(name+' Model True North reset failed '+JSON.stringify(compassCheck));
+
     if(!(await model.locator('#detailContent').textContent()).includes('Hồ Trúc Giang'))
       errors.push(name+' semantic lake entity not displayed');
     if(!(await model.locator('#detailContent').textContent()).includes('Đường bao chưa đạt xác minh'))
