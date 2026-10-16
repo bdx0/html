@@ -125,8 +125,12 @@ try{
  paint();setView();$('status').textContent=F.length+' đối tượng nháp · '+R.length+' đỉnh bờ · không thay đổi SQLite/OSM';
  for(const [x,y,s] of [[37,61,'Bờ Tây Nam: giảm lồi'],[61,25,'Bờ Bắc phải: lồi nhiều hơn'],[51,25,'Bờ Bắc trái: lồi ít hơn'],[50,70,'Bờ Nam giữa: không lồi'],[68,73,'Đông Nam: giảm phần lồi']]){let b=document.createElement('button');b.textContent=s;b.onclick=()=>{let p=modelToView([1448*x/100,1086*y/100]);zoom(2,p.x,p.y);$('info').textContent=s+' · X='+x+'%, Y='+y+'%';$('inspector').classList.add('open')};$('review').append(b)}
 }catch(ex){$('status').textContent='Lỗi tải dữ liệu: '+ex.message;console.error(ex)}
-svg.addEventListener('pointerdown',ev=>{let h=ev.target.closest('[data-h]');if(edit&&h){history();selected=+h.dataset.h;pid=ev.pointerId;svg.setPointerCapture(pid);drawHandles();ev.preventDefault();return}if(!edit&&ev.target.closest('[data-i]'))detail(+ev.target.closest('[data-i]').dataset.i);pan={id:ev.pointerId,start:mouseView(ev),v:V.slice()};svg.setPointerCapture(ev.pointerId);ev.preventDefault()});
-svg.addEventListener('pointermove',ev=>{if(pid===ev.pointerId&&selected>=0){let p=mouse(ev);R[selected]=[+p.x.toFixed(1),+p.y.toFixed(1)];updateRing()}else if(pan&&pan.id===ev.pointerId){let q=mouseView(ev);V=[pan.v[0]-(q.x-pan.start.x),pan.v[1]-(q.y-pan.start.y),pan.v[2],pan.v[3]];setView()}});
+svg.addEventListener('pointerdown',ev=>{let h=ev.target.closest('[data-h]');if(edit&&h){history();selected=+h.dataset.h;pid=ev.pointerId;svg.setPointerCapture(pid);drawHandles();ev.preventDefault();return}if(!edit&&ev.target.closest('[data-i]'))detail(+ev.target.closest('[data-i]').dataset.i);pan={id:ev.pointerId,clientX:ev.clientX,clientY:ev.clientY,v:V.slice()};svg.setPointerCapture(ev.pointerId);ev.preventDefault()});
+svg.addEventListener('pointermove',ev=>{if(pid===ev.pointerId&&selected>=0){let p=mouse(ev);R[selected]=[+p.x.toFixed(1),+p.y.toFixed(1)];updateRing()}else if(pan&&pan.id===ev.pointerId){
+ let rect=svg.getBoundingClientRect(),scale=Math.min(rect.width/pan.v[2],rect.height/pan.v[3])||1;
+ V=[pan.v[0]-(ev.clientX-pan.clientX)/scale,pan.v[1]-(ev.clientY-pan.clientY)/scale,pan.v[2],pan.v[3]];
+ setView()
+}});
 const end=ev=>{if(pid===ev.pointerId){pid=null;save()}if(pan&&pan.id===ev.pointerId)pan=null};svg.addEventListener('pointerup',end);svg.addEventListener('pointercancel',end);
 svg.addEventListener('dblclick',ev=>{if(!edit)return;let p=mouse(ev),idx=-1,dmin=15;R.forEach((a,i)=>{let b=R[(i+1)%R.length],dx=b[0]-a[0],dy=b[1]-a[1],t=Math.max(0,Math.min(1,((p.x-a[0])*dx+(p.y-a[1])*dy)/(dx*dx+dy*dy))),d=Math.hypot(p.x-(a[0]+t*dx),p.y-(a[1]+t*dy));if(d<dmin)dmin=d,idx=i});if(idx>=0){history();R.splice(idx+1,0,[+p.x.toFixed(1),+p.y.toFixed(1)]);updateRing();save()}});
 svg.addEventListener('wheel',ev=>{ev.preventDefault();let p=mouseView(ev);zoom(ev.deltaY<0?1.18:1/1.18,p.x,p.y)},{passive:false});
