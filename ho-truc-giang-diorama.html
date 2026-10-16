@@ -178,14 +178,14 @@ function lakeMesh(poly){
    'precision highp float;varying vec2 vLake;uniform float uTime;uniform float uNight;',
    'float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453123);}',
    'void main(){',
-   'float r=sin(vLake.y*.62+sin(vLake.x*.19)*1.75+uTime*.37);',
-   'float small=sin(vLake.y*4.0+sin(vLake.x*.54+uTime*.18)*1.1-uTime*.76);',
+   'float r=sin(vLake.y*.22+sin(vLake.x*.17)*.9+uTime*.19);',
+   'float small=sin(vLake.y*2.1+sin(vLake.x*.31+uTime*.22)*3.1-uTime*.62);',
    'float sw=sin(vLake.x*.28+uTime*.15+sin(vLake.y*.14)*1.3);',
-   'float noise=hash(floor(vLake*1.25))*.007;',
+   'float noise=(hash(floor(vLake*.36))-.5)*.055;',
    'vec3 dark=vec3(.017,.22,.265),light=vec3(.034,.44,.53);',
-   'vec3 color=mix(dark,light,.53+.08*r+.055*sw);',
-   'color+=vec3(.04,.075,.083)*pow(max(0.0,small*.5+.5),29.0);',
-   'color+=vec3(noise);',
+   'vec3 color=mix(dark,light,.54+.028*r+.12*noise+.04*sw);',
+   'color+=vec3(.012,.028,.038)*pow(max(0.0,small*.5+.5),30.0);',
+   'color+=vec3(noise*.25);',
    'color=mix(color,color*.40+vec3(.022,.04,.08),uNight*.72);',
    'gl_FragColor=vec4(color,1.0);',
    '}'
@@ -345,9 +345,9 @@ function studioBase(){
  box(SIZE.w+1.9,.20,SIZE.d+1.8,0,-.43,0,"#d5aa75");
  box(SIZE.w-1.0,.14,SIZE.d-.9,0,-.14,0,"#a5b88f");
  for(var z of [-39.8,39.8])box(SIZE.w+1.2,.20,.18,0,-.04,z,"#d6c29e");
- var signBody=box(31,3.15,.44,0,-2.6,42.02,"#b68c50");
- box(29.9,2.75,.12,0,-2.6,42.3,"#dabb78");
- var plate=M.text(world,"HỒ TRÚC GIANG - BẾN TRE",0,-2.6,42.40,27.5,2.18,0,"#392e25","#e1c78c");labels.push(plate);
+ var signBody=box(31,2.65,.44,0,-3.2,42.38,"#b68c50");
+ box(29.9,2.32,.12,0,-3.2,42.69,"#dabb78");
+ var plate=M.text(world,"HỒ TRÚC GIANG - BẾN TRE",0,-3.2,42.82,27.5,2.0,0,"#392e25","#e1c78c");labels.push(plate);
  // Soft translucent, photographic contact shadow beneath the exhibit.
  var shadowCanvas=document.createElement("canvas");shadowCanvas.width=256;shadowCanvas.height=256;
  var s=shadowCanvas.getContext("2d"),gr=s.createRadialGradient(128,128,24,128,128,127);
