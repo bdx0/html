@@ -7,6 +7,12 @@ on:
       - "scripts/test_ben_tre.mjs"
       - ".github/workflows/smoke-ben-tre.yml"
       - "assets/three.min.js"
+  pull_request:
+    branches: [main]
+    paths:
+      - "bo-ho-ben-tre/**"
+      - "scripts/test_ben_tre.mjs"
+      - ".github/workflows/smoke-ben-tre.yml"
   workflow_dispatch:
 permissions:
   contents: read
