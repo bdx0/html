@@ -526,6 +526,39 @@ try {
       await cad.screenshot({path:'ben-tre-cad-gis-'+name+'.png'});
     }
     await cad.close();
+    // OSM-first preview: road/water source stays identical and CAD contributes only
+    // explicitly unverified, user-adjustable local indentations.
+    const hybrid=await ctx.newPage();
+    hybrid.on('pageerror',e=>errors.push(name+' hybrid page JS '+e.message));
+    await hybrid.goto('http://127.0.0.1:8765/bo-ho-ben-tre/hybrid-review.html',{waitUntil:'load',timeout:30000});
+    await hybrid.waitForFunction(()=>window.TrucGiangHybridReview?.getState().osmWay===217484891,{timeout:30000});
+    const beforeHybrid=await hybrid.evaluate(()=>({
+      state:TrucGiangHybridReview.getState(),
+      baseline:JSON.stringify(TrucGiangHybridReview.baselineRing()),
+      candidate:JSON.stringify(TrucGiangHybridReview.previewRing())
+    }));
+    if(beforeHybrid.state.roadCount!==159||beforeHybrid.state.status!=='USER_VISUAL_REVIEW_NOT_SURVEYED'||
+       beforeHybrid.state.previewAreaM2>=beforeHybrid.state.originalAreaM2||
+       beforeHybrid.baseline===beforeHybrid.candidate)
+      errors.push(name+' hybrid preview missing OSM source or local notches '+JSON.stringify(beforeHybrid.state));
+    await hybrid.evaluate(()=>TrucGiangHybridReview.setDepths(0,0,0));
+    const zero=await hybrid.evaluate(()=>({
+       baseline:JSON.stringify(TrucGiangHybridReview.baselineRing()),
+       preview:JSON.stringify(TrucGiangHybridReview.previewRing()),
+       state:TrucGiangHybridReview.getState()
+    }));
+    if(zero.baseline!==zero.preview||Math.abs(zero.state.originalAreaM2-zero.state.previewAreaM2)>0.001)
+      errors.push(name+' hybrid zero-depth mode does not restore exact OSM ring');
+    await hybrid.evaluate(()=>TrucGiangHybridReview.setDepths(7,7,6));
+    const screen=await hybrid.evaluate(()=>({
+       width:document.documentElement.scrollWidth,innerWidth:window.innerWidth,
+       height:document.documentElement.scrollHeight,innerHeight:window.innerHeight
+    }));
+    if(screen.width>screen.innerWidth+2||screen.height>screen.innerHeight+2)
+      errors.push(name+' hybrid review page overflows mobile/desktop viewport '+JSON.stringify(screen));
+    if(name==='desktop'||name==='mobile-390')
+      await hybrid.screenshot({path:'ben-tre-hybrid-'+name+'.png'});
+    await hybrid.close();
     // Open independent SQL browser and validate the snapshot against the real DB counts.
     const explorer=await ctx.newPage();
     explorer.on('pageerror',e=>errors.push(name+' SQLite JS '+e.message));
