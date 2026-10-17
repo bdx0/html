@@ -430,26 +430,29 @@ try {
       errors.push(name+' CAD/GIS digitization missing or marked authoritative '+JSON.stringify(cadState));
     if(await cad.locator('#layerList input[type=checkbox]').count()!==11)
       errors.push(name+' CAD/GIS must have 11 toggleable layers');
-    // Four cardinal orientations share one client-side bearing with Model View.
-    // CAD is still an unverified illustration: rotating it must not touch vertices,
-    // numeric GeoJSON coordinates or the original DXF geometry.
+    // Four cardinal directions control only the viewport. The sketch has a separate
+    // tentative alignment relative to the north-up OSM overlay.
+    // Direction changes must not change ring or the exported nominal geometry.
     const cadOriginal=await cad.evaluate(()=>({
       ring:JSON.stringify(TrucGiangCadGis.candidateRing()),
       geo:JSON.stringify(TrucGiangCadGis.geojson()),
       dxf:TrucGiangCadGis.dxf()
     }));
-    for(const [dir,bearing,dx,dy] of [
-      ['north',0,100,0],['east',90,0,-100],['south',180,-100,0],['west',270,0,100]
+    for(const [dir,bearing] of [
+      ['north',0],['east',90],['south',180],['west',270]
     ]){
       await cad.locator('#cadDirectionBar [data-map-direction="'+dir+'"]').click();
       const check=await cad.evaluate(()=>{
         const api=TrucGiangCadGis,view=api.modelToView([824,543]),back=api.viewToModel(view);
-        return {info:api.getInfo(),view,back,
+        const q=TrucGiangCadGeoref.point([824,543],api.getCadNorthOffset());
+        const v=TrucGiangOrientation.rotate(q[0]-724,543-q[1],api.getInfo().direction);
+        const expected={x:724+v.x,y:543-v.z};
+        return {info:api.getInfo(),view,back,expected,
           active:Array.from(document.querySelectorAll('#cadDirectionBar [data-map-direction].selected')).map(b=>b.dataset.mapDirection)};
       });
       if(check.info.direction!==dir||check.info.heading!==bearing||
          !check.active.includes(dir)||check.active.length!==1||
-         Math.abs(check.view.x-724-dx)>0.02||Math.abs(check.view.y-543-dy)>0.02||
+         Math.abs(check.view.x-check.expected.x)>0.02||Math.abs(check.view.y-check.expected.y)>0.02||
          Math.abs(check.back.x-824)>0.02||Math.abs(check.back.y-543)>0.02)
         errors.push(name+' CAD heading transform/inverse does not match '+dir+' '+JSON.stringify(check));
       await cad.locator('#minus').click();
@@ -467,6 +470,36 @@ try {
        cadOriginal.dxf!==cadAfter.dxf||cadAfter.northVerified!==false)
       errors.push(name+' CAD display bearings changed draft source or claim GPS verification');
 
+    // Calibrated sketch rotates without moving the north-up OSM layer or CAD pixels.
+    await cad.locator('#cadDirectionBar [data-map-direction="north"]').click();
+    const beforeCalibration=await cad.evaluate(()=>({
+      ring:JSON.stringify(TrucGiangCadGis.candidateRing()),
+      geo:JSON.stringify(TrucGiangCadGis.geojson()),
+      osmPath:document.querySelector('#osmDrawing path')?.getAttribute('d'),
+      sketchMatrix:document.getElementById('cadSketchAligned').getAttribute('transform'),
+      angle:TrucGiangCadGis.getCadNorthOffset()
+    }));
+    await cad.locator('#cadNorthRange').evaluate(el=>{
+      el.value='-16.0';el.dispatchEvent(new Event('input',{bubbles:true}))
+    });
+    const afterCalibration=await cad.evaluate(()=>({
+      ring:JSON.stringify(TrucGiangCadGis.candidateRing()),
+      geo:TrucGiangCadGis.geojson(),
+      osmPath:document.querySelector('#osmDrawing path')?.getAttribute('d'),
+      sketchMatrix:document.getElementById('cadSketchAligned').getAttribute('transform'),
+      angle:TrucGiangCadGis.getCadNorthOffset(),
+      northVerified:TrucGiangCadGis.getInfo().trueNorthOfIllustrationVerified
+    }));
+    if(afterCalibration.angle!==-16||afterCalibration.sketchMatrix===beforeCalibration.sketchMatrix||
+       afterCalibration.osmPath!==beforeCalibration.osmPath||
+       afterCalibration.ring!==beforeCalibration.ring||
+       JSON.stringify(afterCalibration.geo)===beforeCalibration.geo||
+       afterCalibration.geo.metadata.cad_north_offset_deg!==-16||
+       afterCalibration.geo.metadata.verified!==false||afterCalibration.northVerified!==false)
+      errors.push(name+' CAD north calibration mutated source or OSM reference '+JSON.stringify(afterCalibration).slice(0,700));
+    await cad.evaluate(deg=>TrucGiangCadGis.setCadNorthOffset(deg),beforeCalibration.angle);
+    if((await cad.evaluate(()=>TrucGiangCadGis.getInfo().cadNorthOffsetDeg))!==beforeCalibration.angle)
+      errors.push(name+' CAD north calibration reset failed');
     await cad.locator('#edit').click();
     if((await cad.locator('#handles circle').count())<70)
       errors.push(name+' CAD/GIS editable shoreline vertices missing');
