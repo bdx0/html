@@ -1,5 +1,16 @@
 # Hồ Trúc Giang / Bờ Hồ Bến Tre — Digital Twin (vùng 300m)
 
+## CAD/GIS: tách Bắc địa lý khỏi góc của ảnh minh họa (nhánh thử nghiệm 2026-10-17)
+
+- Trước đây N/E/S/W chỉ xoay toàn bộ SVG, mặc nhiên giả định ảnh CAD có Bắc ở trên. CAD số hóa từ ảnh minh họa, vì vậy giả định này không được kiểm chứng.
+- `cad-north-calibration.js` áp dụng **phép xoay affine riêng cho sketch CAD** quanh mốc ảnh `(795,542)`, tính trong hệ mét địa phương để không nhầm tỉ lệ px trục X/Y (`200/968`, `107/574`). Lớp `osm_reference` được giữ độc lập trên hệ tọa độ Bắc–Đông; nút N/E/S/W xoay **viewport** chứ không ghi tọa độ.
+- Hai trục đường mang tên Hai Bà Trưng và Lê Quý Đôn có hướng tương đối khác nhau khoảng 12,1° và 10,5° khi so đường CAD với OSM. Giá trị hiệu chỉnh đề xuất **−11,3°**, đo dương theo chiều kim đồng hồ của SVG, là **ước lượng hình học**, không phải góc Bắc được đo trên thực địa.
+- Nhấn **🧭 Căn Bắc** ở CAD/GIS: có thể bật đường tím OSM, thay đổi góc −45° đến +45° theo 0,1°, trở về giá trị ước lượng hay 0°. Lưu lựa chọn tại máy `bdx0:truc-giang:cad-north-preview-deg-v1`. Tất cả các thao tác hiệu chỉnh bằng mắt có trạng thái chưa xác minh, không ghi vào SQLite, `scene.json`, bản vẽ CAD nguyên bản hay OSM.
+- Công cụ edit đỉnh dùng `cadSketchAligned.getScreenCTM().inverse()` để kéo đúng khi lớp CAD đã được xoay, kể cả khi hướng N/E/S/W thay đổi. GeoJSON/DXF **bản nháp** phản ánh góc người xem đặt và metadata `cad_north_offset_deg` cùng `verified:false`; JSON chỉnh bờ luôn giữ `ring_image_pixels` nguyên tọa độ ảnh và ghi riêng góc hiệu chỉnh.
+- **Chưa hoàn tất georeference:** còn cần ít nhất hai điểm kiểm soát độc lập có tọa độ và thông tin sai số, lý tưởng từ ba điểm trở lên không thẳng hàng, để xác minh phép xoay, tịnh tiến, tỷ lệ và kiểm tra biến dạng. Không coi sai khác hình bờ CAD với OSM là bằng chứng duy nhất cho góc Bắc chuẩn.
+
+
+
 ## N/E/S/W đồng bộ cho CAD/GIS và Model View (2026-10-16)
 
 **Bốn hướng nhìn dùng chung:** `N` = Bắc ở trên (0°), `E` = Đông ở trên (90°), `S` = Nam ở trên (180°), `W` = Tây ở trên (270°). Đây là **góc xoay mặt bằng trên màn hình**, không phải camera đứng nhìn từ phía Bắc/Đông trong 3D. Nút hướng và mũi tên Bắc đều thay đổi, có thể quay về N nhanh. Bố cục mobile giữ nút bấm nhỏ gọn, không thêm drawer. Lựa chọn lưu tại localStorage `bdx0:truc-giang:view-direction-v1`; chuyển `cad-gis.html` ↔ `model.html` giữ nguyên, hai tab cập nhật thông qua `storage` event. Có thể override khi mở trang bằng query `?dir=north|east|south|west`.
