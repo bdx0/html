@@ -1,5 +1,13 @@
 # Hồ Trúc Giang / Bờ Hồ Bến Tre — Digital Twin (vùng 300m)
 
+## Hybrid preview — đường/hồ OSM, ba chỗ lõm theo nhận xét CAD (2026-10-17)
+
+- **Nguồn nền:** `data/scene.json`, riêng `osm-way-217484891` làm mặt nước và 159 đoạn `road` OSM làm tim đường. Không dùng đa giác đường minh họa CAD để thay dữ liệu OSM.
+- `hybrid-review.html`: hiển thị ranh nước OSM gốc (tím đứt), mặt nước xem thử (xanh), bản CAD (cam, chỉ để tham khảo). Cho người đánh giá chỉnh riêng ba vị trí lõm: **1 Bắc**, **2 Nam**, **3 Nam**. Các chỗ lõm sử dụng đường cong cosine thuôn về hai đầu, tăng phần đất nhô vào vùng nước, vị trí % trên cạnh OSM có thể chỉnh.
+- **Tham số ban đầu (7/7/6 m) chỉ là giả thuyết hình học**: không xác nhận vị trí chính xác từ CAD chưa georeference. Chọn 0 cho cả ba khôi phục **nguyên vẹn polygon OSM**. Hệ tọa độ local chỉ dùng phép tính xem thử và xuất nháp; không được tự động coi đó là tọa độ đo.
+- JSON tải xuống mang schema `truc-giang-hybrid-review-v1`, `status=USER_VISUAL_REVIEW_NOT_SURVEYED`, `verified:false`, `modified_database:false`; không nhập vào OSM/SQLite/3D renderer trước khi đủ chứng cứ đo và được người dùng chấp thuận.
+- Dữ liệu CAD mới có các điểm uốn nhiều hơn OSM. Khi chưa có GCP độc lập, cần duyệt **từng vị trí vết lõm, độ sâu và bề rộng** thay vì nối trực tiếp điểm pixel CAD vào bản đồ GPS. Kiểm thử browser kiểm 159 road features, vòng nguồn không đổi, ba chỗ lõm, và phép trả về nguồn khi depth=0.
+
 ## CAD/GIS: tách Bắc địa lý khỏi góc của ảnh minh họa (nhánh thử nghiệm 2026-10-17)
 
 - Trước đây N/E/S/W chỉ xoay toàn bộ SVG, mặc nhiên giả định ảnh CAD có Bắc ở trên. CAD số hóa từ ảnh minh họa, vì vậy giả định này không được kiểm chứng.
