@@ -136,6 +136,20 @@ try{
  scene=await r.json();water=scene.features.find(f=>f.kind==="water"&&f.osm_id===217484891);
  roads=scene.features.filter(f=>f.kind==="road");
  if(!water)throw Error("Không thấy OSM way 217484891");
+ window.TrucGiangHybridReview={
+   getState:()=>({roadCount:roads.length,osmWay:water.osm_id,params:structuredClone(control),
+       originalAreaM2:Math.abs(signedArea(WGS(water)[0])),
+       previewAreaM2:Math.abs(signedArea(patched())),status:"USER_VISUAL_REVIEW_NOT_SURVEYED"}),
+   baselineRing:()=>WGS(water)[0].map(q=>q.slice()),
+   previewRing:()=>patched(),
+   setDepths:(north,south1,south2)=>{
+     for(const [id,value]of Object.entries({north,south1,south2})){
+       if(!Number.isFinite(value)||value<0||value>12)throw Error("Depth outside 0..12 m");
+       control[id]=value;$(id).value=value;$(id+"Value").textContent=value+" m"
+     }
+     render();
+   }
+ };
  try{
   const packed=window.TrucGiangCadGisPacked,raw=Uint8Array.from(atob(packed),x=>x.charCodeAt(0));
   const data=JSON.parse(await new Response(new Blob([raw]).stream().pipeThrough(new DecompressionStream("deflate"))).text());
