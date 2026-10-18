@@ -250,7 +250,7 @@ def publish(outdir, scene_path=None):
         for kind,specs in data["templates"].items():
             db.executemany("INSERT INTO parameter_specs VALUES (?,?,?,?,?,?,?)",[
                 (kind,s["key"],s["label"],s["unit"],s["min"],s["max"],s["step"]) for s in specs])
-        db.executemany("INSERT INTO objects VALUES (?,?,?,?,?,?,?,?)",[
+        db.executemany("INSERT INTO objects VALUES (?,?,?,?,?,?,?,?,?)",[
             (x["id"],x["name"],x["category"],x["source"],x["source_reference"],
              x["verification"],json.dumps(x["geometry"],ensure_ascii=False) if x["geometry"] else None,
              x["geometry"]["crs"] if x["geometry"] and "crs" in x["geometry"]
