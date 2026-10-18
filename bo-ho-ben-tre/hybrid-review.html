@@ -36,17 +36,17 @@ main{height:calc(100dvh - 66px);display:grid;grid-template-columns:minmax(0,1fr)
 <label class="check"><input id="raw" type="checkbox" checked> So với OSM gốc</label>
 <label class="check"><input id="roads" type="checkbox" checked> Đường OSM</label>
 <label class="check"><input id="cad" type="checkbox"> Bờ CAD tham khảo</label></div>
-<div class="control"><header><label for="north">① Bờ Bắc · lõm bổ sung</label><output id="northValue">7 m</output></header>
-<input id="north" type="range" min="0" max="12" step=".5" value="7"><div class="muted">Tham chiếu CAD; tạo ở cạnh Bắc–Tây của hồ OSM</div></div>
-<div class="control"><header><label for="south1">② Bờ Nam · lõm thứ nhất</label><output id="south1Value">7 m</output></header>
-<input id="south1" type="range" min="0" max="12" step=".5" value="7"></div>
+<div class="control"><header><label for="north">① Bờ Bắc · lõm bổ sung</label><output id="northValue">3.5 m</output></header>
+<input id="north" type="range" min="0" max="12" step=".5" value="3.5"><div class="muted">Cạnh OSM #21 (0-based), không phải #22 như phiên bản nháp trước. Vẫn dùng vị trí 50% bạn chọn trên bờ Bắc.</div></div>
+<div class="control"><header><label for="south1">② Bờ Nam · lõm thứ nhất</label><output id="south1Value">6 m</output></header>
+<input id="south1" type="range" min="0" max="12" step=".5" value="6"></div>
 <div class="control"><header><label for="south2">③ Bờ Nam · lõm thứ hai</label><output id="south2Value">6 m</output></header>
 <input id="south2" type="range" min="0" max="12" step=".5" value="6"></div>
 <div class="control"><header><label for="northPos">Vị trí chỗ lõm Bắc</label><output id="northPosValue">50%</output></header><input id="northPos" type="range" min="20" max="80" step="1" value="50"></div>
 <div class="control"><header><label for="south1Pos">Vị trí lõm Nam ①</label><output id="south1PosValue">30%</output></header><input id="south1Pos" type="range" min="15" max="42" step="1" value="30"></div>
 <div class="control"><header><label for="south2Pos">Vị trí lõm Nam ②</label><output id="south2PosValue">72%</output></header><input id="south2Pos" type="range" min="58" max="87" step="1" value="72"></div>
 <div class="actions"><button id="reset">↶ Mặc định</button><button id="zoomIn">＋</button><button id="zoomOut">−</button><button id="export" class="primary">⇩ Xuất nháp JSON</button></div>
-<div class="warn">Chỉ để bạn đánh giá hình dáng: độ sâu 6–7 m và vị trí % là <b>giả thiết chỉnh được</b>, không trích xuất tọa độ có độ tin cậy từ ảnh CAD. Dữ liệu CAD số hóa từ ảnh minh họa chưa georeference.</div>
+<div class="warn"><b>Bộ tham số bạn duyệt thử: Bắc 3,5 m @50%, Nam 6 m @30% và 6 m @72%.</b> Đây là giả thiết chỉnh được, không phải tọa độ đo; chỗ lõm được tạo theo đường cong xem trước, chưa phải bản sao chính xác hình CAD. Phần Bắc đã sửa lỗi chỉ số cạnh #22 → #21. Không sửa OSM/SQLite.</div>
 </aside></main>
 <script src="cad-north-calibration.js"></script>
 <script src="cad-gis-vector-data.js"></script>
@@ -57,13 +57,20 @@ const $=id=>document.getElementById(id),cv=$('canvas'),ctx=cv.getContext('2d'),O
 const point=q=>[(q[0]-O[0])*kE,(q[1]-O[1])*kN],gps=p=>[+(O[0]+p[0]/kE).toFixed(8),+(O[1]+p[1]/kN).toFixed(8)];
 const WGS=(f)=>Array.isArray(f?.geometry?.coordinates)?f.geometry.coordinates:[];
 let scene,water,roads=[],cadRing=[],viewport={x:0,y:0,z:1},width=400,height=400;
-const control={north:7,south1:7,south2:6,northPos:50,south1Pos:30,south2Pos:72};
+const DEFAULT_CONTROL=Object.freeze({north:3.5,south1:6,south2:6,northPos:50,south1Pos:30,south2Pos:72});
+const control={...DEFAULT_CONTROL};
+const EDGES=Object.freeze({north:21,south1:7,south2:7});
+const EDGE_REVIEW=Object.freeze({
+ north:{user_original_edge:22,preview_edge:21,
+   reason:"Old edge #22 is 8.15m at north-west corner; edge #21 is 78.87m north bank, 0-based OSM ring"},
+ south1:{preview_edge:7},south2:{preview_edge:7}
+});
 const sourceRing=()=>water.geometry.coordinates[0].slice(0,-1);
 function patched(){
  const ring=sourceRing(),args=[
-   {edge:22,f:control.northPos/100,depth:control.north,width:19},
-   {edge:7,f:control.south1Pos/100,depth:control.south1,width:18},
-   {edge:7,f:control.south2Pos/100,depth:control.south2,width:18}
+   {edge:EDGES.north,f:control.northPos/100,depth:control.north,width:19},
+   {edge:EDGES.south1,f:control.south1Pos/100,depth:control.south1,width:18},
+   {edge:EDGES.south2,f:control.south2Pos/100,depth:control.south2,width:18}
  ];
  const out=[];for(let i=0;i<ring.length;i++){
   const A=point(ring[i]),B=point(ring[(i+1)%ring.length]),dx=B[0]-A[0],dy=B[1]-A[1],len=Math.hypot(dx,dy);
@@ -101,7 +108,7 @@ function render(){
  else drawLine(sourceRing(),"#64b2ccaa","#176d9c",2.4);
  if($('raw').checked)drawLine(WGS(water)[0],null,"#8253af",2.1,[6,4]);
  if($('cad').checked&&cadRing.length)drawLine(cadRing,null,"#d77a24",1.8,[5,5]);
- let samples=[{idx:22,p:control.northPos/100,text:"①"},{idx:7,p:control.south1Pos/100,text:"②"},{idx:7,p:control.south2Pos/100,text:"③"}];
+ let samples=[{idx:EDGES.north,p:control.northPos/100,text:"①"},{idx:EDGES.south1,p:control.south1Pos/100,text:"②"},{idx:EDGES.south2,p:control.south2Pos/100,text:"③"}];
  const base=sourceRing();for(const m of samples){let a=point(base[m.idx]),b=point(base[(m.idx+1)%base.length]),q=project([a[0]+(b[0]-a[0])*m.p,a[1]+(b[1]-a[1])*m.p]);ctx.beginPath();ctx.arc(...q,11,0,Math.PI*2);ctx.fillStyle="#fff8d9";ctx.fill();ctx.strokeStyle="#a76620";ctx.lineWidth=1.8;ctx.stroke();ctx.fillStyle="#774a1d";ctx.textAlign="center";ctx.font="bold 13px system-ui";ctx.fillText(m.text,q[0],q[1]+4)}
  const baseArea=Math.abs(signedArea(WGS(water)[0])),newArea=Math.abs(signedArea(proposal));
  $('status').textContent="OSM gốc "+Math.round(baseArea).toLocaleString("vi-VN")+" m² · Xem thử "+Math.round(newArea).toLocaleString("vi-VN")+" m² · "+Math.round(10000*(newArea/baseArea-1))/100+"% · KHÔNG khảo sát";
@@ -112,7 +119,7 @@ function fit(){let coords=sourceRing().map(point),xs=coords.map(x=>x[0]),ys=coor
  viewport.x=(l+r)/2;viewport.y=(b+t)/2;viewport.z=Math.min((width-36)/(r-l),(height-42)/(t-b))*0.86;render()}
 for(const [id,defaultValue]of Object.entries(control)){$(id).addEventListener('input',e=>{control[id]=Number(e.target.value);$(id+"Value").textContent=(id.endsWith("Pos")?control[id]+"%":control[id]+" m");render()})}
 for(const id of ["hybrid","raw","roads","cad"])$(id).addEventListener("change",render);
-$("reset").onclick=()=>{Object.assign(control,{north:7,south1:7,south2:6,northPos:50,south1Pos:30,south2Pos:72});for(const [id,v]of Object.entries(control)){$(id).value=v;$(id+"Value").textContent=id.endsWith("Pos")?v+"%":v+" m"}fit()};
+$("reset").onclick=()=>{Object.assign(control,DEFAULT_CONTROL);for(const [id,v]of Object.entries(control)){$(id).value=v;$(id+"Value").textContent=id.endsWith("Pos")?v+"%":v+" m"}fit()};
 $("zoomIn").onclick=()=>{viewport.z*=1.3;render()};
 $("zoomOut").onclick=()=>{viewport.z/=1.3;render()};
 $("export").onclick=()=>{
@@ -121,7 +128,9 @@ $("export").onclick=()=>{
    source_geometry:"OSM way 217484891",roads:"OSM scene.json untouched",
    cad_reference:"AI illustration, UNVERIFIED; notch shapes not independently georeferenced",
    geometry_provenance:"calculated OSM-edge preview offsets, not survey coordinates",
-   params:structuredClone(control),area_base_m2:Math.abs(signedArea(base)),area_preview_m2:Math.abs(signedArea(proposal)),
+   params:structuredClone(control),preview_edge_indices_zero_based:structuredClone(EDGES),edge_mapping_review:structuredClone(EDGE_REVIEW),
+   user_review_date:"2026-10-18",user_review_scope:"visual_preview_only",notch_width_m_preview_only:{north:19,south1:18,south2:18},
+   area_base_m2:Math.abs(signedArea(base)),area_preview_m2:Math.abs(signedArea(proposal)),
    proposed_geojson_preview_only:{type:"Polygon",coordinates:[proposal]},verified:false,modified_database:false,
    exported_at:new Date().toISOString()
  };
@@ -138,6 +147,7 @@ try{
  if(!water)throw Error("Không thấy OSM way 217484891");
  window.TrucGiangHybridReview={
    getState:()=>({roadCount:roads.length,osmWay:water.osm_id,params:structuredClone(control),
+       edges:structuredClone(EDGES),edgeMappingReview:structuredClone(EDGE_REVIEW),
        originalAreaM2:Math.abs(signedArea(WGS(water)[0])),
        previewAreaM2:Math.abs(signedArea(patched())),status:"USER_VISUAL_REVIEW_NOT_SURVEYED"}),
    baselineRing:()=>WGS(water)[0].map(q=>q.slice()),
