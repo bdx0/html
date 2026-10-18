@@ -1,0 +1,59 @@
+name: Review Studio: data integrity and visual widget
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'bo-ho-ben-tre/object-review.html'
+      - 'bo-ho-ben-tre/object-review.js'
+      - 'bo-ho-ben-tre/cad-gis-vector-data.js'
+      - 'bo-ho-ben-tre/scripts/build_object_review.py'
+      - 'bo-ho-ben-tre/data/object-review/reviews/**'
+      - 'bo-ho-ben-tre/data/scene.json'
+      - 'scripts/test_object_review.mjs'
+      - '.github/workflows/smoke-object-review.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build the independent review baseline without overwriting canonical sources
+        run: |
+          python3 bo-ho-ben-tre/scripts/build_object_review.py
+          python3 - <<'PY'
+          import json,sqlite3
+          from pathlib import Path
+          b=Path('bo-ho-ben-tre/data')
+          j=json.loads((b/'object-review-base.json').read_text())
+          d=sqlite3.connect(b/'object-review.sqlite')
+          assert d.execute('PRAGMA integrity_check').fetchone()[0]=='ok'
+          assert len(j['objects'])>=400
+          assert d.execute('SELECT COUNT(*) FROM objects').fetchone()[0]==len(j['objects'])
+          assert d.execute('SELECT COUNT(*) FROM approved_parameters WHERE review_level <> ?',('visual_review_only_not_surveyed',)).fetchone()[0]==0
+          assert j['readonly_baseline'] is True
+          print('review baseline',j['stats'])
+          PY
+          git diff --exit-code -- bo-ho-ben-tre/data/scene.json bo-ho-ben-tre/data/catalog.sqlite bo-ho-ben-tre/cad-gis-vector-data.js
+          node --check bo-ho-ben-tre/object-review.js
+      - name: Install browser
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Test selection and approval on desktop and mobile
+        run: node scripts/test_object_review.mjs
+      - name: Upload screenshots and review diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: truc-giang-object-review-qa
+          path: |
+            object-review-initial-*.png
+            object-review-after-*.png
+            object-review-smoke.json
+          if-no-files-found: ignore
