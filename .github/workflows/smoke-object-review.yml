@@ -1,4 +1,4 @@
-name: Review Studio: data integrity and visual widget
+name: "Review Studio: data integrity and visual widget"
 on:
   push:
     branches: [main]
