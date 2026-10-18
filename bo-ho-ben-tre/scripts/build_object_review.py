@@ -11,6 +11,7 @@ can create approved rows in a later, audited step.
 import argparse
 import base64
 import json
+import hashlib
 import re
 import sqlite3
 import zlib
@@ -129,6 +130,78 @@ def make():
                  "review_placeholders":len(manual)}
     }
 
+
+def import_archived_reviews(db, data):
+    """Replay committed, immutable review bundles. Never promote visual approval
+    to measured verification and never mutate the source catalog.
+    """
+    archive=ROOT/"data/object-review/reviews"
+    specs=data["templates"]
+    known={o["id"]:o for o in data["objects"]}
+    seen={}
+    events=[]
+    if not archive.exists():
+        return 0
+    for path in sorted(archive.glob("*.json")):
+        raw=path.read_bytes()
+        if len(raw)>12_000_000:
+            raise ValueError("Review archive too large: "+str(path))
+        bundle=json.loads(raw)
+        if bundle.get("schema")!="truc-giang-review-bundle-v1":
+            raise ValueError("Invalid review bundle: "+str(path))
+        sha=hashlib.sha256(raw).hexdigest()
+        for ev in bundle.get("events",[]):
+            if not isinstance(ev,dict) or ev.get("action")!="visual_approve":
+                continue
+            ident=ev.get("eventId");oid=ev.get("objectId")
+            if oid not in known or not isinstance(ident,str) or not ident.startswith("evt:"):
+                raise ValueError("Unknown review object/event in "+str(path))
+            payload=ev.get("payload") or {}
+            values=payload.get("parameters") or {}
+            template={s["key"]:s for s in specs.get(known[oid]["category"],[])}
+            if not isinstance(values,dict) or any(k not in template for k in values):
+                raise ValueError("Unknown parameter in "+str(path))
+            for key,value in values.items():
+                if value is None or value=="": continue
+                s=template[key]
+                if s["unit"] in ("m","integer"):
+                    if (not isinstance(value,(float,int)) or isinstance(value,bool)
+                        or not s["min"]<=value<=s["max"]
+                        or s["unit"]=="integer" and int(value)!=value):
+                        raise ValueError("Invalid measurement in "+str(path))
+                elif not isinstance(value,str) or len(value)>150:
+                    raise ValueError("Invalid text parameter in "+str(path))
+            ring=payload.get("ring")
+            if ring is not None:
+                if (known[oid]["category"]!="lake_surface" or
+                    known[oid]["source"]!="cad_illustration" or
+                    not isinstance(ring,list) or not 5<=len(ring)<=600 or
+                    not all(isinstance(p,list) and len(p)==2 and
+                    all(isinstance(v,(int,float)) and not isinstance(v,bool) and -600<=v<=2300
+                        for v in p) for p in ring)):
+                    raise ValueError("Invalid visual-only candidate ring in "+str(path))
+            recorded=(
+                ident,oid,ev.get("timestamp") or "",
+                "visual_approve",json.dumps(payload,ensure_ascii=False),
+                "visual_review_only_not_surveyed",sha
+            )
+            if ident in seen:
+                if seen[ident][:6]!=recorded[:6]:
+                    raise ValueError("Conflicting duplicated review event: "+ident)
+                continue
+            seen[ident]=recorded
+            events.append(recorded)
+    for event in sorted(events,key=lambda x:(x[2],x[0])):
+        db.execute("INSERT INTO review_events VALUES (?,?,?,?,?,?,?)",event)
+        values=json.loads(event[4]).get("parameters") or {}
+        for key,value in values.items():
+            db.execute("""INSERT INTO approved_parameters VALUES (?,?,?,?,?)
+              ON CONFLICT(object_id,parameter_key) DO UPDATE SET
+              value_json=excluded.value_json, review_level=excluded.review_level,
+              event_id=excluded.event_id""",
+              (event[1],key,json.dumps(value,ensure_ascii=False),event[5],event[0]))
+    return len(events)
+
 def publish(outdir):
     outdir.mkdir(parents=True,exist_ok=True)
     data=make()
@@ -182,12 +255,13 @@ def publish(outdir):
              x["geometry"]["crs"] if x["geometry"] and "crs" in x["geometry"]
              else ("EPSG:4326" if x["source"]=="osm_crowdsourced" else None),x["kind"])
             for x in data["objects"]])
+        event_count=import_archived_reviews(db,data)
         db.commit()
         assert db.execute("PRAGMA integrity_check").fetchone()[0]=="ok"
         assert db.execute("SELECT COUNT(*) FROM objects").fetchone()[0]==len(data["objects"])
-        assert db.execute("SELECT COUNT(*) FROM review_events").fetchone()[0]==0
+        assert db.execute("SELECT COUNT(*) FROM review_events").fetchone()[0]==event_count
         print(json.dumps({"objects":len(data["objects"]),"stats":data["stats"],
-                          "sqlite":str(db_path),"json":str(json_path)},ensure_ascii=False))
+                          "sqlite":str(db_path),"json":str(json_path),"archived_events":event_count},ensure_ascii=False))
     finally: db.close()
 
 if __name__=="__main__":
