@@ -234,13 +234,13 @@ function queueDraft(id){
  clearTimeout(W.saveTimer);
  W.saveTimer=setTimeout(async()=>{const d=W.drafts.get(id);if(d){await persistDraft(d);msg("Nháp đã lưu trên trình duyệt");}},260);
 }
-async function saveDraft(){
+async function saveDraft(exportOnSave=true){
  const item=current();if(!item){msg("Hãy chọn đối tượng","error");return;}
  const d=clone(getDraft(item.id));d.note=$("note").value.slice(0,2000);d.updated=new Date().toISOString();
  if(item.id===W.cadWaterId&&W.ring)d.ring=clone(W.ring);
  if(!validValues(item,d.parameters)){msg("Kiểm tra thông số bị sai giới hạn","error");return;}
  if(d.ring&&!ringValid(d.ring)){msg("Đường bao tự cắt hoặc tọa độ không hợp lệ","error");return;}
- await persistDraft(d);msg("Đã lưu nháp · "+W.storage);renderList();
+ await persistDraft(d);msg("Đã lưu nháp · "+W.storage);renderList();if(exportOnSave===true)exportBackup();
 }
 function getBundle(){
  return {schema:SCHEMA,exported_at:new Date().toISOString(),project:"Hồ Trúc Giang",
@@ -251,7 +251,7 @@ function getBundle(){
 function exportBackup(){const b=getBundle();download("truc-giang-review-"+new Date().toISOString().slice(0,10)+"-"+String(W.events.length).padStart(3,"0")+".json",JSON.stringify(b,null,2));msg("Đã xuất bản sao · "+W.events.length+" sự kiện");}
 async function approve(){
  const item=current();if(!item){msg("Chưa chọn đối tượng","error");return;}
- await saveDraft();
+ await saveDraft(false);
  const d=clone(getDraft(item.id));
  if(!validValues(item,d.parameters)||(d.ring&&!ringValid(d.ring)))return;
  const rec={eventId:uid(),objectId:item.id,action:"visual_approve",timestamp:new Date().toISOString(),
@@ -269,7 +269,7 @@ async function importBundle(file){
   let added=0,ds=0;
   for(const e of doc.events){
    const o=W.byId.get(e.objectId);
-   if(!o||typeof e.eventId!=="string"||e.eventId.length>140||!["visual_approve","restore"].includes(e.action)||!e.payload
+   if(!o||typeof e.timestamp!=="string"||!Number.isFinite(Date.parse(e.timestamp))||typeof e.eventId!=="string"||e.eventId.length>140||!["visual_approve","restore"].includes(e.action)||!e.payload
       ||!validValues(o,e.payload.parameters||{})||(e.payload.ring&&!ringValid(e.payload.ring)))continue;
    if(!W.events.some(x=>x.eventId===e.eventId)){await persistEvent(e);added++;}
   }
@@ -468,7 +468,9 @@ function setup(){
     if(dist<best){best=dist;at=i;}
    }
    if(best<30&&at>=0){
-    W.ringUndo.push(clone(W.ring));W.ring.splice(at+1,0,[loc.x,loc.y]);paint();queueDraft(W.cadWaterId);msg("Đã thêm điểm CAD nháp");}
+    const before=clone(W.ring);W.ringUndo.push(before);W.ring.splice(at+1,0,[loc.x,loc.y]);
+    if(!ringValid(W.ring)){W.ring=before;W.ringUndo.pop();msg("Điểm mới tạo giao cắt, đã hoàn tác","error");return;}
+    const d=clone(getDraft(W.cadWaterId));d.ring=clone(W.ring);W.drafts.set(d.objectId,d);paint();queueDraft(W.cadWaterId);msg("Đã thêm điểm CAD nháp");}
   });
  }
 }
