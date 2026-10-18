@@ -1,0 +1,73 @@
+{
+  "schema": "truc-giang-hybrid-review-note-v1",
+  "project": "Ho Truc Giang",
+  "review_date": "2026-10-18",
+  "review_level": "USER_VISUAL_REVIEW_NOT_SURVEYED",
+  "scope": "preview_only",
+  "approved_as_survey_or_public_geometry": false,
+  "baseline": {
+    "dataset": "bo-ho-ben-tre/data/scene.json",
+    "osm_water_way_id": 217484891,
+    "road_source": "OSM scene.json; 159 way segments in 2026-10-16 snapshot",
+    "water_geometry_preserved": true
+  },
+  "settings": {
+    "north": {
+      "depth_m": 3.5,
+      "relative_position_on_edge_pct": 50,
+      "source_user_edge_zero_based": 22,
+      "corrected_preview_edge_zero_based": 21,
+      "reason": "Edge #22 is ~8.15 m north-west corner, edge #21 is ~78.87 m northern shoreline",
+      "provisional_anchor_on_osm_edge_lon_lat": [
+        106.37766945,
+        10.2389131
+      ]
+    },
+    "south_1": {
+      "depth_m": 6,
+      "relative_position_on_edge_pct": 30,
+      "edge_zero_based": 7,
+      "provisional_anchor_on_osm_edge_lon_lat": [
+        106.37788322,
+        10.23819059
+      ]
+    },
+    "south_2": {
+      "depth_m": 6,
+      "relative_position_on_edge_pct": 72,
+      "edge_zero_based": 7,
+      "provisional_anchor_on_osm_edge_lon_lat": [
+        106.378460468,
+        10.238154596
+      ]
+    }
+  },
+  "visualization_only": {
+    "north_width_m": 19,
+    "south_1_width_m": 18,
+    "south_2_width_m": 18,
+    "shape": "cosine taper attached to OSM edge, not copied from CAD measured vertices",
+    "cad_role": "visual shape reference; CAD illustration has no verified ground control or georeference"
+  },
+  "qa_local_planar_approx": {
+    "calculation_origin_lon_lat": [
+      106.37814,
+      10.23861
+    ],
+    "metres_per_degree_lon": 109530,
+    "metres_per_degree_lat": 110610,
+    "osm_area_m2": 16730.19,
+    "preview_area_m2": 16447.69,
+    "delta_area_m2": -282.5,
+    "self_crossings": 0,
+    "not_survey_area": true
+  },
+  "outstanding_user_review": [
+    "Confirm north notch center on corrected edge #21 rather than old edge #22",
+    "Confirm two south notch centers and which side of the water is land",
+    "Confirm provisional notch widths (north 19m; each south 18m) and whether cosine-shaped transitions match CAD visually",
+    "Confirm relationship between shoreline, retaining wall, promenade, railings and street before modelling any offsets"
+  ],
+  "original_sqlite_osm_scene_untouched": true,
+  "notes": "The user's supplied depths and percentages are faithfully preserved. Correcting north OSM edge number is a code-side mapping fix, not a new surveyed coordinate."
+}

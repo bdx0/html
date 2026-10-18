@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>OSM + CAD lõm bờ · Hồ Trúc Giang | Hybrid review</title>
+<meta name="description" content="Đối chiếu OSM đường và mặt nước, dùng CAD như tham khảo cho ba chỗ lõm bờ. Chỉ là bản nháp chưa khảo sát.">
+<style>
+:root{font:13px/1.45 system-ui,sans-serif;color:#193d4e;background:#ecf3f2}*{box-sizing:border-box}
+body{margin:0;overflow:hidden}button,input{font:inherit}button{cursor:pointer;border:1px solid #c2d4d5;border-radius:8px;background:#fff;color:#174454;padding:8px}
+button.active{background:#195f70;color:white;border-color:#195f70}h1{font-size:17px;margin:0}p{margin:5px 0}
+header{background:#fff;border-bottom:1px solid #d7e1e3;display:flex;gap:12px;padding:12px 14px;align-items:center}
+header small{color:#71858c;display:block;font-size:10px}header nav{margin-left:auto;display:flex;gap:6px}a{color:#146b84}
+main{height:calc(100dvh - 66px);display:grid;grid-template-columns:minmax(0,1fr) 322px}
+#stage{min-height:0;position:relative;overflow:hidden}#canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
+#canvas:active{cursor:grabbing}.hud{position:absolute;z-index:3;background:#fffffff2;box-shadow:0 5px 17px #31555e22;border:1px solid #bcd1d4;border-radius:10px;padding:9px;font-size:11px}
+#legend{top:10px;left:10px;max-width:240px}#compass{top:10px;right:10px;text-align:center;min-width:52px}#status{bottom:10px;left:10px;max-width:min(460px,calc(100% - 20px))}
+.panel{background:#fff;border-left:1px solid #d7e1e3;padding:14px;overflow:auto;overscroll-behavior:contain}.panel h2{font-size:14px;margin:5px 0 9px}
+.control{border-bottom:1px solid #e5eff0;padding:9px 0}.control header{padding:0;border:0;justify-content:space-between}.control label{font-weight:650}
+.control input[type=range]{width:100%;margin:8px 0;accent-color:#14869d}.muted{color:#687f86;font-size:11px}
+.check{display:inline-flex;gap:5px;align-items:center;margin:3px 10px 4px 0;font-size:11px}
+.actions{display:flex;gap:7px;flex-wrap:wrap;margin:12px 0}.primary{background:#126a81;color:#fff;border-color:#126a81}
+.small{font-size:10px}.warn{padding:9px;border-radius:9px;border:1px solid #edd7a7;background:#fff7e5;color:#785b26}
+@media(max-width:800px){header{height:56px;padding:7px 9px}h1{font-size:13px}header small{display:none}header nav a{font-size:11px}main{height:calc(100dvh - 56px);display:flex;flex-direction:column}#stage{flex:1;min-height:0}.panel{flex:0 0 auto;max-height:42dvh;border:0;border-top:1px solid #cadada;padding:10px}.control{padding:6px 0}#legend{max-width:175px}.hud{padding:6px;font-size:10px}}
+</style></head>
+<body>
+<header><div><h1>Hồ Trúc Giang · OSM + CAD</h1><small>Đường và hồ OSM làm nền; CAD tham khảo các vị trí đất nhô vào hồ</small></div>
+<nav><a href="./">3D gốc</a><a href="cad-gis.html">CAD/GIS</a><a href="model.html">Model</a></nav></header>
+<main><section id="stage">
+<canvas id="canvas" aria-label="Bản đồ mặt hồ OSM với ba chỗ lõm xem thử"></canvas>
+<div class="hud" id="legend"><b>Đối chiếu đường bờ</b><p style="color:#236ba7">▰ Nước hybrid (xem thử)</p><p style="color:#7d52b4">┄ Bờ nước OSM gốc</p><p style="color:#df812f">┄ CAD tham khảo (chưa căn GPS)</p><p style="color:#697e85">━ Tim đường OSM</p></div>
+<div class="hud" id="compass">↑ <b>N</b><div style="font-size:9px;color:#687f86">Bắc OSM</div></div>
+<div class="hud" id="status">Đang tải dữ liệu OSM…</div>
+</section>
+<aside class="panel">
+<h2>Hiệu chỉnh trực quan ba chỗ lõm</h2>
+<p class="muted">Giữ nguyên OSM nước và đường. Chỉ tạo một lớp xem thử các phần <b>đất nhô vào mặt hồ</b>; không ghi vào SQLite, OSM hoặc scene.json.</p>
+<div><label class="check"><input id="hybrid" type="checkbox" checked> Hiện hồ kết hợp</label>
+<label class="check"><input id="raw" type="checkbox" checked> So với OSM gốc</label>
+<label class="check"><input id="roads" type="checkbox" checked> Đường OSM</label>
+<label class="check"><input id="cad" type="checkbox"> Bờ CAD tham khảo</label></div>
+<div class="control"><header><label for="north">① Bờ Bắc · lõm bổ sung</label><output id="northValue">3.5 m</output></header>
+<input id="north" type="range" min="0" max="12" step=".5" value="3.5"><div class="muted">Cạnh OSM #21 (0-based), không phải #22 như phiên bản nháp trước. Vẫn dùng vị trí 50% bạn chọn trên bờ Bắc.</div></div>
+<div class="control"><header><label for="south1">② Bờ Nam · lõm thứ nhất</label><output id="south1Value">6 m</output></header>
+<input id="south1" type="range" min="0" max="12" step=".5" value="6"></div>
+<div class="control"><header><label for="south2">③ Bờ Nam · lõm thứ hai</label><output id="south2Value">6 m</output></header>
+<input id="south2" type="range" min="0" max="12" step=".5" value="6"></div>
+<div class="control"><header><label for="northPos">Vị trí chỗ lõm Bắc</label><output id="northPosValue">50%</output></header><input id="northPos" type="range" min="20" max="80" step="1" value="50"></div>
+<div class="control"><header><label for="south1Pos">Vị trí lõm Nam ①</label><output id="south1PosValue">30%</output></header><input id="south1Pos" type="range" min="15" max="42" step="1" value="30"></div>
+<div class="control"><header><label for="south2Pos">Vị trí lõm Nam ②</label><output id="south2PosValue">72%</output></header><input id="south2Pos" type="range" min="58" max="87" step="1" value="72"></div>
+<div class="actions"><button id="reset">↶ Mặc định</button><button id="zoomIn">＋</button><button id="zoomOut">−</button><button id="export" class="primary">⇩ Xuất nháp JSON</button></div>
+<div class="warn"><b>Bộ tham số bạn duyệt thử: Bắc 3,5 m @50%, Nam 6 m @30% và 6 m @72%.</b> Đây là giả thiết chỉnh được, không phải tọa độ đo; chỗ lõm được tạo theo đường cong xem trước, chưa phải bản sao chính xác hình CAD. Phần Bắc đã sửa lỗi chỉ số cạnh #22 → #21. Không sửa OSM/SQLite.</div>
+</aside></main>
+<script src="cad-north-calibration.js"></script>
+<script src="cad-gis-vector-data.js"></script>
+<script>
+(async function(){
+"use strict";
+const $=id=>document.getElementById(id),cv=$('canvas'),ctx=cv.getContext('2d'),O=[106.37814,10.23861],kE=109530,kN=110610;
+const point=q=>[(q[0]-O[0])*kE,(q[1]-O[1])*kN],gps=p=>[+(O[0]+p[0]/kE).toFixed(8),+(O[1]+p[1]/kN).toFixed(8)];
+const WGS=(f)=>Array.isArray(f?.geometry?.coordinates)?f.geometry.coordinates:[];
+let scene,water,roads=[],cadRing=[],viewport={x:0,y:0,z:1},width=400,height=400;
+const DEFAULT_CONTROL=Object.freeze({north:3.5,south1:6,south2:6,northPos:50,south1Pos:30,south2Pos:72});
+const control={...DEFAULT_CONTROL};
+const EDGES=Object.freeze({north:21,south1:7,south2:7});
+const EDGE_REVIEW=Object.freeze({
+ north:{user_original_edge:22,preview_edge:21,
+   reason:"Old edge #22 is 8.15m at north-west corner; edge #21 is 78.87m north bank, 0-based OSM ring"},
+ south1:{preview_edge:7},south2:{preview_edge:7}
+});
+const sourceRing=()=>water.geometry.coordinates[0].slice(0,-1);
+function patched(){
+ const ring=sourceRing(),args=[
+   {edge:EDGES.north,f:control.northPos/100,depth:control.north,width:19},
+   {edge:EDGES.south1,f:control.south1Pos/100,depth:control.south1,width:18},
+   {edge:EDGES.south2,f:control.south2Pos/100,depth:control.south2,width:18}
+ ];
+ const out=[];for(let i=0;i<ring.length;i++){
+  const A=point(ring[i]),B=point(ring[(i+1)%ring.length]),dx=B[0]-A[0],dy=B[1]-A[1],len=Math.hypot(dx,dy);
+  const controls=args.filter(z=>z.edge===i&&z.depth>0);
+  if(!controls.length){out.push(ring[i]);continue}
+  const fractions=new Set([0,1]);for(const s of controls){
+   const half=Math.min(.35,s.width/len);
+   for(let j=0;j<=16;j++)fractions.add(Math.max(0,Math.min(1,s.f-half+(2*half*j/16))));
+  }
+  [...fractions].sort((a,b)=>a-b).slice(0,-1).forEach(t=>{
+   let d=0;for(const s of controls){const half=Math.min(.35,s.width/len),u=(t-s.f)/half;
+    if(Math.abs(u)<1)d+=s.depth*.5*(1+Math.cos(Math.PI*u));
+   }
+   const nx=-dy/len,ny=dx/len;
+   out.push(gps([A[0]+dx*t+nx*d,A[1]+dy*t+ny*d]));
+  });
+ }
+ return out.concat([out[0]]);
+}
+function signedArea(ring){let a=0;for(let i=0;i<ring.length-1;i++){const p=point(ring[i]),q=point(ring[i+1]);a+=p[0]*q[1]-p[1]*q[0]}return a/2}
+function project(p){return [width/2+(p[0]-viewport.x)*viewport.z,height/2-(p[1]-viewport.y)*viewport.z]}
+function drawLine(gpsArray,fill,stroke,lineWidth,dash,closed=true){
+ if(gpsArray.length<2)return;ctx.beginPath();
+ for(let i=0;i<gpsArray.length;i++){const q=project(point(gpsArray[i]));i?ctx.lineTo(...q):ctx.moveTo(...q)}
+ if(closed)ctx.closePath();if(fill){ctx.fillStyle=fill;ctx.fill()}
+ ctx.lineWidth=lineWidth;ctx.strokeStyle=stroke;ctx.setLineDash(dash||[]);ctx.lineJoin="round";ctx.lineCap="round";ctx.stroke();ctx.setLineDash([]);
+}
+function render(){
+ if(!water)return;
+ ctx.fillStyle="#dbe8d8";ctx.fillRect(0,0,width,height);
+ const grid=50;for(let x=-500;x<500;x+=grid){drawLine([gps([x,-500]),gps([x,500])],null,"#fff7",.7,[],false);drawLine([gps([-500,x]),gps([500,x])],null,"#fff7",.7,[],false)}
+ if($('roads').checked)for(const f of roads){if(f.geometry.type==="LineString")drawLine(WGS(f),null,"#8c9b98",2,[],false)}
+ const proposal=patched();
+ if($('hybrid').checked)drawLine(proposal,"#64b2ccaa","#176d9c",2.4);
+ else drawLine(sourceRing(),"#64b2ccaa","#176d9c",2.4);
+ if($('raw').checked)drawLine(WGS(water)[0],null,"#8253af",2.1,[6,4]);
+ if($('cad').checked&&cadRing.length)drawLine(cadRing,null,"#d77a24",1.8,[5,5]);
+ let samples=[{idx:EDGES.north,p:control.northPos/100,text:"①"},{idx:EDGES.south1,p:control.south1Pos/100,text:"②"},{idx:EDGES.south2,p:control.south2Pos/100,text:"③"}];
+ const base=sourceRing();for(const m of samples){let a=point(base[m.idx]),b=point(base[(m.idx+1)%base.length]),q=project([a[0]+(b[0]-a[0])*m.p,a[1]+(b[1]-a[1])*m.p]);ctx.beginPath();ctx.arc(...q,11,0,Math.PI*2);ctx.fillStyle="#fff8d9";ctx.fill();ctx.strokeStyle="#a76620";ctx.lineWidth=1.8;ctx.stroke();ctx.fillStyle="#774a1d";ctx.textAlign="center";ctx.font="bold 13px system-ui";ctx.fillText(m.text,q[0],q[1]+4)}
+ const baseArea=Math.abs(signedArea(WGS(water)[0])),newArea=Math.abs(signedArea(proposal));
+ $('status').textContent="OSM gốc "+Math.round(baseArea).toLocaleString("vi-VN")+" m² · Xem thử "+Math.round(newArea).toLocaleString("vi-VN")+" m² · "+Math.round(10000*(newArea/baseArea-1))/100+"% · KHÔNG khảo sát";
+}
+function resize(){const rect=cv.getBoundingClientRect(),d=Math.min(devicePixelRatio||1,2);width=rect.width;height=rect.height;cv.width=Math.round(width*d);cv.height=Math.round(height*d);ctx.setTransform(d,0,0,d,0,0);render()}
+new ResizeObserver(resize).observe(cv);
+function fit(){let coords=sourceRing().map(point),xs=coords.map(x=>x[0]),ys=coords.map(x=>x[1]),l=Math.min(...xs),r=Math.max(...xs),b=Math.min(...ys),t=Math.max(...ys);
+ viewport.x=(l+r)/2;viewport.y=(b+t)/2;viewport.z=Math.min((width-36)/(r-l),(height-42)/(t-b))*0.86;render()}
+for(const [id,defaultValue]of Object.entries(control)){$(id).addEventListener('input',e=>{control[id]=Number(e.target.value);$(id+"Value").textContent=(id.endsWith("Pos")?control[id]+"%":control[id]+" m");render()})}
+for(const id of ["hybrid","raw","roads","cad"])$(id).addEventListener("change",render);
+$("reset").onclick=()=>{Object.assign(control,DEFAULT_CONTROL);for(const [id,v]of Object.entries(control)){$(id).value=v;$(id+"Value").textContent=id.endsWith("Pos")?v+"%":v+" m"}fit()};
+$("zoomIn").onclick=()=>{viewport.z*=1.3;render()};
+$("zoomOut").onclick=()=>{viewport.z/=1.3;render()};
+$("export").onclick=()=>{
+ const base=WGS(water)[0],proposal=patched(),review={
+   schema:"truc-giang-hybrid-review-v1",status:"USER_VISUAL_REVIEW_NOT_SURVEYED",
+   source_geometry:"OSM way 217484891",roads:"OSM scene.json untouched",
+   cad_reference:"AI illustration, UNVERIFIED; notch shapes not independently georeferenced",
+   geometry_provenance:"calculated OSM-edge preview offsets, not survey coordinates",
+   params:structuredClone(control),preview_edge_indices_zero_based:structuredClone(EDGES),edge_mapping_review:structuredClone(EDGE_REVIEW),
+   user_review_date:"2026-10-18",user_review_scope:"visual_preview_only",notch_width_m_preview_only:{north:19,south1:18,south2:18},
+   area_base_m2:Math.abs(signedArea(base)),area_preview_m2:Math.abs(signedArea(proposal)),
+   proposed_geojson_preview_only:{type:"Polygon",coordinates:[proposal]},verified:false,modified_database:false,
+   exported_at:new Date().toISOString()
+ };
+ const blob=new Blob([JSON.stringify(review,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="truc-giang-hybrid-review.json";a.click();setTimeout(()=>URL.revokeObjectURL(url),2000)
+};
+let drag=null;cv.addEventListener("pointerdown",e=>{drag=[e.pointerId,e.clientX,e.clientY];cv.setPointerCapture(e.pointerId)});
+cv.addEventListener("pointermove",e=>{if(!drag||drag[0]!==e.pointerId)return;viewport.x-=(e.clientX-drag[1])/viewport.z;viewport.y+=(e.clientY-drag[2])/viewport.z;drag=[e.pointerId,e.clientX,e.clientY];render()});
+cv.addEventListener("pointerup",()=>drag=null);cv.addEventListener("pointercancel",()=>drag=null);
+cv.addEventListener("wheel",e=>{e.preventDefault();viewport.z*=e.deltaY<0?1.08:.92;render()},{passive:false});
+try{
+ const r=await fetch("./data/scene.json");if(!r.ok)throw Error("scene.json HTTP "+r.status);
+ scene=await r.json();water=scene.features.find(f=>f.kind==="water"&&f.osm_id===217484891);
+ roads=scene.features.filter(f=>f.kind==="road");
+ if(!water)throw Error("Không thấy OSM way 217484891");
+ window.TrucGiangHybridReview={
+   getState:()=>({roadCount:roads.length,osmWay:water.osm_id,params:structuredClone(control),
+       edges:structuredClone(EDGES),edgeMappingReview:structuredClone(EDGE_REVIEW),
+       originalAreaM2:Math.abs(signedArea(WGS(water)[0])),
+       previewAreaM2:Math.abs(signedArea(patched())),status:"USER_VISUAL_REVIEW_NOT_SURVEYED"}),
+   baselineRing:()=>WGS(water)[0].map(q=>q.slice()),
+   previewRing:()=>patched(),
+   setDepths:(north,south1,south2)=>{
+     for(const [id,value]of Object.entries({north,south1,south2})){
+       if(!Number.isFinite(value)||value<0||value>12)throw Error("Depth outside 0..12 m");
+       control[id]=value;$(id).value=value;$(id+"Value").textContent=value+" m"
+     }
+     render();
+   }
+ };
+ try{
+  const packed=window.TrucGiangCadGisPacked,raw=Uint8Array.from(atob(packed),x=>x.charCodeAt(0));
+  const data=JSON.parse(await new Response(new Blob([raw]).stream().pipeThrough(new DecompressionStream("deflate"))).text());
+  const cad=data.features.find(f=>f[0]==="water")?.[2]?.[0]||[];
+  const calibrate=window.TrucGiangCadGeoref;
+  cadRing=cad.map(q=>gps(calibrate.localMetres(q,-11.3)));
+ }catch(err){console.warn("CAD preview unavailable; keeping OSM geometry",err)}
+ fit();
+}catch(err){$("status").textContent="Không tải được dữ liệu OSM: "+err.message;console.error(err)}
+})();
+</script>
+</body></html>

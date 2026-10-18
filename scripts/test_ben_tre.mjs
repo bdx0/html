@@ -417,7 +417,11 @@ try {
       errors.push(name+' source OSM lake geometry not restored: '+JSON.stringify(diag.lakeGeometry));
     const snapshot={name,modeOk,viewport,drawCalls:diag.drawCalls,triangles:diag.renderTriangles,frames:diag.frame,errorLog:diag.errors};
     report.push(snapshot);
-    await page.locator('#dbg').click();
+    // #dbg is intentionally hidden on mobile: the debug panel was opened via
+    // the mobile menu above. Closing via the backing button handler avoids
+    // the hidden-element Playwright timeout without relaxing debug assertions.
+    if(mobile)await page.locator('#dbg').evaluate(el=>el.click());
+    else await page.locator('#dbg').click();
     await page.screenshot({path:'ben-tre-'+name+'.png',fullPage:true});
     // Visual CAD/GIS digitization is a separate review layer; source SQLite stays immutable.
     const cad=await ctx.newPage();
@@ -430,26 +434,29 @@ try {
       errors.push(name+' CAD/GIS digitization missing or marked authoritative '+JSON.stringify(cadState));
     if(await cad.locator('#layerList input[type=checkbox]').count()!==11)
       errors.push(name+' CAD/GIS must have 11 toggleable layers');
-    // Four cardinal orientations share one client-side bearing with Model View.
-    // CAD is still an unverified illustration: rotating it must not touch vertices,
-    // numeric GeoJSON coordinates or the original DXF geometry.
+    // Four cardinal directions control only the viewport. The sketch has a separate
+    // tentative alignment relative to the north-up OSM overlay.
+    // Direction changes must not change ring or the exported nominal geometry.
     const cadOriginal=await cad.evaluate(()=>({
       ring:JSON.stringify(TrucGiangCadGis.candidateRing()),
       geo:JSON.stringify(TrucGiangCadGis.geojson()),
       dxf:TrucGiangCadGis.dxf()
     }));
-    for(const [dir,bearing,dx,dy] of [
-      ['north',0,100,0],['east',90,0,-100],['south',180,-100,0],['west',270,0,100]
+    for(const [dir,bearing] of [
+      ['north',0],['east',90],['south',180],['west',270]
     ]){
       await cad.locator('#cadDirectionBar [data-map-direction="'+dir+'"]').click();
       const check=await cad.evaluate(()=>{
         const api=TrucGiangCadGis,view=api.modelToView([824,543]),back=api.viewToModel(view);
-        return {info:api.getInfo(),view,back,
+        const q=TrucGiangCadGeoref.point([824,543],api.getCadNorthOffset());
+        const v=TrucGiangOrientation.rotate(q[0]-724,543-q[1],api.getInfo().direction);
+        const expected={x:724+v.x,y:543-v.z};
+        return {info:api.getInfo(),view,back,expected,
           active:Array.from(document.querySelectorAll('#cadDirectionBar [data-map-direction].selected')).map(b=>b.dataset.mapDirection)};
       });
       if(check.info.direction!==dir||check.info.heading!==bearing||
          !check.active.includes(dir)||check.active.length!==1||
-         Math.abs(check.view.x-724-dx)>0.02||Math.abs(check.view.y-543-dy)>0.02||
+         Math.abs(check.view.x-check.expected.x)>0.02||Math.abs(check.view.y-check.expected.y)>0.02||
          Math.abs(check.back.x-824)>0.02||Math.abs(check.back.y-543)>0.02)
         errors.push(name+' CAD heading transform/inverse does not match '+dir+' '+JSON.stringify(check));
       await cad.locator('#minus').click();
@@ -467,6 +474,36 @@ try {
        cadOriginal.dxf!==cadAfter.dxf||cadAfter.northVerified!==false)
       errors.push(name+' CAD display bearings changed draft source or claim GPS verification');
 
+    // Calibrated sketch rotates without moving the north-up OSM layer or CAD pixels.
+    await cad.locator('#cadDirectionBar [data-map-direction="north"]').click();
+    const beforeCalibration=await cad.evaluate(()=>({
+      ring:JSON.stringify(TrucGiangCadGis.candidateRing()),
+      geo:JSON.stringify(TrucGiangCadGis.geojson()),
+      osmPath:document.querySelector('#osmDrawing path')?.getAttribute('d'),
+      sketchMatrix:document.getElementById('cadSketchAligned').getAttribute('transform'),
+      angle:TrucGiangCadGis.getCadNorthOffset()
+    }));
+    await cad.locator('#cadNorthRange').evaluate(el=>{
+      el.value='-16.0';el.dispatchEvent(new Event('input',{bubbles:true}))
+    });
+    const afterCalibration=await cad.evaluate(()=>({
+      ring:JSON.stringify(TrucGiangCadGis.candidateRing()),
+      geo:TrucGiangCadGis.geojson(),
+      osmPath:document.querySelector('#osmDrawing path')?.getAttribute('d'),
+      sketchMatrix:document.getElementById('cadSketchAligned').getAttribute('transform'),
+      angle:TrucGiangCadGis.getCadNorthOffset(),
+      northVerified:TrucGiangCadGis.getInfo().trueNorthOfIllustrationVerified
+    }));
+    if(afterCalibration.angle!==-16||afterCalibration.sketchMatrix===beforeCalibration.sketchMatrix||
+       afterCalibration.osmPath!==beforeCalibration.osmPath||
+       afterCalibration.ring!==beforeCalibration.ring||
+       JSON.stringify(afterCalibration.geo)===beforeCalibration.geo||
+       afterCalibration.geo.metadata.cad_north_offset_deg!==-16||
+       afterCalibration.geo.metadata.verified!==false||afterCalibration.northVerified!==false)
+      errors.push(name+' CAD north calibration mutated source or OSM reference '+JSON.stringify(afterCalibration).slice(0,700));
+    await cad.evaluate(deg=>TrucGiangCadGis.setCadNorthOffset(deg),beforeCalibration.angle);
+    if((await cad.evaluate(()=>TrucGiangCadGis.getInfo().cadNorthOffsetDeg))!==beforeCalibration.angle)
+      errors.push(name+' CAD north calibration reset failed');
     await cad.locator('#edit').click();
     if((await cad.locator('#handles circle').count())<70)
       errors.push(name+' CAD/GIS editable shoreline vertices missing');
@@ -493,6 +530,45 @@ try {
       await cad.screenshot({path:'ben-tre-cad-gis-'+name+'.png'});
     }
     await cad.close();
+    // OSM-first preview: road/water source stays identical and CAD contributes only
+    // explicitly unverified, user-adjustable local indentations.
+    const hybrid=await ctx.newPage();
+    hybrid.on('pageerror',e=>errors.push(name+' hybrid page JS '+e.message));
+    await hybrid.goto('http://127.0.0.1:8765/bo-ho-ben-tre/hybrid-review.html',{waitUntil:'load',timeout:30000});
+    await hybrid.waitForFunction(()=>window.TrucGiangHybridReview?.getState().osmWay===217484891,{timeout:30000});
+    const beforeHybrid=await hybrid.evaluate(()=>({
+      state:TrucGiangHybridReview.getState(),
+      baseline:JSON.stringify(TrucGiangHybridReview.baselineRing()),
+      candidate:JSON.stringify(TrucGiangHybridReview.previewRing())
+    }));
+    if(beforeHybrid.state.roadCount!==159||beforeHybrid.state.status!=='USER_VISUAL_REVIEW_NOT_SURVEYED'||
+       beforeHybrid.state.params.north!==3.5||beforeHybrid.state.params.south1!==6||
+       beforeHybrid.state.params.south2!==6||beforeHybrid.state.params.northPos!==50||
+       beforeHybrid.state.params.south1Pos!==30||beforeHybrid.state.params.south2Pos!==72||
+       beforeHybrid.state.edges.north!==21||beforeHybrid.state.edges.south1!==7||
+       beforeHybrid.state.edges.south2!==7||
+       beforeHybrid.state.edgeMappingReview.north.user_original_edge!==22||
+       beforeHybrid.state.previewAreaM2>=beforeHybrid.state.originalAreaM2||
+       beforeHybrid.baseline===beforeHybrid.candidate)
+      errors.push(name+' hybrid preview missing OSM source or local notches '+JSON.stringify(beforeHybrid.state));
+    await hybrid.evaluate(()=>TrucGiangHybridReview.setDepths(0,0,0));
+    const zero=await hybrid.evaluate(()=>({
+       baseline:JSON.stringify(TrucGiangHybridReview.baselineRing()),
+       preview:JSON.stringify(TrucGiangHybridReview.previewRing()),
+       state:TrucGiangHybridReview.getState()
+    }));
+    if(zero.baseline!==zero.preview||Math.abs(zero.state.originalAreaM2-zero.state.previewAreaM2)>0.001)
+      errors.push(name+' hybrid zero-depth mode does not restore exact OSM ring');
+    await hybrid.evaluate(()=>TrucGiangHybridReview.setDepths(3.5,6,6));
+    const screen=await hybrid.evaluate(()=>({
+       width:document.documentElement.scrollWidth,innerWidth:window.innerWidth,
+       height:document.documentElement.scrollHeight,innerHeight:window.innerHeight
+    }));
+    if(screen.width>screen.innerWidth+2||screen.height>screen.innerHeight+2)
+      errors.push(name+' hybrid review page overflows mobile/desktop viewport '+JSON.stringify(screen));
+    if(name==='desktop'||name==='mobile-390')
+      await hybrid.screenshot({path:'ben-tre-hybrid-'+name+'.png'});
+    await hybrid.close();
     // Open independent SQL browser and validate the snapshot against the real DB counts.
     const explorer=await ctx.newPage();
     explorer.on('pageerror',e=>errors.push(name+' SQLite JS '+e.message));
