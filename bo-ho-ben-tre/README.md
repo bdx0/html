@@ -1,5 +1,15 @@
 # Hồ Trúc Giang / Bờ Hồ Bến Tre — Digital Twin (vùng 300m)
 
+## 🧭 Object Review Studio (2026-10-18)
+
+**[MỞ WIDGET DUYỆT ĐỐI TƯỢNG](object-review.html)** · [Hướng dẫn và quy tắc sao lưu](OBJECT_REVIEW_GUIDE.md)
+
+- SQLite kiểm duyệt **tách riêng** `data/object-review.sqlite` và bản xuất `data/object-review-base.json`, sinh từ 311 CAD illustration vectors, OSM scene hiện tại và 7 mục ghi chú, không chỉnh `catalog.sqlite`, `scene.json` hoặc dữ liệu gốc.
+- Chọn đối tượng, chỉnh thông số, xem phác mặt cắt, kéo đỉnh bờ CAD, so sánh **hai khung riêng CAD/OSM** để không giả vờ hai nguồn đã căn GPS. Thông số chưa đo giữ trống.
+- Lưu nháp vào IndexedDB + localStorage và tự tải bản sao JSON; duyệt tạo **event mới không ghi đè** và cũng tự tải JSON. Giữ file JSON đến khi được kiểm tra/commit vào `data/object-review/reviews/` cho lần build tiếp theo.
+- CAD hiện tại là số hóa từ ảnh minh họa, không phải CAD đo đạc; duyệt trực quan không đồng nghĩa xác nhận GPS/survey.
+
+
 ## N/E/S/W đồng bộ cho CAD/GIS và Model View (2026-10-16)
 
 **Bốn hướng nhìn dùng chung:** `N` = Bắc ở trên (0°), `E` = Đông ở trên (90°), `S` = Nam ở trên (180°), `W` = Tây ở trên (270°). Đây là **góc xoay mặt bằng trên màn hình**, không phải camera đứng nhìn từ phía Bắc/Đông trong 3D. Nút hướng và mũi tên Bắc đều thay đổi, có thể quay về N nhanh. Bố cục mobile giữ nút bấm nhỏ gọn, không thêm drawer. Lựa chọn lưu tại localStorage `bdx0:truc-giang:view-direction-v1`; chuyển `cad-gis.html` ↔ `model.html` giữ nguyên, hai tab cập nhật thông qua `storage` event. Có thể override khi mở trang bằng query `?dir=north|east|south|west`.
