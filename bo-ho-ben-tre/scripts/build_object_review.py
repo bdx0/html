@@ -78,9 +78,9 @@ def load_cad():
         raise ValueError("Missing CAD illustration features")
     return features
 
-def make():
+def make(scene_path=None):
     cad=load_cad()
-    scene=json.loads((ROOT/"data/scene.json").read_text(encoding="utf-8"))
+    scene=json.loads((Path(scene_path) if scene_path else ROOT/"data/scene.json").read_text(encoding="utf-8"))
     items=[]
     for i,f in enumerate(cad):
         layer,geom_type,coords,desc=f
@@ -202,9 +202,9 @@ def import_archived_reviews(db, data):
               (event[1],key,json.dumps(value,ensure_ascii=False),event[5],event[0]))
     return len(events)
 
-def publish(outdir):
+def publish(outdir, scene_path=None):
     outdir.mkdir(parents=True,exist_ok=True)
-    data=make()
+    data=make(scene_path)
     json_path=outdir/"object-review-base.json"
     json_path.write_text(json.dumps(data,ensure_ascii=False,separators=(",",":")),encoding="utf-8")
     db_path=outdir/"object-review.sqlite"
@@ -267,4 +267,6 @@ def publish(outdir):
 if __name__=="__main__":
     a=argparse.ArgumentParser()
     a.add_argument("--output",type=Path,default=ROOT/"data")
-    publish(a.parse_args().output)
+    a.add_argument("--scene",type=Path,default=None)
+    args=a.parse_args()
+    publish(args.output,args.scene)
