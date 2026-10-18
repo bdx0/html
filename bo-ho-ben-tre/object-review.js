@@ -440,7 +440,7 @@ function setup(){
  $("undo").onclick=()=>{if(W.ringUndo.length){W.ring=W.ringUndo.pop();const d=clone(getDraft(W.cadWaterId));d.ring=clone(W.ring);W.drafts.set(d.objectId,d);queueDraft(d.objectId);paint();}};
  $("resetView").onclick=()=>{W.ring=W.ring||loadRing();$("cadSvg").setAttribute("viewBox","0 0 1448 1086");$("osmSvg").setAttribute("viewBox","0 0 1448 1086");W.zoom=1;$("mapZoom").textContent="100%";};
  $("note").oninput=()=>{const o=current();if(!o)return;const d=clone(getDraft(o.id));d.note=$("note").value.slice(0,2000);W.drafts.set(o.id,d);queueDraft(o.id);};
- $("saveDraft").onclick=saveDraft;
+ $("saveDraft").onclick=()=>saveDraft(true);
  $("approve").onclick=approve;
  $("export").onclick=exportBackup;
  $("importBtn").onclick=()=>$("importFile").click();
