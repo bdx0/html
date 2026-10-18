@@ -417,7 +417,11 @@ try {
       errors.push(name+' source OSM lake geometry not restored: '+JSON.stringify(diag.lakeGeometry));
     const snapshot={name,modeOk,viewport,drawCalls:diag.drawCalls,triangles:diag.renderTriangles,frames:diag.frame,errorLog:diag.errors};
     report.push(snapshot);
-    await page.locator('#dbg').click();
+    // #dbg is intentionally hidden on mobile: the debug panel was opened via
+    // the mobile menu above. Closing via the backing button handler avoids
+    // the hidden-element Playwright timeout without relaxing debug assertions.
+    if(mobile)await page.locator('#dbg').evaluate(el=>el.click());
+    else await page.locator('#dbg').click();
     await page.screenshot({path:'ben-tre-'+name+'.png',fullPage:true});
     // Visual CAD/GIS digitization is a separate review layer; source SQLite stays immutable.
     const cad=await ctx.newPage();
@@ -538,6 +542,12 @@ try {
       candidate:JSON.stringify(TrucGiangHybridReview.previewRing())
     }));
     if(beforeHybrid.state.roadCount!==159||beforeHybrid.state.status!=='USER_VISUAL_REVIEW_NOT_SURVEYED'||
+       beforeHybrid.state.params.north!==3.5||beforeHybrid.state.params.south1!==6||
+       beforeHybrid.state.params.south2!==6||beforeHybrid.state.params.northPos!==50||
+       beforeHybrid.state.params.south1Pos!==30||beforeHybrid.state.params.south2Pos!==72||
+       beforeHybrid.state.edges.north!==21||beforeHybrid.state.edges.south1!==7||
+       beforeHybrid.state.edges.south2!==7||
+       beforeHybrid.state.edgeMappingReview.north.user_original_edge!==22||
        beforeHybrid.state.previewAreaM2>=beforeHybrid.state.originalAreaM2||
        beforeHybrid.baseline===beforeHybrid.candidate)
       errors.push(name+' hybrid preview missing OSM source or local notches '+JSON.stringify(beforeHybrid.state));
@@ -549,7 +559,7 @@ try {
     }));
     if(zero.baseline!==zero.preview||Math.abs(zero.state.originalAreaM2-zero.state.previewAreaM2)>0.001)
       errors.push(name+' hybrid zero-depth mode does not restore exact OSM ring');
-    await hybrid.evaluate(()=>TrucGiangHybridReview.setDepths(7,7,6));
+    await hybrid.evaluate(()=>TrucGiangHybridReview.setDepths(3.5,6,6));
     const screen=await hybrid.evaluate(()=>({
        width:document.documentElement.scrollWidth,innerWidth:window.innerWidth,
        height:document.documentElement.scrollHeight,innerHeight:window.innerHeight
