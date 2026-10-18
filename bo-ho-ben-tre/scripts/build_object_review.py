@@ -83,7 +83,8 @@ def make(scene_path=None):
     scene=json.loads((Path(scene_path) if scene_path else ROOT/"data/scene.json").read_text(encoding="utf-8"))
     items=[]
     for i,f in enumerate(cad):
-        layer,geom_type,coords,desc=f
+        layer,geom_type,coords=f[:3]
+        desc=f[3] if len(f)>3 else None
         if layer not in CLASSES:
             continue
         items.append({
