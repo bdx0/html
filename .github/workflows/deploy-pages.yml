@@ -37,6 +37,13 @@ jobs:
           test -s _site/bo-ho-ben-tre/data/scene.json
           test -s _site/bo-ho-ben-tre/data/sqlite-explorer.json
           test -s _site/bo-ho-ben-tre/data/model-view.json
+          # Build the independent review database from the same deployed scene.
+          # Never change canonical catalog.sqlite or any OSM/CAD source.
+          python3 bo-ho-ben-tre/scripts/build_object_review.py --scene _site/bo-ho-ben-tre/data/scene.json --output _site/bo-ho-ben-tre/data
+          test -s _site/bo-ho-ben-tre/data/object-review.sqlite
+          test -s _site/bo-ho-ben-tre/data/object-review-base.json
+          test -s _site/bo-ho-ben-tre/object-review.html
+          test -s _site/bo-ho-ben-tre/object-review.js
           test -s _site/bo-ho-ben-tre/model.html
           test -s _site/bo-ho-ben-tre/sqlite.html
           python3 scripts/build_catalog.py --root . --output _site/catalog.json
