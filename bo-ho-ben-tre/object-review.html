@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a1b29">
+<meta name="description" content="Hồ Trúc Giang — công cụ xem và duyệt từng đối tượng, đường bao CAD nháp và dữ liệu OpenStreetMap. Mọi ghi chú được sao lưu thành các phiên bản; không chỉnh SQLite gốc.">
+<meta name="catalog:category" content="GIS & 3D">
+<meta name="catalog:tags" content="CAD, GIS, SQLite, review, đường bờ, diorama">
+<meta name="catalog:icon" content="🧭">
+<title>Object Review Studio | Hồ Trúc Giang</title>
+<style>
+:root{color-scheme:dark;--bg:#091724;--panel:#10263a;--panel2:#142c42;--text:#f0f7fa;--muted:#a9c0cc;--accent:#72e0ce;--line:#35536a;--orange:#ffbf8c;--red:#ff7e96}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font:13px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+button,input,select,textarea{font:inherit}button{cursor:pointer;border:1px solid var(--line);color:var(--text);background:#203c54;border-radius:10px;padding:10px 12px;font-weight:750}button:hover{background:#2a5069}button:disabled{opacity:.5;cursor:not-allowed}button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #82eedd;outline-offset:2px}
+a{color:#a5eee4}
+header{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 20px;background:#0e2234;border-bottom:1px solid #29475d}
+.brand{display:flex;align-items:center;gap:11px}.brand .mark{font-size:24px;background:#16463f;padding:8px;border-radius:13px}.brand strong{font-size:17px}.brand small{display:block;font-size:10px;color:var(--muted);letter-spacing:.05em}
+header nav{display:flex;gap:12px;white-space:nowrap;font-size:12px}
+.hero{padding:15px 20px 10px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.hero h1{font-size:20px;letter-spacing:-.03em;margin:0}.hero p{margin:4px 0;color:var(--muted);font-size:11px}
+.badge{display:inline-flex;padding:5px 9px;background:#3d342e;border:1px solid #99744d;color:#ffe1b8;border-radius:99px;font-size:10px;font-weight:850}
+.layout{display:grid;grid-template-columns:minmax(200px,235px) minmax(0,1fr) minmax(275px,318px);gap:12px;padding:9px 14px 15px;height:calc(100dvh - 133px);min-height:510px}
+.panel{background:var(--panel);border:1px solid #2d485e;border-radius:16px;min-height:0;overflow:hidden;display:flex;flex-direction:column}
+.panelHead{padding:13px 14px;border-bottom:1px solid #29485e;flex:none;display:flex;align-items:center;justify-content:space-between;gap:8px}.panelHead h2{font-size:13px;letter-spacing:.03em;margin:0}.panelBody{min-height:0;overflow:auto;padding:12px}
+.search{width:100%;background:#0d2030;border:1px solid #39576a;border-radius:9px;color:white;padding:11px;margin-bottom:10px}
+.tabs{display:flex;gap:5px;flex-wrap:wrap}.tabs button{padding:7px 10px;font-size:11px}.tabs button[aria-pressed="true"]{background:#266a70;border-color:#60d1c5}
+#typeChips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}#typeChips button{font-size:10px;padding:5px 8px}#typeChips button[aria-pressed=true]{color:#042a26;background:var(--accent)}
+#objectList{display:flex;flex-direction:column;gap:5px}
+.item{width:100%;display:flex;text-align:left;justify-content:space-between;gap:10px;border-radius:10px;padding:10px;background:#142d43}
+.item b{font-size:11px;font-weight:750;overflow-wrap:anywhere}.item small{display:block;color:#9cb9c8;font-size:10px;font-weight:500}
+.item[aria-current=true]{background:#285a62;border-color:#65cbbb}.item .state{color:#b6cae0;white-space:nowrap;font-size:12px}
+#listCount{font-size:10px;color:#a3bac6;margin:9px 0 4px}
+.mapPanel{position:relative;overflow:hidden;background:#deebdc;min-height:250px}
+.mapControls{display:flex;align-items:center;gap:7px;flex-wrap:wrap;padding:9px;background:#152e42;border-bottom:1px solid #426177;position:relative;z-index:2}
+.mapControls button{padding:7px 10px;font-size:11px}
+#maps{flex:1;min-height:0;display:grid;grid-template-columns:1fr;overflow:hidden}
+#maps.compare{grid-template-columns:1fr 1fr}
+.mapSlot{position:relative;min-width:0;min-height:0;overflow:hidden;background:#e4eddd}
+.mapSlot[hidden]{display:none}#maps:not(.compare) .mapSlot:not(.active){display:none}
+.mapSlot svg{display:block;width:100%;height:100%;touch-action:none}
+.mapSlot .tag{position:absolute;left:8px;top:8px;border-radius:8px;background:#ffffffed;padding:6px 8px;color:#344b5b;font-size:10px;font-weight:800;pointer-events:none}
+.mapSlot .compass{position:absolute;right:12px;top:9px;font-size:19px;font-weight:850;color:#255375;pointer-events:none}
+.mapSlot svg .feature{cursor:pointer;vector-effect:non-scaling-stroke;transition:opacity .1s}
+.mapSlot svg .feature:hover{stroke:#ec8d3c;stroke-width:3!important}
+.mapSlot svg .feature.selected{stroke:#ea4576!important;stroke-width:4!important;filter:drop-shadow(0 2px 2px #fa668d80)}
+.mapSlot svg .vertex{fill:white;stroke:#dc2f64;stroke-width:2;cursor:grab;vector-effect:non-scaling-stroke}
+.mapSlot svg .vertex.active{fill:#ffe19b}
+.mapFoot{padding:9px 12px;background:#172c3c;border-top:1px solid #37566a;display:flex;align-items:center;justify-content:space-between;gap:12px;color:#b6cbd7;font-size:10px}
+.warn{padding:11px;border-radius:10px;background:#2c2d2f;border:1px solid #665745;color:#ffe1af;font-size:11px;line-height:1.55}
+.line{height:1px;background:#365166;margin:11px 0}
+h3{font-size:12px;margin:13px 0 7px}p{margin:7px 0}
+.kv{display:grid;grid-template-columns:90px 1fr;gap:6px;font-size:11px}.kv dt{color:var(--muted)}.kv dd{margin:0;overflow-wrap:anywhere}
+.field{background:var(--panel2);border:1px solid #35546b;padding:11px;border-radius:10px;margin:9px 0}
+.field label{display:block;font-size:11px;font-weight:820}.field .desc{font-size:10px;color:var(--muted);margin:2px 0 8px}
+.field .editRow{display:flex;align-items:center;gap:9px}.field input[type=number],.field input[type=text],.field select{min-width:0;flex:1;width:100%;background:#071e2d;border:1px solid #45647b;border-radius:8px;padding:9px;color:white}
+.field input[type=range]{width:100%;accent-color:var(--accent)}.field .unit{color:#c2d7e2;white-space:nowrap}
+.field button{padding:8px;font-size:10px}
+textarea{width:100%;resize:vertical;min-height:58px;background:#0c2234;color:white;border:1px solid #3b5c73;border-radius:9px;padding:9px}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:7px}.actions button{padding:10px 6px;font-size:11px}
+.primary{background:#7be0ce;color:#06312f;border-color:#7be0ce}.primary:hover{background:#a5f4e6}
+#history{display:flex;flex-direction:column;gap:6px;margin-top:8px}.log{border:1px solid #385267;border-radius:9px;padding:8px;font-size:10px;background:#0e263a}.log button{float:right;padding:4px 7px;font-size:10px}
+#status{font-size:10px;color:#afe7da}
+#cross{width:100%;height:100px;background:#0b2235;border:1px solid #3a5a70;border-radius:9px}
+.footerNote{font-size:10px;color:#b8cdda}
+input[type=file]{display:none}
+@media(max-width:1000px){.layout{grid-template-columns:190px minmax(0,1fr) 280px;gap:7px;padding:7px}.panelBody{padding:9px}}
+@media(max-width:740px){
+ header{padding:9px 11px}.brand strong{font-size:13px}.brand small{font-size:9px}header nav{font-size:10px;gap:6px}
+ .hero{padding:8px 11px}.hero h1{font-size:16px}.hero p{font-size:10px}
+ .layout{display:flex;flex-direction:column;height:auto;min-height:0;padding:7px;gap:8px}
+ #mapPanel{height:54dvh;min-height:360px;order:0;flex:none}
+ #inspector{order:1;max-height:none}
+ #catalog{order:2;max-height:260px}
+ #maps.compare{grid-template-columns:1fr 1fr}.mapSlot .tag{font-size:8px;padding:5px}
+ .panelHead{padding:10px}.panelBody{padding:10px}
+ #maps{min-height:0}
+}
+@media(max-width:390px){#mapPanel{height:48dvh;min-height:320px}.mapControls button{padding:5px 8px;font-size:10px}.hero .badge{font-size:9px}}
+</style>
+</head>
+<body>
+<header>
+<div class="brand"><span class="mark">🧭</span><div><strong>Trúc Giang · Object Studio</strong><small>REVIEW → VERSION → DATABASE</small></div></div>
+<nav><a href="./">Bờ Hồ 3D</a><a href="cad-gis.html">CAD / GIS</a><a href="../ho-truc-giang-diorama.html">Diorama</a></nav>
+</header>
+<div class="hero">
+<div><h1>Duyệt từng đối tượng trước khi ghi dữ liệu</h1><p>Chọn đối tượng trên bản vẽ, chỉnh thông số, so sánh và duyệt. Không ghi đè SQLite/OSM gốc.</p></div>
+<span class="badge" id="badge">Chưa tải dữ liệu</span>
+</div>
+<main class="layout">
+<aside class="panel" id="catalog">
+<div class="panelHead"><h2>01 / Danh mục đối tượng</h2><span id="count">…</span></div>
+<div class="panelBody">
+<input id="search" class="search" type="search" placeholder="Tìm tên, ID, loại…" aria-label="Tìm đối tượng">
+<div id="typeChips"></div>
+<div id="listCount"></div>
+<div id="objectList" role="listbox" aria-label="Chọn đối tượng"></div>
+</div>
+</aside>
+<section class="panel mapPanel" id="mapPanel">
+<div class="mapControls">
+<div class="tabs" role="group" aria-label="Chế độ bản đồ">
+<button id="cadMode" aria-pressed="true">CAD nháp</button>
+<button id="osmMode" aria-pressed="false">OSM</button>
+<button id="compareMode" aria-pressed="false">So sánh đôi</button>
+</div>
+<div style="flex:1"></div>
+<button id="editGeometry" aria-pressed="false">✎ Sửa bờ</button>
+<button id="undo" title="Hoàn tác một bước">↶</button>
+<button id="resetView">⌂</button>
+</div>
+<div id="maps">
+<div class="mapSlot active" id="cadSlot"><span class="tag">CAD minh họa · tọa độ pixel, chưa định hướng GPS</span><svg id="cadSvg" viewBox="0 0 1448 1086" role="img" aria-label="Bản vẽ CAD nháp có thể chọn đối tượng"><g id="cadShapes"></g><g id="cadHandles"></g></svg></div>
+<div class="mapSlot" id="osmSlot"><span class="tag">OSM way 217484891 · WGS84 · chưa khảo sát</span><span class="compass">↑ N</span><svg id="osmSvg" viewBox="0 0 1448 1086" role="img" aria-label="Địa hình OSM gốc có thể chọn đối tượng"><g id="osmShapes"></g></svg></div>
+</div>
+<div class="mapFoot"><span id="mapHint">Chạm một đối tượng để xem thông số</span><span id="mapZoom">100%</span></div>
+</section>
+<aside class="panel" id="inspector">
+<div class="panelHead"><h2>02 / Thông số & duyệt</h2><span id="status">Đang tải…</span></div>
+<div class="panelBody">
+<div id="selection"><h3>Chưa chọn đối tượng</h3><p class="footerNote">Chọn trực tiếp trên CAD, OSM hoặc danh sách bên trái.</p></div>
+<div class="warn" id="sourceWarning">CAD là bản phác dựa trên ảnh minh họa; OSM là dữ liệu cộng đồng. Chưa có polygon CAD đo đạc chính thức.</div>
+<div id="parameterFields"></div>
+<h3>Thử mặt cắt 2.5D (chỉ mô phỏng)</h3>
+<svg id="cross" viewBox="0 0 300 100" aria-label="Mặt cắt minh họa theo thông số"></svg>
+<h3>Ghi chú duyệt</h3><textarea id="note" placeholder="Ví dụ: bờ bắc đoạn này thẳng, phần lõm kế bên giữ nguyên…"></textarea>
+<div class="actions" style="margin-top:10px">
+<button id="saveDraft">Lưu nháp</button><button id="approve" class="primary">✓ Duyệt trực quan</button>
+<button id="export">⇩ Xuất sao lưu</button><button id="importBtn">⇧ Khôi phục</button>
+</div>
+<input id="importFile" type="file" accept="application/json,.json">
+<p class="footerNote">Duyệt trực quan ≠ xác minh GPS. Mỗi lần duyệt tạo một phiên bản mới và tải JSON sao lưu. Để đồng bộ vĩnh viễn lên GitHub/SQLite, gửi file JSON đã xuất cho mình.</p>
+<div class="line"></div>
+<h3>03 / Lịch sử phiên bản</h3>
+<div id="history"></div>
+<div class="line"></div>
+<p class="footerNote">Nguồn gốc không sửa: <a href="https://www.openstreetmap.org/way/217484891" target="_blank" rel="noopener">OSM water way</a> · <a href="cad-gis.html">CAD/GIS nháp</a> · <a href="sqlite.html">SQLite nguồn</a>.</p>
+</div>
+</aside>
+</main>
+<script src="object-review.js"></script>
+</body>
+</html>
