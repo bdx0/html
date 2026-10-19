@@ -17,9 +17,10 @@ const LABEL={lake_surface:"Mặt hồ",lake_edge:"Đường bờ",lake_wall:"Th�
  vacant_lot:"Đất trống",fountain:"Đài phun nước",park_area:"Công viên",
  plaza:"Quảng trường",review_point:"Điểm cần duyệt",osm_reference:"Đối chiếu OSM"};
 const BASE_URL="./data/object-review-base.json",SCHEMA="truc-giang-review-bundle-v1";
+const north=window.TrucGiangCadNorth;
 const W={base:null,byId:new Map(),selectedId:null,filters:"all",query:"",
  drafts:new Map(),events:[],db:null,mode:"cad",editing:false,ring:null,ringUndo:[],
- cadWaterId:null,dirty:false,zoom:1,drag:null,saveTimer:null,storage:"loading",loadError:null};
+ cadWaterId:null,dirty:false,zoom:1,drag:null,saveTimer:null,storage:"loading",loadError:null,selectedVertex:-1,vertexStep:1,insertMode:false,mobileSheet:"map",mapPointers:new Map()};
 function safeName(s){return String(s||"").slice(0,180);}
 function fmt(n){return Number.isFinite(n)?Number(n).toLocaleString("vi-VN",{maximumFractionDigits:2}):"Chưa đo";}
 function msg(s,kind){$("status").textContent=s;$("status").style.color=kind==="error"?"#ffb1bd":"#aef1db";}
@@ -179,6 +180,10 @@ function select(id){
   const dt=document.createElement("dt"),dd=document.createElement("dd");dt.textContent=label;dd.textContent=String(value);meta.append(dt,dd);
  }
  $("selection").append(h,p,meta);
+ $("mobileObjectName").textContent=safeName(item.name);
+ $("mobileObjectType").textContent=(LABEL[item.category]||item.category)+" · "+sourceLabel(item);
+ if(innerWidth<=740&&W.mobileSheet==="objects")openSheet("fields");
+
  const warn=$("sourceWarning");warn.textContent=item.source==="osm_crowdsourced"?
   "OSM có tọa độ WGS84 cộng đồng; vẫn chưa được đo khảo sát. Duyệt thông số không tự thay đường bao OSM.":
   "Hình học CAD là pixel ảnh minh họa, chưa canh GPS. Không suy ra kích thước mét hoặc cao độ đo thật từ hình này.";
@@ -373,6 +378,8 @@ function mkFeature(item,isCad){
 }
 function paint(){
  if(!W.base)return;
+ const cadAligned=$("cadAligned");
+ if(cadAligned&&north)cadAligned.setAttribute("transform","rotate("+north.get()+" 724 543)");
  const cad=$("cadShapes"),osm=$("osmShapes");clear(cad);clear(osm);
  for(const o of W.base.objects){
   if(o.kind==="cad"){
@@ -388,15 +395,15 @@ function paint(){
  const handles=$("cadHandles");clear(handles);
  if(W.editing&&W.ring&&current()?.id===W.cadWaterId){
   W.ring.forEach((p,i)=>{
-   const c=svgNode("circle",{class:"vertex",cx:p[0],cy:p[1],r:6,"data-point":i},handles);
+   const c=svgNode("circle",{class:"vertex"+(i===W.selectedVertex?" active":""),cx:p[0],cy:p[1],r:innerWidth<=740?12:8,"data-point":i},handles);
    c.addEventListener("pointerdown",e=>{
-    e.preventDefault();e.stopPropagation();W.ringUndo.push(clone(W.ring));if(W.ringUndo.length>80)W.ringUndo.shift();
+    e.preventDefault();e.stopPropagation();W.selectedVertex=i;W.insertMode=false;updateVertexBar();W.ringUndo.push(clone(W.ring));if(W.ringUndo.length>80)W.ringUndo.shift();
     W.drag={index:i,pointer:e.pointerId};c.classList.add("active");try{c.setPointerCapture(e.pointerId);}catch(_){}
    });
    c.addEventListener("pointermove",e=>{
     if(!W.drag||W.drag.pointer!==e.pointerId)return;
     const svg=$("cadSvg"),point=svg.createSVGPoint();point.x=e.clientX;point.y=e.clientY;
-    const m=point.matrixTransform(svg.getScreenCTM().inverse());
+    const m=point.matrixTransform($("cadAligned").getScreenCTM().inverse());
     W.ring[i]=[Math.max(-400,Math.min(1900,m.x)),Math.max(-400,Math.min(1600,m.y))];
     const path=cad.querySelector('[data-id="'+W.cadWaterId+'"]');
     if(path)path.setAttribute("d","M"+W.ring.map(p=>p.join(",")).join(" L")+" Z");
@@ -414,6 +421,50 @@ function paint(){
    c.addEventListener("pointerup",done);c.addEventListener("pointercancel",done);
   });
  }
+}
+function updateVertexBar(){
+ const on=W.editing&&W.selectedVertex>=0;
+ $("vertexTools").classList.toggle("active",W.editing);
+ $("vertexLabel").textContent=on?"Đỉnh "+(W.selectedVertex+1)+" / "+W.ring.length:
+  W.insertMode?"Chạm mép hồ để thêm điểm":"Chạm đỉnh để chỉnh chính xác";
+ $("vertexStep").textContent=W.vertexStep+"px";
+ const toggle=$("insertVertex");if(toggle)toggle.setAttribute("aria-pressed",String(W.insertMode));
+}
+function nudgeVertex(dx,dy){
+ if(!W.editing||W.selectedVertex<0)return;
+ const prev=clone(W.ring),p=W.ring[W.selectedVertex];
+ const x=p[0]+dx*W.vertexStep,y=p[1]+dy*W.vertexStep;
+ if(x< -400||x>1900||y< -400||y>1600)return;
+ W.ringUndo.push(prev);W.ring[W.selectedVertex]=[x,y];
+ if(!ringValid(W.ring)){W.ring=W.ringUndo.pop();msg("Đường bờ tự cắt, không áp dụng","error");}
+ else{const draft=clone(getDraft(W.cadWaterId));draft.ring=clone(W.ring);W.drafts.set(draft.objectId,draft);queueDraft(draft.objectId);msg("Đỉnh "+(W.selectedVertex+1)+" đã đổi · CAD nháp");}
+ paint();updateVertexBar();
+}
+function insertVertexAt(clientX,clientY){
+ const svg=$("cadSvg"),v=svg.createSVGPoint();v.x=clientX;v.y=clientY;
+ const loc=v.matrixTransform($("cadAligned").getScreenCTM().inverse());
+ let best=Infinity,at=-1,atPoint=null;
+ for(let i=0;i<W.ring.length;i++){
+  const a=W.ring[i],b=W.ring[(i+1)%W.ring.length],dx=b[0]-a[0],dy=b[1]-a[1];
+  const u=Math.max(0,Math.min(1,((loc.x-a[0])*dx+(loc.y-a[1])*dy)/(dx*dx+dy*dy||1)));
+  const p=[a[0]+dx*u,a[1]+dy*u],d=Math.hypot(loc.x-p[0],loc.y-p[1]);
+  if(d<best){best=d;at=i;atPoint=p;}
+ }
+ const scale=svg.viewBox.baseVal.width/Math.max(1,svg.getBoundingClientRect().width);
+ if(at<0||best>Math.max(18,18*scale)){msg("Chạm gần mép nước để thêm đỉnh","error");return false;}
+ const original=clone(W.ring);W.ring.splice(at+1,0,atPoint);
+ if(!ringValid(W.ring)){W.ring=original;msg("Không thêm vì làm đường bao lỗi","error");return false;}
+ W.ringUndo.push(original);W.selectedVertex=at+1;W.insertMode=false;
+ const d=clone(getDraft(W.cadWaterId));d.ring=clone(W.ring);W.drafts.set(d.objectId,d);queueDraft(d.objectId);
+ paint();updateVertexBar();msg("Đã thêm đỉnh CAD nháp "+(at+2));return true;
+}
+function openSheet(which){
+ W.mobileSheet=which;
+ $("catalog").classList.toggle("mobileOpen",which==="objects");
+ $("inspector").classList.toggle("mobileOpen",which==="fields");
+ $("sheetShade").classList.toggle("mobileOpen",which!=="map");
+ for(const [id,target] of [["mobileMap","map"],["mobileObjects","objects"],["mobileFields","fields"]])
+  $(id).setAttribute("aria-pressed",String(which===target));
 }
 function setMode(mode){
  W.mode=mode;
@@ -435,44 +486,104 @@ function setup(){
   if(W.selectedId!==W.cadWaterId)select(W.cadWaterId);
   W.editing=!W.editing;$("editGeometry").setAttribute("aria-pressed",String(W.editing));
   if(W.editing)setMode("cad");
-  paint();msg(W.editing?"Kéo điểm hồng của CAD nháp. Không sửa OSM/SQLite.":"Đã tắt chỉnh hình học");
+  updateVertexBar();paint();msg(W.editing?"Kéo điểm hồng của CAD nháp. Không sửa OSM/SQLite.":"Đã tắt chỉnh hình học");
  };
  $("undo").onclick=()=>{if(W.ringUndo.length){W.ring=W.ringUndo.pop();const d=clone(getDraft(W.cadWaterId));d.ring=clone(W.ring);W.drafts.set(d.objectId,d);queueDraft(d.objectId);paint();}};
- $("resetView").onclick=()=>{W.ring=W.ring||loadRing();$("cadSvg").setAttribute("viewBox","0 0 1448 1086");$("osmSvg").setAttribute("viewBox","0 0 1448 1086");W.zoom=1;$("mapZoom").textContent="100%";};
+ $("resetView").onclick=()=>{["cadSvg","osmSvg"].forEach(id=>$(id).dispatchEvent(new Event("viewport-reset")));};
  $("note").oninput=()=>{const o=current();if(!o)return;const d=clone(getDraft(o.id));d.note=$("note").value.slice(0,2000);W.drafts.set(o.id,d);queueDraft(o.id);};
  $("saveDraft").onclick=()=>saveDraft(true);
  $("approve").onclick=approve;
  $("export").onclick=exportBackup;
  $("importBtn").onclick=()=>$("importFile").click();
  $("importFile").onchange=async e=>{if(e.target.files?.[0])await importBundle(e.target.files[0]);e.target.value="";};
- // Pinch/zoom and wheel: zoom the CAD and OSM viewBoxes *independently*, not their data coordinates.
+ // A real thumb-friendly mobile control system; map always stays full size.
+ $("mobileMap").onclick=()=>openSheet("map");
+ $("mobileObjects").onclick=()=>openSheet("objects");
+ $("mobileFields").onclick=()=>openSheet("fields");
+ $("mobileBackup").onclick=()=>{exportBackup();openSheet("map");};
+ $("mobileInspect").onclick=()=>openSheet("fields");
+ $("sheetShade").onclick=()=>openSheet("map");
+ document.addEventListener("keydown",e=>{if(e.key==="Escape")openSheet("map");});
+ // Swipe down from the mobile sheet's title bar to dismiss (without hindering scrolling).
+ for(const id of ["catalog","inspector"]){
+  let sy=null;
+  const bar=$(id).querySelector(".panelHead");
+  bar.addEventListener("pointerdown",e=>{if(innerWidth<=740)sy=e.clientY;});
+  bar.addEventListener("pointerup",e=>{if(sy!==null&&e.clientY-sy>65)openSheet("map");sy=null;});
+ }
+ north.bind("cadNorthSlider","cadNorthReadout","cadNorthReset");
+ north.onChange(()=>{paint();msg("Căn Bắc CAD "+north.get().toFixed(1)+"° (ước lượng OSM, chưa survey)");});
+ $("northAdjust").onclick=()=>{
+  const panel=$("cadNorthPanel"),open=!panel.classList.contains("open");
+  panel.classList.toggle("open",open);$("northAdjust").setAttribute("aria-expanded",String(open));
+ };
+ for(const btn of document.querySelectorAll("[data-vertex-move]")){
+  btn.onclick=()=>{const [dx,dy]=btn.dataset.vertexMove.split(",").map(Number);nudgeVertex(dx,dy);};
+ }
+ $("vertexStep").onclick=()=>{W.vertexStep=W.vertexStep===1?5:1;updateVertexBar();};
+ $("insertVertex").onclick=()=>{
+  if(!W.editing){msg("Bật Sửa bờ trước","error");return;}
+  W.insertMode=!W.insertMode;updateVertexBar();msg(W.insertMode?"Chạm gần mép nước để thêm một đỉnh":"Đã tắt thêm đỉnh");
+ };
+
+ // Two-finger pinch and one-finger pan without scrolling the page.
+ // Each map owns a separate viewBox because CAD image pixels are NOT GPS.
  for(const id of ["cadSvg","osmSvg"]){
-  const svg=$(id),orig=[0,0,1448,1086];let vb=orig.slice();
+  const svg=$(id),orig=[0,0,1448,1086],vb=orig.slice(),points=new Map();
+  let panMoved=false,singleStart=null,pinchDistance=0;
+  const update=()=>{svg.setAttribute("viewBox",vb.join(" "));$("mapZoom").textContent=Math.round(100*orig[2]/vb[2])+"%";};
+  const clampWidth=w=>Math.max(130,Math.min(4600,w));
+  function zoomAt(f,px,py){
+   const nw=clampWidth(vb[2]*f),nh=nw*orig[3]/orig[2],ratio=nw/vb[2];
+   vb.splice(0,4,px-(px-vb[0])*ratio,py-(py-vb[1])*ratio,nw,nh);update();
+  }
+  function toSvg(clientX,clientY){
+   const p=svg.createSVGPoint();p.x=clientX;p.y=clientY;
+   return p.matrixTransform(svg.getScreenCTM().inverse());
+  }
   svg.addEventListener("wheel",e=>{
-   e.preventDefault();const point=svg.createSVGPoint();point.x=e.clientX;point.y=e.clientY;
-   const p=point.matrixTransform(svg.getScreenCTM().inverse());
-   let next=vb[2]*Math.exp(e.deltaY*.001),factor=Math.max(.15,Math.min(5,next/orig[2]));
-   let width=orig[2]*factor,height=orig[3]*factor;
-   vb=[p.x-(p.x-vb[0])*width/vb[2],p.y-(p.y-vb[1])*height/vb[3],width,height];
-   svg.setAttribute("viewBox",vb.join(" "));$("mapZoom").textContent=Math.round(100/factor)+"%";
+   e.preventDefault();const p=toSvg(e.clientX,e.clientY);
+   zoomAt(Math.exp(e.deltaY*.001),p.x,p.y);
   },{passive:false});
+  svg.addEventListener("pointerdown",e=>{
+   if(e.target.closest(".vertex"))return;
+   if(W.insertMode&&id==="cadSvg"&&W.editing){
+    e.preventDefault();e.stopPropagation();insertVertexAt(e.clientX,e.clientY);return;
+   }
+   points.set(e.pointerId,{x:e.clientX,y:e.clientY});panMoved=false;
+   if(points.size===1)singleStart={x:e.clientX,y:e.clientY};
+   if(points.size===2){
+    const a=[...points.values()];pinchDistance=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);
+   }
+   try{svg.setPointerCapture(e.pointerId);}catch(error){}
+  });
+  svg.addEventListener("pointermove",e=>{
+   const old=points.get(e.pointerId);if(!old)return;
+   const dx=e.clientX-old.x,dy=e.clientY-old.y;
+   old.x=e.clientX;old.y=e.clientY;
+   if(Math.abs(dx)+Math.abs(dy)>2)panMoved=true;
+   if(points.size===1){
+    const rect=svg.getBoundingClientRect();
+    vb[0]-=dx*vb[2]/Math.max(rect.width,1);
+    vb[1]-=dy*vb[3]/Math.max(rect.height,1);update();
+   }else if(points.size>=2){
+    const arr=[...points.values()],dist=Math.hypot(arr[0].x-arr[1].x,arr[0].y-arr[1].y);
+    const pivot=toSvg((arr[0].x+arr[1].x)/2,(arr[0].y+arr[1].y)/2);
+    if(pinchDistance)zoomAt(pinchDistance/Math.max(15,dist),pivot.x,pivot.y);
+    pinchDistance=dist;panMoved=true;
+   }
+  });
+  const done=e=>{points.delete(e.pointerId);if(points.size<2)pinchDistance=0;};
+  ["pointerup","pointercancel","lostpointercapture"].forEach(type=>svg.addEventListener(type,done));
+  // Mobile tap can choose a lake polygon; do not trigger a click after a drag.
+  svg.addEventListener("click",e=>{if(panMoved){e.preventDefault();e.stopPropagation();panMoved=false;}},true);
   svg.addEventListener("dblclick",e=>{
    if(id!=="cadSvg"||!W.editing||W.selectedId!==W.cadWaterId)return;
-   const p=svg.createSVGPoint();p.x=e.clientX;p.y=e.clientY;
-   const loc=p.matrixTransform(svg.getScreenCTM().inverse());
-   let best=Infinity,at=-1;
-   for(let i=0;i<W.ring.length;i++){
-    const a=W.ring[i],b=W.ring[(i+1)%W.ring.length],dx=b[0]-a[0],dy=b[1]-a[1];
-    const u=Math.max(0,Math.min(1,((loc.x-a[0])*dx+(loc.y-a[1])*dy)/(dx*dx+dy*dy||1)));
-    const dist=Math.hypot(loc.x-a[0]-dx*u,loc.y-a[1]-dy*u);
-    if(dist<best){best=dist;at=i;}
-   }
-   if(best<30&&at>=0){
-    const before=clone(W.ring);W.ringUndo.push(before);W.ring.splice(at+1,0,[loc.x,loc.y]);
-    if(!ringValid(W.ring)){W.ring=before;W.ringUndo.pop();msg("Điểm mới tạo giao cắt, đã hoàn tác","error");return;}
-    const d=clone(getDraft(W.cadWaterId));d.ring=clone(W.ring);W.drafts.set(d.objectId,d);paint();queueDraft(W.cadWaterId);msg("Đã thêm điểm CAD nháp");}
+   e.preventDefault();insertVertexAt(e.clientX,e.clientY);
   });
+  svg.addEventListener("viewport-reset",()=>{vb.splice(0,4,...orig);update();});
  }
+
 }
 try{
  const resp=await fetch(BASE_URL,{cache:"no-store"});if(!resp.ok)throw Error("Không tải được "+BASE_URL+" ("+resp.status+")");
