@@ -5,6 +5,8 @@ on:
     paths:
       - 'bo-ho-ben-tre/object-review.html'
       - 'bo-ho-ben-tre/object-review.js'
+      - 'bo-ho-ben-tre/cad-north-alignment.js'
+      - 'bo-ho-ben-tre/cad-gis.html'
       - 'bo-ho-ben-tre/cad-gis-vector-data.js'
       - 'bo-ho-ben-tre/scripts/build_object_review.py'
       - 'bo-ho-ben-tre/data/object-review/reviews/**'
@@ -41,6 +43,7 @@ jobs:
           PY
           git diff --exit-code -- bo-ho-ben-tre/data/scene.json bo-ho-ben-tre/data/catalog.sqlite bo-ho-ben-tre/cad-gis-vector-data.js
           node --check bo-ho-ben-tre/object-review.js
+          node --check bo-ho-ben-tre/cad-north-alignment.js
       - name: Install browser
         run: |
           npm install --no-save playwright
