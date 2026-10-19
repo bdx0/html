@@ -58,5 +58,6 @@ jobs:
           path: |
             object-review-initial-*.png
             object-review-after-*.png
+            object-review-fields-*.png
             object-review-smoke.json
           if-no-files-found: ignore
