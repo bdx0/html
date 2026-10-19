@@ -59,5 +59,6 @@ jobs:
             object-review-initial-*.png
             object-review-after-*.png
             object-review-fields-*.png
+            cad-north-up-*.png
             object-review-smoke.json
           if-no-files-found: ignore
