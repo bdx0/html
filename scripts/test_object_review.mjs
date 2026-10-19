@@ -68,6 +68,7 @@ try{
         await page.locator('#mobileFields').click();
         const fields=await page.evaluate(()=>document.getElementById('inspector').classList.contains('mobileOpen'));
         if(!fields)errors.push('Mobile parameter sheet failed to open');
+        await page.waitForTimeout(360);
         await page.screenshot({path:'object-review-fields-'+mode.name+'.png'}).catch(e=>errors.push('fields screenshot: '+e));
       }
       const num=page.locator('#parameterFields input[type=number]').first();
