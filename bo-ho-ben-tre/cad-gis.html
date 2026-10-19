@@ -28,6 +28,8 @@ main{height:calc(100dvh - 60px);display:grid;grid-template-columns:220px minmax(
  #legend{bottom:53px;left:7px;font-size:9px;max-width:calc(100% - 14px)}
 }
 @media(max-width:380px){.cad-dir-readout{display:none}#cadDirectionBar{gap:4px}}
+#northCalibrate{position:absolute;z-index:5;left:10px;bottom:10px;display:flex;gap:7px;align-items:center;max-width:calc(100% - 340px);padding:7px 10px;background:#ffffffee;border:1px solid #c5d6e8;border-radius:10px;box-shadow:0 4px 15px #263c5d1a;font-size:10px}#northCalibrate label{font-weight:750;white-space:nowrap}#northCalibrate input{width:115px;accent-color:#1c6c95}#northCalibrate span{white-space:nowrap}#northCalibrate button{padding:5px;font-size:10px}
+@media(max-width:800px){#northCalibrate{left:7px;right:7px;bottom:55px;max-width:none;justify-content:center;flex-wrap:wrap;gap:4px}#northCalibrate input{flex:1;min-width:80px;max-width:160px}#legend{bottom:110px}}
 </style></head><body>
 <header><div><strong>▧ Hồ Trúc Giang / CAD · GIS</strong><small>FLOOR PLAN · VECTOR TÁCH LỚP</small></div><nav><a href="./">3D</a><a href="model.html">Model</a><a href="object-review.html">✓ Duyệt dữ liệu</a><a href="sqlite.html">SQLite</a></nav></header>
 <main><aside id="layersSide"><h2>11 lớp CAD/GIS · nháp</h2><div id="layerList"></div><div class="buttons"><button id="all">Hiện tất cả</button><button id="core">Đường bờ</button></div><div class="warning">N/E/S/W chỉ xoay bản vẽ trên màn hình cùng quy tắc Model View. <b>Góc Bắc thực của ảnh minh họa chưa được xác minh</b>, nên không coi bản nháp là đã căn GPS. OSM/SQLite không đổi.</div></aside>
@@ -41,13 +43,13 @@ main{height:calc(100dvh - 60px);display:grid;grid-template-columns:220px minmax(
  <button type="button" data-map-direction="west" aria-label="Tây ở trên">W</button>
  <span class="cad-dir-readout" id="cadDirectionText">Bắc ↑</span>
  <span class="cad-dir-arrow" id="cadTrueNorth" aria-label="Hướng Bắc của bản vẽ"><b id="cadNorthArrow">↑ N</b></span>
-</div></section>
+</div><div id="northCalibrate"><label for="northOffset">🧭 Căn Bắc (ước lượng từ OSM)</label><input id="northOffset" type="range" min="-25" max="25" step=".2" value="0" aria-label="Bù hướng Bắc bản vẽ CAD"><span id="northValue">CAD -9.6°</span><button id="northReset" type="button">Khôi phục</button></div></section>
 <aside id="inspector"><div style="display:flex;gap:8px;align-items:center"><h2 style="flex:1">Kiểm tra CAD/GIS</h2><button id="closeInfo" style="display:none">Đóng ×</button></div><div id="info" class="panel">Chạm vào một đối tượng trên sơ đồ để đọc thông tin nguồn/lớp.</div>
 <h2>Vị trí cần duyệt</h2><div id="review" class="buttons"></div><h2>Xuất bản vẽ</h2><p style="font-size:11px">Bật Chỉnh đường bờ, kéo đỉnh trắng; nhấp đúp lên mép nước để thêm đỉnh. Gửi JSON đã chỉnh cho mình.</p><div class="buttons"><button id="candidate" class="primary">⇩ JSON chỉnh bờ</button><button id="geojson">⇩ GIS GeoJSON</button><button id="dxf">⇩ CAD DXF</button><button id="svgOut">⇩ SVG</button><button id="restore">Khôi phục</button></div><p style="font-size:11px">Nhận xét bổ sung:</p><textarea id="note" placeholder="Nhận xét hình dạng hồ cần chỉnh..."></textarea><p id="status">Đang tải vector...</p><p class="warning">Đơn vị DXF: mét danh nghĩa, không đo đạc. GeoJSON: WGS84 suy diễn từ phép đặt ảnh chưa xác minh. Bản nháp này không tự cập nhật OSM/SQLite.</p></aside></main>
-<script src="map-orientation.js?v=20261016-cardinal"></script><script src="cad-gis-vector-data.js"></script><script>
+<script src="map-orientation.js?v=20261016-cardinal"></script><script src="cad-north-alignment.js"></script><script src="cad-gis-vector-data.js"></script><script>
 (async()=>{
 'use strict';
-const $=id=>document.getElementById(id),svg=$('map'),orientation=window.TrucGiangOrientation,rotated=$('cadRotated'),NS='http://www.w3.org/2000/svg',order=['roads','parks','buildings','waterfront_walk','water','trees','plazas','fountain','osm_reference','shoreline','review_points'];
+const $=id=>document.getElementById(id),svg=$('map'),orientation=window.TrucGiangOrientation,north=window.TrucGiangCadNorth,rotated=$('cadRotated'),NS='http://www.w3.org/2000/svg',order=['roads','parks','buildings','waterfront_walk','water','trees','plazas','fountain','osm_reference','shoreline','review_points'];
 const label={roads:'Giao thông',parks:'Công viên',buildings:'Công trình',waterfront_walk:'Đường dạo ven hồ',water:'Mặt nước',trees:'Cây xanh',plazas:'Quảng trường',fountain:'Đài phun nước',osm_reference:'OSM gốc (đối chiếu)',shoreline:'Đường bờ',review_points:'Ghim cần duyệt'};
 const col={roads:'#89949c',parks:'#a1ce9b',buildings:'#dbcbb3',waterfront_walk:'#e7d3af',water:'#55a9bb',trees:'#428b4d',plazas:'#bdad96',fountain:'#466da4',osm_reference:'#8452b5',shoreline:'#f03775',review_points:'#d63d3d'};
 let F=[],R=[],original=[],vis={},edit=false,selected=-1,pid=null,pan=null,V=[0,0,1448,1086],undo=[],redo=[],currentDirection=orientation.get();
@@ -80,14 +82,19 @@ function mouse(e){let p=svg.createSVGPoint();p.x=e.clientX;p.y=e.clientY;return 
 function mouseView(e){let p=svg.createSVGPoint();p.x=e.clientX;p.y=e.clientY;return p.matrixTransform(svg.getScreenCTM().inverse())}
 /* CAD source: X right, Y down in an unverified illustration.
  * Only viewport rotates. GIS coordinate exports remain untouched. */
+// Apply a shared display-only north calibration, then the chosen N/E/S/W viewport.
 function modelToView(p,dir=currentDirection){
- const v=orientation.rotate(p[0]-724,543-p[1],dir);return {x:724+v.x,y:543-v.z}
+ const degree=(-({north:0,east:90,south:180,west:270}[dir]||0)+north.get())*Math.PI/180;
+ const dx=p[0]-724,dy=p[1]-543,c=Math.cos(degree),s=Math.sin(degree);
+ return {x:724+c*dx-s*dy,y:543+s*dx+c*dy};
 }
 function viewToModel(p,dir=currentDirection){
- const v=orientation.unrotate(p.x-724,543-p.y,dir);return {x:724+v.x,y:543-v.z}
+ const degree=(-({north:0,east:90,south:180,west:270}[dir]||0)+north.get())*Math.PI/180;
+ const dx=p.x-724,dy=p.y-543,c=Math.cos(degree),s=Math.sin(degree);
+ return {x:724+c*dx+s*dy,y:543-s*dx+c*dy};
 }
 function setView(){
- rotated.setAttribute('transform','rotate('+(-orientation.degree())+' 724 543)');
+ rotated.setAttribute('transform','rotate('+(-orientation.degree()+north.get())+' 724 543)');
  svg.setAttribute('viewBox',V.join(' '));
  $('zoom').textContent=Math.round(100*1448/V[2])+'%'
 }
@@ -144,12 +151,14 @@ $('geojson').onclick=()=>download('truc-giang-draft.geojson',JSON.stringify(geo(
 $('dxf').onclick=()=>download('truc-giang-draft.dxf',dxf(),'application/dxf');
 $('svgOut').onclick=()=>download('truc-giang-draft.svg',new XMLSerializer().serializeToString(svg),'image/svg+xml');
 $('restore').onclick=()=>{if(confirm('Khôi phục về hình bờ được số hóa từ ảnh?')){history();R=original.map(p=>p.slice());updateRing();save()}};
+north.bind('northOffset','northValue','northReset');
+north.onChange(()=>{setView();$('status').textContent='CAD căn Bắc '+north.get().toFixed(1)+'° theo OSM (nháp, chưa định vị GPS)';});
 orientation.bindControls($('cadDirectionBar'));
 orientation.onChange(syncDirection);
 syncDirection(currentDirection);
 $('openInfo').onclick=()=>$('inspector').classList.add('open');$('closeInfo').onclick=()=>$('inspector').classList.remove('open');
 window.TrucGiangCadGis={getInfo:()=>({count:F.length,shoreVertices:R.length,sourceChanged:false,
- direction:orientation.get(),heading:orientation.degree(),viewBox:V.slice(),trueNorthOfIllustrationVerified:false}),
+ direction:orientation.get(),heading:orientation.degree(),cadNorthDisplayRotation:north.get(),northReference:north.basis,viewBox:V.slice(),trueNorthOfIllustrationVerified:false}),
  candidateRing:()=>R.map(p=>p.slice()),geojson:geo,dxf,
  modelToView:p=>modelToView(p),viewToModel:p=>viewToModel(p),setDirection:v=>orientation.set(v)};
 })();
