@@ -77,6 +77,67 @@ input[type=file]{display:none}
  #maps{min-height:0}
 }
 @media(max-width:390px){#mapPanel{height:48dvh;min-height:320px}.mapControls button{padding:5px 8px;font-size:10px}.hero .badge{font-size:9px}}
+
+#cadNorthPanel{display:none;padding:10px 13px;background:#173044;border-bottom:1px solid #48667a;gap:8px;align-items:center;flex-wrap:wrap}
+#cadNorthPanel.open{display:flex}
+#cadNorthPanel label{font-size:11px;font-weight:800}
+#cadNorthPanel input{flex:1;min-width:90px;max-width:260px;accent-color:#77ded1}
+#cadNorthPanel small{font-size:10px;color:#ffdfac}
+#cadNorthPanel button{font-size:10px;padding:6px}
+#cadNorthLabel{font-size:10px;color:#aceee1;white-space:nowrap;font-weight:850}
+#maps .mapSlot .compass{font-size:13px;background:#f3f9f0e8;padding:5px 7px;border-radius:8px;top:38px}
+#cadCompass{display:block}
+#vertexTools{display:none;align-items:center;gap:5px;padding:7px 9px;background:#28435a;color:#fff;flex-wrap:wrap}
+#vertexTools.active{display:flex}#vertexTools span{font-size:11px;font-weight:850;margin-right:auto}
+#vertexTools button{min-height:38px;min-width:40px;padding:7px;font-size:16px}
+#mobileNav{display:none}
+#mobileFocus{display:none}
+#sheetShade{display:none}
+@media(max-width:740px){
+ html,body{height:100%;overflow:hidden}
+ header{height:54px;position:relative;z-index:3}
+ .hero{display:none}
+ .layout{display:block;padding:0;margin:0;height:calc(100dvh - 54px);min-height:0}
+ #mapPanel{position:absolute;inset:54px 0 61px;height:auto;min-height:0!important;border:0;border-radius:0;z-index:1}
+ #mapPanel .mapControls{padding:7px 6px;gap:5px}
+ #mapPanel .mapControls button{min-height:42px;font-size:11px;padding:8px}
+ .mapControls .tabs{flex:1;min-width:0}
+ .mapControls .tabs button{flex:1;padding:6px}
+ .mapControls>div[style]{display:none}
+ #maps{min-height:0}
+ #maps.compare .mapSlot .tag{max-width:90%;font-size:9px}
+ #maps.compare{grid-template-columns:1fr}
+ #maps.compare #cadSlot{height:50%;border-bottom:3px solid #587d89}
+ #maps.compare #osmSlot{height:50%}
+ .mapSlot svg{touch-action:none}
+ .mapSlot .tag{left:7px;top:7px;font-size:9px;max-width:75%;white-space:normal}
+ .mapFoot{padding:7px 10px;font-size:9px}
+ #vertexTools{padding:5px}
+ #vertexTools button{min-height:42px;min-width:43px}
+ #catalog,#inspector{position:fixed;left:0;right:0;bottom:61px;top:auto;z-index:15;
+   max-height:78dvh;height:78dvh;min-height:0;border-radius:18px 18px 0 0;
+   transform:translateY(calc(100% + 62px));transition:transform .2s ease;
+   box-shadow:0 -12px 45px #081723a8;pointer-events:none}
+ #catalog.mobileOpen,#inspector.mobileOpen{transform:translateY(0);pointer-events:auto}
+ #catalog .panelBody,#inspector .panelBody{overflow:auto;overscroll-behavior:contain;padding-bottom:28px}
+ #catalog .panelHead,#inspector .panelHead{min-height:50px}
+ #mobileNav{display:grid;position:fixed;z-index:25;bottom:0;left:0;right:0;height:calc(61px + env(safe-area-inset-bottom));
+   grid-template-columns:repeat(4,1fr);gap:3px;padding:5px 5px max(5px,env(safe-area-inset-bottom));
+   background:#122e43;border-top:1px solid #42677a}
+ #mobileNav button{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:2px;font-size:10px;padding:4px;min-height:48px;border:0;background:transparent}
+ #mobileNav button span{font-size:18px}
+ #mobileNav button[aria-pressed=true]{background:#266d71;border-radius:10px;color:white}
+ #sheetShade.mobileOpen{display:block;position:fixed;z-index:14;inset:54px 0 61px;background:#07162294}
+ #mobileFocus{display:block;position:absolute;bottom:32px;left:9px;right:9px;max-width:100%;z-index:6;
+   background:#122f43ed;border:1px solid #6bafbd;border-radius:11px;padding:8px 12px;
+   box-shadow:0 4px 18px #182f4260;font-size:10px}
+ #mobileFocus b{font-size:11px}
+ #mobileFocus button{float:right;min-height:36px;padding:7px 12px}
+ #cadNorthPanel{padding:7px;gap:7px}#cadNorthPanel.open{display:flex}
+ #cadNorthPanel label{font-size:10px}#cadNorthPanel input{max-width:none}
+ .mapSlot svg .vertex{stroke-width:2}
+}
+@media(max-width:390px){#mapPanel .mapControls button{font-size:10px;padding:6px}#vertexTools button{min-width:36px}}
 </style>
 </head>
 <body>
@@ -108,13 +169,27 @@ input[type=file]{display:none}
 <div style="flex:1"></div>
 <button id="editGeometry" aria-pressed="false">✎ Sửa bờ</button>
 <button id="undo" title="Hoàn tác một bước">↶</button>
-<button id="resetView">⌂</button>
+<button id="resetView">⌂</button><button id="northAdjust" aria-expanded="false" aria-controls="cadNorthPanel">🧭 Bắc</button>
+</div>
+<div id="cadNorthPanel">
+<label for="cadNorthSlider">🧭 Căn Bắc CAD theo OSM (nháp)</label>
+<input id="cadNorthSlider" type="range" min="-25" max="25" step=".2" value="0" aria-label="Góc bù hướng Bắc CAD">
+<span id="cadNorthReadout">CAD −9.6°</span><button id="cadNorthReset" type="button">Đặt lại</button>
+<small>Tham chiếu trục Hai Bà Trưng; chưa có mốc khảo sát.</small>
+</div>
+<div id="vertexTools" role="group" aria-label="Chỉnh điểm CAD được chọn">
+<span id="vertexLabel">Chọn đỉnh đường bờ</span>
+<button data-vertex-move="-1,0" aria-label="Dịch trái 1 pixel">←</button>
+<button data-vertex-move="0,-1" aria-label="Dịch lên 1 pixel">↑</button>
+<button data-vertex-move="0,1" aria-label="Dịch xuống 1 pixel">↓</button>
+<button data-vertex-move="1,0" aria-label="Dịch phải 1 pixel">→</button>
+<button id="vertexStep" type="button" title="Bước di chuyển">1px</button>
 </div>
 <div id="maps">
-<div class="mapSlot active" id="cadSlot"><span class="tag">CAD minh họa · tọa độ pixel, chưa định hướng GPS</span><svg id="cadSvg" viewBox="0 0 1448 1086" role="img" aria-label="Bản vẽ CAD nháp có thể chọn đối tượng"><g id="cadShapes"></g><g id="cadHandles"></g></svg></div>
+<div class="mapSlot active" id="cadSlot"><span class="tag">CAD minh họa · tọa độ pixel, chưa định hướng GPS</span><svg id="cadSvg" viewBox="0 0 1448 1086" role="img" aria-label="Bản vẽ CAD nháp có thể chọn đối tượng"><g id="cadAligned"><g id="cadShapes"></g><g id="cadHandles"></g></g></svg><span id="cadCompass" class="compass">↑ N · OSM</span></div>
 <div class="mapSlot" id="osmSlot"><span class="tag">OSM way 217484891 · WGS84 · chưa khảo sát</span><span class="compass">↑ N</span><svg id="osmSvg" viewBox="0 0 1448 1086" role="img" aria-label="Địa hình OSM gốc có thể chọn đối tượng"><g id="osmShapes"></g></svg></div>
 </div>
-<div class="mapFoot"><span id="mapHint">Chạm một đối tượng để xem thông số</span><span id="mapZoom">100%</span></div>
+<div id="mobileFocus"><button id="mobileInspect" type="button">Thông số ↗</button><b id="mobileObjectName">Mặt hồ</b><div id="mobileObjectType">Chọn đối tượng để duyệt</div></div><div class="mapFoot"><span id="mapHint">Chạm một đối tượng để xem thông số</span><span id="mapZoom">100%</span></div>
 </section>
 <aside class="panel" id="inspector">
 <div class="panelHead"><h2>02 / Thông số & duyệt</h2><span id="status">Đang tải…</span></div>
@@ -139,6 +214,13 @@ input[type=file]{display:none}
 </div>
 </aside>
 </main>
-<script src="object-review.js"></script>
+<div id="sheetShade" aria-hidden="true"></div>
+<nav id="mobileNav" aria-label="Công cụ tương tác trên điện thoại">
+<button type="button" id="mobileMap" aria-pressed="true"><span>🗺️</span>Bản đồ</button>
+<button type="button" id="mobileObjects" aria-pressed="false"><span>☷</span>Đối tượng</button>
+<button type="button" id="mobileFields" aria-pressed="false"><span>⚙</span>Thông số</button>
+<button type="button" id="mobileBackup" aria-pressed="false"><span>⇩</span>Sao lưu</button>
+</nav>
+<script src="cad-north-alignment.js"></script><script src="object-review.js"></script>
 </body>
 </html>
