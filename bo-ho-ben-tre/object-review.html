@@ -137,7 +137,19 @@ input[type=file]{display:none}
  #cadNorthPanel label{font-size:10px}#cadNorthPanel input{max-width:none}
  .mapSlot svg .vertex{stroke-width:2}
 }
-@media(max-width:390px){#mapPanel .mapControls button{font-size:10px;padding:6px}#vertexTools button{min-width:36px}}
+@media(max-width:390px){
+ header{height:54px}header nav{display:none}.brand small{display:none}.brand strong{font-size:14px}
+ #mapPanel .mapControls{gap:3px;flex-wrap:nowrap;padding:6px 3px}
+ #mapPanel .mapControls button{font-size:10px;padding:4px 5px;min-height:42px;border-radius:8px}
+ #mapPanel .mapControls .tabs{flex-wrap:nowrap;gap:3px}
+ #mapPanel .mapControls .tabs button{min-width:0}
+ #compareMode,#editGeometry,#northAdjust{font-size:0!important}
+ #compareMode:after{content:"Đôi";font-size:10px}
+ #editGeometry:after{content:"✎ Bờ";font-size:10px}
+ #northAdjust:after{content:"🧭";font-size:12px}
+ #resetView{display:none}
+ #vertexTools button{min-width:36px}
+}
 </style>
 </head>
 <body>
