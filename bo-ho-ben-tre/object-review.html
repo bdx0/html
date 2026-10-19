@@ -106,9 +106,9 @@ input[type=file]{display:none}
  .mapControls>div[style]{display:none}
  #maps{min-height:0}
  #maps.compare .mapSlot .tag{max-width:90%;font-size:9px}
- #maps.compare{grid-template-columns:1fr}
- #maps.compare #cadSlot{height:50%;border-bottom:3px solid #587d89}
- #maps.compare #osmSlot{height:50%}
+ #maps.compare{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) minmax(0,1fr)}
+ #maps.compare #cadSlot{height:auto;border-bottom:3px solid #587d89}
+ #maps.compare #osmSlot{height:auto}
  .mapSlot svg{touch-action:none}
  .mapSlot .tag{left:7px;top:7px;font-size:9px;max-width:75%;white-space:normal}
  .mapFoot{padding:7px 10px;font-size:9px}
@@ -183,7 +183,7 @@ input[type=file]{display:none}
 <button data-vertex-move="0,-1" aria-label="Dịch lên 1 pixel">↑</button>
 <button data-vertex-move="0,1" aria-label="Dịch xuống 1 pixel">↓</button>
 <button data-vertex-move="1,0" aria-label="Dịch phải 1 pixel">→</button>
-<button id="vertexStep" type="button" title="Bước di chuyển">1px</button>
+<button id="vertexStep" type="button" title="Bước di chuyển">1px</button><button id="insertVertex" type="button" aria-pressed="false" title="Chạm mép hồ để thêm đỉnh">＋ Đỉnh</button>
 </div>
 <div id="maps">
 <div class="mapSlot active" id="cadSlot"><span class="tag">CAD minh họa · tọa độ pixel, chưa định hướng GPS</span><svg id="cadSvg" viewBox="0 0 1448 1086" role="img" aria-label="Bản vẽ CAD nháp có thể chọn đối tượng"><g id="cadAligned"><g id="cadShapes"></g><g id="cadHandles"></g></g></svg><span id="cadCompass" class="compass">↑ N · OSM</span></div>
