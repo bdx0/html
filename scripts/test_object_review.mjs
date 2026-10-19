@@ -81,10 +81,20 @@ try{
       await page.waitForFunction(()=>window.__TrucGiangObjectReview?.getStats()?.objects>=400);
       const after=await page.evaluate(()=>({stat:window.__TrucGiangObjectReview?.getStats(),history:document.querySelectorAll('#history .log').length,overflow:document.documentElement.scrollWidth-innerWidth, status:document.getElementById('status').textContent,heading:window.TrucGiangCadNorth?.get()}));
       await page.screenshot({path:'object-review-after-'+mode.name+'.png'}).catch(e=>errors.push('shot2: '+e));
+      await page.goto('http://127.0.0.1:'+port+'/bo-ho-ben-tre/cad-gis.html',{timeout:30000});
+      await page.waitForFunction(()=>window.TrucGiangCadGis?.getInfo()?.count>100,null,{timeout:20000});
+      const legacyCad=await page.evaluate(()=>({
+        info:window.TrucGiangCadGis.getInfo(),
+        transform:document.getElementById('cadRotated').getAttribute('transform'),
+        calibrationSlider:!!document.getElementById('northOffset')
+      }));
+      if(Math.abs(legacyCad.info.cadNorthDisplayRotation-cadNorth.angle)>.01||!legacyCad.transform.includes('-5.6')||!legacyCad.calibrationSlider)
+        errors.push('Original CAD floor plan does not share north alignment with review studio');
+      await page.screenshot({path:'cad-north-up-'+mode.name+'.png'}).catch(e=>errors.push('CAD screenshot '+e));
       const passed=status===200&&gestures.pan&&gestures.pinch&&Math.abs(cadNorth.angle+5.6)<.01&&before.stat.objects>400&&before.candrawn>=250&&before.osmdrawn>150
         &&handles>=12&&approveState.events>=1&&after.stat.events>=1&&after.history>=1
         &&after.overflow<=2&&!errors.length;
-      report.push({mode:mode.name,pass:passed,http:status,before,gestures,cadNorth,handles,approveState,download:downloaded?.suggestedFilename(),after,errors});
+      report.push({mode:mode.name,pass:passed,http:status,before,gestures,cadNorth,legacyCad,handles,approveState,download:downloaded?.suggestedFilename(),after,errors});
     }else report.push({mode:mode.name,pass:false,http:status,before,errors});
     console.log(JSON.stringify(report.at(-1)));
     await context.close();
