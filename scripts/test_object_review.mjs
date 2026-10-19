@@ -39,6 +39,14 @@ try{
       await page.locator('#editGeometry').click();
       const handles=await page.locator('#cadHandles .vertex').count();
       if(handles<12)errors.push('no editable lake handles: '+handles);
+      if(mode.mobile){
+        await page.locator('#mobileObjects').click();
+        const sheet=await page.evaluate(()=>document.getElementById('catalog').classList.contains('mobileOpen'));
+        if(!sheet)errors.push('Mobile object sheet failed to open');
+        await page.locator('#mobileFields').click();
+        const fields=await page.evaluate(()=>document.getElementById('inspector').classList.contains('mobileOpen'));
+        if(!fields)errors.push('Mobile parameter sheet failed to open');
+      }
       const num=page.locator('#parameterFields input[type=number]').first();
       await num.fill('3.2');
       const downloadPromise=page.waitForEvent('download',{timeout:16000});
@@ -47,7 +55,7 @@ try{
       const approveState=await page.evaluate(()=>window.__TrucGiangObjectReview?.getStats());
       await page.reload();
       await page.waitForFunction(()=>window.__TrucGiangObjectReview?.getStats()?.objects>=400);
-      const after=await page.evaluate(()=>({stat:window.__TrucGiangObjectReview?.getStats(),history:document.querySelectorAll('#history .log').length,overflow:document.documentElement.scrollWidth-innerWidth, status:document.getElementById('status').textContent}));
+      const after=await page.evaluate(()=>({stat:window.__TrucGiangObjectReview?.getStats(),history:document.querySelectorAll('#history .log').length,overflow:document.documentElement.scrollWidth-innerWidth, status:document.getElementById('status').textContent,heading:window.TrucGiangCadNorth?.get()}));
       await page.screenshot({path:'object-review-after-'+mode.name+'.png'}).catch(e=>errors.push('shot2: '+e));
       const passed=status===200&&before.stat.objects>400&&before.candrawn>=250&&before.osmdrawn>150
         &&handles>=12&&approveState.events>=1&&after.stat.events>=1&&after.history>=1
