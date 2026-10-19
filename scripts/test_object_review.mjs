@@ -39,6 +39,28 @@ try{
       await page.locator('#editGeometry').click();
       const handles=await page.locator('#cadHandles .vertex').count();
       if(handles<12)errors.push('no editable lake handles: '+handles);
+      const gestures=await page.evaluate(()=>{
+        const svg=document.getElementById('cadSvg'),r=svg.getBoundingClientRect();
+        const x=r.left+r.width*.45,y=r.top+r.height*.45;
+        const emit=(type,id,xx,yy)=>svg.dispatchEvent(new PointerEvent(type,{
+          bubbles:true,cancelable:true,pointerId:id,pointerType:'touch',clientX:xx,clientY:yy,buttons:type==='pointerup'?0:1
+        }));
+        const start=svg.getAttribute('viewBox');
+        emit('pointerdown',901,x,y);emit('pointermove',901,x+65,y+12);emit('pointerup',901,x+65,y+12);
+        const afterPan=svg.getAttribute('viewBox');
+        emit('pointerdown',902,x-30,y);emit('pointerdown',903,x+30,y);
+        emit('pointermove',903,x+85,y);emit('pointerup',903,x+85,y);emit('pointerup',902,x-30,y);
+        const afterPinch=svg.getAttribute('viewBox');
+        return {pan:afterPan!==start,pinch:afterPinch!==afterPan,before:start,after:afterPinch};
+      });
+      if(!gestures.pan||!gestures.pinch)errors.push('Touch gestures do not change CAD viewBox');
+      await page.locator('#northAdjust').click();
+      await page.locator('#cadNorthSlider').evaluate(el=>{el.value='4';el.dispatchEvent(new Event('input',{bubbles:true}));});
+      const cadNorth=await page.evaluate(()=>({
+        angle:window.TrucGiangCadNorth.get(),
+        transform:document.getElementById('cadAligned').getAttribute('transform')
+      }));
+      if(Math.abs(cadNorth.angle+5.6)>.01||!cadNorth.transform.includes('-5.6'))errors.push('North calibration not applied to CAD');
       if(mode.mobile){
         await page.locator('#mobileObjects').click();
         const sheet=await page.evaluate(()=>document.getElementById('catalog').classList.contains('mobileOpen'));
@@ -46,6 +68,7 @@ try{
         await page.locator('#mobileFields').click();
         const fields=await page.evaluate(()=>document.getElementById('inspector').classList.contains('mobileOpen'));
         if(!fields)errors.push('Mobile parameter sheet failed to open');
+        await page.screenshot({path:'object-review-fields-'+mode.name+'.png'}).catch(e=>errors.push('fields screenshot: '+e));
       }
       const num=page.locator('#parameterFields input[type=number]').first();
       await num.fill('3.2');
@@ -57,10 +80,10 @@ try{
       await page.waitForFunction(()=>window.__TrucGiangObjectReview?.getStats()?.objects>=400);
       const after=await page.evaluate(()=>({stat:window.__TrucGiangObjectReview?.getStats(),history:document.querySelectorAll('#history .log').length,overflow:document.documentElement.scrollWidth-innerWidth, status:document.getElementById('status').textContent,heading:window.TrucGiangCadNorth?.get()}));
       await page.screenshot({path:'object-review-after-'+mode.name+'.png'}).catch(e=>errors.push('shot2: '+e));
-      const passed=status===200&&before.stat.objects>400&&before.candrawn>=250&&before.osmdrawn>150
+      const passed=status===200&&gestures.pan&&gestures.pinch&&Math.abs(cadNorth.angle+5.6)<.01&&before.stat.objects>400&&before.candrawn>=250&&before.osmdrawn>150
         &&handles>=12&&approveState.events>=1&&after.stat.events>=1&&after.history>=1
         &&after.overflow<=2&&!errors.length;
-      report.push({mode:mode.name,pass:passed,http:status,before,handles,approveState,download:downloaded?.suggestedFilename(),after,errors});
+      report.push({mode:mode.name,pass:passed,http:status,before,gestures,cadNorth,handles,approveState,download:downloaded?.suggestedFilename(),after,errors});
     }else report.push({mode:mode.name,pass:false,http:status,before,errors});
     console.log(JSON.stringify(report.at(-1)));
     await context.close();
