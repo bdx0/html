@@ -53,6 +53,7 @@ const $=id=>document.getElementById(id),svg=$('map'),orientation=window.TrucGian
 const label={roads:'Giao thông',parks:'Công viên',buildings:'Công trình',waterfront_walk:'Đường dạo ven hồ',water:'Mặt nước',trees:'Cây xanh',plazas:'Quảng trường',fountain:'Đài phun nước',osm_reference:'OSM gốc (đối chiếu)',shoreline:'Đường bờ',review_points:'Ghim cần duyệt'};
 const col={roads:'#89949c',parks:'#a1ce9b',buildings:'#dbcbb3',waterfront_walk:'#e7d3af',water:'#55a9bb',trees:'#428b4d',plazas:'#bdad96',fountain:'#466da4',osm_reference:'#8452b5',shoreline:'#f03775',review_points:'#d63d3d'};
 let F=[],R=[],original=[],vis={},edit=false,selected=-1,pid=null,pan=null,V=[0,0,1448,1086],undo=[],redo=[],currentDirection=orientation.get();
+const touchPoints=new Map();let lastPinch=0;
 const e=(tag,a,p)=>{let n=document.createElementNS(NS,tag);Object.entries(a||{}).forEach(([k,v])=>n.setAttribute(k,String(v)));if(p)p.append(n);return n};
 const line=q=>q.map((p,i)=>(i?'L':'M')+p.join(' ')).join(' ');
 const path=g=>g.map(q=>line(q)+'Z').join(' ');
@@ -77,7 +78,7 @@ function updateRing(){
  let d=line(R)+'Z',w=drawing.querySelector('g:nth-child(5) path'),s=drawing.querySelector('g:nth-child(10) path');
  if(w)w.setAttribute('d',d);if(s)s.setAttribute('d',d);drawHandles()
 }
-function drawHandles(){handles.textContent='';if(edit)R.forEach((p,i)=>e('circle',{cx:p[0],cy:p[1],r:6.4,'data-h':i,class:i===selected?'active':''},handles))}
+function drawHandles(){handles.textContent='';if(edit)R.forEach((p,i)=>e('circle',{cx:p[0],cy:p[1],r:innerWidth<=800?13:6.4,'data-h':i,class:i===selected?'active':''},handles))}
 function mouse(e){let p=svg.createSVGPoint();p.x=e.clientX;p.y=e.clientY;return p.matrixTransform(rotated.getScreenCTM().inverse())}
 function mouseView(e){let p=svg.createSVGPoint();p.x=e.clientX;p.y=e.clientY;return p.matrixTransform(svg.getScreenCTM().inverse())}
 /* CAD source: X right, Y down in an unverified illustration.
@@ -132,13 +133,41 @@ try{
  paint();setView();$('status').textContent=F.length+' đối tượng nháp · '+R.length+' đỉnh bờ · không thay đổi SQLite/OSM';
  for(const [x,y,s] of [[37,61,'Bờ Tây Nam: giảm lồi'],[61,25,'Bờ Bắc phải: lồi nhiều hơn'],[51,25,'Bờ Bắc trái: lồi ít hơn'],[50,70,'Bờ Nam giữa: không lồi'],[68,73,'Đông Nam: giảm phần lồi']]){let b=document.createElement('button');b.textContent=s;b.onclick=()=>{let p=modelToView([1448*x/100,1086*y/100]);zoom(2,p.x,p.y);$('info').textContent=s+' · X='+x+'%, Y='+y+'%';$('inspector').classList.add('open')};$('review').append(b)}
 }catch(ex){$('status').textContent='Lỗi tải dữ liệu: '+ex.message;console.error(ex)}
-svg.addEventListener('pointerdown',ev=>{let h=ev.target.closest('[data-h]');if(edit&&h){history();selected=+h.dataset.h;pid=ev.pointerId;svg.setPointerCapture(pid);drawHandles();ev.preventDefault();return}if(!edit&&ev.target.closest('[data-i]'))detail(+ev.target.closest('[data-i]').dataset.i);pan={id:ev.pointerId,clientX:ev.clientX,clientY:ev.clientY,v:V.slice()};svg.setPointerCapture(ev.pointerId);ev.preventDefault()});
-svg.addEventListener('pointermove',ev=>{if(pid===ev.pointerId&&selected>=0){let p=mouse(ev);R[selected]=[+p.x.toFixed(1),+p.y.toFixed(1)];updateRing()}else if(pan&&pan.id===ev.pointerId){
+svg.addEventListener('pointerdown',ev=>{
+ if(ev.pointerType==='touch'){
+  touchPoints.set(ev.pointerId,{x:ev.clientX,y:ev.clientY});
+  if(touchPoints.size===2){
+   pan=null;
+   const a=[...touchPoints.values()];lastPinch=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);
+  }
+ }
+ let h=ev.target.closest('[data-h]');
+ if(edit&&h&&touchPoints.size<2){
+  history();selected=+h.dataset.h;pid=ev.pointerId;svg.setPointerCapture(pid);drawHandles();ev.preventDefault();return
+ }
+ if(!edit&&ev.target.closest('[data-i]'))detail(+ev.target.closest('[data-i]').dataset.i);
+ if(touchPoints.size<2)pan={id:ev.pointerId,clientX:ev.clientX,clientY:ev.clientY,v:V.slice()};
+ svg.setPointerCapture(ev.pointerId);ev.preventDefault()
+});
+svg.addEventListener('pointermove',ev=>{
+ if(touchPoints.has(ev.pointerId)){
+  touchPoints.set(ev.pointerId,{x:ev.clientX,y:ev.clientY});
+  if(touchPoints.size>=2){
+   const a=[...touchPoints.values()];
+   const dist=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);
+   if(lastPinch>0){
+    const p=mouseView({clientX:(a[0].x+a[1].x)/2,clientY:(a[0].y+a[1].y)/2});
+    zoom(dist/lastPinch,p.x,p.y);
+   }
+   lastPinch=dist;return;
+  }
+ }
+ if(pid===ev.pointerId&&selected>=0){let p=mouse(ev);R[selected]=[+p.x.toFixed(1),+p.y.toFixed(1)];updateRing()}else if(pan&&pan.id===ev.pointerId){
  let rect=svg.getBoundingClientRect(),scale=Math.min(rect.width/pan.v[2],rect.height/pan.v[3])||1;
  V=[pan.v[0]-(ev.clientX-pan.clientX)/scale,pan.v[1]-(ev.clientY-pan.clientY)/scale,pan.v[2],pan.v[3]];
  setView()
 }});
-const end=ev=>{if(pid===ev.pointerId){pid=null;save()}if(pan&&pan.id===ev.pointerId)pan=null};svg.addEventListener('pointerup',end);svg.addEventListener('pointercancel',end);
+const end=ev=>{touchPoints.delete(ev.pointerId);if(touchPoints.size<2)lastPinch=0;if(pid===ev.pointerId){pid=null;save()}if(pan&&pan.id===ev.pointerId)pan=null};svg.addEventListener('pointerup',end);svg.addEventListener('pointercancel',end);
 svg.addEventListener('dblclick',ev=>{if(!edit)return;let p=mouse(ev),idx=-1,dmin=15;R.forEach((a,i)=>{let b=R[(i+1)%R.length],dx=b[0]-a[0],dy=b[1]-a[1],t=Math.max(0,Math.min(1,((p.x-a[0])*dx+(p.y-a[1])*dy)/(dx*dx+dy*dy))),d=Math.hypot(p.x-(a[0]+t*dx),p.y-(a[1]+t*dy));if(d<dmin)dmin=d,idx=i});if(idx>=0){history();R.splice(idx+1,0,[+p.x.toFixed(1),+p.y.toFixed(1)]);updateRing();save()}});
 svg.addEventListener('wheel',ev=>{ev.preventDefault();let p=mouseView(ev);zoom(ev.deltaY<0?1.18:1/1.18,p.x,p.y)},{passive:false});
 $('edit').onclick=()=>{edit=!edit;$('edit').classList.toggle('selected',edit);svg.classList.toggle('editing',edit);drawHandles()};
