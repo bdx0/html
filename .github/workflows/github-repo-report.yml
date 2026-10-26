@@ -1,0 +1,42 @@
+name: Refresh public repository report
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 1 * * *'
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/build_github_repo_report.py'
+      - '.github/workflows/github-repo-report.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: github-repository-report
+  cancel-in-progress: false
+
+jobs:
+  update:
+    name: Snapshot public repositories
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Build report JSON
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python3 scripts/build_github_repo_report.py
+      - name: Commit snapshot if changed
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/github-repositories.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'data: refresh public GitHub repository status'
+            git push
+          fi
