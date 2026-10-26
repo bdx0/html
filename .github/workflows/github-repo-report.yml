@@ -12,6 +12,7 @@ on:
 
 permissions:
   contents: write
+  actions: write
 
 concurrency:
   group: github-repository-report
@@ -32,6 +33,7 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         run: python3 scripts/build_github_repo_report.py
       - name: Commit snapshot if changed
+        id: snapshot
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
@@ -39,4 +41,10 @@ jobs:
           if ! git diff --cached --quiet; then
             git commit -m 'data: refresh public GitHub repository status'
             git push
+            echo 'changed=true' >> "$GITHUB_OUTPUT"
           fi
+      - name: Dispatch Pages rebuild after snapshot update
+        if: steps.snapshot.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run deploy-pages.yml --ref main
