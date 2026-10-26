@@ -80,18 +80,33 @@ def simplify(r):
     }
 
 
-def search_public(kind, public_names):
-    raw = get("/search/issues", {"q": "user:" + OWNER + " is:" + kind + " is:open",
-                                 "per_page": 100}, optional=True) or {}
-    items = []
-    for issue in raw.get("items", []):
-        repository = issue.get("repository_url", "").split("/repos/")[-1]
-        if repository not in public_names:
+def list_open_items(repos):
+    """Inspect public repos with nonzero open items, including PRs.
+
+    GitHub's open_issues_count includes pull requests.
+    """
+    prs, issues = [], []
+    for repo in repos:
+        if not repo["open_issues"]:
             continue
-        items.append({"repo": repository, "number": issue.get("number"),
-                      "title": issue.get("title"), "html_url": issue.get("html_url"),
-                      "updated_at": issue.get("updated_at")})
-    return sorted(items, key=lambda x: x["updated_at"] or "", reverse=True)
+        page = 1
+        while True:
+            batch = get("/repos/" + OWNER + "/" + urllib.parse.quote(repo["name"]) + "/issues",
+                        {"state": "open", "per_page": 100, "page": page}, optional=True) or []
+            if not isinstance(batch, list):
+                break
+            for issue in batch:
+                item = {"repo": repo["full_name"], "number": issue.get("number"),
+                        "title": issue.get("title"), "html_url": issue.get("html_url"),
+                        "updated_at": issue.get("updated_at")}
+                (prs if "pull_request" in issue else issues).append(item)
+            if len(batch) < 100:
+                break
+            page += 1
+            if page > 10:
+                break
+    key = lambda x: x["updated_at"] or ""
+    return sorted(prs, key=key, reverse=True), sorted(issues, key=key, reverse=True)
 
 
 def main():
@@ -105,9 +120,16 @@ def main():
         if name not in by_name:
             continue
         data = get("/repos/" + OWNER + "/" + urllib.parse.quote(name) + "/actions/runs",
-                   {"per_page": 1}, optional=True)
+                   {"per_page": 12}, optional=True)
         runs = (data or {}).get("workflow_runs", [])
         if runs:
+            deploy_run = next((x for x in runs if "deploy" in (x.get("name") or "").lower()), None)
+            if deploy_run:
+                by_name[name]["ci_deploy"] = {
+                    "name": deploy_run.get("name"), "status": deploy_run.get("status"),
+                    "conclusion": deploy_run.get("conclusion"),
+                    "html_url": deploy_run.get("html_url"), "created_at": deploy_run.get("created_at")
+                }
             run = runs[0]
             by_name[name]["ci"] = {
                 "name": run.get("name"), "status": run.get("status"),
@@ -117,6 +139,7 @@ def main():
 
     now = dt.datetime.now(dt.timezone.utc)
     threshold = now - dt.timedelta(days=30)
+    public_prs, public_issues = list_open_items(repos)
     report = {
         "owner": OWNER, "generated_at": now.isoformat(timespec="seconds"),
         "source": "GitHub public REST API via GitHub Actions",
@@ -129,8 +152,8 @@ def main():
             for r in repos),
         "featured": [by_name[n] for n in FEATURED if n in by_name],
         "repositories": repos,
-        "open_prs": search_public("pr", public_fullnames),
-        "open_issues": search_public("issue", public_fullnames)
+        "open_prs": public_prs,
+        "open_issues": public_issues
     }
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
