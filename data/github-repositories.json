@@ -1,6 +1,6 @@
 {
   "owner": "bdx0",
-  "generated_at": "2026-10-26T01:40:22+00:00",
+  "generated_at": "2026-10-26T01:42:16+00:00",
   "source": "GitHub public REST API via GitHub Actions",
   "coverage": "complete_public",
   "total_public": 597,
@@ -18,8 +18,8 @@
       "default_branch": "main",
       "archived": false,
       "fork": false,
-      "pushed_at": "2026-10-26T01:40:06Z",
-      "updated_at": "2026-10-26T01:40:10Z",
+      "pushed_at": "2026-10-26T01:42:04Z",
+      "updated_at": "2026-10-26T01:42:07Z",
       "created_at": "2026-10-09T04:40:11Z",
       "has_pages": true,
       "stars": 0,
@@ -30,8 +30,15 @@
         "name": "Refresh public repository report",
         "status": "in_progress",
         "conclusion": null,
-        "html_url": "https://github.com/bdx0/html/actions/runs/40255337211",
-        "created_at": "2026-10-26T01:40:08Z"
+        "html_url": "https://github.com/bdx0/html/actions/runs/40255495787",
+        "created_at": "2026-10-26T01:42:05Z"
+      },
+      "ci_deploy": {
+        "name": "Deploy HTML Lab to GitHub Pages",
+        "status": "in_progress",
+        "conclusion": null,
+        "html_url": "https://github.com/bdx0/html/actions/runs/40255495694",
+        "created_at": "2026-10-26T01:42:05Z"
       }
     },
     {
@@ -58,6 +65,13 @@
         "conclusion": "success",
         "html_url": "https://github.com/bdx0/warestack-3d/actions/runs/37902566421",
         "created_at": "2026-10-09T08:02:51Z"
+      },
+      "ci_deploy": {
+        "name": "Deploy WareTrack 3D to GitHub Pages",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/bdx0/warestack-3d/actions/runs/37902566421",
+        "created_at": "2026-10-09T08:02:51Z"
       }
     },
     {
@@ -79,6 +93,13 @@
       "open_issues": 0,
       "size_kb": 21619,
       "ci": {
+        "name": "Deploy Next.js site to Pages",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/bdx0/bdx0.github.io/actions/runs/38527404292",
+        "created_at": "2026-10-14T07:17:49Z"
+      },
+      "ci_deploy": {
         "name": "Deploy Next.js site to Pages",
         "status": "completed",
         "conclusion": "success",
@@ -129,6 +150,13 @@
         "status": "completed",
         "conclusion": "failure",
         "html_url": "https://github.com/bdx0/cv/actions/runs/29087984296",
+        "created_at": "2026-07-10T10:58:31Z"
+      },
+      "ci_deploy": {
+        "name": "Deploy Next.js App to GitHub Pages",
+        "status": "completed",
+        "conclusion": "failure",
+        "html_url": "https://github.com/bdx0/cv/actions/runs/29087984203",
         "created_at": "2026-07-10T10:58:31Z"
       }
     },
@@ -1333,6 +1361,13 @@
       "open_issues": 0,
       "size_kb": 21619,
       "ci": {
+        "name": "Deploy Next.js site to Pages",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/bdx0/bdx0.github.io/actions/runs/38527404292",
+        "created_at": "2026-10-14T07:17:49Z"
+      },
+      "ci_deploy": {
         "name": "Deploy Next.js site to Pages",
         "status": "completed",
         "conclusion": "success",
@@ -2863,6 +2898,13 @@
         "status": "completed",
         "conclusion": "failure",
         "html_url": "https://github.com/bdx0/cv/actions/runs/29087984296",
+        "created_at": "2026-07-10T10:58:31Z"
+      },
+      "ci_deploy": {
+        "name": "Deploy Next.js App to GitHub Pages",
+        "status": "completed",
+        "conclusion": "failure",
+        "html_url": "https://github.com/bdx0/cv/actions/runs/29087984203",
         "created_at": "2026-07-10T10:58:31Z"
       }
     },
@@ -4836,8 +4878,8 @@
       "default_branch": "main",
       "archived": false,
       "fork": false,
-      "pushed_at": "2026-10-26T01:40:06Z",
-      "updated_at": "2026-10-26T01:40:10Z",
+      "pushed_at": "2026-10-26T01:42:04Z",
+      "updated_at": "2026-10-26T01:42:07Z",
       "created_at": "2026-10-09T04:40:11Z",
       "has_pages": true,
       "stars": 0,
@@ -4848,8 +4890,15 @@
         "name": "Refresh public repository report",
         "status": "in_progress",
         "conclusion": null,
-        "html_url": "https://github.com/bdx0/html/actions/runs/40255337211",
-        "created_at": "2026-10-26T01:40:08Z"
+        "html_url": "https://github.com/bdx0/html/actions/runs/40255495787",
+        "created_at": "2026-10-26T01:42:05Z"
+      },
+      "ci_deploy": {
+        "name": "Deploy HTML Lab to GitHub Pages",
+        "status": "in_progress",
+        "conclusion": null,
+        "html_url": "https://github.com/bdx0/html/actions/runs/40255495694",
+        "created_at": "2026-10-26T01:42:05Z"
       }
     },
     {
@@ -11556,6 +11605,13 @@
         "conclusion": "success",
         "html_url": "https://github.com/bdx0/warestack-3d/actions/runs/37902566421",
         "created_at": "2026-10-09T08:02:51Z"
+      },
+      "ci_deploy": {
+        "name": "Deploy WareTrack 3D to GitHub Pages",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/bdx0/warestack-3d/actions/runs/37902566421",
+        "created_at": "2026-10-09T08:02:51Z"
       }
     },
     {
@@ -12119,6 +12175,113 @@
       "ci": null
     }
   ],
-  "open_prs": [],
-  "open_issues": []
+  "open_prs": [
+    {
+      "repo": "bdx0/html",
+      "number": 2,
+      "title": "CAD/GIS Bắc & Hybrid: OSM nền, ba chỗ lõm duyệt nháp 3,5/6/6 m",
+      "html_url": "https://github.com/bdx0/html/pull/2",
+      "updated_at": "2026-10-18T10:38:07Z"
+    },
+    {
+      "repo": "bdx0/quickemu",
+      "number": 1,
+      "title": "chore: update flake.lock",
+      "html_url": "https://github.com/bdx0/quickemu/pull/1",
+      "updated_at": "2026-10-14T18:09:30Z"
+    },
+    {
+      "repo": "bdx0/blog01",
+      "number": 5,
+      "title": "Bump rimraf from 5.0.7 to 6.0.1",
+      "html_url": "https://github.com/bdx0/blog01/pull/5",
+      "updated_at": "2024-07-25T09:39:22Z"
+    },
+    {
+      "repo": "bdx0/blog01",
+      "number": 4,
+      "title": "Bump preact-render-to-string from 6.5.5 to 6.5.7",
+      "html_url": "https://github.com/bdx0/blog01/pull/4",
+      "updated_at": "2024-07-25T09:39:16Z"
+    },
+    {
+      "repo": "bdx0/blog01",
+      "number": 3,
+      "title": "Bump @types/node from 20.14.11 to 20.14.12",
+      "html_url": "https://github.com/bdx0/blog01/pull/3",
+      "updated_at": "2024-07-25T09:39:09Z"
+    },
+    {
+      "repo": "bdx0/blog01",
+      "number": 2,
+      "title": "Bump globby from 14.0.1 to 14.0.2",
+      "html_url": "https://github.com/bdx0/blog01/pull/2",
+      "updated_at": "2024-07-25T09:39:02Z"
+    },
+    {
+      "repo": "bdx0/blog01",
+      "number": 1,
+      "title": "Bump workerpool from 9.1.2 to 9.1.3",
+      "html_url": "https://github.com/bdx0/blog01/pull/1",
+      "updated_at": "2024-07-25T09:38:56Z"
+    }
+  ],
+  "open_issues": [
+    {
+      "repo": "bdx0/cv",
+      "number": 1,
+      "title": "update new cv",
+      "html_url": "https://github.com/bdx0/cv/issues/1",
+      "updated_at": "2020-06-15T04:27:30Z"
+    },
+    {
+      "repo": "bdx0/python-random-quote",
+      "number": 1,
+      "title": "Prepare your environment",
+      "html_url": "https://github.com/bdx0/python-random-quote/issues/1",
+      "updated_at": "2020-06-04T02:38:29Z"
+    },
+    {
+      "repo": "bdx0/gowut",
+      "number": 6,
+      "title": "Add limited <canvas> support",
+      "html_url": "https://github.com/bdx0/gowut/issues/6",
+      "updated_at": "2015-06-21T15:32:23Z"
+    },
+    {
+      "repo": "bdx0/gowut",
+      "number": 5,
+      "title": "Why is \"text\" hardcoded in a text box?",
+      "html_url": "https://github.com/bdx0/gowut/issues/5",
+      "updated_at": "2015-06-21T15:32:23Z"
+    },
+    {
+      "repo": "bdx0/gowut",
+      "number": 4,
+      "title": "Expander.Content() wrong implementation",
+      "html_url": "https://github.com/bdx0/gowut/issues/4",
+      "updated_at": "2015-06-21T15:32:23Z"
+    },
+    {
+      "repo": "bdx0/gowut",
+      "number": 3,
+      "title": "site/gowebuitoolkit/",
+      "html_url": "https://github.com/bdx0/gowut/issues/3",
+      "updated_at": "2015-06-21T15:32:23Z"
+    },
+    {
+      "repo": "bdx0/gowut",
+      "number": 2,
+      "title": "can not panic() program",
+      "html_url": "https://github.com/bdx0/gowut/issues/2",
+      "updated_at": "2015-06-21T15:32:22Z"
+    },
+    {
+      "repo": "bdx0/gowut",
+      "number": 1,
+      "title": "IE 6 show javascript errors and some behavior can not work",
+      "html_url": "https://github.com/bdx0/gowut/issues/1",
+      "updated_at": "2015-06-21T15:32:22Z"
+    }
+  ]
 }
