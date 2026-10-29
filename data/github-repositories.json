@@ -1,6 +1,6 @@
 {
   "owner": "bdx0",
-  "generated_at": "2026-10-28T06:53:47+00:00",
+  "generated_at": "2026-10-29T07:11:12+00:00",
   "source": "GitHub public REST API via GitHub Actions",
   "coverage": "complete_public",
   "total_public": 597,
@@ -18,27 +18,27 @@
       "default_branch": "main",
       "archived": false,
       "fork": false,
-      "pushed_at": "2026-10-27T06:21:54Z",
-      "updated_at": "2026-10-27T06:21:58Z",
+      "pushed_at": "2026-10-28T06:53:50Z",
+      "updated_at": "2026-10-28T06:53:54Z",
       "created_at": "2026-10-09T04:40:11Z",
       "has_pages": true,
       "stars": 0,
       "forks": 0,
       "open_issues": 1,
-      "size_kb": 2442,
+      "size_kb": 2443,
       "ci": {
         "name": "Refresh public repository report",
         "status": "in_progress",
         "conclusion": null,
-        "html_url": "https://github.com/bdx0/html/actions/runs/40646613682",
-        "created_at": "2026-10-28T06:53:24Z"
+        "html_url": "https://github.com/bdx0/html/actions/runs/40833781590",
+        "created_at": "2026-10-29T07:10:56Z"
       },
       "ci_deploy": {
         "name": "Deploy HTML Lab to GitHub Pages",
         "status": "completed",
         "conclusion": "success",
-        "html_url": "https://github.com/bdx0/html/actions/runs/40460658341",
-        "created_at": "2026-10-27T06:21:55Z"
+        "html_url": "https://github.com/bdx0/html/actions/runs/40646661182",
+        "created_at": "2026-10-28T06:53:51Z"
       }
     },
     {
@@ -4878,27 +4878,27 @@
       "default_branch": "main",
       "archived": false,
       "fork": false,
-      "pushed_at": "2026-10-27T06:21:54Z",
-      "updated_at": "2026-10-27T06:21:58Z",
+      "pushed_at": "2026-10-28T06:53:50Z",
+      "updated_at": "2026-10-28T06:53:54Z",
       "created_at": "2026-10-09T04:40:11Z",
       "has_pages": true,
       "stars": 0,
       "forks": 0,
       "open_issues": 1,
-      "size_kb": 2442,
+      "size_kb": 2443,
       "ci": {
         "name": "Refresh public repository report",
         "status": "in_progress",
         "conclusion": null,
-        "html_url": "https://github.com/bdx0/html/actions/runs/40646613682",
-        "created_at": "2026-10-28T06:53:24Z"
+        "html_url": "https://github.com/bdx0/html/actions/runs/40833781590",
+        "created_at": "2026-10-29T07:10:56Z"
       },
       "ci_deploy": {
         "name": "Deploy HTML Lab to GitHub Pages",
         "status": "completed",
         "conclusion": "success",
-        "html_url": "https://github.com/bdx0/html/actions/runs/40460658341",
-        "created_at": "2026-10-27T06:21:55Z"
+        "html_url": "https://github.com/bdx0/html/actions/runs/40646661182",
+        "created_at": "2026-10-28T06:53:51Z"
       }
     },
     {
@@ -9231,7 +9231,7 @@
       "default_branch": "master",
       "archived": false,
       "fork": true,
-      "pushed_at": "2026-10-14T18:09:28Z",
+      "pushed_at": "2026-10-28T19:03:21Z",
       "updated_at": "2024-08-12T15:00:55Z",
       "created_at": "2023-12-30T08:11:08Z",
       "has_pages": false,
@@ -12177,18 +12177,18 @@
   ],
   "open_prs": [
     {
+      "repo": "bdx0/quickemu",
+      "number": 1,
+      "title": "chore: update flake.lock",
+      "html_url": "https://github.com/bdx0/quickemu/pull/1",
+      "updated_at": "2026-10-28T19:03:23Z"
+    },
+    {
       "repo": "bdx0/html",
       "number": 2,
       "title": "CAD/GIS Bắc & Hybrid: OSM nền, ba chỗ lõm duyệt nháp 3,5/6/6 m",
       "html_url": "https://github.com/bdx0/html/pull/2",
       "updated_at": "2026-10-18T10:38:07Z"
-    },
-    {
-      "repo": "bdx0/quickemu",
-      "number": 1,
-      "title": "chore: update flake.lock",
-      "html_url": "https://github.com/bdx0/quickemu/pull/1",
-      "updated_at": "2026-10-14T18:09:30Z"
     },
     {
       "repo": "bdx0/blog01",
