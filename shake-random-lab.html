@@ -119,7 +119,7 @@ kbd{background:#edf3fa;padding:2px 5px;border-radius:4px}
 <div class="main">
 <div class="stack">
 <section class="panel"><h2>01 / Thiết lập thí nghiệm</h2><p class="panel-desc">Giữ cố định tập số trong mỗi lượt thử để kết quả thống kê có thể so sánh.</p>
-<label class="field-label" for="faces">Chọn tập kết quả</label>
+<label class="field-label" for="algorithm">Cách sinh kết quả</label><select class="select" id="algorithm" style="margin-bottom:15px"><option value="crypto" selected>Web Crypto · ngẫu nhiên chuẩn</option><option value="motion">Gia tốc cú lắc · thực nghiệm</option></select><div class="note" id="algorithmInfo" style="margin:-5px 0 15px">Chuyển động chỉ là nút kích hoạt; số do Web Crypto sinh ra.</div><label class="field-label" for="faces">Chọn tập kết quả</label>
 <select class="select" id="faces"><option value="2">Đồng xu · 1–2</option><option value="6" selected>Xúc xắc · 1–6</option><option value="10">1–10</option><option value="20">1–20</option><option value="100">1–100</option></select>
 <div class="range-wrap"><label class="field-label" for="sensitivity" style="margin:0">Ngưỡng phát hiện lắc</label><strong style="font-size:12px;color:#51758a" id="sensitivityValue">10 m/s²</strong></div>
 <input class="slider" type="range" id="sensitivity" min="5" max="22" step="1" value="10"><div class="note">Ngưỡng thấp nhạy hơn. Cần hai chuyển động nhanh trong khoảng ngắn để tính một lần lắc.</div>
@@ -131,7 +131,7 @@ kbd{background:#edf3fa;padding:2px 5px;border-radius:4px}
 <button class="btn btn-subtle btn-wide" id="batch1000" style="margin-top:9px">⚡ Mô phỏng +1.000 mẫu</button>
 <div id="notice" class="notice" role="status">Mẫu mô phỏng/chạm được đánh dấu riêng, không giả làm cú lắc thật.</div>
 </section>
-<section class="panel"><h2>Nguyên tắc tạo số</h2><p class="panel-desc" style="margin-bottom:0">Cảm biến chỉ xác định <strong>khi nào</strong> tạo số. Giá trị được lấy từ <code>crypto.getRandomValues()</code> và dùng <em>rejection sampling</em> để không gây thiên lệch modulo. Vì vậy phép thử đánh giá <strong>chuỗi số từ Web Crypto</strong>, không chứng minh chuyển động tay là nguồn ngẫu nhiên.</p></section>
+<section class="panel"><h2>Nguyên tắc tạo số</h2><p class="panel-desc" style="margin-bottom:0"><strong>Web Crypto:</strong> cảm biến xác định lúc gieo; <code>crypto.getRandomValues()</code> và <em>rejection sampling</em> sinh số đều. <strong>Gia tốc thực nghiệm:</strong> giá trị được tính từ độ thay đổi gia tốc ở cú lắc, lượng tử hóa rồi lấy phần dư theo tập số. Đây là phép biến đổi tất định, <strong>không phải nguồn ngẫu nhiên an toàn</strong>. Hãy thử hai chế độ riêng biệt để xem mức độ đồng đều và độc lập của các kết quả.</p></section>
 </div>
 <div class="stack">
 <section class="panel">
@@ -157,14 +157,14 @@ kbd{background:#edf3fa;padding:2px 5px;border-radius:4px}
 <section class="panel"><div class="toolbar"><div><h2>05 / Dữ liệu &amp; lịch sử</h2><div class="note">Lưu cục bộ trong trình duyệt này, không gửi lên máy chủ</div></div><div class="toolbar-actions"><button class="btn btn-subtle" id="csvBtn">↓ CSV</button><button class="btn btn-danger" id="resetBtn">Xóa dữ liệu</button></div></div><div class="history" id="history"><span class="note">Chưa có kết quả.</span></div><div class="note" style="margin-top:9px">Hiển thị tối đa 24 kết quả mới nhất của bộ lọc. Lưu tối đa 15.000 lần gieo; kết quả cũ nhất sẽ được loại bỏ khi vượt giới hạn.</div></section>
 </div>
 </div>
-<div class="foot"><strong>Chú ý khi thử nghiệm:</strong> hãy mở trang bằng HTTPS trên Safari, cấp quyền chuyển động và thử lắc vừa phải, giữ thiết bị chắc tay. iOS/iPadOS có thể hạn chế cảm biến theo quyền, phiên bản Safari hoặc thiết bị; khi đó vẫn có thể gieo số bằng nút. Kết quả mô phỏng không được xem là bằng chứng cảm biến đã hoạt động. Các phép kiểm định là công cụ tham khảo, không dùng để chứng nhận hệ thống dùng cho an ninh, cờ bạc hay khoa học nghiêm ngặt.</div>
+<div class="foot"><strong>Chú ý khi thử nghiệm:</strong> hãy mở trang bằng HTTPS trên Safari, cấp quyền chuyển động và thử lắc vừa phải, giữ thiết bị chắc tay. iOS/iPadOS có thể hạn chế cảm biến theo quyền, phiên bản Safari hoặc thiết bị; khi đó vẫn có thể gieo số bằng nút. Kết quả mô phỏng không được xem là bằng chứng cảm biến đã hoạt động. Các phép kiểm định là công cụ tham khảo, không dùng để chứng nhận hệ thống dùng cho an ninh, cờ bạc hay khoa học nghiêm ngặt. Chế độ lấy số từ gia tốc có thể thiên lệch và không dùng cho mục đích bảo mật.</div>
 <div class="footer">Shake Lab · 100% HTML/CSS/JavaScript · Web Crypto · Offline after load</div>
 </div>
 <script>
 (function(){
 "use strict";
 var KEY="bdx0-shake-lab-v1", CAP=15000;
-var state={faces:6,records:[],scope:"shake",running:false,lastShakeAt:0,lastVector:null,impulses:[],seenMotion:false,lastMotionAt:0,motionMagnitude:0,threshold:10};
+var state={faces:6,algorithm:"crypto",records:[],scope:"shake",running:false,lastShakeAt:0,lastVector:null,impulses:[],seenMotion:false,lastMotionAt:0,motionMagnitude:0,threshold:10};
 var $=function(id){return document.getElementById(id);};
 var format=function(n,d){return Number.isFinite(n)?n.toLocaleString("vi-VN",{maximumFractionDigits:d===undefined?2:d,minimumFractionDigits:d===undefined?0:d}):"—";};
 function alertText(msg,warn){$("notice").textContent=msg;$("notice").className=warn?"notice warn":"notice";}
@@ -175,7 +175,7 @@ function secureInt(max){
  return (a[0]%max)+1;
 }
 function persist(){
- try{localStorage.setItem(KEY,JSON.stringify({faces:state.faces,records:state.records}));}
+ try{localStorage.setItem(KEY,JSON.stringify({faces:state.faces,algorithm:state.algorithm,records:state.records}));}
  catch(err){alertText("Không thể lưu dữ liệu cục bộ (bộ nhớ hoặc chế độ riêng tư bị giới hạn).",true);}
 }
 function restore(){
@@ -183,6 +183,8 @@ function restore(){
   var s=JSON.parse(localStorage.getItem(KEY)||"null");
   if(!s||![2,6,10,20,100].includes(Number(s.faces))||!Array.isArray(s.records))return;
   state.faces=Number(s.faces);
+  state.algorithm=s.algorithm==="motion"?"motion":"crypto";
+  $("algorithm").value=state.algorithm;
   state.records=s.records.slice(-CAP).filter(function(r){return r&&Number.isInteger(r.v)&&r.v>=1&&r.v<=state.faces&&(r.s==="shake"||r.s==="control")&&Number.isFinite(r.t);});
   $("faces").value=String(state.faces);
  }catch(err){/* Unavailable storage: in-memory still works. */}
@@ -190,14 +192,16 @@ function restore(){
 function selected(){
  return state.records.filter(function(r){return state.scope==="all"||r.s===state.scope;});
 }
-function draw(source){
+function draw(source,delta){
  try{
-  var v=secureInt(state.faces);
+  if(state.algorithm==="motion"&&source!=="shake")throw new Error("Chế độ gia tốc chỉ ghi nhận cú lắc thật; không hỗ trợ bấm hoặc mô phỏng.");
+  if(state.algorithm==="motion"&&!Number.isFinite(delta))throw new Error("Không nhận được gia tốc hợp lệ.");
+  var v=state.algorithm==="motion"?(Math.floor(Math.abs(delta)*1000)%state.faces)+1:secureInt(state.faces);
   state.records.push({v:v,s:source,t:Date.now()});
   if(state.records.length>CAP)state.records.splice(0,state.records.length-CAP);
   persist();
   $("result").textContent=v;
-  $("resultSub").textContent=(source==="shake"?"Phát hiện lắc · ":"Gieo đối chứng · ")+new Date().toLocaleTimeString("vi-VN");
+  $("resultSub").textContent=(source==="shake"?(state.algorithm==="motion"?"Gia tốc cú lắc · ":"Lắc Web Crypto · "):"Gieo đối chứng · ")+new Date().toLocaleTimeString("vi-VN");
   $("result").classList.remove("pulse");void $("result").offsetWidth;$("result").classList.add("pulse");
   setScope(source);
   render();
@@ -206,6 +210,7 @@ function draw(source){
 }
 function addBatch(size){
  try{
+  if(state.algorithm==="motion"){alertText("Chỉ cú lắc thật mới có dữ liệu gia tốc; hãy chuyển sang Web Crypto để tạo mẫu mô phỏng.",true);return;}
   var now=Date.now();
   for(var i=0;i<size;i++)state.records.push({v:secureInt(state.faces),s:"control",t:now+i});
   if(state.records.length>CAP)state.records.splice(0,state.records.length-CAP);
@@ -335,7 +340,7 @@ function onMotion(e){
  if(state.impulses.length){
   state.impulses=[];state.lastShakeAt=now;
   if(navigator.vibrate)navigator.vibrate(30);
-  draw("shake");
+  draw("shake",delta);
  }else{state.impulses.push(now);}
 }
 function stopMotion(){
@@ -364,8 +369,8 @@ async function toggleMotion(){
  }catch(err){alertText("Không truy cập được cảm biến: "+(err.message||String(err)),true);}
 }
 function exportCSV(){
- var data=selected(),rows=["\uFEFFtime_iso,source,value,range_max"];
- data.forEach(function(r){rows.push(new Date(r.t).toISOString()+","+(r.s==="shake"?"shake":"control")+","+r.v+","+state.faces);});
+ var data=selected(),rows=["\uFEFFtime_iso,source,algorithm,value,range_max"];
+ data.forEach(function(r){rows.push(new Date(r.t).toISOString()+","+(r.s==="shake"?"shake":"control")+","+state.algorithm+","+r.v+","+state.faces);});
  var blob=new Blob([rows.join("\r\n")],{type:"text/csv;charset=utf-8"}),url=URL.createObjectURL(blob),a=document.createElement("a");
  a.href=url;a.download="shake-lab-"+state.scope+"-"+new Date().toISOString().slice(0,10)+".csv";document.body.appendChild(a);a.click();a.remove();
  setTimeout(function(){URL.revokeObjectURL(url);},2000);
@@ -375,6 +380,15 @@ $("faces").addEventListener("change",function(e){
  if(state.records.length&&!confirm("Đổi tập số sẽ xóa dữ liệu của thí nghiệm hiện tại. Tiếp tục?")){e.target.value=String(state.faces);return;}
  state.faces=next;state.records=[];persist();$("result").textContent="—";$("resultSub").textContent="Bắt đầu thí nghiệm mới";render();
 });
+function setAlgorithm(algorithm){
+ if(state.records.length&&!confirm("Đổi thuật toán sẽ xóa dữ liệu đang lưu để không trộn hai nguồn ngẫu nhiên. Tiếp tục?")){$("algorithm").value=state.algorithm;return;}
+ state.algorithm=algorithm;state.records=[];persist();
+ $("manualBtn").disabled=algorithm==="motion";$("batch100").disabled=algorithm==="motion";$("batch1000").disabled=algorithm==="motion";
+ $("algorithmInfo").textContent=algorithm==="motion"?"Thí nghiệm: lấy phần dư từ độ thay đổi gia tốc; chỉ ghi mẫu lắc thật. Không bảo đảm ngẫu nhiên hoặc bảo mật.":"Web Crypto sinh số đều; cảm biến chỉ kích hoạt cú gieo.";
+ $("result").textContent="—";$("resultSub").textContent="Đã chọn "+(algorithm==="motion"?"gia tốc thực nghiệm":"Web Crypto");
+ setScope("shake");render();
+}
+$("algorithm").addEventListener("change",function(e){setAlgorithm(e.target.value);});
 $("sensitivity").addEventListener("input",function(e){state.threshold=Number(e.target.value);$("sensitivityValue").textContent=state.threshold+" m/s²";});
 $("sensorBtn").addEventListener("click",toggleMotion);
 $("manualBtn").addEventListener("click",function(){draw("control");});
@@ -390,7 +404,9 @@ setInterval(function(){
  if(state.seenMotion){$("sensorLabel").textContent="Đang nhận chuyển động";$("sensorFoot").textContent="Gia tốc biến thiên được hiển thị theo thời gian thực.";}
  else{$("sensorLabel").textContent="Chờ dữ liệu chuyển động";$("sensorFoot").textContent="Không có tín hiệu? Kiểm tra Safari → Quyền truy cập chuyển động.";}
 },1400);
-restore();render();
+restore();
+if(state.algorithm==="motion"){$("manualBtn").disabled=true;$("batch100").disabled=true;$("batch1000").disabled=true;$("algorithmInfo").textContent="Thí nghiệm gia tốc: chỉ ghi mẫu lắc thật. Không bảo đảm ngẫu nhiên hay bảo mật.";}
+render();
 })();
 </script>
 </body>
