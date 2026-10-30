@@ -103,6 +103,16 @@ a{color:inherit}
 .foot{margin-top:19px;font-size:12px;line-height:1.75;color:#647892}
 .foot strong{color:#314b69}
 .footer{text-align:center;margin-top:25px;font-size:11px;color:#9aa8b9}
+.sensor-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:12px 0}
+.sensor-stat{background:white;border-radius:9px;padding:8px 5px;text-align:center;min-width:0}
+.sensor-stat span{display:block;font-size:9px;color:#7790a6;font-weight:750}
+.sensor-stat b{display:block;font-size:17px;color:#21475c;margin-top:4px;font-variant-numeric:tabular-nums}
+.sensor-xyz{margin-top:9px;font-size:11px;color:#4c6680;font-variant-numeric:tabular-nums}
+.sensor-svg{display:block;width:100%;height:67px;border-radius:9px;background:#e6eef7;margin-top:9px}
+.guide{background:#f2f8fc;color:#527087;font-size:12px;line-height:1.7;border:1px solid #dfeaf3;padding:11px;margin:12px 0;border-radius:10px}
+.guide strong{color:#28506b}
+.sensor-diagnostic{background:#e7f7f2;color:#237565;padding:10px 12px;border-radius:10px;font-size:12px;line-height:1.65;margin-top:11px}
+.sensor-diagnostic.warn{background:#fff1e6;color:#a26531}
 kbd{background:#edf3fa;padding:2px 5px;border-radius:4px}
 @media(max-width:920px){.main{grid-template-columns:1fr}.stack{grid-template-columns:repeat(2,minmax(0,1fr));align-items:start}}
 @media(max-width:670px){.shell{padding:16px 12px 40px}.header{margin-bottom:18px}.hero{grid-template-columns:1fr;padding:27px 23px;gap:20px}.hero-side{padding:12px}.hero-side .number{font-size:65px}.main{margin-top:12px;gap:12px}.stack{grid-template-columns:1fr;gap:12px}.panel{padding:18px;border-radius:16px}.metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.tests{grid-template-columns:1fr}.test .name{min-height:0}.section-head{align-items:flex-start}.scope{width:100%;justify-content:space-between}.scope button{flex:1}.toplink{font-size:12px}.chart-row{grid-template-columns:53px minmax(0,1fr) 40px;gap:8px}}
@@ -121,14 +131,21 @@ kbd{background:#edf3fa;padding:2px 5px;border-radius:4px}
 <section class="panel"><h2>01 / Thiết lập thí nghiệm</h2><p class="panel-desc">Giữ cố định tập số trong mỗi lượt thử để kết quả thống kê có thể so sánh.</p>
 <label class="field-label" for="algorithm">Cách sinh kết quả</label><select class="select" id="algorithm" style="margin-bottom:15px"><option value="crypto" selected>Web Crypto · ngẫu nhiên chuẩn</option><option value="motion">Gia tốc cú lắc · thực nghiệm</option></select><div class="note" id="algorithmInfo" style="margin:-5px 0 15px">Chuyển động chỉ là nút kích hoạt; số do Web Crypto sinh ra.</div><label class="field-label" for="faces">Chọn tập kết quả</label>
 <select class="select" id="faces"><option value="2">Đồng xu · 1–2</option><option value="6" selected>Xúc xắc · 1–6</option><option value="10">1–10</option><option value="20">1–20</option><option value="100">1–100</option></select>
-<div class="range-wrap"><label class="field-label" for="sensitivity" style="margin:0">Ngưỡng phát hiện lắc</label><strong style="font-size:12px;color:#51758a" id="sensitivityValue">10 m/s²</strong></div>
-<input class="slider" type="range" id="sensitivity" min="5" max="22" step="1" value="10"><div class="note">Ngưỡng thấp nhạy hơn. Cần hai chuyển động nhanh trong khoảng ngắn để tính một lần lắc.</div>
+<div class="range-wrap"><label class="field-label" for="sensitivity" style="margin:0">Ngưỡng phát hiện lắc</label><strong style="font-size:12px;color:#51758a" id="sensitivityValue">2,5 m/s²</strong></div>
+<input class="slider" type="range" id="sensitivity" min="1" max="10" step="0.5" value="2.5"><div class="note">Ngưỡng mặc định 2,5 m/s². Nếu đồ thị có chuyển động nhưng không ghi nhận cú lắc, thử giảm còn 1–2. Không cần lắc mạnh.</div>
 </section>
 <section class="panel"><h2>02 / Thu thập mẫu</h2><p class="panel-desc">Quyền cảm biến trên Safari phải được cấp sau khi chạm nút.</p>
-<div class="motion"><div class="motion-line"><span><i class="dot" id="sensorDot"></i><strong id="sensorLabel">Chưa bật cảm biến</strong></span><span id="motionValue">—</span></div><div class="motion-meter"><div id="motionBar"></div></div><div class="note" id="sensorFoot">Dữ liệu cảm biến chỉ dùng để phát hiện cú lắc.</div></div>
+<div class="motion"><div class="motion-line"><span><i class="dot" id="sensorDot"></i><strong id="sensorLabel">Chưa bật cảm biến</strong></span><span id="motionValue">—</span></div><div class="motion-meter"><div id="motionBar"></div></div><div class="note" id="sensorFoot">Dữ liệu cảm biến chỉ dùng để phát hiện cú lắc.</div>
+<div class="sensor-stats"><div class="sensor-stat"><span>SỰ KIỆN CẢM BIẾN</span><b id="eventCounter">0</b></div><div class="sensor-stat"><span>GIA TỐC ĐỈNH</span><b id="peakValue">—</b></div><div class="sensor-stat"><span>LẮC NHẬN DIỆN</span><b id="shakeCounter">0</b></div></div>
+<div id="xyzValue" class="sensor-xyz">X — · Y — · Z — (m/s²)</div>
+<svg class="sensor-svg" viewBox="0 0 320 67" preserveAspectRatio="none" role="img" aria-label="Gia tốc theo thời gian"><line id="thresholdLine" x1="0" x2="320" y1="31" y2="31" stroke="#e6a047" stroke-width="1.5" stroke-dasharray="5 4"/><polyline id="traceLine" fill="none" stroke="#099f98" stroke-width="2.3" stroke-linejoin="round" points=""/></svg>
+<div class="note">Đường xanh: gia tốc · vạch cam: ngưỡng phát hiện</div>
+</div>
+<div class="guide"><strong>Cách thử:</strong> Mở trực tiếp bằng Safari → Bật cảm biến → Cho phép → lắc qua lại 2 nhịp. Nếu “Sự kiện cảm biến” vẫn 0, trang chưa nhận dữ liệu từ Safari.</div>
+<div class="sensor-diagnostic" id="sensorDiagnostic" role="status">Nhấn Bật cảm biến để bắt đầu thu thập dữ liệu.</div>
 <button class="btn btn-primary btn-wide" id="sensorBtn">Bật cảm biến và bắt đầu lắc</button>
 <div class="btn-row"><button class="btn btn-subtle" id="manualBtn">🎲 Chạm để gieo</button><button class="btn btn-dark" id="batch100">+100 mẫu</button></div>
-<button class="btn btn-subtle btn-wide" id="batch1000" style="margin-top:9px">⚡ Mô phỏng +1.000 mẫu</button>
+<button class="btn btn-subtle btn-wide" id="batch1000" style="margin-top:9px">⚡ Mô phỏng +1.000 mẫu</button><button class="btn btn-subtle btn-wide" id="rawCsvBtn" style="margin-top:9px" disabled>↓ Tải CSV gia tốc thu được</button>
 <div id="notice" class="notice" role="status">Mẫu mô phỏng/chạm được đánh dấu riêng, không giả làm cú lắc thật.</div>
 </section>
 <section class="panel"><h2>Nguyên tắc tạo số</h2><p class="panel-desc" style="margin-bottom:0"><strong>Web Crypto:</strong> cảm biến xác định lúc gieo; <code>crypto.getRandomValues()</code> và <em>rejection sampling</em> sinh số đều. <strong>Gia tốc thực nghiệm:</strong> giá trị được tính từ độ thay đổi gia tốc ở cú lắc, lượng tử hóa rồi lấy phần dư theo tập số. Đây là phép biến đổi tất định, <strong>không phải nguồn ngẫu nhiên an toàn</strong>. Hãy thử hai chế độ riêng biệt để xem mức độ đồng đều và độc lập của các kết quả.</p></section>
@@ -154,7 +171,7 @@ kbd{background:#edf3fa;padding:2px 5px;border-radius:4px}
 </div>
 <div class="explain" id="interpretation">Thu thập ít nhất 30–50 kết quả, hoặc tạo 1.000 mẫu đối chứng để thấy các phép kiểm định hoạt động. <strong>p ≥ 0,05 chỉ có nghĩa là chưa có đủ bằng chứng bác bỏ giả thuyết ngẫu nhiên</strong>, không chứng minh dữ liệu thực sự ngẫu nhiên. Thử nhiều phép kiểm định có thể tạo cảnh báo giả.</div>
 </section>
-<section class="panel"><div class="toolbar"><div><h2>05 / Dữ liệu &amp; lịch sử</h2><div class="note">Lưu cục bộ trong trình duyệt này, không gửi lên máy chủ</div></div><div class="toolbar-actions"><button class="btn btn-subtle" id="csvBtn">↓ CSV</button><button class="btn btn-danger" id="resetBtn">Xóa dữ liệu</button></div></div><div class="history" id="history"><span class="note">Chưa có kết quả.</span></div><div class="note" style="margin-top:9px">Hiển thị tối đa 24 kết quả mới nhất của bộ lọc. Lưu tối đa 15.000 lần gieo; kết quả cũ nhất sẽ được loại bỏ khi vượt giới hạn.</div></section>
+<section class="panel"><div class="toolbar"><div><h2>05 / Dữ liệu &amp; lịch sử</h2><div class="note">Lưu cục bộ trong trình duyệt này, không gửi lên máy chủ</div></div><div class="toolbar-actions"><button class="btn btn-subtle" id="csvBtn">↓ CSV</button><button class="btn btn-danger" id="resetBtn">Xóa dữ liệu</button></div></div><div class="history" id="history"><span class="note">Chưa có kết quả.</span></div><div class="note" style="margin-top:9px">Hiển thị tối đa 24 kết quả mới nhất của bộ lọc. Lưu tối đa 15.000 lần gieo. Dữ liệu gia tốc thô giới hạn 10.000 mẫu/phiên (nên xuất CSV trước khi rời trang).</div></section>
 </div>
 </div>
 <div class="foot"><strong>Chú ý khi thử nghiệm:</strong> hãy mở trang bằng HTTPS trên Safari, cấp quyền chuyển động và thử lắc vừa phải, giữ thiết bị chắc tay. iOS/iPadOS có thể hạn chế cảm biến theo quyền, phiên bản Safari hoặc thiết bị; khi đó vẫn có thể gieo số bằng nút. Kết quả mô phỏng không được xem là bằng chứng cảm biến đã hoạt động. Các phép kiểm định là công cụ tham khảo, không dùng để chứng nhận hệ thống dùng cho an ninh, cờ bạc hay khoa học nghiêm ngặt. Chế độ lấy số từ gia tốc có thể thiên lệch và không dùng cho mục đích bảo mật.</div>
@@ -164,7 +181,7 @@ kbd{background:#edf3fa;padding:2px 5px;border-radius:4px}
 (function(){
 "use strict";
 var KEY="bdx0-shake-lab-v1", CAP=15000;
-var state={faces:6,algorithm:"crypto",records:[],scope:"shake",running:false,lastShakeAt:0,lastVector:null,impulses:[],seenMotion:false,lastMotionAt:0,motionMagnitude:0,threshold:10};
+var state={faces:6,algorithm:"crypto",records:[],scope:"shake",running:false,lastShakeAt:0,seenMotion:false,lastMotionAt:0,motionMagnitude:0,threshold:2.5,gravity:null,events:0,validEvents:0,shakes:0,peak:0,trace:[],raw:[],peakActive:false,firstPeakAt:0,lastPeakAt:0,startedAt:0,lastGraphAt:0};
 var $=function(id){return document.getElementById(id);};
 var format=function(n,d){return Number.isFinite(n)?n.toLocaleString("vi-VN",{maximumFractionDigits:d===undefined?2:d,minimumFractionDigits:d===undefined?0:d}):"—";};
 function alertText(msg,warn){$("notice").textContent=msg;$("notice").className=warn?"notice warn":"notice";}
@@ -192,12 +209,12 @@ function restore(){
 function selected(){
  return state.records.filter(function(r){return state.scope==="all"||r.s===state.scope;});
 }
-function draw(source,delta){
+function draw(source,delta,axes){
  try{
   if(state.algorithm==="motion"&&source!=="shake")throw new Error("Chế độ gia tốc chỉ ghi nhận cú lắc thật; không hỗ trợ bấm hoặc mô phỏng.");
   if(state.algorithm==="motion"&&!Number.isFinite(delta))throw new Error("Không nhận được gia tốc hợp lệ.");
   var v=state.algorithm==="motion"?(Math.floor(Math.abs(delta)*1000)%state.faces)+1:secureInt(state.faces);
-  state.records.push({v:v,s:source,t:Date.now()});
+  state.records.push({v:v,s:source,t:Date.now(),axes:source==="shake"?axes:null,amplitude:source==="shake"?delta:null});
   if(state.records.length>CAP)state.records.splice(0,state.records.length-CAP);
   persist();
   $("result").textContent=v;
@@ -325,27 +342,72 @@ function render(){
  var recent=data.slice(-24).reverse();
  $("history").innerHTML=recent.length?recent.map(function(r){return '<span class="chip '+r.s+'" title="'+(r.s==="shake"?"Lắc thật":"Đối chứng")+' · '+new Date(r.t).toLocaleString("vi-VN")+'">'+r.v+'</span>';}).join(""):'<span class="note">Chưa có kết quả trong bộ lọc.</span>';
 }
+function validVector(a){
+ return !!a&&[a.x,a.y,a.z].every(function(v){return typeof v==="number"&&Number.isFinite(v);});
+}
+function renderTrace(now){
+ if(now-state.lastGraphAt<110)return;
+ state.lastGraphAt=now;
+ var values=state.trace,top=Math.max(6,state.threshold*2.4,...values);
+ $("traceLine").setAttribute("points",values.map(function(v,i){
+  return (values.length<2?0:i*320/(values.length-1)).toFixed(1)+","+(61-55*Math.min(1,v/top)).toFixed(1);
+ }).join(" "));
+ var y=61-55*state.threshold/top;
+ $("thresholdLine").setAttribute("y1",String(y));$("thresholdLine").setAttribute("y2",String(y));
+}
 function onMotion(e){
- var a=e.accelerationIncludingGravity||e.acceleration;
- if(!a||![a.x,a.y,a.z].every(function(v){return typeof v==="number"&&Number.isFinite(v);}))return;
- var now=performance.now(),v=[a.x,a.y,a.z];
- state.seenMotion=true;state.lastMotionAt=now;
- if(!state.lastVector){state.lastVector=v;return;}
- var delta=Math.hypot(v[0]-state.lastVector[0],v[1]-state.lastVector[1],v[2]-state.lastVector[2]);
- state.lastVector=v;state.motionMagnitude=delta;
+ if(!state.running)return;
+ state.events++;
+ $("eventCounter").textContent=format(state.events,0);
+ var now=performance.now(),v=null,a=e.acceleration,raw=e.accelerationIncludingGravity;
+ if(validVector(a))v=[a.x,a.y,a.z];
+ else if(validVector(raw)){
+  var vRaw=[raw.x,raw.y,raw.z];
+  if(!state.gravity){state.gravity=vRaw.slice();return;}
+  state.gravity=state.gravity.map(function(g,i){return 0.85*g+0.15*vRaw[i];});
+  v=vRaw.map(function(x,i){return x-state.gravity[i];});
+ }
+ if(!v){
+  $("sensorLabel").textContent="Sự kiện thiếu gia tốc";
+  $("sensorDiagnostic").className="sensor-diagnostic warn";
+  $("sensorDiagnostic").textContent="Safari có gửi sự kiện, nhưng gia tốc bị rỗng. Hãy thử mở trang trực tiếp trong Safari.";
+  return;
+ }
+ var delta=Math.hypot(v[0],v[1],v[2]);
+ state.seenMotion=true;state.validEvents++;state.lastMotionAt=now;state.motionMagnitude=delta;
+ state.peak=Math.max(state.peak,delta);
+ $("sensorLabel").textContent="Đang nhận dữ liệu";
  $("motionValue").textContent=format(delta,1)+" m/s²";
- $("motionBar").style.width=Math.min(100,100*delta/(state.threshold*2.2))+"%";
- if(delta<state.threshold||now-state.lastShakeAt<750)return;
- state.impulses=state.impulses.filter(function(t){return now-t<600;});
- if(state.impulses.length){
-  state.impulses=[];state.lastShakeAt=now;
+ $("motionBar").style.width=Math.min(100,100*delta/(state.threshold*2.5))+"%";
+ $("peakValue").textContent=format(state.peak,1);
+ $("xyzValue").textContent="X "+format(v[0],2)+" · Y "+format(v[1],2)+" · Z "+format(v[2],2)+" (m/s²)";
+ state.trace.push(delta);if(state.trace.length>48)state.trace.shift();
+ state.raw.push({t:Date.now(),x:v[0],y:v[1],z:v[2],m:delta});
+ if(state.raw.length>10000)state.raw.shift();
+ $("rawCsvBtn").disabled=false;
+ renderTrace(now);
+ if(now-state.lastShakeAt<900)return;
+ if(now-state.firstPeakAt>1400)state.firstPeakAt=0;
+ if(delta<state.threshold*0.6){state.peakActive=false;return;}
+ if(delta<state.threshold)return;
+ if(state.peakActive&&now-state.lastPeakAt<200)return;
+ state.peakActive=true;state.lastPeakAt=now;
+ if(state.firstPeakAt&&now-state.firstPeakAt>=150&&now-state.firstPeakAt<=1400){
+  state.firstPeakAt=0;state.lastShakeAt=now;state.shakes++;
+  $("shakeCounter").textContent=format(state.shakes,0);
+  $("sensorDiagnostic").className="sensor-diagnostic";
+  $("sensorDiagnostic").textContent="✅ Nhận diện cú lắc số "+state.shakes+"! Đã thêm kết quả vào nhóm Lắc thật.";
   if(navigator.vibrate)navigator.vibrate(30);
-  draw("shake",delta);
- }else{state.impulses.push(now);}
+  draw("shake",delta,{x:v[0],y:v[1],z:v[2]});
+ }else{
+  state.firstPeakAt=now;
+  $("sensorDiagnostic").className="sensor-diagnostic";
+  $("sensorDiagnostic").textContent="Nhận được nhịp lắc thứ nhất! Hãy lắc ngược lại một lần nữa.";
+ }
 }
 function stopMotion(){
  window.removeEventListener("devicemotion",onMotion);
- state.running=false;state.lastVector=null;state.impulses=[];state.seenMotion=false;
+ state.running=false;state.gravity=null;state.peakActive=false;state.firstPeakAt=0;
  $("sensorBtn").textContent="Bật cảm biến và bắt đầu lắc";
  $("sensorDot").classList.remove("live");$("sensorLabel").textContent="Đã tắt cảm biến";
  $("sensorFoot").textContent="Có thể bật lại bất cứ lúc nào.";
@@ -359,12 +421,19 @@ async function toggleMotion(){
    var perm=await DeviceMotionEvent.requestPermission();
    if(perm!=="granted"){alertText("Chưa được cấp quyền chuyển động. Hãy bật trong cài đặt Safari và thử lại.",true);return;}
   }
-  state.lastVector=null;state.impulses=[];state.running=true;state.seenMotion=false;
+  state.gravity=null;state.peakActive=false;state.firstPeakAt=0;state.lastPeakAt=0;state.lastShakeAt=0;
+  state.events=0;state.validEvents=0;state.shakes=0;state.peak=0;state.trace=[];state.raw=[];state.lastGraphAt=0;
+  state.running=true;state.seenMotion=false;state.startedAt=performance.now();
+  $("eventCounter").textContent="0";$("peakValue").textContent="—";$("shakeCounter").textContent="0";
+  $("xyzValue").textContent="X — · Y — · Z — (m/s²)";
+  $("traceLine").setAttribute("points","");$("rawCsvBtn").disabled=true;
   window.addEventListener("devicemotion",onMotion,{passive:true});
   $("sensorBtn").textContent="Dừng theo dõi cảm biến";
   $("sensorDot").classList.add("live");
   $("sensorLabel").textContent="Đang chờ tín hiệu";
-  $("sensorFoot").textContent="Giữ chắc máy rồi lắc qua lại 2–3 lần.";
+  $("sensorFoot").textContent="Lắc qua lại, theo dõi số sự kiện và đồ thị gia tốc.";
+  $("sensorDiagnostic").className="sensor-diagnostic";
+  $("sensorDiagnostic").textContent="Đang chờ tín hiệu. Bộ đếm sự kiện sẽ tăng kể cả khi chưa nhận đủ cú lắc.";
   alertText("Đã đăng ký cảm biến. Nếu không thấy giá trị gia tốc, hãy kiểm tra quyền Safari.");
  }catch(err){alertText("Không truy cập được cảm biến: "+(err.message||String(err)),true);}
 }
@@ -389,20 +458,45 @@ function setAlgorithm(algorithm){
  setScope("shake");render();
 }
 $("algorithm").addEventListener("change",function(e){setAlgorithm(e.target.value);});
-$("sensitivity").addEventListener("input",function(e){state.threshold=Number(e.target.value);$("sensitivityValue").textContent=state.threshold+" m/s²";});
+$("sensitivity").addEventListener("input",function(e){state.threshold=Number(e.target.value);$("sensitivityValue").textContent=format(state.threshold,1)+" m/s²";state.peakActive=false;state.firstPeakAt=0;});
 $("sensorBtn").addEventListener("click",toggleMotion);
 $("manualBtn").addEventListener("click",function(){draw("control");});
 $("batch100").addEventListener("click",function(){addBatch(100);});
 $("batch1000").addEventListener("click",function(){addBatch(1000);});
 $("csvBtn").addEventListener("click",exportCSV);
+$("rawCsvBtn").addEventListener("click",function(){
+ if(!state.raw.length){alertText("Chưa có mẫu gia tốc để xuất.",true);return;}
+ var rows=["time_iso,x_m_s2,y_m_s2,z_m_s2,amplitude_m_s2"];
+ state.raw.forEach(function(r){rows.push([new Date(r.t).toISOString(),r.x,r.y,r.z,r.m].join(","));});
+ var blob=new Blob(["\uFEFF"+rows.join("\r\n")],{type:"text/csv;charset=utf-8"});
+ var u=URL.createObjectURL(blob),a=document.createElement("a");
+ a.href=u;a.download="shake-lab-sensor-"+new Date().toISOString().slice(0,10)+".csv";
+ document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(u);},2000);
+});
 $("resetBtn").addEventListener("click",function(){if(!state.records.length||confirm("Xóa toàn bộ "+state.records.length+" kết quả đã lưu? Không thể hoàn tác.")){state.records=[];persist();$("result").textContent="—";$("resultSub").textContent="Đã xóa dữ liệu";render();}});
 document.querySelectorAll("[data-scope]").forEach(function(b){b.addEventListener("click",function(){setScope(b.dataset.scope);});});
 window.addEventListener("pagehide",function(){if(state.running)window.removeEventListener("devicemotion",onMotion);});
 window.addEventListener("pageshow",function(){if(state.running)window.addEventListener("devicemotion",onMotion,{passive:true});});
 setInterval(function(){
  if(!state.running)return;
- if(state.seenMotion){$("sensorLabel").textContent="Đang nhận chuyển động";$("sensorFoot").textContent="Gia tốc biến thiên được hiển thị theo thời gian thực.";}
- else{$("sensorLabel").textContent="Chờ dữ liệu chuyển động";$("sensorFoot").textContent="Không có tín hiệu? Kiểm tra Safari → Quyền truy cập chuyển động.";}
+ var now=performance.now();
+ if(!state.seenMotion&&now-state.startedAt>3500){
+  $("sensorLabel").textContent=state.events?"Gia tốc không khả dụng":"Không nhận sự kiện";
+  $("sensorFoot").textContent="Đã nhận "+state.events+" sự kiện (gia tốc hợp lệ: "+state.validEvents+").";
+  $("sensorDiagnostic").className="sensor-diagnostic warn";
+  $("sensorDiagnostic").textContent="Không nhận được gia tốc. Mở trang trực tiếp bằng Safari, cấp quyền chuyển động, rồi tải lại và bật cảm biến.";
+ }else if(state.seenMotion&&now-state.lastMotionAt>3500){
+  $("sensorLabel").textContent="Tín hiệu tạm dừng";
+  $("sensorDiagnostic").className="sensor-diagnostic warn";
+  $("sensorDiagnostic").textContent="Không thấy dữ liệu mới: mở lại Safari và giữ màn hình sáng.";
+ }else if(state.seenMotion){
+  $("sensorLabel").textContent="Đang nhận dữ liệu";
+  $("sensorFoot").textContent="Có "+format(state.validEvents,0)+" mẫu gia tốc, tải CSV thô để xem.";
+  if(state.shakes===0&&now-state.startedAt>6000&&(!state.firstPeakAt||now-state.firstPeakAt>1500)){
+   $("sensorDiagnostic").className="sensor-diagnostic";
+   $("sensorDiagnostic").textContent="Đang thu gia tốc nhưng chưa đủ 2 nhịp. Lắc ngang qua lại, hoặc hạ ngưỡng về 1–2 m/s².";
+  }
+ }
 },1400);
 restore();
 if(state.algorithm==="motion"){$("manualBtn").disabled=true;$("batch100").disabled=true;$("batch1000").disabled=true;$("algorithmInfo").textContent="Thí nghiệm gia tốc: chỉ ghi mẫu lắc thật. Không bảo đảm ngẫu nhiên hay bảo mật.";}
