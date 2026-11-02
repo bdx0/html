@@ -30,6 +30,38 @@ body.virtual-controls .footer{display:none}
 #toast{position:fixed;z-index:35;top:18%;left:50%;transform:translateX(-50%);padding:12px 19px;background:#3b2a2df0;border-radius:16px;border:1px solid #efcd91;box-shadow:0 12px 40px #1e172c99;opacity:0;transition:opacity .25s;pointer-events:none;text-align:center;max-width:85%;font-size:14px}#toast.show{opacity:1}
 #cover,#layer{position:fixed;inset:0;z-index:30;display:flex;align-items:center;justify-content:center;padding:18px;background:linear-gradient(0deg,#241923dd,#371e2ca8);backdrop-filter:blur(9px);overflow:auto;touch-action:pan-y}#cover{z-index:40;background:radial-gradient(ellipse at 50% 31%,#9a5d58,#38233a 62%,#211c2e)}#cover:before{content:"✦        ✧       ✦";position:fixed;top:8%;font-size:28px;letter-spacing:3rem;color:#ffd88b55;pointer-events:none}.sheet{width:min(480px,100%);max-height:calc(100dvh - 36px);overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y;background:linear-gradient(160deg,#fff5dd,#f3dbb8);color:#483134;border:1px solid #ffebbf;box-shadow:0 18px 70px #130d26b0;border-radius:25px;padding:24px 23px;position:relative}.sheet h1,.sheet h2{font-family:Georgia,'Times New Roman',serif;text-align:center;margin:.35em 0;color:#782f39}.sheet h1{font-size:clamp(31px,7vw,43px)}.sheet h2{font-size:27px}.sheet p{line-height:1.55;font-size:14px}.sheet small{font-size:12px;color:#795d56}.seal{font-size:46px;text-align:center;line-height:1.3;margin:3px 0}.ornament{display:flex;align-items:center;gap:12px;justify-content:center;color:#ac704f;font-size:13px;letter-spacing:1px}.ornament:before,.ornament:after{content:"";height:1px;width:65px;background:#b88968}.sheet input,.sheet textarea{width:100%;padding:13px 14px;border-radius:13px;border:1px solid #c6a08a;background:#fffaf0;color:#4b3036;outline:none;font-size:16px;touch-action:auto}.sheet textarea{min-height:112px;resize:vertical}.sheet label{display:block;color:#704d45;font-size:13px;font-weight:700;margin:14px 0 7px}.primary,.secondary{display:inline-flex;justify-content:center;align-items:center;gap:8px;min-height:49px;padding:12px 17px;border:0;border-radius:14px;font-weight:800;font-size:15px}.primary{background:linear-gradient(120deg,#933e48,#692933);color:#fff4df;box-shadow:0 6px 18px #662c3040}.secondary{background:#e5cba5;color:#643e3c;border:1px solid #bd9872}.actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:19px}.actions>*{flex:1}.choice{padding:14px;border:1px solid #d3ab90;border-radius:15px;background:#fff9e9;color:#65413d;flex:1;min-width:110px;text-align:center}.choice b{display:block;font-size:21px;color:#8e4240}.choice.selected{outline:3px solid #b76058}.close{position:absolute;right:12px;top:10px;border:0;background:#d9b9a44f;border-radius:50%;width:37px;height:37px;font-size:22px;color:#7b4846}.note{background:#fbebcf;border-left:3px solid #ad6a60;padding:11px 13px;border-radius:6px;font-size:13px}.muted{color:#80675f}.journal-entry{border-bottom:1px solid #d3b69b;padding:10px 0;font-size:13px;line-height:1.5;overflow-wrap:anywhere}.journal-entry strong{color:#8c3f4b}.bar{height:11px;border-radius:100px;background:#d8bfa6;overflow:hidden;margin:11px 0}.bar>i{display:block;height:100%;width:0;background:linear-gradient(90deg,#ba7453,#9c3b45);border-radius:100px;transition:width .1s}.rhythm{width:182px;height:182px;margin:18px auto;position:relative;border:3px solid #ca9a6a;border-radius:50%;display:grid;place-items:center;background:radial-gradient(#fbe2b7,#ead0b1);touch-action:none;user-select:none}.rhythm .target{position:absolute;width:112px;height:112px;border:6px solid #bc6d61;border-radius:50%;opacity:.72}.rhythm .ring{position:absolute;width:112px;height:112px;border:5px solid #90414b;border-radius:50%;transform:scale(1.55);will-change:transform}.rhythm .middle{font-size:52px;line-height:1}.result{font-size:45px;font-family:Georgia,serif;color:#8e4148;text-align:center;font-weight:bold}.blessing{font-family:Georgia,serif;font-size:21px;text-align:center;color:#813a41;line-height:1.6;padding:15px 0}.footer{position:absolute;bottom:max(10px,env(safe-area-inset-bottom));left:0;right:0;text-align:center;font-size:10px;color:#fff3ce9c;z-index:4;pointer-events:none}.help-step{display:flex;gap:12px;align-items:center;margin:16px 0}.help-step strong{display:grid;place-items:center;flex:0 0 34px;height:34px;border-radius:50%;background:#903f4c;color:#fff0d5}.help-step span{font-size:14px;line-height:1.45}.banner{margin:12px 0;padding:12px;border:1px dashed #b47b62;border-radius:10px;text-align:center;color:#713e42}#layer[hidden],#cover[hidden]{display:none!important}
 @media(min-width:800px){#hud{left:22px;right:22px}.sheet{padding:29px}body:not(.virtual-controls) #hint{bottom:28px}body:not(.virtual-controls) #act{bottom:40px}}@media(max-height:620px){.sheet{padding:16px}.seal{font-size:30px}.sheet h1{font-size:29px}.sheet h2{font-size:23px}}
+
+/* Hồ sơ concept & implementation spec, chỉ là tài liệu — không thay scene hiện hữu */
+#designLayer[hidden],.design-pane[hidden]{display:none!important}
+#designLayer{position:fixed;inset:0;z-index:90;background:#1d1b27ed;display:flex;align-items:center;justify-content:center;padding:max(12px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left));touch-action:pan-y}
+.design-dialog{display:flex;flex-direction:column;overflow:hidden;width:min(900px,100%);height:min(94dvh,920px);min-height:200px;border-radius:20px;background:#fcf4e7;color:#372e31;border:1px solid #dfc5a1;box-shadow:0 16px 55px #100c1fcc;touch-action:pan-y}
+.design-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 20px 12px;background:#eee0c8;flex:0 0 auto}
+.design-head h2{font-family:Georgia,serif;margin:4px 0 0;font-size:clamp(19px,4vw,26px);color:#773c3e}
+.design-head small{color:#896154;letter-spacing:1px;font-size:10px;font-weight:800}
+#designClose{width:44px;height:44px;flex:0 0 44px;border:0;border-radius:12px;font-size:26px;background:#e5caaa;color:#58373c}
+.design-tabs{display:flex;gap:8px;padding:10px 16px;background:#f5e9d7;flex:0 0 auto}
+.design-tab{border:1px solid #b8a28e;border-radius:12px;background:#fcf6e9;color:#65423d;flex:1;min-height:44px;padding:7px 8px;font-size:13px;font-weight:750}
+.design-tab[aria-selected="true"]{background:#763d43;border-color:#763d43;color:#ffefcf}
+.design-body{overflow:auto;overscroll-behavior:contain;touch-action:pan-y;flex:1;padding:8px clamp(14px,4vw,34px) 30px;scrollbar-gutter:stable}
+.design-pane{font-size:14px;line-height:1.7;overflow-wrap:anywhere}
+.design-pane h2{font-family:Georgia,serif;font-size:25px;color:#713637;line-height:1.3;margin:22px 0 11px}
+.design-pane h3{font-size:19px;color:#714337;margin:26px 0 9px;line-height:1.35;border-bottom:1px solid #dcc6aa;padding-bottom:6px}
+.design-pane h4{font-size:16px;color:#754a3d;margin:20px 0 7px}
+.design-pane p,.design-pane ul,.design-pane ol{margin:11px 0}
+.design-pane li{margin:5px 0}
+.design-pane strong{color:#6f3838}
+.design-pane blockquote{margin:12px 0;background:#f4e4c9;border-left:3px solid #945b4d;padding:12px 15px;border-radius:6px}
+.design-table{max-width:100%;overflow-x:auto;touch-action:pan-x pan-y;overscroll-behavior-x:contain;border:1px solid #dcc9ae;border-radius:8px}
+.design-table table{border-collapse:collapse;font-size:12px;min-width:570px;width:100%}
+.design-table th,.design-table td{padding:8px 9px;border-bottom:1px solid #e3d1bd;text-align:left;vertical-align:top}
+.design-table th{background:#eeddc1;color:#663c3d}
+.design-table tr:nth-child(even) td{background:#faf1e4}
+.design-plan{max-width:100%;overflow-x:auto;touch-action:pan-x pan-y;white-space:pre;font:12px/1.65 ui-monospace,monospace;background:#302b32;color:#f2dec1;border-radius:10px;padding:13px}
+.design-foot{border-top:1px solid #e0cdb4;background:#f5e8d5;padding:10px 16px;display:flex;align-items:center;gap:13px;justify-content:space-between;flex-wrap:wrap;font-size:11px;color:#715a51}
+.design-foot a{color:#713e45;text-decoration:underline;text-underline-offset:2px}
+#designOpen{width:100%;margin-top:10px;min-height:44px}
+@media(max-width:480px){.design-dialog{height:96dvh;border-radius:14px}.design-head{padding:11px 12px}.design-tabs{padding:8px}.design-tab{font-size:12px}.design-body{padding-top:4px}.design-pane h2{font-size:21px}}
+
 </style>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.js"}}</script>
 </head>
@@ -38,8 +70,274 @@ body.virtual-controls .footer{display:none}
 <div id="hud"><div><div class="brand"><strong>✿ CHÙA AN LẠC</strong><span id="who">Khách hành hương</span></div><div class="counter" id="counter">Hôm nay có 146 người lên chùa cầu an <span style="opacity:.75">(mô phỏng)</span></div></div><div class="top-actions"><button id="padToggle" class="round" aria-label="Hiện hoặc ẩn tay cầm ảo" title="Tay cầm ảo" aria-pressed="false">🎮</button><button id="sound" class="round" aria-label="Tắt hoặc bật âm thanh" title="Âm thanh">🔊</button><button id="book" class="round" aria-label="Sổ cầu an" title="Sổ cầu an">📖</button><button id="share" class="round" aria-label="Chia sẻ ảnh" title="Chia sẻ">↗</button><button id="help" class="round" aria-label="Hướng dẫn" title="Hướng dẫn">?</button></div></div>
 <div id="hint">Di chuyển để khám phá sân chùa</div><button id="act" aria-label="Thực hiện hoạt động">✨ Tới gần</button><div id="stick" class="pad-stick" role="group" aria-label="Cần di chuyển ảo"><div id="knob" class="pad-knob"></div><span class="pad-caption">DI CHUYỂN</span></div><div id="look-stick" class="pad-stick" role="group" aria-label="Cần xoay góc nhìn"><div id="lookKnob" class="pad-knob"></div><span class="pad-caption">XOAY NHÌN</span></div><button id="padA" aria-label="Tương tác khi ở gần hoạt động" disabled><span class="face-button">A</span><span id="padActionLabel">TỚI GẦN</span></button><div id="toast" role="status" aria-live="polite"></div>
 <div class="footer">Một chuyến ghé chùa bình yên • Mang tính giải trí • Không có giao dịch hay quyên góp</div>
-<div id="cover"><section class="sheet"><div class="seal">🏮 ⛩️ 🪷</div><div class="ornament">HOÀNG HÔN AN LÀNH</div><h1>Lên Chùa Cầu An</h1><p style="text-align:center">Dạo bước dưới mái chùa Việt, gửi một lời lành cho những người thương và tìm một khoảng lặng cho tâm hồn.</p><label for="name">Tên khách hành hương</label><input id="name" maxlength="28" autocomplete="nickname" placeholder="Bạn muốn được gọi là gì?" value="Khách an lành"><div class="actions"><button class="primary" id="enter">🪷 Vào chùa</button></div><p style="text-align:center"><small>Không cần đăng nhập • Mọi ghi chép chỉ lưu trên thiết bị • Cần Internet để tải thư viện Three.js từ CDN lần đầu</small></p></section></div>
+<div id="cover"><section class="sheet"><div class="seal">🏮 ⛩️ 🪷</div><div class="ornament">HOÀNG HÔN AN LÀNH</div><h1>Lên Chùa Cầu An</h1><p style="text-align:center">Dạo bước dưới mái chùa Việt, gửi một lời lành cho những người thương và tìm một khoảng lặng cho tâm hồn.</p><label for="name">Tên khách hành hương</label><input id="name" maxlength="28" autocomplete="nickname" placeholder="Bạn muốn được gọi là gì?" value="Khách an lành"><div class="actions"><button class="primary" id="enter">🪷 Vào chùa</button></div><button type="button" class="secondary" id="designOpen">🏛 Xem hồ sơ thiết kế kiến trúc &amp; lập trình</button><p style="text-align:center"><small>Không cần đăng nhập • Mọi ghi chép chỉ lưu trên thiết bị • Cần Internet để tải thư viện Three.js từ CDN lần đầu</small></p></section></div>
 <div id="layer" hidden><div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-label="Hoạt động tại chùa"></div></div>
+<!-- Tài liệu kiến trúc và implementation spec được nhúng trực tiếp trong HTML để đọc offline sau khi tải game. -->
+<div id="designLayer" hidden>
+  <section class="design-dialog" role="dialog" aria-modal="true" aria-labelledby="designTitle">
+    <div class="design-head"><div><small>CHÙA AN LẠC VIÊN · ĐỀ XUẤT V1.0 · CHƯA DỰNG CẢNH MỚI</small><h2 id="designTitle">🏛 Hồ sơ thiết kế</h2></div><button id="designClose" type="button" aria-label="Đóng hồ sơ thiết kế">×</button></div>
+    <div class="design-tabs" role="tablist" aria-label="Loại tài liệu">
+      <button type="button" class="design-tab" role="tab" aria-selected="true" aria-controls="conceptPane" id="conceptTab" data-pane="conceptPane">🏛 Kiến trúc</button>
+      <button type="button" class="design-tab" role="tab" aria-selected="false" aria-controls="implementationPane" id="implementationTab" data-pane="implementationPane">🧭 Spec coder</button>
+    </div>
+    <div class="design-body" id="designScroll">
+      <article class="design-pane" role="tabpanel" id="conceptPane" aria-labelledby="conceptTab"><h2>HỒ SƠ CONCEPT KIẾN TRÚC — CHÙA AN LẠC VIÊN</h2>
+<p>Phiên bản: 1.0 • Ngày: 02/11/2026 • Loại: thiết kế ý tưởng cho thế giới 3D tương tác</p>
+<blockquote>Trạng thái: ĐỀ XUẤT — CHƯA DỰNG LẠI CẢNH. Đây là hồ sơ định hướng nghệ thuật và không gian cho một ngôi chùa HƯ CẤU trong game, không phải hồ sơ thi công, hồ sơ kết cấu, hồ sơ PCCC hoặc một công trình có thật được đo đạc.</blockquote>
+<h3>A. Tuyên ngôn thiết kế</h3>
+<p><strong>“Bước qua tam quan, bước chậm lại.”</strong> Một khuôn viên chùa Nam Bộ mộc mạc, trang nghiêm, hiên sâu, gió nhẹ và có các khoảng lặng. Đặt trải nghiệm chiêm bái và quan sát lên trên tính thắng thua. Không dựng một “sân game” nơi mọi vật thể đều đòi người chơi bấm nút.</p>
+<p>Bốn giá trị: (1) trục nghi lễ rõ ràng; (2) tỉ lệ kiến trúc hợp lý; (3) cảnh quan điều hòa cảm xúc; (4) người và không gian ứng xử đúng mực.</p>
+<h3>B. Cơ sở tham chiếu và giới hạn</h3>
+<ul>
+<li>Tham chiếu kiến trúc chùa cổ Nam Bộ: Chùa Giác Lâm có bố cục chữ Tam gồm chính điện, giảng đường, nhà trai; chính điện một gian hai chái và hệ cột gỗ. Nguồn: Cục Du lịch Quốc gia Việt Nam, https://vietnamtourism.vn/index.php/tourism/items/259</li>
+<li>Lối hành lễ và ứng xử: hạn chế nhang khói, tôn trọng khu thờ tự, giữ tiếng nói nhỏ, không tự ý chạm tượng/thờ tự. Tham khảo: Vietnam News, https://vietnamnews.vn/life-style/expat-corner/1778088/temple-etiquette-keeps-visitors-in-sacred-harmony.html</li>
+<li>Chọn ngôn ngữ kiến trúc chủ đạo là chùa Phật giáo Bắc tông phổ biến trong khu vực Nam Bộ; không trộn mái, tượng Naga và họa tiết Khmer hoặc mô típ Trung Hoa tùy tiện. Đặc trưng chùa Khmer là một dòng kiến trúc khác, không phải bộ trang trí thay thế. Nguồn phân biệt: Cục Du lịch, https://vietnamtourism.vn/en/index.php/news/items/10615</li>
+<li>Các kích thước dưới đây là THÔNG SỐ THIẾT KẾ CHO GAME, cần thẩm tra riêng nếu chuyển thành công trình thực.</li>
+</ul>
+<h3>C. Nhiệm vụ thiết kế và chỉ tiêu</h3>
+<ul>
+<li>Đất giả định 64 m ngang × 56 m sâu, trục đối xứng chính Bắc–Nam; hướng vào chùa ở phía Nam (+Z), chính điện ở phía Bắc (−Z); gốc tọa độ (0,0,0) giữa sân.</li>
+<li>Quy ước 1 đơn vị Three.js = 1 m; X: trái/phải khi đứng ở cổng nhìn vào chính điện; Y: cao độ; Z dương: về cổng.</li>
+<li>3 lớp: <strong>Từ phố vào tam quan → Sân lễ trang nghiêm → Vườn thiền, hồ sen và hậu viện</strong>. Mỗi lớp có một tốc độ di chuyển và mật độ âm thanh/NPC khác nhau.</li>
+<li>Mục tiêu trải nghiệm: trong 20–40 giây đầu nhìn ra trục chùa và chính điện; từ chỗ xuất phát có thể tiếp cận 5 hoạt động mà không xuyên vật thể; có ít nhất hai góc ngồi không bắt buộc tương tác.</li>
+<li>Ngôn ngữ màu: ngói đỏ nâu #88453F, gạch tàu #A76350, tường vôi kem #E5CEA6, gỗ trầm #58392F, đá xám #8D9287, lá #486B48, nước #527C84, ánh đèn #EAB676.</li>
+</ul>
+<h3>D. Tổng mặt bằng và tọa độ quy hoạch</h3>
+<p>Tất cả tâm vị trí ở mặt phẳng X/Z. Kích thước là ngang × sâu (m), trừ khi ghi khác.</p>
+<div class="design-table"><table>
+<tr><th>Hạng mục</th><th>Tâm (X, Z)</th><th>Kích thước dự kiến</th><th>Vai trò</th></tr>
+<tr><td>Ranh khuôn viên</td><td>(0, 0)</td><td>64 × 56</td><td>Hàng rào thấp, sân cỏ, không xuyên qua</td></tr>
+<tr><td>Tam quan ba lối</td><td>(0, +25)</td><td>12 × 3.5; cao ~7</td><td>Cửa vào, điểm chuyển cảm xúc</td></tr>
+<tr><td>Sân gạch chính</td><td>(0, +8)</td><td>28 × 22</td><td>Trục hành lễ và tập kết</td></tr>
+<tr><td>Lư hương</td><td>(0, −3)</td><td>Ø 2.0; cao ~1.7</td><td>Trước bậc chính điện, không chặn lối</td></tr>
+<tr><td>Chính điện</td><td>(0, −16)</td><td>20 × 14; nền +0.6</td><td>Khối chính, hiên và chỗ lễ</td></tr>
+<tr><td>Bậc lên chính điện</td><td>(0, −7.6)</td><td>rộng 7.5; 4 bậc × 0.15</td><td>Chuyển tiếp mặt sân–hiên</td></tr>
+<tr><td>Lối dốc bên hiên</td><td>(+12.5, −8.5)</td><td>dốc dài ≥7.2, rộng ≥1.5</td><td>Tuyến thay thế bậc, mô phỏng tiếp cận</td></tr>
+<tr><td>Gác chuông</td><td>(−20, +4)</td><td>5 × 5; cao ~8</td><td>Không tranh vai chính điện</td></tr>
+<tr><td>Hồ sen</td><td>(+20, +5)</td><td>elip ~13 × 9</td><td>Góc ngắm, thả hoa đăng</td></tr>
+<tr><td>Cây bồ đề</td><td>(−20, −12)</td><td>bóng tán Ø 11–13</td><td>Vòng ngồi và dải lụa nguyện</td></tr>
+<tr><td>Hành lang tĩnh</td><td>(+20, −13)</td><td>12 × 3</td><td>Lối dạo ít người</td></tr>
+<tr><td>Góc ghế đá</td><td>(+20, −16)</td><td>5 × 4</td><td>Nhìn về hồ, nghỉ không nhiệm vụ</td></tr>
+<tr><td>Hậu viện/nếp nhà phụ</td><td>(−19, −24)</td><td>8 × 5</td><td>Nơi quét sân, chăm cây, giới hạn vào</td></tr>
+<tr><td>Nhà trà/nhà khách biểu trưng</td><td>(+20, −24)</td><td>8 × 5</td><td>Chỉ mô phỏng, không lấn chính điện</td></tr>
+</table></div>
+<p>Sơ đồ quan hệ, KHÔNG theo tỉ lệ:</p>
+<pre class="design-plan">BẮC (−Z)
+[Hậu viện]       [CHÍNH ĐIỆN]       [Nhà trà]
+   [Bồ đề]     [hiên / bậc lên]     [Hành lang]
+   [Gác chuông]   [LƯ HƯƠNG]        [Hồ sen]
+                   [SÂN GẠCH]
+             [TAM QUAN / CỔNG]
+NAM (+Z) — điểm người chơi bắt đầu</pre>
+<p>Tuyến chính: tam quan → sân → lư hương → chính điện. Tuyến vòng: chính điện → gác chuông → bồ đề → phía sau → hành lang → hồ sen → sân. Không cho phép đường ngắn xuyên qua bàn thờ, hồ, thân cây và mái hiên kín.</p>
+<h3>E. Khối tích và cấu tạo hình học dự kiến</h3>
+<h4>E1. Tam quan</h4>
+<p>Ba cửa có nhịp 5.2 m giữa + 2.4 m mỗi bên, mố cột và khoảng đệm còn lại; mái lợp ngói âm dương cách điệu bằng lớp ngói lặp; độ cong đầu mái tiết chế, phân biệt mũ mái phụ. Biển tên “CHÙA AN LẠC VIÊN” quay về phía tiếp cận. Cửa hai bên tiếp đón khách, cửa giữa không tạo hiệu ứng cổng VIP.</p>
+<h4>E2. Chính điện</h4>
+<p>Giữ hình thái nhà gỗ Nam Bộ “một gian hai chái” theo tinh thần tham khảo, không mô phỏng sao chép di tích. Nền cao +0.6 m; bốn cột trụ chính nhấn nhịp kiến trúc; ba nhịp cửa mặt trước; hiên sâu 2.5–3 m. Mái dốc bốn mặt có bo góc cong nhẹ; mái phải có diềm, đòn tay, đường ngói và đua mái hợp lý. Tượng Phật bố trí trên bục có khoảng lùi, không để camera hoặc người đi xuyên tượng. Đèn nội thất ấm và dịu; không ánh nhấp nháy kiểu sân khấu.</p>
+<h4>E3. Gác chuông</h4>
+<p>Khung gỗ 4 trụ, một mái chính có nét cong nhỏ; chuông đồng tại vùng nhìn rõ. Chuông chuyển động biên độ rất thấp; vị trí gõ có khoảng đứng an toàn. Không bắt người chơi “đập chuông để thắng điểm”.</p>
+<h4>E4. Công trình phụ</h4>
+<p>Giảng đường/nhà trà chỉ tạo chiều sâu hậu cảnh ở giai đoạn đầu. Bất kỳ mặt bằng/khung chịu lực nào đều là biểu đạt trực quan trong game; không tuyên bố cấu kiện đủ chịu lực thực tế. Công năng tăng xá không được biến thành minigame làm phiền sinh hoạt.</p>
+<h3>F. Cảnh quan và vi khí hậu</h3>
+<ul>
+<li><strong>Sân:</strong> gạch nung xen khe, độ biến thiên màu nhẹ; không tạo ổ gà gây cản trở điều khiển; trục lễ để thoáng.</li>
+<li><strong>Bồ đề:</strong> gốc sần vừa phải, tán nhiều tầng, bóng lọc sáng; bệ ngồi tròn thấp đặt ngoài bán kính va chạm thân cây; lụa treo ở các nhánh có thể nhìn rõ.</li>
+<li><strong>Hồ sen:</strong> bờ elip mềm, thấp; mặt nước có sóng nhỏ với phản quang tiết chế; nhiều lá, ít hoa, hoa đăng thưa; có viền an toàn và lối đi không cắt ngang nước.</li>
+<li><strong>Hành lang:</strong> bóng râm dọc hiên 2–3 m, ít người, cây thấp và ghế đá để tĩnh tâm.</li>
+<li><strong>Đời sống:</strong> lá lay động, chim về chiều, đèn thắp chậm, người quét sân; không có hiệu ứng lấp lánh liên tục.</li>
+</ul>
+<h3>G. Ánh sáng, âm thanh, ba thời điểm</h3>
+<div class="design-table"><table>
+<tr><th>Pha</th><th>Thị giác</th><th>Âm thanh / hành vi</th></tr>
+<tr><td>Hoàng hôn</td><td>Ánh xiên ấm, bóng dài, mặt gạch ấm</td><td>Chim, gió, người dạo</td></tr>
+<tr><td>Chạng vạng</td><td>Trời tím xanh, hiên và đèn bắt đầu sáng</td><td>Giảm tiếng nói, chuông thưa</td></tr>
+<tr><td>Tối nhẹ</td><td>Nước phản chiếu, nội điện ấm, lối đủ sáng</td><td>Khoảng lặng, tiếng lá, côn trùng rất nhỏ</td></tr>
+</table></div>
+<p>Luôn ưu tiên khả năng nhìn rõ lối đi và giao diện; chế độ giảm chuyển động, tắt âm và tắt hiệu ứng rối. Không giả tiếng tụng kinh thật của một dòng truyền thừa cụ thể nếu chưa có tư liệu phù hợp và kiểm duyệt.</p>
+<h3>H. Thiết kế trải nghiệm năm điểm</h3>
+<ol>
+<li><strong>Dâng hương:</strong> lư trước chính điện; mặc định 1 nén, cho lựa chọn tượng trưng; nhân vật chắp tay và cúi đầu, không phát pháo sáng.</li>
+<li><strong>Thỉnh chuông:</strong> tương tác theo nhịp nhẹ, tiếng chuông ngân và âm nền hạ xuống; không đếm thành tích công khai.</li>
+<li><strong>Gõ mõ/tĩnh tâm:</strong> vẫn có nhịp 30 giây như phiên bản hiện tại, nhưng lời kết là “Tâm an / Đang tập trung / Cứ chậm lại”; số điểm kỹ thuật có thể giữ nội bộ để tương thích dữ liệu.</li>
+<li><strong>Viết lời cầu an:</strong> tối đa 120 ký tự, lưu tại máy; chọn treo lụa gần bồ đề hoặc hoa đăng hồ sen; tuyệt đối không khẳng định điều ước sẽ thành hiện thực.</li>
+<li><strong>Một lời lành:</strong> giữ tối thiểu 40 câu tích cực, diễn đạt như lời khích lệ, không gọi là tiên tri hay kết quả số mệnh.</li>
+</ol>
+<h3>I. Hành vi nhân vật và phẩm chất không gian</h3>
+<ul>
+<li>Tăng nhân: quét sân, tưới cây, đi tới khu nội viện, ngồi tĩnh tâm (tránh tạo hoạt động sai nghi lễ).</li>
+<li>Khách lễ: dạo chậm, nhường đường, dừng chắp tay, nghỉ ở ghế; gia đình và trẻ nhỏ cư xử phù hợp.</li>
+<li>Phân vùng: trong chính điện mật độ ≤ 4 NPC hiện hữu tại một thời điểm và tốc độ rất chậm; sân thoáng 8–16; góc thiền 0–2; vùng vườn/hồ 2–5.</li>
+<li>Tránh NPC đi qua lư hương, tượng, mép nước, hàng cột hoặc xuyên nhau; giữ khoảng trống trước nơi hành lễ.</li>
+</ul>
+<h3>J. Góc máy và phân cảnh đánh giá</h3>
+<ol>
+<li>Từ ngoài cổng thấy mái chính điện theo trục.</li>
+<li>Từ sân bên trái thấy gác chuông, hiên và chiều sâu hàng cột.</li>
+<li>Từ ghế bên hồ thấy bóng nước và cây, không bị HUD che.</li>
+<li>Từ bệ bồ đề thấy nắng xuyên tán và sân vắng.</li>
+<li>Trong chính điện đủ trang nghiêm, không camera lọt xuyên tường/tượng.</li>
+</ol>
+<h3>K. Quy trình nghiệm thu concept</h3>
+<ul>
+<li>Khóa mặt bằng bằng bản đồ tọa độ trước khi dựng chi tiết; chụp ảnh top-down để kiểm tra xung đột.</li>
+<li>Review tỉ lệ người (1.65–1.75 m) cạnh cửa/cột/bậc; đảm bảo đường dạo không bế tắc.</li>
+<li>Kiểm duyệt mô tả và nghi lễ với người hiểu văn hóa Phật giáo Việt Nam trước khi công bố “chân thực”.</li>
+<li>Test điện thoại dọc, điện thoại ngang, iPad Safari, máy tính và gamepad.</li>
+<li>Chỉ đánh dấu <strong>ĐÃ DỰNG</strong> sau khi có màn hình thực tế và kiểm thử, không đồng nhất tài liệu thiết kế với trạng thái game.</li>
+</ul>
+<h3>L. Các quyết định chưa khóa</h3>
+<ul>
+<li>Tên hiển thị trong game đang là “CHÙA AN LẠC”; “AN LẠC VIÊN” là tên <em>concept đề xuất</em>, không tự đổi thương hiệu trước khi được duyệt.</li>
+<li>Vị trí giảng đường/nhà trai là lớp hậu cảnh; chưa mô phỏng hành lễ nội viện.</li>
+<li>Các kích thước là thước tỷ lệ cho mô hình, KHÔNG phải thiết kế kết cấu hoặc tiêu chuẩn tiếp cận đã được phê duyệt.</li>
+</ul></article>
+      <article class="design-pane" role="tabpanel" id="implementationPane" aria-labelledby="implementationTab" hidden><h2>IMPLEMENTATION SPEC — REDESIGN CHÙA AN LẠC VIÊN (THREE.JS)</h2>
+<p>Phiên bản: 1.0 • Ngày: 02/11/2026 • Trạng thái: BACKLOG/CHƯA TRIỂN KHAI CẢNH MỚI</p>
+<h3>1. Vai trò và nhiệm vụ cho coder</h3>
+<p>Bạn là senior Three.js engineer, technical artist low-poly, UX engineer mobile Safari và gameplay developer. <strong>Nhiệm vụ</strong>: xây lại môi trường 3D theo hồ sơ CONCEPT-ARCHITECTURE.md; giữ hệ thống đang chạy và cải thiện tính chân thực kiến trúc. Không quảng bá rằng cảnh mới đã triển khai khi mới có spec.</p>
+<p>Mã nguồn hiện tại: len-chua-cau-an/index.html (ES module, importmap Three.js CDN, thủ công hình học, WebAudio, 5 hoạt động, NPC, virtual dual analog, Gamepad API, localStorage, canvas share). Không thay thế bằng dự án framework hay bộ asset có bản quyền. Xuất bản chính: https://bdx0.github.io/html/len-chua-cau-an/; không tái tạo dự án Cloudflare Pages đã xóa.</p>
+<h3>2. Quy tắc bảo toàn</h3>
+<ul>
+<li>Giữ một file index.html độc lập làm bản chạy: hình học tạo bằng mã, không import mô hình 3D/tranh/nhạc không rõ quyền; importmap Three.js đã có là ngoại lệ được chấp thuận.</li>
+<li>Giữ URL và khả năng chạy GitHub Pages, không làm hỏng root HTML Lab hoặc các dự án khác.</li>
+<li>Không xóa dữ liệu người dùng cũ: giữ localStorage key len-chua-cau-an-v1, định dạng name/incense/best/wishes/fortunes; khi mở rộng phải migration versioned và có fallback.</li>
+<li>Giữ hoạt động dâng hương, chuông, mõ 30 giây, cầu an tối đa 120 chữ và tối thiểu 40 lời lành; giữ ảnh chia sẻ 1080×1350, nhật ký, mute, bàn phím WASD/mũi tên/E, cảm ứng 2 cần + nút A và gamepad vật lý.</li>
+<li>Không sử dụng chỉ số khách mô phỏng làm thống kê người thật; không ép đăng nhập, giao dịch, quyên góp, quảng cáo hoặc dự đoán vận mệnh.</li>
+<li>Giữ cách chặn double-tap/pinch Safari <em>trong canvas và vùng điều khiển</em>, song không cản ô nhập, cuộn modal và chức năng phóng to hỗ trợ của hệ điều hành.</li>
+</ul>
+<h3>3. Hệ tọa độ và dữ liệu kiến trúc</h3>
+<ul>
+<li>Đơn vị: 1 Three.js unit = 1 m. X hướng ngang; Y đứng; +Z phía tam quan / người chơi; −Z phía chính điện. Site x∈[−32,+32], z∈[−28,+28].</li>
+<li>Không tiếp tục hard-code rời rạc. Tạo const SITE_PLAN chứa id, kind, position, footprint, elevation, orientation, bounds, access, zone, detailLevel, interactiveId. Dữ liệu là nguồn duy nhất để sinh hình học, collision, waypoint và điểm tương tác.</li>
+<li>Các tâm mốc: gate(0,+25), courtyard(0,+8), incense(0,−3), hall(0,−16), bell(−20,+4), pond(+20,+5), bodhi(−20,−12), quietCorridor(+20,−13).</li>
+<li>Kích thước xem hồ sơ concept. Kiểm tra không chồng footprint; biên an toàn người đi ≥0.45 m ngoài vật cản; lối chính ≥2.2 m theo hệ game. Khoảng cách tương tác thường 1.8–2.6 m, nhưng chỉ kích hoạt khi có tuyến tiếp cận hợp lệ.</li>
+<li>Tách builder chức năng (có thể là nhiều function trong cùng HTML): buildSite, buildCourtyard, buildGate, buildMainHall, buildBellTower, buildPond, buildBodhi, buildQuietWalk, buildProps, populateNPCs.</li>
+</ul>
+<h3>4. Geometry &amp; technical art (không tạo vật thể vô lý)</h3>
+<ul>
+<li>Roof builder: 2–4 mặt mái hợp lý, các mặt gặp nhau liên tục tại đường nóc/góc giao; tránh mái cong dạng tấm lơ lửng, ngói xuyên nhau, đòn tay không có điểm đỡ. Mái có diềm, đầu hồi phù hợp; số ngói dùng InstancedMesh, dải màu nhẹ, LOD theo khoảng cách.</li>
+<li>Main hall: nền +0.6 m, bốn bậc cao 0.15 m, lối dốc mô phỏng bên hiên; mái và cột thống nhất tỉ lệ; 3 nhịp cửa nhìn thấy, hiên sâu 2.5–3 m. Phòng thờ bố cục tập trung, cấm xuyên qua tượng và bàn thờ.</li>
+<li>Gate: 3 lối cân đối có ray đỡ, khoảng thông cửa hợp lý; biển chữ đọc xuôi từ hướng vào; không render chữ bị lật do mặt sau.</li>
+<li>Bell: chuông có quai treo và dầm đỡ; khi gõ rung nhỏ có giảm chấn; trụ và xà không xuyên thân chuông.</li>
+<li>Pond: mặt nước theo đường bờ, vùng va chạm theo polygon/elip + margin; hoa đăng nổi theo Y tương ứng mặt nước, không lạc ra khỏi bờ.</li>
+<li>Bodhi: thân cây có nhánh chịu các dải lụa, lá nhiều lớp không tạo tường che camera; dây treo hợp lý.</li>
+<li>Vật liệu procedural dùng màu/roughness/normal nhẹ tự sinh bằng CanvasTexture; tiết chế texture kích thước và cấp phát, dispose đúng khi xóa đồ.</li>
+</ul>
+<h3>5. Cấu trúc scene graph và resource lifecycle</h3>
+<ul>
+<li>Root groups: environment / architecture / landscape / props / NPC / interactives / VFX / UI3D. Đặt tên mesh/id để debug; static geometry không bị cập nhật mỗi frame.</li>
+<li>Cảnh vật tĩnh dùng geometry/material shared và InstancedMesh. Có camera frustum culling và khoảng tối đa cập nhật NPC xa.</li>
+<li>Mọi geometry/material/texture tạo theo lượt chơi hoặc lời cầu nguyện phải có hàm dispose. Không tạo canvas texture mới mỗi frame.</li>
+<li>Target ưu tiên: ≥30 FPS ổn định trên iPhone/iPad tầm trung, mục tiêu 60 FPS ở thiết bị khá; không hứa cố định mọi máy. Pixel ratio adapt 1–2, shadows có cấu hình low/medium, giảm hạt/đèn.</li>
+<li>Hạn chế đèn đổ bóng động, ưu tiên một nguồn chính + đèn ấm không shadow. Màn hình mất WebGL/CDN phải hiện thông báo thân thiện, không trắng toàn trang.</li>
+</ul>
+<h3>6. Đi lại, va chạm, camera, tương tác</h3>
+<ul>
+<li>Sinh collision từ footprint và ranh giới cùng nguồn SITE_PLAN; thêm collider cho cột, bậc, lư, bờ hồ, cây, tượng, bàn thờ; sân/lối dốc là walkable surfaces.</li>
+<li>Đường nối waypoint: Gate → Court → Hall; Court ↔ Bell ↔ Bodhi; Court ↔ Pond ↔ Corridor ↔ Hall; có kết nối vòng; BFS/A* từ điểm spawn tới cả 5 điểm không vướng collider.</li>
+<li>Khóa camera qua tường/cột bằng raycast/spherecast hoặc giới hạn khoảng cách camera động; giữ damping khi xoay. Không cho camera clipping vào tượng hoặc mái.</li>
+<li>Spawn từ bên trong sân sau tam quan, hướng nhìn vào chính điện; không spawn trúng NPC.</li>
+<li>Giữ 2 analog: trái di chuyển, phải xoay; nút A tương tác. Nếu có physical Gamepad ưu tiên nhận input, khi ngắt trở lại virtual. Keyboard, drag-camera và nút tương tác giữ đầy đủ.</li>
+<li>Khi modal mở, xóa input đang giữ để tránh nhân vật đi tiếp; focus và scroll modal được khôi phục hợp lý.</li>
+</ul>
+<h3>7. NPC state machines (có đời sống)</h3>
+<ul>
+<li>Các archetype: MONK_SWEEP, MONK_GARDEN, MONK_WALK, DEVOTEE_PRAY, DEVOTEE_REST, FAMILY_WALK, QUIET_VISITOR.</li>
+<li>Trạng thái chung: idle → pathfind → walk → arrive → action → idle. State transitions theo timer, không teleport trước camera; path có độ rộng và tránh vật thể/nhân vật bằng local separation.</li>
+<li>Tốc độ: trong điện 0–0.55 m/s; sân 0.65–1.05; khu vườn 0.4–0.8 (đây là tốc độ mô phỏng, không phải số liệu dân số).</li>
+<li>Giới hạn mật độ: trong điện 0–4; sân 8–16; tĩnh tâm 0–2; hồ/vườn 2–5. Khi thiết bị yếu, giảm cỡ đoàn mà không bỏ nhân vật cốt lõi (một sư quét sân, hai khách lễ).</li>
+<li>Không bubble chat ở chính điện, không dùng giọng đọc kinh giả giọng tu sĩ, trẻ em không chạy trong gian lễ.</li>
+<li>Bộ đếm khách phải ghi rõ “mô phỏng”, không ngụ ý lượt truy cập web.</li>
+</ul>
+<h3>8. Trải nghiệm hoạt động &amp; dữ liệu</h3>
+<ul>
+<li>Dâng hương: khu lư ngoài chính điện, mặc định 1 nén; giữ tùy chọn 3 nén như tính năng cũ nếu phù hợp; cúi đầu 1–2 giây; số lượng hiển thị hợp lý, tàn hương tự fade sau thời gian.</li>
+<li>Thỉnh chuông: giao diện nhẹ, không ăn mừng thắng; sound envelope dài, giảm ambient tạm thời, không lặp chuông bất ngờ khi người chơi ở chánh điện.</li>
+<li>Gõ mõ: 30 giây, tính chính xác nhịp nội bộ; phần báo cho người chơi là câu động viên, không “đứng hạng”.</li>
+<li>Cầu an: giới hạn 120 ký tự, sanitize DOM (textContent), lưu localStorage; tùy chọn ribbon/lotus; tái dựng trên scene ở lần chơi sau, không tăng bộ nhớ mãi mãi.</li>
+<li>Lời lành: 40+ câu, tránh khẳng định tiên tri, không đánh đồng với nghi thức chùa.</li>
+<li>Mỗi activity có states enter → interact → feedback → return; không khóa điều khiển sau khi đóng modal. Journal đọc/ghi tương thích dữ liệu cũ.</li>
+<li>Ảnh chia sẻ vẽ Canvas 1080×1350, ghi rõ “mô phỏng”, không tự động đăng hoặc thu thập lời cầu nguyện.</li>
+</ul>
+<h3>9. Ánh sáng, VFX, âm thanh</h3>
+<ul>
+<li>3 pha thời gian: hoàng hôn / chạng vạng / tối nhẹ, khoảng 3–4 phút vòng chuyển cảnh; màu hướng và ambient interpolated, không chuyển ánh sáng đột ngột.</li>
+<li>Đèn nội điện ấm, đèn lồng và hoa đăng có cường độ hợp lý; hạn chế point lights, bật đẹp trên desktop nhưng mobile vẫn chạy.</li>
+<li>Gió, chim, lá, nước nhỏ; âm trong điện thưa và tĩnh hơn ngoài sân. WebAudio chỉ khởi tạo sau user gesture; mute rõ ràng, không phát nhạc bản quyền.</li>
+<li>Preset Reduced Motion: giảm chuyển động lá, hạt, gợn nước, camera bob và cường độ tương phản; tôn trọng prefers-reduced-motion.</li>
+<li>Vật lý: hoa đăng trôi trong vùng hồ, lá rơi có gia tốc/chu kỳ hợp lý, lụa đu theo gió giảm dần, chuông có hồi phục về cân bằng.</li>
+</ul>
+<h3>10. UX, khả dụng, bảo mật</h3>
+<ul>
+<li>Mobile-first 320×640, 390×844, iPad 800×600 và desktop 1440×900; HUD tránh safe-area của Safari, không che nút điều khiển hoặc lối tương tác.</li>
+<li>Chống accidental zoom trên vùng game, nhưng không vô hiệu zoom trợ năng ngoài vùng game; form text ≥16px để tránh tự phóng khi focus trên Safari.</li>
+<li>CSS không horizontal overflow, modal có scroll, focus/escape/đóng rõ ràng, hỗ trợ bàn phím, nhãn tiếng Việt.</li>
+<li>Không fetch dữ liệu cá nhân; toàn bộ lời nguyện và tên ở localStorage, có tính năng xóa nếu bổ sung trong tương lai; hiển thị rằng chia sẻ là tự nguyện.</li>
+<li>Tránh XSS với mọi tên/lời nguyện khi chèn vào DOM hoặc canvas; không chèn user text vào innerHTML.</li>
+<li>Khi tài nguyên CDN/WebGL lỗi, có fallback màn hướng dẫn thử lại thay vì trang trống.</li>
+</ul>
+<h3>11. Kế hoạch triển khai theo 5 milestone (mỗi milestone có bằng chứng)</h3>
+<div class="design-table"><table>
+<tr><th>Mốc</th><th>Công việc</th><th>Gate nghiệm thu</th></tr>
+<tr><td>M0</td><td>Snapshot bản hiện tại, baseline đo FPS và kiểm thử 5 hoạt động</td><td>Không hồi quy tính năng</td></tr>
+<tr><td>M1</td><td>SITE_PLAN + top-down plan + đường đi/collision, giữ geometry cũ tạm</td><td>BFS đi được 5 điểm, không xuyên lư/hồ/tường</td></tr>
+<tr><td>M2</td><td>Tái dựng tam quan/chính điện/gác chuông/mái ngói theo tỉ lệ</td><td>5 góc camera kiểm tra mái/cột/ngói, không vật thể lơ lửng</td></tr>
+<tr><td>M3</td><td>Hồ sen/bồ đề/hành lang + NPC theo zone + ánh sáng và âm thanh</td><td>NPC không xuyên vật thể; hai góc nghỉ yên tĩnh</td></tr>
+<tr><td>M4</td><td>UX nghi lễ, quality setting, accessibility, hồi quy Safari &amp; gamepad</td><td>Tất cả checklist cuối và GitHub Pages thành công</td></tr>
+</table></div>
+<p>Không gộp một commit khổng lồ. Sau mỗi mốc: đo FPS mobile, chụp ảnh 3D thật, kiểm tra console, commit riêng, cập nhật changelog. Nếu gặp lỗi ở mốc sau phải có thể rollback an toàn.</p>
+<h3>12. Checklist kiểm thử bắt buộc</h3>
+<ul>
+<li>Desktop Chrome/Firefox/Safari (nếu có), iPhone Safari và iPad Safari thật; thiết bị thật xác thực được hành vi đa chạm.</li>
+<li>320×640 / 390×844 / 800×600 / 1440×900: cover, HUD, virtual controller, dialog không tràn ngang.</li>
+<li>Double-tap và pinch vùng gameplay không làm zoom kẹt; textarea và modal vẫn nhập/cuộn được.</li>
+<li>WASD/mũi tên, hai analog, E/A, Gamepad connect/disconnect, resize/orientation, mất focus.</li>
+<li>Đi từ spawn tới 5 hoạt động; không rơi xuống hồ, xuyên chính điện, cột, tượng, bệ cây.</li>
+<li>Dâng hương x1/x3, thỉnh chuông, nhịp mõ 30 giây, lời cầu an ribbon và lotus, 40+ lời lành.</li>
+<li>Reload giữ dữ liệu cũ, mở journal đúng, xóa/stale texture có dispose, Canvas 1080×1350, Web Share fallback.</li>
+<li>Không lỗi JS console, không 404 assets, CDN fallback; kiểm tra FPS và bộ nhớ sau 10 phút.</li>
+<li>Quan sát camera từ 5 góc kiến trúc, không mái xuyên cột, không biển chữ lật, không NPC đứng trên nước.</li>
+<li>CI GitHub Pages sinh catalog và đường dẫn truy cập ổn định. Chỉ đánh dấu checked nếu có kết quả thử thật.</li>
+</ul>
+<h3>13. Definition of Done</h3>
+<p>Một mốc chỉ hoàn tất nếu: mã được commit, scene chạy bằng Three.js thật (không stub), ảnh/screenshots từ browser thực, test tự động và kiểm tra tương tác, có so sánh trước/sau, có tóm tắt giới hạn và bản deploy GitHub Pages. Không gọi spec là “đã thiết kế xong game” khi các hạng mục còn là kế hoạch.</p>
+<h3>14. Prompt bàn giao cho coding agent</h3>
+<p>Mở CONCEPT-ARCHITECTURE.md và IMPLEMENTATION-SPEC.md, đọc toàn bộ index.html hiện tại. Phân tích các phụ thuộc và lập bảng mapping từ SITE_PLAN sang scene, collision, navigation, interaction. Thực hiện tuần tự M0→M4, mỗi mốc có commit, ảnh thực tế và checklist. Ưu tiên đúng kiến trúc Nam Bộ và di chuyển thông suốt hơn nhiều vật trang trí. Không xóa phần đang hoạt động, không phá GitHub Pages, không deploy Cloudflare Pages. Báo cáo rõ tính năng nào mới ở mức concept và tính năng nào đã code.</p></article>
+    </div>
+    <div class="design-foot"><span>Hồ sơ concept cho game 3D — không phải bản vẽ thi công.</span><span><a href="https://github.com/bdx0/html/blob/main/len-chua-cau-an/CONCEPT-ARCHITECTURE.md" target="_blank" rel="noopener noreferrer">File kiến trúc</a> · <a href="https://github.com/bdx0/html/blob/main/len-chua-cau-an/IMPLEMENTATION-SPEC.md" target="_blank" rel="noopener noreferrer">Spec coder</a></span></div>
+  </section>
+</div>
+<script>
+(() => {
+  const layer=document.getElementById('designLayer'), scroller=document.getElementById('designScroll');
+  const tabs=Array.from(layer.querySelectorAll('[data-pane]'));
+  let returnFocus=null;
+  function selectTab(id){
+    tabs.forEach(tab=>{const selected=tab.dataset.pane===id;tab.setAttribute('aria-selected',String(selected));document.getElementById(tab.dataset.pane).hidden=!selected;});
+    scroller.scrollTop=0;
+  }
+  function open(){
+    returnFocus=document.activeElement;
+    selectTab('conceptPane');
+    layer.hidden=false;
+    window.dispatchEvent(new CustomEvent('chua:design',{detail:{open:true}}));
+    document.getElementById('designClose').focus();
+  }
+  function close(){
+    layer.hidden=true;
+    window.dispatchEvent(new CustomEvent('chua:design',{detail:{open:false}}));
+    if(returnFocus?.isConnected) returnFocus.focus({preventScroll:true});
+  }
+  window.showChuaDesignSpec=open;
+  document.getElementById('designOpen').addEventListener('click',open);
+  document.getElementById('designClose').addEventListener('click',close);
+  layer.addEventListener('click',event=>{if(event.target===layer)close()});
+  tabs.forEach((tab,i)=>{tab.addEventListener('click',()=>selectTab(tab.dataset.pane));tab.addEventListener('keydown',event=>{if(event.key==='ArrowRight'||event.key==='ArrowLeft'){event.preventDefault();const next=tabs[(i+(event.key==='ArrowRight'?1:tabs.length-1))%tabs.length];selectTab(next.dataset.pane);next.focus()}})});
+  document.addEventListener('keydown',event=>{if(layer.hidden)return;if(event.key==='Escape'){event.preventDefault();close()}if(event.key==='Tab'){const tabbable=Array.from(layer.querySelectorAll('button,a[href]')).filter(e=>e.getClientRects().length);if(!tabbable.length)return;const first=tabbable[0],last=tabbable[tabbable.length-1];if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus()}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus()}}});
+})();
+</script>
+
 <!-- ===== Chống zoom Safari: chặn double-tap và pinch ngoài ô nhập, không khóa cuộn bảng ===== -->
 <script>
 (() => {
@@ -80,6 +378,7 @@ const storeKey='len-chua-cau-an-v1';let saved={name:'Khách an lành',incense:0,
 try{const v=JSON.parse(localStorage.getItem(storeKey)||'null');if(v && typeof v==='object'){saved={...saved,...v};saved.wishes=Array.isArray(v.wishes)?v.wishes.slice(-24):[];saved.fortunes=Array.isArray(v.fortunes)?v.fortunes.slice(-45):[];}}catch{}
 function persist(){try{localStorage.setItem(storeKey,JSON.stringify(saved))}catch{toast('Không thể lưu: bộ nhớ trình duyệt đang bị giới hạn.')}}
 const $layer=$('#layer'),$sheet=$('#sheet');let playing=false,active=null,mini=null,modalOpen=false,toaster=0,attendance=146;
+window.addEventListener('chua:design',event=>{modalOpen=!!event.detail.open||!$layer.hidden;});
 function toast(s){const e=$('#toast');e.textContent=s;e.classList.add('show');clearTimeout(toaster);toaster=setTimeout(()=>e.classList.remove('show'),2600)}
 function panel(html){modalOpen=true;$sheet.innerHTML=`<button class="close" id="dismiss" aria-label="Đóng">×</button>`+html;$layer.hidden=false;$('#dismiss').onclick=closePanel;}
 function closePanel(){modalOpen=false;mini=null;$layer.hidden=true;$sheet.innerHTML='';if(document.activeElement instanceof HTMLElement)document.activeElement.blur()}
@@ -219,7 +518,7 @@ async function shareCard(){try{const out=document.createElement('canvas');out.wi
 // ===== Giao diện hoạt động, hướng dẫn, và điều khiển điện thoại / PC =====
 const activities=[{id:'incense',x:0,z:-5.1,range:4,title:'🪔 Thắp hương',fn:incenseActivity},{id:'bell',x:11.3,z:-10.6,range:4.4,title:'🔔 Thỉnh chuông',fn:bellActivity},{id:'mok',x:-9.8,z:-11,range:4.1,title:'🥁 Gõ mõ tụng kinh',fn:mokActivity},{id:'wish',x:-12,z:4,range:4.1,title:'🎀 Viết lời cầu an',fn:wishActivity},{id:'fortune',x:-11.5,z:14.8,range:3.6,title:'🎋 Xin quẻ đầu năm',fn:fortuneActivity}];
 function checkNearby(){let closest=null,min=Infinity;for(const a of activities){const d=Math.hypot(player.x-a.x,player.z-a.z);if(d<a.range&&d<min){closest=a;min=d}}active=closest;const button=$('#act');button.style.display=playing&&!modalOpen&&closest?'block':'none';if(closest)button.textContent=closest.title;$('#padA').disabled=!closest||modalOpen;$('#padActionLabel').textContent=closest?closest.title:'TỚI GẦN';$('#hint').textContent=closest?'Đã đến gần: '+closest.title:'Đi khắp sân chùa để khám phá 5 hoạt động'}
-function helpActivity(){panel(`<div class="seal">🪷</div><h2>Ba bước dạo chùa</h2><div class="help-step"><strong>1</strong><span><b>Đi lại:</b> Cần ảo bên trái, WASD / phím mũi tên hoặc cần trái tay cầm vật lý.</span></div><div class="help-step"><strong>2</strong><span><b>Nhìn quanh:</b> Cần ảo bên phải, vuốt cảnh 3D hoặc cần phải tay cầm vật lý.</span></div><div class="help-step"><strong>3</strong><span><b>Hoạt động:</b> Đến gần điểm hoạt động rồi bấm nút A ảo, nút A vật lý hoặc phím E. Nút 🎮 ở trên giúp hiện/ẩn tay cầm ảo.</span></div><p class="note">Không có thắng thua. Đây là trò chơi thư giãn, tôn trọng không gian tín ngưỡng.</p><div class="actions"><button class="primary" id="gotIt">Đã hiểu, vào chùa</button><button class="secondary" id="skip">Bỏ qua</button></div>`);btn('gotIt',closePanel);btn('skip',closePanel)}
+function helpActivity(){panel(`<div class="seal">🪷</div><h2>Ba bước dạo chùa</h2><div class="help-step"><strong>1</strong><span><b>Đi lại:</b> Cần ảo bên trái, WASD / phím mũi tên hoặc cần trái tay cầm vật lý.</span></div><div class="help-step"><strong>2</strong><span><b>Nhìn quanh:</b> Cần ảo bên phải, vuốt cảnh 3D hoặc cần phải tay cầm vật lý.</span></div><div class="help-step"><strong>3</strong><span><b>Hoạt động:</b> Đến gần điểm hoạt động rồi bấm nút A ảo, nút A vật lý hoặc phím E. Nút 🎮 ở trên giúp hiện/ẩn tay cầm ảo.</span></div><p class="note">Không có thắng thua. Đây là trò chơi thư giãn, tôn trọng không gian tín ngưỡng.</p><div class="actions"><button class="primary" id="gotIt">Đã hiểu, vào chùa</button><button class="secondary" id="skip">Bỏ qua</button></div><button type="button" class="secondary" id="specFromHelp" style="width:100%;margin-top:12px">🏛 Hồ sơ thiết kế v1.0</button>`);btn('gotIt',closePanel);btn('skip',closePanel);btn('specFromHelp',()=>window.showChuaDesignSpec())}
 // ===== Điều khiển: tay cầm cảm ứng, tay cầm vật lý, bàn phím và kéo camera =====
 const keys=new Set(),touch={x:0,y:0,id:null},lookStick={x:0,y:0,id:null},drag={id:null,x:0,y:0};
 const joy=$('#stick'),knob=$('#knob'),lookJoy=$('#look-stick'),lookKnob=$('#lookKnob');
