@@ -14,7 +14,6 @@ from pathlib import Path
 
 
 EXCLUDED_DIRS = {".git", ".github", "_site", "scripts", "node_modules", "vendor"}
-EXCLUDED_FILES = {"index.html", "404.html"}
 
 
 class PageInfo(HTMLParser):
@@ -54,9 +53,10 @@ def build(root: Path, output: Path):
     overrides_path = root / "_catalog.json"
     overrides = json.loads(overrides_path.read_text(encoding="utf-8")) if overrides_path.exists() else {}
     pages = []
+    # Bỏ qua trang chủ ở gốc, nhưng vẫn liệt kê index.html của dự án con.
     for path in sorted(root.rglob("*.html")):
         rel = path.relative_to(root)
-        if path.name in EXCLUDED_FILES or any(part.startswith(".") or part in EXCLUDED_DIRS for part in rel.parts[:-1]):
+        if (rel == Path("index.html") or path.name == "404.html" or any(part.startswith(".") or part in EXCLUDED_DIRS for part in rel.parts[:-1])):
             continue
         if any(part in EXCLUDED_DIRS for part in rel.parts):
             continue
