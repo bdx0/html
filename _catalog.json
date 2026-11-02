@@ -31,5 +31,22 @@
     "theme": "emerald",
     "featured": true,
     "order": 2
+  },
+  "len-chua-cau-an/index.html": {
+    "title": "Lên Chùa Cầu An — Chùa An Lạc",
+    "description": "Dạo bước trong chùa Việt 3D lúc hoàng hôn, thắp hương, thỉnh chuông, gõ mõ, viết lời cầu an và xin quẻ giải trí. Có tay cầm ảo và sổ lưu trên máy.",
+    "category": "Trò chơi 3D",
+    "tags": [
+      "Three.js",
+      "WebGL",
+      "Game 3D",
+      "Chùa Việt",
+      "Cầu an",
+      "Điện thoại"
+    ],
+    "icon": "🪷",
+    "theme": "amber",
+    "featured": true,
+    "order": 0
   }
 }
