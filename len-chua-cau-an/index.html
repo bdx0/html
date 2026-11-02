@@ -652,12 +652,7 @@ function updateGuests(t,dt){npcTick+=dt;if(t>nextGroup){spawnGroup(t);nextGroup=
  if(t>nextTalk){const b=bubbleNodes.find(b=>b.until<t)||bubbleNodes[0],id=Math.floor(rand(8,npcCount));b.id=id;b.until=t+rand(3.5,6);b.el.textContent=speech[Math.floor(rand(0,speech.length))];nextTalk=t+rand(3,6)}for(const b of bubbleNodes){if(t>b.until){b.el.style.display='none';continue}const g=guests[b.id];if(!g||g.z< -8.7||g.role==='monk')continue;tmpLook.set(g.x,g.scale*2.1,g.z).project(camera);if(tmpLook.z>-1&&tmpLook.z<1&&Math.abs(tmpLook.x)<.9&&Math.abs(tmpLook.y)<.85){b.el.style.display='block';b.el.style.left=`${(tmpLook.x*.5+.5)*innerWidth}px`;b.el.style.top=`${(-tmpLook.y*.5+.5)*innerHeight-20}px`;b.el.style.transform='translate(-50%,-100%)'}else b.el.style.display='none'}}
 // Nạp một số khách vào chu trình đi dạo ban đầu.
 for(const g of guests)chooseGuestTarget(g,0);
-window.templeQA=Object.freeze({
- sitePlan:SITE_PLAN,activities:activities.map(a=>({id:a.id,x:a.x,z:a.z})),
- canMove,findPath,
- routes:()=>activities.map(a=>({id:a.id,nodes:findPath(player.x,player.z,a.x+(a.id==='wish'?3:0),a.z+(a.id==='incense'?3:3)).length})),
- getStats:()=>({npcCount:guests.length,sceneObjects:scene.children.length,player:{x:player.x,z:player.z},version:'an-lac-vien-v2'})
-});
+
 // ===== Âm thanh Web Audio: gió, lá, chim, tiếng ngân chuông, mõ, tụng rì rầm =====
 let audio=null,silent=false,nextBird=0,nextAmbientBell=43;
 function startAudio(){if(!audio){const ctx=new (window.AudioContext||window.webkitAudioContext)(),master=ctx.createGain();master.gain.value=.55;master.connect(ctx.destination);audio={ctx,master};const noise=ctx.createBuffer(1,ctx.sampleRate*3,ctx.sampleRate),buf=noise.getChannelData(0);for(let i=0;i<buf.length;i++)buf[i]=Math.random()*2-1;
@@ -706,6 +701,12 @@ const activities=[
  {id:'wish',x:P.bodhi.x,z:P.bodhi.z,range:5.2,title:'🎀 Viết lời cầu an',fn:wishActivity},
  {id:'fortune',x:P.fortune.x,z:P.fortune.z,range:3.8,title:'🎋 Một lời lành',fn:fortuneActivity}
 ];
+window.templeQA=Object.freeze({
+ sitePlan:SITE_PLAN,activities:activities.map(a=>({id:a.id,x:a.x,z:a.z})),
+ canMove,findPath,
+ routes:()=>activities.map(a=>({id:a.id,nodes:findPath(player.x,player.z,a.x+(a.id==='wish'?3:0),a.z+(a.id==='incense'?3:3)).length})),
+ getStats:()=>({npcCount:guests.length,sceneObjects:scene.children.length,player:{x:player.x,z:player.z},version:'an-lac-vien-v2'})
+});
 function checkNearby(){let closest=null,min=Infinity;for(const a of activities){const d=Math.hypot(player.x-a.x,player.z-a.z);if(d<a.range&&d<min){closest=a;min=d}}active=closest;const button=$('#act');button.style.display=playing&&!modalOpen&&closest?'block':'none';if(closest)button.textContent=closest.title;$('#padA').disabled=!closest||modalOpen;$('#padActionLabel').textContent=closest?closest.title:'TỚI GẦN';$('#hint').textContent=closest?'Đã đến gần: '+closest.title:'Đi khắp sân chùa để khám phá 5 hoạt động'}
 function helpActivity(){panel(`<div class="seal">🪷</div><h2>Ba bước dạo chùa</h2><div class="help-step"><strong>1</strong><span><b>Đi lại:</b> Cần ảo bên trái, WASD / phím mũi tên hoặc cần trái tay cầm vật lý.</span></div><div class="help-step"><strong>2</strong><span><b>Nhìn quanh:</b> Cần ảo bên phải, vuốt cảnh 3D hoặc cần phải tay cầm vật lý.</span></div><div class="help-step"><strong>3</strong><span><b>Hoạt động:</b> Đến gần điểm hoạt động rồi bấm nút A ảo, nút A vật lý hoặc phím E. Nút 🎮 ở trên giúp hiện/ẩn tay cầm ảo.</span></div><p class="note">Không có thắng thua. Đây là trò chơi thư giãn, tôn trọng không gian tín ngưỡng.</p><div class="actions"><button class="primary" id="gotIt">Đã hiểu, vào chùa</button><button class="secondary" id="skip">Bỏ qua</button></div><button type="button" class="secondary" id="specFromHelp" style="width:100%;margin-top:12px">🏛 Hồ sơ thiết kế v1.0</button>`);btn('gotIt',closePanel);btn('skip',closePanel);btn('specFromHelp',()=>window.showChuaDesignSpec())}
 // ===== Điều khiển: tay cầm cảm ứng, tay cầm vật lý, bàn phím và kéo camera =====
