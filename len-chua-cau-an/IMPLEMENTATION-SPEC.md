@@ -1,5 +1,5 @@
 # IMPLEMENTATION SPEC — REDESIGN CHÙA AN LẠC VIÊN (THREE.JS)
-Phiên bản: 1.0 • Ngày: 02/11/2026 • Trạng thái: BACKLOG/CHƯA TRIỂN KHAI CẢNH MỚI
+Phiên bản: 1.0 • Ngày: 02/11/2026 • Trạng thái: V2 ĐANG TRIỂN KHAI — theo dõi IMPLEMENTATION-STATUS.md
 
 ## 1. Vai trò và nhiệm vụ cho coder
 Bạn là senior Three.js engineer, technical artist low-poly, UX engineer mobile Safari và gameplay developer. **Nhiệm vụ**: xây lại môi trường 3D theo hồ sơ CONCEPT-ARCHITECTURE.md; giữ hệ thống đang chạy và cải thiện tính chân thực kiến trúc. Không quảng bá rằng cảnh mới đã triển khai khi mới có spec.
