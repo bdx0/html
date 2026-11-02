@@ -593,21 +593,71 @@ function findPath(ax,az,bx,bz){
 }
 
 // ===== Khách AI: 52 nhân vật theo InstancedMesh, dạo bước và đoàn từ cổng =====
-const npcCount=52;const npcBody=new THREE.InstancedMesh(G.cyl,mat('#ffffff'),npcCount),npcHead=new THREE.InstancedMesh(G.sphere,M.skin,npcCount),npcHair=new THREE.InstancedMesh(G.sphere,M.dark,npcCount),npcLegs=new THREE.InstancedMesh(G.box,M.dark,npcCount*2),npcArms=new THREE.InstancedMesh(G.sphere,mat('#ffffff'),npcCount*2),npcPhone=new THREE.InstancedMesh(G.box,M.dark,npcCount);[npcBody,npcHead,npcHair,npcLegs,npcArms,npcPhone].forEach(o=>{o.instanceMatrix.setUsage(THREE.DynamicDrawUsage);o.frustumCulled=false;o.castShadow=false;scene.add(o)});
-const npcClothes=['#8d8484','#9ba48b','#b88d69','#899fad','#c9a0aa','#a89dca','#9da98d','#d4ac78','#c78d80','#8996a5'];const guests=Array.from({length:npcCount},(_,i)=>{let x=rand(-14,14),z=rand(-13,21);if(!canMove(x,z,.28)){x=rand(-7,7);z=rand(1,17)}return {x,z,tx:x,tz:z,yaw:rand(0,TAU),phase:rand(0,TAU),speed:rand(.45,.95),scale:i%8===0?.78:i%9===0?1.13:1,activity:'walk',until:0,group:false,talk:0,color:new THREE.Color(npcClothes[i%npcClothes.length])}});
-guests.slice(0,6).forEach((g,i)=>{g.seated=true;g.activity='chant';g.x=-5.8+i*2.15;g.z=-18.4-(i%2)*.75;g.tx=g.x;g.tz=g.z;g.until=1e9;g.yaw=0});
+const npcCount=34;const npcBody=new THREE.InstancedMesh(G.cyl,mat('#ffffff'),npcCount),npcHead=new THREE.InstancedMesh(G.sphere,M.skin,npcCount),npcHair=new THREE.InstancedMesh(G.sphere,M.dark,npcCount),npcLegs=new THREE.InstancedMesh(G.box,M.dark,npcCount*2),npcArms=new THREE.InstancedMesh(G.sphere,mat('#ffffff'),npcCount*2),npcPhone=new THREE.InstancedMesh(G.box,M.dark,npcCount);[npcBody,npcHead,npcHair,npcLegs,npcArms,npcPhone].forEach(o=>{o.instanceMatrix.setUsage(THREE.DynamicDrawUsage);o.frustumCulled=false;o.castShadow=false;scene.add(o)});
+
+const npcClothes=['#8d8484','#9ba48b','#b88d69','#899fad','#c9a0aa','#a89dca','#9da98d','#d4ac78','#c78d80','#8996a5'];
+const guests=Array.from({length:npcCount},(_,i)=>{
+ let x=0,z=18;for(let tries=0;tries<45;tries++){x=rand(-27,27);z=rand(-20,24);if(canMove(x,z,.3))break}
+ const monk=i>=4&&i<8,scale=i%9===0?.86:1;
+ return {x,z,tx:x,tz:z,path:[],role:i<4?'meditate':monk?'monk':i%7===0?'family':'visitor',
+ yaw:rand(0,TAU),phase:rand(0,TAU),speed:monk?rand(.40,.58):rand(.50,.86),scale,
+ activity:'walk',until:0,group:false,talk:0,
+ seated:i<4,color:new THREE.Color(monk?'#bb985e':npcClothes[i%npcClothes.length])};
+});
+guests.slice(0,4).forEach((g,i)=>{g.seated=true;g.activity='chant';g.x=[-5.2,-3.5,3.5,5.2][i];g.z=-17;g.tx=g.x;g.tz=g.z;g.until=1e9;g.yaw=0;g.path=[]});
+
 const npcDummy=new THREE.Object3D(),parts=[npcBody,npcHead,npcHair,npcLegs,npcArms,npcPhone];const placeNpc=(mesh,id,x,y,z,sx,sy,sz,rot=0)=>{npcDummy.position.set(x,y,z);npcDummy.rotation.set(0,rot,0);npcDummy.scale.set(sx,sy,sz);npcDummy.updateMatrix();mesh.setMatrixAt(id,npcDummy.matrix)};
 for(let i=0;i<npcCount;i++){npcBody.setColorAt(i,guests[i].color);npcArms.setColorAt(2*i,guests[i].color);npcArms.setColorAt(2*i+1,guests[i].color)}
 const speech=['Cầu cho mẹ khoẻ','Mong thi đậu','Bình an cả nhà','Nam mô A Di Đà Phật','Một năm an vui','Mong mọi người mạnh khoẻ','Thật thanh tịnh!','Chùa đẹp quá','Chúc gia đình bình an','Nguyện điều lành đến'];const bubbleNodes=[];
 for(let i=0;i<4;i++){const d=document.createElement('div');d.style.cssText='position:fixed;z-index:8;pointer-events:none;background:#fff1dce8;color:#684343;border:1px solid #d5ad89;border-radius:16px;padding:6px 10px;font-size:11px;white-space:nowrap;box-shadow:0 3px 12px #38243145;display:none;max-width:150px;overflow:hidden;text-overflow:ellipsis';document.body.appendChild(d);bubbleNodes.push({el:d,id:-1,until:0})}
 let nextGroup=18, npcTick=0, nextTalk=6;
-function chooseGuestTarget(g,t){if(g.seated)return;const p=Math.random();if(p<.3){g.activity='pray';g.tx=rand(-5.5,5.5);g.tz=rand(-11,-8)}else if(p<.48){g.activity='incense';g.tx=rand(-2.5,2.5);g.tz=rand(-2.5,0)}else if(p<.62){g.activity='photo';g.tx=rand(-12,7);g.tz=rand(3,16)}else if(p<.72){g.activity='chant';g.tx=rand(-7.2,6.7);g.tz=rand(-11.5,-9.5)}else{g.activity='walk';g.tx=rand(-14,14);g.tz=rand(-16,21)}if(!canMove(g.tx,g.tz,.32)){g.tx=rand(-7,7);g.tz=rand(2,18)}g.until=t+rand(5,14)}
-function spawnGroup(t){attendance+=Math.floor(rand(10,20));$('#counter').innerHTML=`Hôm nay có <b>${attendance}</b> người lên chùa cầu an <span style="opacity:.75">(mô phỏng)</span>`;for(let i=0;i<15;i++){const g=guests[(i+15)%npcCount];g.x=rand(-5,5);g.z=rand(21,24);g.tx=rand(-11,11);g.tz=rand(9,15);g.group=true;g.activity='walk';g.until=t+rand(15,25)}toast('🏮 Một đoàn khách vừa ghé chùa!')}
+
+function assignGuestRoute(g,x,z,t,activity='walk'){
+ if(!canMove(x,z,.32))return false;
+ g.tx=x;g.tz=z;g.path=findPath(g.x,g.z,x,z);g.activity=activity;g.until=t+rand(4,11);
+ return g.path.length>0;
+}
+function chooseGuestTarget(g,t){
+ if(g.seated)return;
+ const targets=g.role==='monk'
+  ? [[-21,-19,'sweep'],[-18,-22,'garden'],[-21,-6,'walk'],[-14,-12,'walk'],[-24,11,'walk']]
+  : [[-2,-7,'pray'],[3,-6,'pray'],[-3,0,'incense'],[3,1,'incense'],
+     [-18,-5,'walk'],[-22,-18,'rest'],[17,12,'rest'],[25,6,'walk'],
+     [20,15,'photo'],[-11,11,'walk'],[7,16,'walk'],[-1,20,'walk'],
+     [20,-11,'rest'],[12,2,'walk'],[-25,16,'walk']];
+ for(let tries=0;tries<10;tries++){
+  const [tx,tz,activity]=targets[Math.floor(rand(0,targets.length))];
+  const x=tx+rand(-1.1,1.1),z=tz+rand(-1.1,1.1);
+  if(assignGuestRoute(g,x,z,t,activity))return;
+ }
+ g.path=[];g.until=t+2;
+}
+function spawnGroup(t){
+ attendance+=Math.floor(rand(5,10));
+ $('#counter').innerHTML=`Hôm nay có <b>${attendance}</b> người lên chùa cầu an <span style="opacity:.75">(mô phỏng)</span>`;
+ for(let i=0;i<7;i++){const g=guests[11+i];if(!g)continue;g.x=rand(-2,2);g.z=rand(24,26);g.group=true;assignGuestRoute(g,rand(-6,6),rand(12,18),t)}
+ toast('🏮 Một nhóm khách vừa ghé chùa!');
+}
+function advanceGuest(g,t,h){
+ if(g.seated)return;
+ if(!g.path||g.path.length===0){if(t>g.until)chooseGuestTarget(g,t);return;}
+ const dest=g.path[0],dx=dest.x-g.x,dz=dest.z-g.z,dist=Math.hypot(dx,dz);
+ if(dist<.25){g.path.shift();if(!g.path.length)g.until=t+rand(2,8);return}
+ const step=Math.min(g.speed*h,dist),a=Math.atan2(dx,dz),nx=g.x+Math.sin(a)*step,nz=g.z+Math.cos(a)*step;g.yaw=a;
+ if(canMove(nx,nz,.27)){g.x=nx;g.z=nz}else{g.path=[];g.until=t+.5}
+}
+
 function updateGuests(t,dt){npcTick+=dt;if(t>nextGroup){spawnGroup(t);nextGroup=t+rand(50,70)}if(npcTick<.07)return;const h=Math.min(npcTick,.14);npcTick=0;
- guests.forEach((g,i)=>{if(g.seated){}else if(Math.hypot(g.tx-g.x,g.tz-g.z)<.65){if(t>g.until)chooseGuestTarget(g,t)}else{const a=Math.atan2(g.tx-g.x,g.tz-g.z),step=g.speed*h,xx=g.x+Math.sin(a)*step,zz=g.z+Math.cos(a)*step;g.yaw=a;if(canMove(xx,zz,.26)){g.x=xx;g.z=zz}else chooseGuestTarget(g,t)}const moving=!g.seated&&Math.hypot(g.tx-g.x,g.tz-g.z)>.4,bob=moving?Math.sin(t*7+g.phase)*.04:0,s=g.scale,sit=g.seated,fold=g.activity==='pray'||g.activity==='incense'||sit,photo=g.activity==='photo';placeNpc(npcBody,i,g.x,(sit?.62:.92)*s+bob,g.z,.39*s,(sit?.50:.89)*s,.36*s,g.yaw);placeNpc(npcHead,i,g.x,(sit?1.13:1.58)*s+bob,g.z,.4*s,.45*s,.38*s);placeNpc(npcHair,i,g.x,(sit?1.40:1.86)*s+bob,g.z-.04,.39*s,.17*s,.39*s);for(let j=0;j<2;j++){const side=j===0?-1:1;placeNpc(npcLegs,i*2+j,g.x+side*.17*s,(sit?.18:.27)*s+Math.abs(bob),g.z+(sit?.31:0),.19*s,(sit?.22:.48)*s,(sit?.45:.24)*s,g.yaw);const ax=fold?side*.14:side*.42;placeNpc(npcArms,i*2+j,g.x+ax*s,(sit?.77:1.03)*s+bob,g.z+(fold?-.30:photo?-.2:0)*s,.16*s,.40*s,.19*s,g.yaw)}placeNpc(npcPhone,i,g.x+.34*s,1.46*s,g.z-.35*s,photo?.16:0,photo?.25:0,photo?.05:0,g.yaw)});parts.forEach(o=>{o.instanceMatrix.needsUpdate=true});
- if(t>nextTalk){const b=bubbleNodes.find(b=>b.until<t)||bubbleNodes[0],id=Math.floor(rand(0,npcCount));b.id=id;b.until=t+rand(3.5,6);b.el.textContent=speech[Math.floor(rand(0,speech.length))];nextTalk=t+rand(3,6)}for(const b of bubbleNodes){if(t>b.until){b.el.style.display='none';continue}const g=guests[b.id];if(!g)continue;tmpLook.set(g.x,g.scale*2.1,g.z).project(camera);if(tmpLook.z>-1&&tmpLook.z<1&&Math.abs(tmpLook.x)<.9&&Math.abs(tmpLook.y)<.85){b.el.style.display='block';b.el.style.left=`${(tmpLook.x*.5+.5)*innerWidth}px`;b.el.style.top=`${(-tmpLook.y*.5+.5)*innerHeight-20}px`;b.el.style.transform='translate(-50%,-100%)'}else b.el.style.display='none'}}
+ guests.forEach((g,i)=>{advanceGuest(g,t,h);const moving=!g.seated&&g.path?.length>0,bob=moving?Math.sin(t*7+g.phase)*.04:0,s=g.scale,sit=g.seated,fold=g.activity==='pray'||g.activity==='incense'||sit,photo=g.activity==='photo';placeNpc(npcBody,i,g.x,(sit?.62:.92)*s+bob,g.z,.39*s,(sit?.50:.89)*s,.36*s,g.yaw);placeNpc(npcHead,i,g.x,(sit?1.13:1.58)*s+bob,g.z,.4*s,.45*s,.38*s);placeNpc(npcHair,i,g.x,(sit?1.40:1.86)*s+bob,g.z-.04,.39*s,.17*s,.39*s);for(let j=0;j<2;j++){const side=j===0?-1:1;placeNpc(npcLegs,i*2+j,g.x+side*.17*s,(sit?.18:.27)*s+Math.abs(bob),g.z+(sit?.31:0),.19*s,(sit?.22:.48)*s,(sit?.45:.24)*s,g.yaw);const ax=fold?side*.14:side*.42;placeNpc(npcArms,i*2+j,g.x+ax*s,(sit?.77:1.03)*s+bob,g.z+(fold?-.30:photo?-.2:0)*s,.16*s,.40*s,.19*s,g.yaw)}placeNpc(npcPhone,i,g.x+.34*s,1.46*s,g.z-.35*s,photo?.16:0,photo?.25:0,photo?.05:0,g.yaw)});parts.forEach(o=>{o.instanceMatrix.needsUpdate=true});
+ if(t>nextTalk){const b=bubbleNodes.find(b=>b.until<t)||bubbleNodes[0],id=Math.floor(rand(8,npcCount));b.id=id;b.until=t+rand(3.5,6);b.el.textContent=speech[Math.floor(rand(0,speech.length))];nextTalk=t+rand(3,6)}for(const b of bubbleNodes){if(t>b.until){b.el.style.display='none';continue}const g=guests[b.id];if(!g||g.z< -8.7||g.role==='monk')continue;tmpLook.set(g.x,g.scale*2.1,g.z).project(camera);if(tmpLook.z>-1&&tmpLook.z<1&&Math.abs(tmpLook.x)<.9&&Math.abs(tmpLook.y)<.85){b.el.style.display='block';b.el.style.left=`${(tmpLook.x*.5+.5)*innerWidth}px`;b.el.style.top=`${(-tmpLook.y*.5+.5)*innerHeight-20}px`;b.el.style.transform='translate(-50%,-100%)'}else b.el.style.display='none'}}
 // Nạp một số khách vào chu trình đi dạo ban đầu.
 for(const g of guests)chooseGuestTarget(g,0);
+window.templeQA=Object.freeze({
+ sitePlan:SITE_PLAN,activities:activities.map(a=>({id:a.id,x:a.x,z:a.z})),
+ canMove,findPath,
+ routes:()=>activities.map(a=>({id:a.id,nodes:findPath(player.x,player.z,a.x+(a.id==='wish'?3:0),a.z+(a.id==='incense'?3:3)).length})),
+ getStats:()=>({npcCount:guests.length,sceneObjects:scene.children.length,player:{x:player.x,z:player.z},version:'an-lac-vien-v2'})
+});
 // ===== Âm thanh Web Audio: gió, lá, chim, tiếng ngân chuông, mõ, tụng rì rầm =====
 let audio=null,silent=false,nextBird=0,nextAmbientBell=43;
 function startAudio(){if(!audio){const ctx=new (window.AudioContext||window.webkitAudioContext)(),master=ctx.createGain();master.gain.value=.55;master.connect(ctx.destination);audio={ctx,master};const noise=ctx.createBuffer(1,ctx.sampleRate*3,ctx.sampleRate),buf=noise.getChannelData(0);for(let i=0;i<buf.length;i++)buf[i]=Math.random()*2-1;
@@ -649,7 +699,13 @@ async function shareCard(){try{const out=document.createElement('canvas');out.wi
  const blob=await new Promise(resolve=>out.toBlob(resolve,'image/png'));if(!blob)throw new Error('Không thể tạo ảnh');const file=new File([blob],'len-chua-cau-an.png',{type:'image/png'});if(navigator.share&&navigator.canShare?.({files:[file]})){try{await navigator.share({files:[file],title:'Lên Chùa Cầu An',text:'Một lời cầu an từ Chùa An Lạc'});toast('Đã mở bảng chia sẻ.');return}catch(err){if(err.name==='AbortError')return}}
  const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='len-chua-cau-an.png';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);toast('Đã tạo ảnh cầu an để lưu về máy.');}catch(err){toast('Không tạo được ảnh trên thiết bị này: '+(err.message||'lỗi trình duyệt'))}}
 // ===== Giao diện hoạt động, hướng dẫn, và điều khiển điện thoại / PC =====
-const activities=[{id:'incense',x:0,z:-5.1,range:4,title:'🪔 Thắp hương',fn:incenseActivity},{id:'bell',x:11.3,z:-10.6,range:4.4,title:'🔔 Thỉnh chuông',fn:bellActivity},{id:'mok',x:-9.8,z:-11,range:4.1,title:'🥁 Gõ mõ tụng kinh',fn:mokActivity},{id:'wish',x:-12,z:4,range:4.1,title:'🎀 Viết lời cầu an',fn:wishActivity},{id:'fortune',x:-11.5,z:14.8,range:3.6,title:'🎋 Xin quẻ đầu năm',fn:fortuneActivity}];
+const activities=[
+ {id:'incense',x:P.incense.x,z:P.incense.z,range:3.8,title:'🪔 Dâng hương',fn:incenseActivity},
+ {id:'bell',x:P.bell.x,z:P.bell.z,range:4.2,title:'🔔 Thỉnh chuông',fn:bellActivity},
+ {id:'mok',x:P.mok.x,z:P.mok.z,range:3.2,title:'🥁 Tĩnh tâm với mõ',fn:mokActivity},
+ {id:'wish',x:P.bodhi.x,z:P.bodhi.z,range:5.2,title:'🎀 Viết lời cầu an',fn:wishActivity},
+ {id:'fortune',x:P.fortune.x,z:P.fortune.z,range:3.8,title:'🎋 Một lời lành',fn:fortuneActivity}
+];
 function checkNearby(){let closest=null,min=Infinity;for(const a of activities){const d=Math.hypot(player.x-a.x,player.z-a.z);if(d<a.range&&d<min){closest=a;min=d}}active=closest;const button=$('#act');button.style.display=playing&&!modalOpen&&closest?'block':'none';if(closest)button.textContent=closest.title;$('#padA').disabled=!closest||modalOpen;$('#padActionLabel').textContent=closest?closest.title:'TỚI GẦN';$('#hint').textContent=closest?'Đã đến gần: '+closest.title:'Đi khắp sân chùa để khám phá 5 hoạt động'}
 function helpActivity(){panel(`<div class="seal">🪷</div><h2>Ba bước dạo chùa</h2><div class="help-step"><strong>1</strong><span><b>Đi lại:</b> Cần ảo bên trái, WASD / phím mũi tên hoặc cần trái tay cầm vật lý.</span></div><div class="help-step"><strong>2</strong><span><b>Nhìn quanh:</b> Cần ảo bên phải, vuốt cảnh 3D hoặc cần phải tay cầm vật lý.</span></div><div class="help-step"><strong>3</strong><span><b>Hoạt động:</b> Đến gần điểm hoạt động rồi bấm nút A ảo, nút A vật lý hoặc phím E. Nút 🎮 ở trên giúp hiện/ẩn tay cầm ảo.</span></div><p class="note">Không có thắng thua. Đây là trò chơi thư giãn, tôn trọng không gian tín ngưỡng.</p><div class="actions"><button class="primary" id="gotIt">Đã hiểu, vào chùa</button><button class="secondary" id="skip">Bỏ qua</button></div><button type="button" class="secondary" id="specFromHelp" style="width:100%;margin-top:12px">🏛 Hồ sơ thiết kế v1.0</button>`);btn('gotIt',closePanel);btn('skip',closePanel);btn('specFromHelp',()=>window.showChuaDesignSpec())}
 // ===== Điều khiển: tay cầm cảm ứng, tay cầm vật lý, bàn phím và kéo camera =====
@@ -681,8 +737,8 @@ window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camer
 camera.fov=innerWidth<innerHeight?65:58;camera.updateProjectionMatrix();
 // ===== Vòng lặp cập nhật: chuyển hoàng hôn sang đêm, di chuyển và hạt mờ =====
 const sunset=new THREE.Color('#ce8d7c'),night=new THREE.Color('#263554'),dayFog=new THREE.Color('#ce8d7c'),nightFog=new THREE.Color('#38415b');let elapsed=0,nearTick=0;
-function updatePlayer(dt,t){if(!playing||modalOpen)return;const mx=Number(keys.has('d')||keys.has('arrowright'))-Number(keys.has('a')||keys.has('arrowleft'))+touch.x+physical.x,my=Number(keys.has('w')||keys.has('arrowup'))-Number(keys.has('s')||keys.has('arrowdown'))+touch.y+physical.y,mag=Math.hypot(mx,my);if(mag>.04){const x=mx/Math.max(1,mag),y=my/Math.max(1,mag),vx=x*Math.cos(cameraYaw)-y*Math.sin(cameraYaw),vz=-x*Math.sin(cameraYaw)-y*Math.cos(cameraYaw),speed=dt*3.65;const nx=player.x+vx*speed,nz=player.z+vz*speed;if(canMove(nx,player.z))player.x=nx;if(canMove(player.x,nz))player.z=nz;player.yaw=Math.atan2(-vx,-vz);player.walk+=dt*11;avatar.position.y=Math.sin(player.walk)*.038}else{player.walk=0;avatar.position.y=THREE.MathUtils.damp(avatar.position.y,0,10,dt)}avatar.position.x=player.x;avatar.position.z=player.z;avatar.rotation.y=THREE.MathUtils.damp(avatar.rotation.y,player.yaw,8,dt);const arms=avatar.children.filter(v=>v.name==='leftArm'||v.name==='rightArm');for(let i=0;i<arms.length;i++){const pose=t<player.poseUntil;arms[i].rotation.x=THREE.MathUtils.damp(arms[i].rotation.x,pose?-.96:mag>.05?Math.sin(player.walk+(i?Math.PI:0))*.25:0,8,dt);arms[i].position.x=THREE.MathUtils.damp(arms[i].position.x,pose?(i?.15:-.15):(i?.35:-.35),8,dt)}}
-function updateCamera(dt){const dist=innerWidth<innerHeight?10.9:11.8,up=5.8+cameraPitch*5;camGoal.set(player.x+Math.sin(cameraYaw)*dist,up,player.z+Math.cos(cameraYaw)*dist);camera.position.lerp(camGoal,1-Math.exp(-dt*5));camTarget.set(player.x,1.55,player.z);tmpLook.copy(camTarget);camera.lookAt(tmpLook)}
+function updatePlayer(dt,t){if(!playing||modalOpen)return;const mx=Number(keys.has('d')||keys.has('arrowright'))-Number(keys.has('a')||keys.has('arrowleft'))+touch.x+physical.x,my=Number(keys.has('w')||keys.has('arrowup'))-Number(keys.has('s')||keys.has('arrowdown'))+touch.y+physical.y,mag=Math.hypot(mx,my);if(mag>.04){const x=mx/Math.max(1,mag),y=my/Math.max(1,mag),vx=x*Math.cos(cameraYaw)-y*Math.sin(cameraYaw),vz=-x*Math.sin(cameraYaw)-y*Math.cos(cameraYaw),speed=dt*3.65;const nx=player.x+vx*speed,nz=player.z+vz*speed;if(canMove(nx,player.z))player.x=nx;if(canMove(player.x,nz))player.z=nz;player.yaw=Math.atan2(-vx,-vz);player.walk+=dt*11;avatar.position.y=walkHeight(player.x,player.z)+Math.sin(player.walk)*.038}else{player.walk=0;avatar.position.y=THREE.MathUtils.damp(avatar.position.y,walkHeight(player.x,player.z),10,dt)}avatar.position.x=player.x;avatar.position.z=player.z;avatar.rotation.y=THREE.MathUtils.damp(avatar.rotation.y,player.yaw,8,dt);const arms=avatar.children.filter(v=>v.name==='leftArm'||v.name==='rightArm');for(let i=0;i<arms.length;i++){const pose=t<player.poseUntil;arms[i].rotation.x=THREE.MathUtils.damp(arms[i].rotation.x,pose?-.96:mag>.05?Math.sin(player.walk+(i?Math.PI:0))*.25:0,8,dt);arms[i].position.x=THREE.MathUtils.damp(arms[i].position.x,pose?(i?.15:-.15):(i?.35:-.35),8,dt)}}
+function updateCamera(dt){const dist=innerWidth<innerHeight?10.9:11.8,up=5.8+cameraPitch*5+walkHeight(player.x,player.z);camGoal.set(player.x+Math.sin(cameraYaw)*dist,up,player.z+Math.cos(cameraYaw)*dist);camera.position.lerp(camGoal,1-Math.exp(-dt*5));camTarget.set(player.x,1.55+walkHeight(player.x,player.z),player.z);tmpLook.copy(camTarget);camera.lookAt(tmpLook)}
 function updateNature(t,dt){let darkness=clamp((t-12)/145,0,.83);scene.background.copy(sunset).lerp(night,darkness);scene.fog.color.copy(dayFog).lerp(nightFog,darkness);ambient.intensity=2.05-darkness*.87;sun.intensity=2.8-darkness*2.0;warmLights.forEach((l,i)=>l.intensity=(.65+darkness*1.7)*(1+Math.sin(t*3+i*1.8)*.09));
  for(let i=0;i<flies.n;i++){const f=flyData[i];flies.positions[3*i]=f.x+Math.sin(t*.44+f.p)*.65;flies.positions[3*i+1]=f.y+Math.cos(t*.91+f.p)*.31;flies.positions[3*i+2]=f.z+Math.cos(t*.34+f.p)*.68}flies.points.material.opacity=clamp(.2+darkness*1.4,.25,.95);flies.geometry.attributes.position.needsUpdate=true;
  for(let i=0;i<petals.n;i++){const p=petalData[i],y=2+((p.y-t*p.v)%8+8)%8;petals.positions[i*3]=p.x+Math.sin(t*.43+p.p)*1.5;petals.positions[i*3+1]=y;petals.positions[i*3+2]=p.z+Math.cos(t*.31+p.p)*1.15}petals.geometry.attributes.position.needsUpdate=true;
