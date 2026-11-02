@@ -529,8 +529,69 @@ const flyData=Array.from({length:flies.n},()=>({x:rand(-29,29),y:rand(.3,5.5),z:
 const incenseSticks=[];function plantSticks(count){for(let i=0;i<count;i++){const a=rand(0,TAU),r=rand(.06,.74);const x=P.incense.x+Math.cos(a)*r,z=P.incense.z+Math.sin(a)*r;const stick=cylinder(x,2.48,z,.018,.025,.9,M.woodLight);stick.rotation.z=rand(-.16,.16);const tip=orb(x,2.94,z,.04,.045,.04,new THREE.MeshBasicMaterial({color:0xff5c32}));incenseSticks.push({x,y:2.9,z,tip,stick,life:0});}while(incenseSticks.length>38){const s=incenseSticks.shift();scene.remove(s.tip,s.stick);s.tip.geometry.dispose();s.tip.material.dispose();s.stick.geometry.dispose()}}
 // ===== Nhân vật chibi người chơi =====
 const avatar=new THREE.Group();scene.add(avatar);const body=cylinder(0,.92,0,.35,.52,1.03,mat('#899ea4'),avatar,10);orb(0,1.78,0,.41,.48,.38,M.skin,avatar);orb(0,2.13,-.035,.42,.2,.40,M.dark,avatar);for(const x of [-.35,.35]){const arm=orb(x,.95,0,.15,.46,.18,mat('#98a7af'),avatar);arm.name=x<0?'leftArm':'rightArm'}for(const x of [-.2,.2])cube(x,.3,0,.19,.57,.24,M.dark,avatar);orb(0,1.55,-.395,.14,.10,.07,M.skin,avatar);const faceEyes=[-.15,.15];for(const x of faceEyes)orb(x,1.82,-.35,.038,.055,.03,M.dark,avatar);
-let player={x:0,z:16,yaw:0,poseUntil:0,walk:0},cameraYaw=0,cameraPitch=.26;const camGoal=new THREE.Vector3(),camTarget=new THREE.Vector3(),tmpLook=new THREE.Vector3(),clock=new THREE.Clock();camera.position.set(0,6,25);const obstacles=[{kind:'box',x:0,z:-20,w:19.3,d:11.6},{kind:'circle',x:0,z:-5,r:1.65},{kind:'box',x:11.3,z:-10.6,w:4.8,d:3.7},{kind:'circle',x:-12,z:4,r:1.2},{kind:'ellipse',x:10.8,z:7,rx:5.85,rz:4.6},{kind:'box',x:-11.5,z:14.8,w:2.45,d:1.9},{kind:'box',x:-9.8,z:-11.1,w:2.2,d:1.75}];
-function canMove(x,z,r=.38){if(x< -15.85+r||x>15.85-r||z< -24.8+r||z>24.7-r)return false;for(const o of obstacles){if(o.kind==='box'){const dx=Math.max(Math.abs(x-o.x)-o.w/2,0),dz=Math.max(Math.abs(z-o.z)-o.d/2,0);if(dx*dx+dz*dz<(r+.07)**2)return false}else if(o.kind==='circle'){if(Math.hypot(x-o.x,z-o.z)<o.r+r)return false}else{const xx=(x-o.x)/(o.rx+r),zz=(z-o.z)/(o.rz+r);if(xx*xx+zz*zz<1)return false}}return true}
+
+let player={x:0,z:21,yaw:0,poseUntil:0,walk:0},cameraYaw=0,cameraPitch=.26;
+const camGoal=new THREE.Vector3(),camTarget=new THREE.Vector3(),tmpLook=new THREE.Vector3(),clock=new THREE.Clock();
+camera.position.set(0,6,28);
+// Collision và luồng di chuyển sinh từ SITE_PLAN, không tạo collider nguyên khối chắn nội điện.
+const obstacles=[
+ {kind:'circle',x:P.incense.x,z:P.incense.z,r:P.incense.r},
+ {kind:'ellipse',x:P.pond.x,z:P.pond.z,rx:P.pond.rx+.12,rz:P.pond.rz+.12},
+ {kind:'circle',x:P.bodhi.x,z:P.bodhi.z,r:P.bodhi.r},
+ ...['fortune','mok','rearLeft','rearRight'].map(k=>({...P[k]})),
+ ...[-9.6,9.6].map(x=>({kind:'box',x,z:P.hall.z,w:.55,d:13.5})),
+ {kind:'box',x:0,z:-22.65,w:20,d:.55},
+ ...[-7.4,7.4].map(x=>({kind:'box',x,z:-9.15,w:2.7,d:.23})),
+ {kind:'circle',x:0,z:-19.2,r:2.7},
+ ...[-8,-4,0,4,8].map(x=>({kind:'circle',x,z:-10.45,r:.35})),
+ ...[-6,-3,3,6].map(x=>({kind:'box',x,z:25,w:.7,d:.75})),
+ ...[-22.05,-17.95].flatMap(x=>[1.95,6.05].map(z=>({kind:'circle',x,z,r:.32}))),
+ ...[15,25].flatMap(x=>[-22,-17,-12].map(z=>({kind:'circle',x,z,r:.25}))),
+ ...[[17.2,12],[23.2,12],[-24,-16],[20,-20],[20,-14]].map(([x,z])=>({kind:'box',x,z,w:2.15,d:1.1}))
+];
+function canMove(x,z,r=.35){
+ if(x< -30.8+r||x>30.8-r||z< -26.5+r||z>27.1-r)return false;
+ for(const o of obstacles){
+  if(o.kind==='circle'){if(Math.hypot(x-o.x,z-o.z)<o.r+r+.05)return false}
+  else if(o.kind==='ellipse'){const xx=(x-o.x)/(o.rx+r),zz=(z-o.z)/(o.rz+r);if(xx*xx+zz*zz<1)return false}
+  else {const dx=Math.max(Math.abs(x-o.x)-o.w/2,0),dz=Math.max(Math.abs(z-o.z)-o.d/2,0);if(dx*dx+dz*dz<(r+.035)**2)return false}
+ }
+ return true;
+}
+// Bậc hiên 0.6m: chiều cao avatar tăng dần khi vào hiên chính điện.
+function walkHeight(x,z){if(Math.abs(x)<4.2&&z<=-7.75&&z>-9.2)return .6*clamp((-7.75-z)/1.45,0,1);if(Math.abs(x)<9.3&&z<=-9.2&&z> -22.25)return .6;return 0}
+// Grid BFS 1.2m, tránh đâm xuyên góc chữ L; áp dụng cho NPC và kiểm thử tuyến đi.
+const NAV_STEP=1.2,NAV_MIN_X=-25,NAV_MAX_X=25,NAV_MIN_Z=-22,NAV_MAX_Z=22,NAV_W=NAV_MAX_X-NAV_MIN_X+1,NAV_H=NAV_MAX_Z-NAV_MIN_Z+1;
+const navNode=(ix,iz)=>(iz-NAV_MIN_Z)*NAV_W+ix-NAV_MIN_X;
+const navCoord=id=>({x:(id%NAV_W+NAV_MIN_X)*NAV_STEP,z:(Math.floor(id/NAV_W)+NAV_MIN_Z)*NAV_STEP});
+const navOpen=new Uint8Array(NAV_W*NAV_H);
+for(let iz=NAV_MIN_Z;iz<=NAV_MAX_Z;iz++)for(let ix=NAV_MIN_X;ix<=NAV_MAX_X;ix++)navOpen[navNode(ix,iz)]=canMove(ix*NAV_STEP,iz*NAV_STEP,.28)?1:0;
+function closestNav(x,z){
+ const ix=Math.round(x/NAV_STEP),iz=Math.round(z/NAV_STEP);
+ for(let d=0;d<=6;d++)for(let ox=-d;ox<=d;ox++)for(let oz=-d;oz<=d;oz++){
+  if(Math.max(Math.abs(ox),Math.abs(oz))!==d)continue;
+  const xx=ix+ox,zz=iz+oz;
+  if(xx<NAV_MIN_X||xx>NAV_MAX_X||zz<NAV_MIN_Z||zz>NAV_MAX_Z)continue;
+  const id=navNode(xx,zz);if(navOpen[id])return id;
+ }return -1;
+}
+function findPath(ax,az,bx,bz){
+ const from=closestNav(ax,az),to=closestNav(bx,bz);if(from<0||to<0)return [];
+ const prev=new Int32Array(navOpen.length);prev.fill(-1);prev[from]=from;
+ const queue=new Int32Array(navOpen.length);let head=0,tail=0;queue[tail++]=from;
+ while(head<tail&&prev[to]===-1){
+  const id=queue[head++],x=id%NAV_W,z=Math.floor(id/NAV_W);
+  for(const [dx,dz] of [[1,0],[-1,0],[0,1],[0,-1]]){
+   const nx=x+dx,nz=z+dz;if(nx<0||nx>=NAV_W||nz<0||nz>=NAV_H)continue;
+   const next=nz*NAV_W+nx;if(navOpen[next]&&!~prev[next]){prev[next]=id;queue[tail++]=next}
+  }
+ }
+ if(prev[to]===-1)return [];
+ const route=[];for(let id=to;id!==from;id=prev[id])route.push(navCoord(id));
+ route.reverse();if(canMove(bx,bz,.28))route.push({x:bx,z:bz});
+ return route;
+}
+
 // ===== Khách AI: 52 nhân vật theo InstancedMesh, dạo bước và đoàn từ cổng =====
 const npcCount=52;const npcBody=new THREE.InstancedMesh(G.cyl,mat('#ffffff'),npcCount),npcHead=new THREE.InstancedMesh(G.sphere,M.skin,npcCount),npcHair=new THREE.InstancedMesh(G.sphere,M.dark,npcCount),npcLegs=new THREE.InstancedMesh(G.box,M.dark,npcCount*2),npcArms=new THREE.InstancedMesh(G.sphere,mat('#ffffff'),npcCount*2),npcPhone=new THREE.InstancedMesh(G.box,M.dark,npcCount);[npcBody,npcHead,npcHair,npcLegs,npcArms,npcPhone].forEach(o=>{o.instanceMatrix.setUsage(THREE.DynamicDrawUsage);o.frustumCulled=false;o.castShadow=false;scene.add(o)});
 const npcClothes=['#8d8484','#9ba48b','#b88d69','#899fad','#c9a0aa','#a89dca','#9da98d','#d4ac78','#c78d80','#8996a5'];const guests=Array.from({length:npcCount},(_,i)=>{let x=rand(-14,14),z=rand(-13,21);if(!canMove(x,z,.28)){x=rand(-7,7);z=rand(1,17)}return {x,z,tx:x,tz:z,yaw:rand(0,TAU),phase:rand(0,TAU),speed:rand(.45,.95),scale:i%8===0?.78:i%9===0?1.13:1,activity:'walk',until:0,group:false,talk:0,color:new THREE.Color(npcClothes[i%npcClothes.length])}});
