@@ -395,42 +395,110 @@ function orb(x,y,z,rx,ry,rz,m,p=scene){return obj(G.sphere,m,x,y,z,rx,ry,rz,p)}
 function cylinder(x,y,z,r1,r2,h,m,p=scene,n=12){return obj(new THREE.CylinderGeometry(r1,r2,h,n),m,x,y,z,1,1,1,p)}
 function pathCurve(points,color=M.gold,r=.055,p=scene){const curve=new THREE.CatmullRomCurve3(points.map(v=>new THREE.Vector3(...v)));const mesh=new THREE.Mesh(new THREE.TubeGeometry(curve,Math.max(8,points.length*6),r,5,false),color);p.add(mesh);return mesh}
 function sign(text,w=3.1,h=.65){const c=document.createElement('canvas');c.width=768;c.height=160;const t=c.getContext('2d');t.fillStyle='#603329';t.fillRect(0,0,768,160);t.strokeStyle='#e0b36e';t.lineWidth=8;t.strokeRect(8,8,752,144);t.fillStyle='#ffe0a1';t.textAlign='center';t.textBaseline='middle';t.font='bold 72px Georgia, serif';t.fillText(text,384,85,710);const tex=new THREE.CanvasTexture(c);tex.colorSpace=THREE.SRGBColorSpace;const mesh=new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({map:tex,side:THREE.DoubleSide}));return mesh}
-const ground=obj(new THREE.PlaneGeometry(150,150),M.grass,0,-.11,0);ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;ground.castShadow=false;
-cube(0,-.04,-.5,33,.13,49,M.grout);
-const tileG=new THREE.BoxGeometry(1.47,.08,1.47),tiles=new THREE.InstancedMesh(tileG,M.brick,22*32);tiles.receiveShadow=true;tiles.castShadow=false;const tileDummy=new THREE.Object3D(),tileCol=new THREE.Color();let ti=0;
-for(let i=0;i<22;i++)for(let j=0;j<32;j++){tileDummy.position.set(-15.75+i*1.5,.035,-23.5+j*1.5);tileDummy.updateMatrix();tiles.setMatrixAt(ti,tileDummy.matrix);tileCol.setHSL(.06+Math.random()*.018,.24+Math.random()*.1,.43+Math.random()*.075);tiles.setColorAt(ti,tileCol);ti++}scene.add(tiles);
-// Mái ngói cong làm bằng lưới hình học, có rìa mái và vân ngói.
-function roof(cx,cy,cz,w,d,m=M.roof){const grp=new THREE.Group();grp.position.set(cx,cy,cz);scene.add(grp);const vertices=[],idx=[],nx=30,nz=12;const roofHeight=(x,z)=>1.85-1.45*Math.abs(z)/(d/2)+.67*Math.pow(Math.abs(x)/(w/2),4)+.36*Math.pow(Math.abs(z)/(d/2),4);
- for(let j=0;j<=nz;j++){let z=-d/2+j*d/nz;for(let i=0;i<=nx;i++){let x=-w/2+i*w/nx;vertices.push(x,roofHeight(x,z),z)}}for(let j=0;j<nz;j++)for(let i=0;i<nx;i++){const a=j*(nx+1)+i,b=a+nx+1;idx.push(a,b,a+1,b,b+1,a+1)}const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(vertices,3));geo.setIndex(idx);geo.computeVertexNormals();const mesh=new THREE.Mesh(geo,m);mesh.castShadow=true;mesh.receiveShadow=true;grp.add(mesh);
- for(let s of [-1,1]){const pts=[];for(let i=0;i<=20;i++){let x=-w/2+i*w/20,z=s*d/2;pts.push([x,roofHeight(x,z)+.035,z])}pathCurve(pts,M.gold,.095,grp)}
- for(let k=0;k<=18;k++){let x=-w/2+k*w/18;const pts=[];for(let j=0;j<=14;j++){const z=-d/2+j*d/14;pts.push([x,roofHeight(x,z)+.025,z])}pathCurve(pts,k%3===0?M.roofLight:M.roof,.026,grp)}
- for(const s of [-1,1])for(const x of [-w/2,w/2]){const tip=obj(G.cone,M.gold,x,roofHeight(x,s*d/2)+.23,s*d/2,.19,.48,.19,grp);tip.rotation.z=-Math.sign(x)*.35}return grp}
-// Tam quan ba lối vào.
-for(const x of [-15.5,15.5])cube(x,1.5,23.1,3,3,1.3,M.plaster);
-for(const x of [-9,-3,3,9]){cube(x,2.1,22.8,.85,4.2,.94,M.woodLight);cube(x,4.15,22.8,1.1,.35,1.2,M.gold)}
-for(const x of [-6,0,6]){roof(x,4.0,22.8,x===0?7.5:6.3,3.35);cube(x,3.82,22.8,x===0?6.1:4.8,.6,1.1,M.wood)}
-const gateSign=sign('CHÙA AN LẠC',4.9,.8);gateSign.position.set(0,4.03,24.46);gateSign.rotation.y=Math.PI;scene.add(gateSign);
-for(const x of [-18,18]){cube(x,1.27,-.3,1.4,2.5,49,M.plaster);cube(x,2.65,-.3,1.8,.3,49,M.roofLight)}cube(0,1.25,-26,37,2.5,1,M.plaster);cube(0,2.65,-26,38,.3,1.4,M.roof);
-// Chính điện với gian thờ có thể nhìn từ sân.
-cube(0,.44,-20,19,.9,11,M.stone);cube(0,2.65,-24.5,18.7,4.4,.7,M.plasterDark);for(const x of [-9,9])cube(x,2.65,-20,.7,4.4,9,M.plasterDark);
-for(let x of [-7.8,-4,0,4,7.8]){cylinder(x,2.95,-14.3,.37,.4,5.5,M.woodLight);cylinder(x,5.75,-14.3,.51,.51,.2,M.gold)}
-cube(0,5.32,-19.4,19.8,.68,11,M.wood);roof(0,5.45,-19.4,22,13);roof(0,7.48,-19.4,13.3,7.4,M.roofLight);
-for(let x of [-7.6,-4.6,4.6,7.6])cube(x,2.0,-23.9,.18,2.8,.14,M.wood);
-const templeSign=sign('CHÍNH ĐIỆN',3.6,.7);templeSign.position.set(0,5.45,-13.27);scene.add(templeSign);
-for(const x of [-5.8,5.8]){cube(x,.55,-12.45,3.2,.28,2.3,M.stone);cylinder(x,1.05,-12.3,.22,.27,.8,M.brass)}
-// Tượng Phật ngồi cách điệu trang nghiêm trong chính điện.
-const buddha=new THREE.Group();buddha.position.set(0,.9,-21.8);scene.add(buddha);cylinder(0,.29,0,2.45,2.55,.6,M.stone,buddha,28);cylinder(0,.66,0,1.8,1.95,.18,M.gold,buddha,28);orb(0,1.18,0,1.38,.61,1.05,M.robe,buddha);obj(new THREE.CylinderGeometry(.9,1.25,1.75,14),M.robe,0,2.21,0,1,1,1,buddha);orb(0,3.45,0,.62,.78,.6,M.skin,buddha);orb(0,4.11,-.05,.53,.25,.55,M.dark,buddha);orb(-.62,3.45,0,.15,.34,.18,M.skin,buddha);orb(.62,3.45,0,.15,.34,.18,M.skin,buddha);orb(-.8,2.26,.44,.25,.7,.24,M.robe,buddha);orb(.8,2.26,.44,.25,.7,.24,M.robe,buddha);orb(0,1.65,.85,.55,.17,.29,M.skin,buddha);
-const halo=new THREE.Mesh(new THREE.TorusGeometry(1.22,.085,7,36),M.gold);halo.position.set(0,3.42,-.42);buddha.add(halo);for(const x of [-.24,.24]){const eye=cube(x,3.49,.56,.22,.035,.035,M.wood,buddha);eye.rotation.z=x>0?-.1:.1}
-// Sân trước, lư hương đồng và những nén hương.
-const censer=new THREE.Group();censer.position.set(0,0,-5);scene.add(censer);for(let x of [-.85,.85])for(let z of [-.6,.6])cylinder(x,.4,z,.15,.2,.75,M.brass,censer);cylinder(0,1.18,0,1.4,1.07,1.45,M.brass,censer,22);cylinder(0,1.96,0,1.54,1.38,.22,M.gold,censer,22);cylinder(0,2.0,0,1.18,1.18,.08,M.dark,censer,22);for(let i=0;i<10;i++){const a=i*TAU/10;orb(Math.cos(a)*1.22,1.4,Math.sin(a)*1.22,.12,.18,.12,M.gold,censer)}for(let x of [-1.4,1.4]){const h=orb(x,1.65,0,.26,.26,.26,M.brass,censer)}
-// Gác chuông.
-const bellPosition=new THREE.Vector3(11.3,0,-10.6);for(let x of [9.1,13.5])for(let z of [-12.2,-9.0]){cube(x,2.7,z,.45,5.4,.45,M.wood);cylinder(x,5.45,z,.31,.32,.26,M.gold)}roof(11.3,5.45,-10.6,6.2,5.7);cube(11.3,4.7,-10.6,4.5,.23,.29,M.woodLight);
-const bell=new THREE.Group();bell.position.set(11.3,3.5,-10.6);scene.add(bell);cylinder(0,-.68,0,.73,.55,1.55,M.brass,bell,20);cylinder(0,-1.44,0,.89,.86,.23,M.gold,bell,20);cylinder(0,.18,0,.22,.22,.35,M.brass,bell);const bellRope=cylinder(0,.7,0,.045,.045,1.15,M.wood,bell);
-const mallet=cylinder(12.82,2.73,-10.6,.16,.16,1.6,M.woodLight);mallet.rotation.z=Math.PI/2;
-// Mõ gỗ ở hiên chùa.
-cube(-9.8,.58,-11.1,2,.3,1.6,M.wood);orb(-9.8,1.05,-11.1,.67,.46,.57,M.woodLight);orb(-9.8,1.12,-10.58,.24,.14,.07,M.dark);const striker=cylinder(-8.75,1.3,-10.8,.08,.08,1.35,M.gold);striker.rotation.z=.9;
-// Bàn xin quẻ đầu năm.
-cube(-11.5,.75,14.8,2.1,1.5,1.4,M.woodLight);cylinder(-11.5,1.8,14.8,.48,.35,.75,M.brass);for(let i=0;i<9;i++){const q=cube(-11.85+i*.09,2.23,14.8,.07,.7,.07,M.plaster);q.rotation.z=(i-4)*.1}
+
+/* ===== AN LẠC VIÊN V2: một mặt bằng chung cho kiến trúc, collision và điểm tương tác ===== */
+const SITE_PLAN=Object.freeze({
+  boundary:{kind:'rect',x:0,z:0,w:64,d:56},
+  gate:{kind:'rect',x:0,z:25,w:12,d:3.5},
+  court:{kind:'rect',x:0,z:8,w:28,d:22},
+  incense:{kind:'circle',x:0,z:-3,r:1.55},
+  hall:{kind:'rect',x:0,z:-16,w:20,d:14,elevation:.6},
+  bell:{kind:'rect',x:-20,z:4,w:5,d:5},
+  pond:{kind:'ellipse',x:20,z:5,rx:6.5,rz:4.5},
+  bodhi:{kind:'circle',x:-20,z:-12,r:1.3},
+  quietCorridor:{kind:'rect',x:20,z:-13,w:12,d:3},
+  stoneSeat:{kind:'rect',x:20,z:-17,w:5,d:4},
+  rearLeft:{kind:'rect',x:-19,z:-24,w:8,d:5},
+  rearRight:{kind:'rect',x:20,z:-24,w:8,d:5},
+  fortune:{kind:'rect',x:-11.5,z:13.7,w:2.15,d:1.45},
+  mok:{kind:'rect',x:-8.5,z:-7.7,w:1.7,d:1.2}
+});
+const P=SITE_PLAN, stoneStep=mat('#89918c'), mossMat=mat('#5d7951'), pathMat=mat('#b9a98c');
+const ground=obj(new THREE.PlaneGeometry(170,170),M.grass,0,-.16,0);ground.rotation.x=-Math.PI/2;ground.castShadow=false;
+// Sân trung tâm, lối đi và đường vòng nối công trình theo đúng tỷ lệ mét.
+cube(0,-.07,7,29,.16,31,M.grout);
+for(const [x,z,w,d] of [[0,23.3,7,8],[0,-4,8,10],[-12,4,19,3.5],[12,5,18,3.5],[-20,-4,3.2,17],[20,-6,3.2,15],[0,-25,45,2.5]])cube(x,-.075,z,w,.16,d,pathMat);
+const tileG=new THREE.BoxGeometry(1.43,.065,1.43),tiles=new THREE.InstancedMesh(tileG,M.brick,20*24);
+tiles.receiveShadow=true;tiles.castShadow=false;
+const tileDummy=new THREE.Object3D(),tileCol=new THREE.Color();
+let ti=0;for(let x=0;x<20;x++)for(let z=0;z<24;z++){
+ tileDummy.position.set(-13.57+1.43*x,.035,-9.5+1.43*z);tileDummy.updateMatrix();tiles.setMatrixAt(ti,tileDummy.matrix);
+ tileCol.setHSL(.05+(x*7+z*3)%13*.001,.24,.45+((x*3+z*5)%7)*.008);tiles.setColorAt(ti++,tileCol);
+}scene.add(tiles);
+// Mái hai dốc có sống nóc chạy theo trục dài nhà, diềm và các đường ngói bám theo mặt mái.
+function roof(cx,cy,cz,w,d,m=M.roof){
+ const grp=new THREE.Group();grp.position.set(cx,cy,cz);scene.add(grp);
+ const verts=[],indices=[],nx=24,nz=16;
+ const h=(x,z)=>.26+1.65*(1-Math.abs(z)/(d/2))+.26*Math.pow(Math.abs(x)/(w/2),4)+.13*Math.pow(Math.abs(z)/(d/2),4);
+ for(let j=0;j<=nz;j++)for(let i=0;i<=nx;i++){const x=-w/2+w*i/nx,z=-d/2+d*j/nz;verts.push(x,h(x,z),z);}
+ for(let j=0;j<nz;j++)for(let i=0;i<nx;i++){const a=j*(nx+1)+i,b=a+nx+1;indices.push(a,b,a+1,b,b+1,a+1)}
+ const geom=new THREE.BufferGeometry();geom.setAttribute('position',new THREE.Float32BufferAttribute(verts,3));geom.setIndex(indices);geom.computeVertexNormals();
+ const plane=new THREE.Mesh(geom,m);plane.castShadow=true;plane.receiveShadow=true;plane.material.side=THREE.DoubleSide;grp.add(plane);
+ for(const z of [-d/2,d/2]){const p=[];for(let i=0;i<=18;i++){let x=-w/2+w*i/18;p.push([x,h(x,z)+.05,z])}pathCurve(p,M.gold,.09,grp)}
+ for(let i=0;i<=Math.ceil(w/.56);i++){const x=-w/2+i*w/Math.ceil(w/.56),p=[];for(let j=0;j<=11;j++){const z=-d/2+j*d/11;p.push([x,h(x,z)+.025,z])}pathCurve(p,i%4===0?M.roofLight:M.roof,.028,grp)}
+ pathCurve([[-w/2,.26+1.65,0],[0,.26+1.65,0],[w/2,.26+1.65,0]],M.gold,.085,grp);
+ for(const x of [-w/2,w/2])for(const z of [-d/2,d/2]){const e=obj(G.cone,M.gold,x,h(x,z)+.18,z,.12,.38,.12,grp);e.rotation.z=-Math.sign(x)*.3}
+ return grp;
+}
+// Hàng rào để thoáng phía cổng, hai hàng cây giới hạn sân.
+for(const x of [-31.4,31.4]){cube(x,1.1,0,.75,2.2,55,M.plaster);cube(x,2.26,0,1,.20,55,M.roofLight)}
+cube(0,1.05,-27.4,62,2.1,.85,M.plaster);cube(0,2.2,-27.4,62,.24,1,M.roof);
+for(const [x,z] of [[-18,26],[18,26],[-27,19],[27,19],[-27,-8],[27,-8]]){cylinder(x,1.2,z,.55,.72,2.4,M.trunk);for(let j=0;j<4;j++)orb(x+Math.cos(j*TAU/4)*1.45,4,z+Math.sin(j*TAU/4)*1.2,1.65,1.65,1.55,M.leaf)}
+// Tam quan theo 3 cửa: nhịp chính 5.2 m, cửa phụ mỗi bên 2.4 m.
+for(const x of [-6,-3,3,6]){cube(x,2.1,25,.68,4.2,.78,M.woodLight);cube(x,4.18,25,.91,.31,1,M.gold)}
+for(const x of [-4.5,0,4.5]){roof(x,4.28,25,x===0?6.5:3.5,3.8);cube(x,3.83,25,x===0?5.5:2.95,.38,.95,M.wood)}
+const gateSign=sign('CHÙA AN LẠC',5.2,.77);gateSign.position.set(0,4.33,27.0);scene.add(gateSign);
+// Chính điện trên nền cao 0.6 m, hiên sâu 3 m. Không đặt tường ở chính diện để có thể bước vào.
+cube(0,.23,-16,20,.64,14,M.stone);
+for(const z of [-22.5,-21,-19,-17,-15,-13,-11]){cube(0,.58,z,19.6,.035,.07,M.plasterDark)}
+cube(0,2.95,-22.65,19.7,4.65,.55,M.plaster);
+for(const x of [-9.6,9.6])cube(x,2.95,-16,.55,4.65,13.4,M.plaster);
+for(const x of [-8,-4,0,4,8]){cylinder(x,3.28,-10.45,.34,.39,5.2,M.woodLight);cylinder(x,5.89,-10.45,.42,.42,.22,M.gold)}
+for(const x of [-6,-2,2,6]){cube(x,3.1,-22.32,.14,3.6,.13,M.wood);cube(x,1.14,-22.25,1.2,.10,.10,M.gold)}
+cube(0,5.65,-16,20.2,.56,14,M.wood);roof(0,5.85,-16,23,17);
+roof(0,8.0,-16,12.5,8,M.roofLight);
+for(let i=0;i<4;i++)cube(0,.075+i*.15,-8.5+i*.35,8.2-i*.22,.15,1.05,stoneStep);
+const sideRamp=cube(11.7,.25,-7.3,2.3,.16,7.5,stoneStep);sideRamp.rotation.x=-.078;
+// Một dãy đèn trong chính điện, cửa lớn có cửa gỗ hai bên và bậc thềm.
+for(const x of [-7.4,7.4]){cube(x,2.48,-9.15,2.7,3.8,.18,M.woodLight);for(let j=0;j<4;j++)cube(x-1.0+j*.7,2.5,-9.01,.07,3.3,.10,M.gold)}
+const templeSign=sign('CHÍNH ĐIỆN',3.9,.66);templeSign.position.set(0,5.1,-9.05);scene.add(templeSign);
+// Tượng thờ hướng về phía người bước vào, khoảng cách bàn thờ trang nghiêm.
+const buddha=new THREE.Group();buddha.position.set(0,.74,-19.2);scene.add(buddha);
+cylinder(0,.28,0,2.4,2.55,.55,M.stone,buddha,28);cylinder(0,.66,0,1.85,1.92,.16,M.gold,buddha,24);
+orb(0,1.18,0,1.36,.60,1.05,M.robe,buddha);obj(new THREE.CylinderGeometry(.9,1.25,1.75,14),M.robe,0,2.21,0,1,1,1,buddha);
+orb(0,3.45,0,.62,.78,.6,M.skin,buddha);orb(0,4.11,-.05,.53,.25,.55,M.dark,buddha);
+for(const x of [-.62,.62]){orb(x,3.45,0,.15,.34,.18,M.skin,buddha);orb(x*1.3,2.26,.44,.25,.7,.24,M.robe,buddha)}
+orb(0,1.65,.85,.55,.17,.29,M.skin,buddha);
+const halo=new THREE.Mesh(new THREE.TorusGeometry(1.2,.085,7,36),M.gold);halo.position.set(0,3.42,-.42);buddha.add(halo);
+for(const x of [-.24,.24])cube(x,3.49,.56,.22,.035,.035,M.wood,buddha);
+// Lư hương và khu đứng dâng hương, đặt trên trục sân.
+const censer=new THREE.Group();censer.position.set(P.incense.x,0,P.incense.z);scene.add(censer);
+for(const x of [-.85,.85])for(const z of [-.6,.6])cylinder(x,.4,z,.15,.2,.75,M.brass,censer);
+cylinder(0,1.18,0,1.35,1.07,1.45,M.brass,censer,22);cylinder(0,1.96,0,1.48,1.36,.22,M.gold,censer,22);cylinder(0,2.0,0,1.14,1.14,.08,M.dark,censer,22);
+for(let i=0;i<10;i++){const a=i*TAU/10;orb(Math.cos(a)*1.22,1.4,Math.sin(a)*1.22,.12,.18,.12,M.gold,censer)}
+// Gác chuông lệch trái khuôn viên, với trụ đỡ và một lối hành lễ riêng.
+const bellPosition=new THREE.Vector3(P.bell.x,0,P.bell.z);
+for(const x of [-22.05,-17.95])for(const z of [1.95,6.05]){cube(x,2.55,z,.44,5.1,.44,M.wood);cylinder(x,5.17,z,.3,.32,.24,M.gold)}
+roof(-20,5.33,4,6.6,6.3);cube(-20,4.68,4,4.4,.28,.32,M.woodLight);
+const bell=new THREE.Group();bell.position.set(-20,3.45,4);scene.add(bell);
+cylinder(0,-.68,0,.73,.55,1.55,M.brass,bell,20);cylinder(0,-1.44,0,.89,.86,.23,M.gold,bell,20);cylinder(0,.18,0,.22,.22,.35,M.brass,bell);
+cylinder(0,.7,0,.045,.045,1.15,M.wood,bell);
+const mallet=cylinder(-18.2,2.6,4,.15,.15,1.6,M.woodLight);mallet.rotation.z=Math.PI/2;
+// Mõ gỗ ở hiên trái; bàn lời lành ở lối đi trước sân.
+cube(P.mok.x,.77,P.mok.z,1.8,.33,1.35,M.wood);orb(P.mok.x,1.21,P.mok.z,.63,.42,.52,M.woodLight);
+orb(P.mok.x,1.28,P.mok.z+.46,.21,.13,.06,M.dark);
+const striker=cylinder(P.mok.x+1.0,1.4,P.mok.z+.15,.075,.075,1.2,M.gold);striker.rotation.z=.9;
+cube(P.fortune.x,.78,P.fortune.z,2.1,1.5,1.45,M.woodLight);
+cylinder(P.fortune.x,1.8,P.fortune.z,.48,.35,.75,M.brass);
+for(let i=0;i<9;i++){const q=cube(P.fortune.x-.35+i*.09,2.2,P.fortune.z,.07,.68,.07,M.plaster);q.rotation.z=(i-4)*.1}
+// Góc tĩnh tâm và dãy hiên phía phải.
+for(const z of [-22,-17,-12])for(const x of [15,25])cylinder(x,1.7,z,.22,.24,3.4,M.woodLight);
+roof(20,3.38,-17,13.8,6.2,M.roof);
+for(const z of [-20,-14]){cube(20,.25,z,4,.45,1.0,M.stone);cube(20,.78,z,3.6,.22,.75,M.woodLight)}
+for(const [x,z] of [[-19,-24],[20,-24]]){cube(x,1.8,z,8,3.5,5,M.plaster);roof(x,3.6,z,9,6.3,M.roofLight);for(const dx of [-2.1,2.1])cube(x+dx,1.7,z+2.51,1.2,2.4,.2,M.wood)}
+// Bậc rêu và cây hoa thấp tập trung ở rìa, không mọc trên trục lễ.
+for(let i=0;i<42;i++){const side=i%2?-1:1,x=side*rand(24,29),z=rand(-21,21);orb(x,.2,z,rand(.5,.8),rand(.3,.7),rand(.5,.8),i%4?mossMat:M.leaf)}
+
 // ===== Cây bồ đề, hồ sen, lụa cầu an, đèn hoa đăng và đèn lồng =====
 const bodhi=new THREE.Group();bodhi.position.set(-12,0,4);scene.add(bodhi);cylinder(0,2.8,0,.65,.88,5.8,M.trunk,bodhi,10);const boughs=[];
 for(let i=0;i<9;i++){let a=i*TAU/9,r=rand(2.0,3.5),px=Math.cos(a)*r,pz=Math.sin(a)*r;const branch=pathCurve([[0,4.3,0],[px*.45,5.4,pz*.45],[px,6.5+Math.sin(i)*.5,pz]],M.trunk,.22,bodhi);boughs.push([px,6.4,pz]);for(let j=0;j<4;j++){let x=px+rand(-1.25,1.25),z=pz+rand(-1.25,1.25),y=6.3+rand(-.4,1.4);orb(x,y,z,rand(.85,1.2),rand(.8,1.15),rand(.8,1.2),j%3===0?mat('#608852'):M.leaf,bodhi)}}
