@@ -16,7 +16,7 @@ assert.match(html,/len-chua-cau-an-v1/,'Existing localStorage schema must stay s
 for(const id of ['stick','look-stick','padA','designLayer','world'])assert(html.includes(`id="${id}"`),`Missing UI ${id}`);
 assert.match(html,/navigator.getGamepads/);
 assert.match(html,/https:\/\/cdn.jsdelivr.net\/npm\/three@/);
-const script=between('<script type="module">','</script>').replace(/^\s*import \* as THREE from 'three';/m,'');
+const script=between('<script type="module">','</script>').replace('<script type="module">','').replace(/^\s*import \* as THREE from 'three';/m,'');
 new Function(script); // Syntax only; does not execute WebGL.
 const siteBlock=between('const SITE_PLAN=Object.freeze(','const P=SITE_PLAN');
 const collisionBlock=between('const obstacles=[','// ===== Khách AI:');
