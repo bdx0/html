@@ -75,7 +75,7 @@ body.virtual-controls .footer{display:none}
 <!-- Tài liệu kiến trúc và implementation spec được nhúng trực tiếp trong HTML để đọc offline sau khi tải game. -->
 <div id="designLayer" hidden>
   <section class="design-dialog" role="dialog" aria-modal="true" aria-labelledby="designTitle">
-    <div class="design-head"><div><small>CHÙA AN LẠC VIÊN · ĐỀ XUẤT V1.0 · CHƯA DỰNG CẢNH MỚI</small><h2 id="designTitle">🏛 Hồ sơ thiết kế</h2></div><button id="designClose" type="button" aria-label="Đóng hồ sơ thiết kế">×</button></div>
+    <div class="design-head"><div><small>CHÙA AN LẠC VIÊN · CONCEPT V1.0 · CẢNH V2 CHƯA NGHIỆM THU</small><h2 id="designTitle">🏛 Hồ sơ thiết kế</h2></div><button id="designClose" type="button" aria-label="Đóng hồ sơ thiết kế">×</button></div>
     <div class="design-tabs" role="tablist" aria-label="Loại tài liệu">
       <button type="button" class="design-tab" role="tab" aria-selected="true" aria-controls="conceptPane" id="conceptTab" data-pane="conceptPane">🏛 Kiến trúc</button>
       <button type="button" class="design-tab" role="tab" aria-selected="false" aria-controls="implementationPane" id="implementationTab" data-pane="implementationPane">🧭 Spec coder</button>
@@ -83,7 +83,7 @@ body.virtual-controls .footer{display:none}
     <div class="design-body" id="designScroll">
       <article class="design-pane" role="tabpanel" id="conceptPane" aria-labelledby="conceptTab"><h2>HỒ SƠ CONCEPT KIẾN TRÚC — CHÙA AN LẠC VIÊN</h2>
 <p>Phiên bản: 1.0 • Ngày: 02/11/2026 • Loại: thiết kế ý tưởng cho thế giới 3D tương tác</p>
-<blockquote>Trạng thái: ĐỀ XUẤT — CHƯA DỰNG LẠI CẢNH. Đây là hồ sơ định hướng nghệ thuật và không gian cho một ngôi chùa HƯ CẤU trong game, không phải hồ sơ thi công, hồ sơ kết cấu, hồ sơ PCCC hoặc một công trình có thật được đo đạc.</blockquote>
+<blockquote>Trạng thái: ĐÃ DỰNG BẢN V2 ĐẦU TIÊN — CHƯA NGHIỆM THU THIẾT BỊ THẬT. Xem IMPLEMENTATION-STATUS.md. Đây là hồ sơ định hướng nghệ thuật và không gian cho một ngôi chùa HƯ CẤU trong game, không phải hồ sơ thi công, hồ sơ kết cấu, hồ sơ PCCC hoặc một công trình có thật được đo đạc.</blockquote>
 <h3>A. Tuyên ngôn thiết kế</h3>
 <p><strong>“Bước qua tam quan, bước chậm lại.”</strong> Một khuôn viên chùa Nam Bộ mộc mạc, trang nghiêm, hiên sâu, gió nhẹ và có các khoảng lặng. Đặt trải nghiệm chiêm bái và quan sát lên trên tính thắng thua. Không dựng một “sân game” nơi mọi vật thể đều đòi người chơi bấm nút.</p>
 <p>Bốn giá trị: (1) trục nghi lễ rõ ràng; (2) tỉ lệ kiến trúc hợp lý; (3) cảnh quan điều hòa cảm xúc; (4) người và không gian ứng xử đúng mực.</p>
@@ -193,7 +193,7 @@ NAM (+Z) — điểm người chơi bắt đầu</pre>
 <li>Các kích thước là thước tỷ lệ cho mô hình, KHÔNG phải thiết kế kết cấu hoặc tiêu chuẩn tiếp cận đã được phê duyệt.</li>
 </ul></article>
       <article class="design-pane" role="tabpanel" id="implementationPane" aria-labelledby="implementationTab" hidden><h2>IMPLEMENTATION SPEC — REDESIGN CHÙA AN LẠC VIÊN (THREE.JS)</h2>
-<p>Phiên bản: 1.0 • Ngày: 02/11/2026 • Trạng thái: BACKLOG/CHƯA TRIỂN KHAI CẢNH MỚI</p>
+<p>Phiên bản: 1.0 • Ngày: 02/11/2026 • Trạng thái: V2 ĐANG TRIỂN KHAI — theo dõi IMPLEMENTATION-STATUS.md</p>
 <h3>1. Vai trò và nhiệm vụ cho coder</h3>
 <p>Bạn là senior Three.js engineer, technical artist low-poly, UX engineer mobile Safari và gameplay developer. <strong>Nhiệm vụ</strong>: xây lại môi trường 3D theo hồ sơ CONCEPT-ARCHITECTURE.md; giữ hệ thống đang chạy và cải thiện tính chân thực kiến trúc. Không quảng bá rằng cảnh mới đã triển khai khi mới có spec.</p>
 <p>Mã nguồn hiện tại: len-chua-cau-an/index.html (ES module, importmap Three.js CDN, thủ công hình học, WebAudio, 5 hoạt động, NPC, virtual dual analog, Gamepad API, localStorage, canvas share). Không thay thế bằng dự án framework hay bộ asset có bản quyền. Xuất bản chính: https://bdx0.github.io/html/len-chua-cau-an/; không tái tạo dự án Cloudflare Pages đã xóa.</p>
@@ -305,7 +305,7 @@ NAM (+Z) — điểm người chơi bắt đầu</pre>
 <h3>14. Prompt bàn giao cho coding agent</h3>
 <p>Mở CONCEPT-ARCHITECTURE.md và IMPLEMENTATION-SPEC.md, đọc toàn bộ index.html hiện tại. Phân tích các phụ thuộc và lập bảng mapping từ SITE_PLAN sang scene, collision, navigation, interaction. Thực hiện tuần tự M0→M4, mỗi mốc có commit, ảnh thực tế và checklist. Ưu tiên đúng kiến trúc Nam Bộ và di chuyển thông suốt hơn nhiều vật trang trí. Không xóa phần đang hoạt động, không phá GitHub Pages, không deploy Cloudflare Pages. Báo cáo rõ tính năng nào mới ở mức concept và tính năng nào đã code.</p></article>
     </div>
-    <div class="design-foot"><span>Hồ sơ concept cho game 3D — không phải bản vẽ thi công.</span><span><a href="https://github.com/bdx0/html/blob/main/len-chua-cau-an/CONCEPT-ARCHITECTURE.md" target="_blank" rel="noopener noreferrer">File kiến trúc</a> · <a href="https://github.com/bdx0/html/blob/main/len-chua-cau-an/IMPLEMENTATION-SPEC.md" target="_blank" rel="noopener noreferrer">Spec coder</a></span></div>
+    <div class="design-foot"><span>Hồ sơ concept cho game 3D — không phải bản vẽ thi công.</span><span><a href="https://github.com/bdx0/html/blob/main/len-chua-cau-an/CONCEPT-ARCHITECTURE.md" target="_blank" rel="noopener noreferrer">File kiến trúc</a> · <a href="https://github.com/bdx0/html/blob/main/len-chua-cau-an/IMPLEMENTATION-STATUS.md" target="_blank" rel="noopener noreferrer">Trạng thái</a> · <a href="https://github.com/bdx0/html/blob/main/len-chua-cau-an/IMPLEMENTATION-SPEC.md" target="_blank" rel="noopener noreferrer">Spec coder</a></span></div>
   </section>
 </div>
 <script>
