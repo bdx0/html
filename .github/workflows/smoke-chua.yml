@@ -1,0 +1,25 @@
+name: Smoke test An Lac Vien temple
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'len-chua-cau-an/**'
+      - '.github/workflows/smoke-chua.yml'
+  pull_request:
+    paths:
+      - 'len-chua-cau-an/**'
+      - '.github/workflows/smoke-chua.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  static-navigation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax, collision and activity navigation smoke
+        run: node len-chua-cau-an/tests/site-plan-smoke.mjs
