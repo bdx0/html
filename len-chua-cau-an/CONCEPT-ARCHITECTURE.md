@@ -1,7 +1,7 @@
 # HỒ SƠ CONCEPT KIẾN TRÚC — CHÙA AN LẠC VIÊN
 Phiên bản: 1.0 • Ngày: 02/11/2026 • Loại: thiết kế ý tưởng cho thế giới 3D tương tác
 
-> Trạng thái: ĐỀ XUẤT — CHƯA DỰNG LẠI CẢNH. Đây là hồ sơ định hướng nghệ thuật và không gian cho một ngôi chùa HƯ CẤU trong game, không phải hồ sơ thi công, hồ sơ kết cấu, hồ sơ PCCC hoặc một công trình có thật được đo đạc.
+> Trạng thái: ĐÃ DỰNG BẢN V2 ĐẦU TIÊN — CHƯA NGHIỆM THU THIẾT BỊ THẬT. Xem IMPLEMENTATION-STATUS.md. Đây là hồ sơ định hướng nghệ thuật và không gian cho một ngôi chùa HƯ CẤU trong game, không phải hồ sơ thi công, hồ sơ kết cấu, hồ sơ PCCC hoặc một công trình có thật được đo đạc.
 
 ## A. Tuyên ngôn thiết kế
 **“Bước qua tam quan, bước chậm lại.”** Một khuôn viên chùa Nam Bộ mộc mạc, trang nghiêm, hiên sâu, gió nhẹ và có các khoảng lặng. Đặt trải nghiệm chiêm bái và quan sát lên trên tính thắng thua. Không dựng một “sân game” nơi mọi vật thể đều đòi người chơi bấm nút.
