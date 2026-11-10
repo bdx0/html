@@ -1,12 +1,12 @@
 {
   "owner": "bdx0",
-  "generated_at": "2026-11-09T08:02:52+00:00",
+  "generated_at": "2026-11-10T08:27:51+00:00",
   "source": "GitHub public REST API via GitHub Actions",
   "coverage": "complete_public",
   "total_public": 598,
   "total_archived": 10,
   "total_forks": 551,
-  "total_recent_30d": 4,
+  "total_recent_30d": 7,
   "featured": [
     {
       "name": "html",
@@ -18,27 +18,27 @@
       "default_branch": "main",
       "archived": false,
       "fork": false,
-      "pushed_at": "2026-11-08T07:27:17Z",
-      "updated_at": "2026-11-08T07:27:20Z",
+      "pushed_at": "2026-11-10T04:15:53Z",
+      "updated_at": "2026-11-10T04:15:57Z",
       "created_at": "2026-10-09T04:40:11Z",
       "has_pages": true,
       "stars": 0,
       "forks": 0,
       "open_issues": 1,
-      "size_kb": 3075,
+      "size_kb": 3079,
       "ci": {
         "name": "Refresh public repository report",
         "status": "in_progress",
         "conclusion": null,
-        "html_url": "https://github.com/bdx0/html/actions/runs/42583107164",
-        "created_at": "2026-11-09T08:02:20Z"
+        "html_url": "https://github.com/bdx0/html/actions/runs/42782805428",
+        "created_at": "2026-11-10T08:27:37Z"
       },
       "ci_deploy": {
         "name": "Deploy HTML Lab to GitHub Pages",
         "status": "completed",
         "conclusion": "success",
-        "html_url": "https://github.com/bdx0/html/actions/runs/42458859150",
-        "created_at": "2026-11-08T07:27:18Z"
+        "html_url": "https://github.com/bdx0/html/actions/runs/42754746182",
+        "created_at": "2026-11-10T04:15:55Z"
       }
     },
     {
@@ -84,27 +84,27 @@
       "default_branch": "main",
       "archived": false,
       "fork": false,
-      "pushed_at": "2026-11-03T09:06:35Z",
-      "updated_at": "2026-11-03T09:06:39Z",
+      "pushed_at": "2026-11-10T04:15:24Z",
+      "updated_at": "2026-11-10T04:15:28Z",
       "created_at": "2015-05-13T03:56:30Z",
       "has_pages": true,
       "stars": 0,
       "forks": 0,
       "open_issues": 0,
-      "size_kb": 21630,
+      "size_kb": 21648,
       "ci": {
         "name": "Deploy Next.js site to Pages",
         "status": "completed",
         "conclusion": "success",
-        "html_url": "https://github.com/bdx0/bdx0.github.io/actions/runs/41608337620",
-        "created_at": "2026-11-03T09:06:37Z"
+        "html_url": "https://github.com/bdx0/bdx0.github.io/actions/runs/42754687097",
+        "created_at": "2026-11-10T04:15:26Z"
       },
       "ci_deploy": {
         "name": "Deploy Next.js site to Pages",
         "status": "completed",
         "conclusion": "success",
-        "html_url": "https://github.com/bdx0/bdx0.github.io/actions/runs/41608337620",
-        "created_at": "2026-11-03T09:06:37Z"
+        "html_url": "https://github.com/bdx0/bdx0.github.io/actions/runs/42754687097",
+        "created_at": "2026-11-10T04:15:26Z"
       }
     },
     {
@@ -117,14 +117,14 @@
       "default_branch": "main",
       "archived": false,
       "fork": false,
-      "pushed_at": "2026-09-30T15:22:32Z",
-      "updated_at": "2026-06-07T16:03:04Z",
+      "pushed_at": "2026-11-10T04:15:28Z",
+      "updated_at": "2026-11-10T04:15:32Z",
       "created_at": "2024-11-14T03:42:21Z",
       "has_pages": false,
       "stars": 0,
       "forks": 0,
       "open_issues": 0,
-      "size_kb": 429,
+      "size_kb": 431,
       "ci": null
     },
     {
@@ -137,27 +137,27 @@
       "default_branch": "main",
       "archived": false,
       "fork": false,
-      "pushed_at": "2026-07-10T10:58:28Z",
-      "updated_at": "2026-07-10T10:58:37Z",
+      "pushed_at": "2026-11-10T04:16:24Z",
+      "updated_at": "2026-11-10T04:16:28Z",
       "created_at": "2013-03-21T02:22:34Z",
       "has_pages": true,
       "stars": 2,
       "forks": 0,
       "open_issues": 1,
-      "size_kb": 1593,
+      "size_kb": 1601,
       "ci": {
         "name": "Generate Resume PDFs (via Puppeteer)",
         "status": "completed",
         "conclusion": "failure",
-        "html_url": "https://github.com/bdx0/cv/actions/runs/29087984296",
-        "created_at": "2026-07-10T10:58:31Z"
+        "html_url": "https://github.com/bdx0/cv/actions/runs/42754803225",
+        "created_at": "2026-11-10T04:16:26Z"
       },
       "ci_deploy": {
         "name": "Deploy Next.js App to GitHub Pages",
         "status": "completed",
         "conclusion": "failure",
-        "html_url": "https://github.com/bdx0/cv/actions/runs/29087984203",
-        "created_at": "2026-07-10T10:58:31Z"
+        "html_url": "https://github.com/bdx0/cv/actions/runs/42754803189",
+        "created_at": "2026-11-10T04:16:26Z"
       }
     },
     {
@@ -170,14 +170,14 @@
       "default_branch": "main",
       "archived": false,
       "fork": false,
-      "pushed_at": "2026-06-05T10:47:57Z",
-      "updated_at": "2026-06-05T10:48:01Z",
+      "pushed_at": "2026-11-10T04:16:36Z",
+      "updated_at": "2026-11-10T04:16:41Z",
       "created_at": "2026-06-04T10:29:13Z",
       "has_pages": false,
       "stars": 0,
       "forks": 0,
       "open_issues": 0,
-      "size_kb": 35,
+      "size_kb": 41,
       "ci": null
     }
   ],
@@ -232,14 +232,14 @@
       "default_branch": "main",
       "archived": false,
       "fork": false,
-      "pushed_at": "2026-06-05T10:47:57Z",
-      "updated_at": "2026-06-05T10:48:01Z",
+      "pushed_at": "2026-11-10T04:16:36Z",
+      "updated_at": "2026-11-10T04:16:41Z",
       "created_at": "2026-06-04T10:29:13Z",
       "has_pages": false,
       "stars": 0,
       "forks": 0,
       "open_issues": 0,
-      "size_kb": 35,
+      "size_kb": 41,
       "ci": null
     },
     {
@@ -1352,27 +1352,27 @@
       "default_branch": "main",
       "archived": false,
       "fork": false,
-      "pushed_at": "2026-11-03T09:06:35Z",
-      "updated_at": "2026-11-03T09:06:39Z",
+      "pushed_at": "2026-11-10T04:15:24Z",
+      "updated_at": "2026-11-10T04:15:28Z",
       "created_at": "2015-05-13T03:56:30Z",
       "has_pages": true,
       "stars": 0,
       "forks": 0,
       "open_issues": 0,
-      "size_kb": 21630,
+      "size_kb": 21648,
       "ci": {
         "name": "Deploy Next.js site to Pages",
         "status": "completed",
         "conclusion": "success",
-        "html_url": "https://github.com/bdx0/bdx0.github.io/actions/runs/41608337620",
-        "created_at": "2026-11-03T09:06:37Z"
+        "html_url": "https://github.com/bdx0/bdx0.github.io/actions/runs/42754687097",
+        "created_at": "2026-11-10T04:15:26Z"
       },
       "ci_deploy": {
         "name": "Deploy Next.js site to Pages",
         "status": "completed",
         "conclusion": "success",
-        "html_url": "https://github.com/bdx0/bdx0.github.io/actions/runs/41608337620",
-        "created_at": "2026-11-03T09:06:37Z"
+        "html_url": "https://github.com/bdx0/bdx0.github.io/actions/runs/42754687097",
+        "created_at": "2026-11-10T04:15:26Z"
       }
     },
     {
@@ -2885,27 +2885,27 @@
       "default_branch": "main",
       "archived": false,
       "fork": false,
-      "pushed_at": "2026-07-10T10:58:28Z",
-      "updated_at": "2026-07-10T10:58:37Z",
+      "pushed_at": "2026-11-10T04:16:24Z",
+      "updated_at": "2026-11-10T04:16:28Z",
       "created_at": "2013-03-21T02:22:34Z",
       "has_pages": true,
       "stars": 2,
       "forks": 0,
       "open_issues": 1,
-      "size_kb": 1593,
+      "size_kb": 1601,
       "ci": {
         "name": "Generate Resume PDFs (via Puppeteer)",
         "status": "completed",
         "conclusion": "failure",
-        "html_url": "https://github.com/bdx0/cv/actions/runs/29087984296",
-        "created_at": "2026-07-10T10:58:31Z"
+        "html_url": "https://github.com/bdx0/cv/actions/runs/42754803225",
+        "created_at": "2026-11-10T04:16:26Z"
       },
       "ci_deploy": {
         "name": "Deploy Next.js App to GitHub Pages",
         "status": "completed",
         "conclusion": "failure",
-        "html_url": "https://github.com/bdx0/cv/actions/runs/29087984203",
-        "created_at": "2026-07-10T10:58:31Z"
+        "html_url": "https://github.com/bdx0/cv/actions/runs/42754803189",
+        "created_at": "2026-11-10T04:16:26Z"
       }
     },
     {
@@ -4878,27 +4878,27 @@
       "default_branch": "main",
       "archived": false,
       "fork": false,
-      "pushed_at": "2026-11-08T07:27:17Z",
-      "updated_at": "2026-11-08T07:27:20Z",
+      "pushed_at": "2026-11-10T04:15:53Z",
+      "updated_at": "2026-11-10T04:15:57Z",
       "created_at": "2026-10-09T04:40:11Z",
       "has_pages": true,
       "stars": 0,
       "forks": 0,
       "open_issues": 1,
-      "size_kb": 3075,
+      "size_kb": 3079,
       "ci": {
         "name": "Refresh public repository report",
         "status": "in_progress",
         "conclusion": null,
-        "html_url": "https://github.com/bdx0/html/actions/runs/42583107164",
-        "created_at": "2026-11-09T08:02:20Z"
+        "html_url": "https://github.com/bdx0/html/actions/runs/42782805428",
+        "created_at": "2026-11-10T08:27:37Z"
       },
       "ci_deploy": {
         "name": "Deploy HTML Lab to GitHub Pages",
         "status": "completed",
         "conclusion": "success",
-        "html_url": "https://github.com/bdx0/html/actions/runs/42458859150",
-        "created_at": "2026-11-08T07:27:18Z"
+        "html_url": "https://github.com/bdx0/html/actions/runs/42754746182",
+        "created_at": "2026-11-10T04:15:55Z"
       }
     },
     {
@@ -7551,14 +7551,14 @@
       "default_branch": "main",
       "archived": false,
       "fork": false,
-      "pushed_at": "2026-09-30T15:22:32Z",
-      "updated_at": "2026-06-07T16:03:04Z",
+      "pushed_at": "2026-11-10T04:15:28Z",
+      "updated_at": "2026-11-10T04:15:32Z",
       "created_at": "2024-11-14T03:42:21Z",
       "has_pages": false,
       "stars": 0,
       "forks": 0,
       "open_issues": 0,
-      "size_kb": 429,
+      "size_kb": 431,
       "ci": null
     },
     {
