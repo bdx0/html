@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0c1322">
+  <meta name="description" content="Tài liệu kiến trúc WebView đa nền tảng: so sánh Tauri, WRY, Chromium và CEF; chiến lược desktop, Android, iOS; thiết kế SDK, bảo mật, lộ trình và tiêu chí quyết định.">
+  <meta name="catalog:category" content="Kiến trúc phần mềm">
+  <meta name="catalog:tags" content="WebView,Chromium,CEF,Tauri,WRY,Rust,SDK,Đa nền tảng">
+  <meta name="catalog:icon" content="🧩">
+  <title>WebView đa nền tảng — Chromium hay Tauri/WRY? | Architecture Brief</title>
+  <style>
+    :root { color-scheme: dark; --bg:#090f1d;--surface:#101a2d;--surface2:#152239;--line:#283750;--ink:#ecf2ff;--muted:#a2b2cc;--soft:#7488a8;--cyan:#6cdeee;--mint:#b4f3ca;--yellow:#f4cd7c;--violet:#b4a9ff;--page:1160px; }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth;scroll-padding-top:90px}
+    body{margin:0;font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.65;-webkit-font-smoothing:antialiased}
+    body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;background:radial-gradient(ellipse 55% 38% at 93% 3%,rgba(67,123,222,.15),transparent 72%),radial-gradient(ellipse 50% 45% at 5% 45%,rgba(31,113,125,.06),transparent 74%)}
+    a{color:var(--cyan);text-decoration:none}a:hover{text-decoration:underline}button{font:inherit}
+    :focus-visible{outline:2px solid var(--cyan);outline-offset:4px;border-radius:5px}
+    .topbar{height:68px;border-bottom:1px solid rgba(255,255,255,.075);background:rgba(9,15,29,.87);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);position:sticky;top:0;z-index:50}
+    .topbar-inner{max-width:var(--page);margin:auto;height:100%;padding:0 26px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+    .brand{display:flex;align-items:center;gap:10px;color:var(--ink);font-size:13px;font-weight:800;letter-spacing:.07em}
+    .brand:hover{text-decoration:none}.brand-mark{display:grid;place-items:center;color:#06121c;width:29px;height:29px;border-radius:9px;background:linear-gradient(135deg,var(--cyan),#8fbdff);font-size:19px;font-weight:900}
+    .toplinks{display:flex;align-items:center;gap:11px}
+    .text-link{font-size:12px;color:var(--muted);font-weight:600}.text-link:hover{color:var(--ink)}
+    .outline-btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;border:1px solid #394761;background:rgba(255,255,255,.025);color:var(--ink);font-size:12px;font-weight:700;padding:9px 13px;border-radius:9px;cursor:pointer;transition:background .18s,border-color .18s}
+    .outline-btn:hover{background:#1b2b47;border-color:#60718f}
+    .hero{max-width:var(--page);margin:0 auto;padding:77px 26px 50px;position:relative}
+    .eyebrow{display:inline-flex;gap:9px;align-items:center;color:var(--cyan);font-size:11px;font-weight:800;letter-spacing:.13em;text-transform:uppercase}
+    .eyebrow:before{content:"";width:18px;height:2px;background:var(--cyan)}
+    h1{font-size:clamp(40px,6.6vw,78px);letter-spacing:-.066em;line-height:1.07;max-width:920px;margin:21px 0 20px;font-weight:830}
+    .gradient-text{background:linear-gradient(95deg,#a6ebff 0%,#85c6ff 47%,#beafff 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .hero-lead{font-size:clamp(16px,2vw,20px);line-height:1.6;max-width:740px;color:var(--muted);margin:0}
+    .hero-meta{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:27px}
+    .tag{border:1px solid var(--line);border-radius:7px;padding:6px 10px;font-size:11px;font-weight:750;color:#c2d3ec;letter-spacing:.04em}
+    .tag.emph{border-color:#315d6c;color:var(--cyan);background:rgba(68,186,209,.07)}
+    .hero-rule{border:0;border-top:1px solid var(--line);margin:48px 0 0}
+    .layout{max-width:var(--page);margin:auto;display:grid;grid-template-columns:204px minmax(0,1fr);gap:53px;padding:0 26px 110px}
+    .toc{align-self:start;position:sticky;top:98px;padding-top:8px}
+    .toc-label{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--soft);font-weight:800;margin-bottom:13px}
+    .toc a{display:block;border-left:2px solid transparent;padding:9px 8px 9px 14px;font-size:12px;font-weight:620;line-height:1.4;color:#8c9eb8}
+    .toc a:hover{color:var(--ink);text-decoration:none}.toc a.active{border-left-color:var(--cyan);background:linear-gradient(90deg,rgba(105,217,238,.09),transparent);color:var(--cyan)}
+    .toc-foot{border-top:1px solid var(--line);margin-top:19px;padding:17px 10px;font-size:11px;line-height:1.6;color:var(--soft)}
+    main{min-width:0}
+    section{margin-bottom:70px;scroll-margin-top:93px}
+    .section-number{font:750 11px/1.3 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--cyan);letter-spacing:.12em}
+    h2{font-size:clamp(26px,3vw,38px);line-height:1.18;letter-spacing:-.045em;margin:9px 0 17px}
+    h3{font-size:19px;line-height:1.3;letter-spacing:-.023em;margin:0 0 9px}
+    h4{font-size:14px;line-height:1.35;margin:0 0 8px}
+    p{margin:0 0 18px;color:var(--muted)}strong{color:var(--ink);font-weight:750}
+    .subhead{font-size:14px;max-width:760px;line-height:1.75;margin-bottom:25px}
+    .decision{padding:25px 28px;border:1px solid #345c68;background:linear-gradient(140deg,rgba(28,72,88,.28),rgba(13,30,49,.7));border-radius:15px;display:grid;grid-template-columns:1fr auto;align-items:center;gap:24px}
+    .decision .label{color:var(--cyan);font-size:11px;letter-spacing:.12em;font-weight:800;text-transform:uppercase;margin-bottom:10px}
+    .decision h3{font-size:23px;margin:0 0 8px;letter-spacing:-.035em}.decision p{font-size:13px;line-height:1.65;margin:0}
+    .decision .stamp{width:62px;height:62px;border:1px solid #477c88;background:#173847;border-radius:16px;display:grid;place-items:center;color:#b9eff9;font-size:30px}
+    .three{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:20px 0}
+    .mini{background:rgba(18,31,51,.8);border:1px solid var(--line);border-radius:12px;padding:19px}
+    .mini .ordinal{font:700 11px/1.3 ui-monospace,monospace;color:var(--cyan);margin-bottom:12px}.mini h4{font-size:15px;margin-bottom:7px}.mini p{font-size:12px;line-height:1.65;margin:0}
+    .diagram{border:1px solid #293b57;border-radius:16px;padding:25px;background:linear-gradient(135deg,rgba(19,35,58,.85),rgba(8,18,33,.95));overflow:hidden}
+    .diagram-caption{color:#95a9c6;font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;margin-bottom:18px}
+    .diagram-layer{padding:17px;border:1px solid #40516d;border-radius:11px;text-align:center;background:#1b2b44}
+    .diagram-layer strong{font-size:14px;display:block;letter-spacing:.005em}.diagram-layer span{font-size:11px;color:var(--muted)}
+    .diagram-layer.highlight{background:linear-gradient(120deg,rgba(48,105,130,.43),rgba(49,70,113,.4));border-color:#4e8aa2}
+    .diagram-arrow{text-align:center;height:29px;color:#79a8bc;font-size:18px;line-height:28px}
+    .diagram-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+    .diagram-bottom{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+    .engine-card{border:1px solid #394962;border-radius:10px;background:#101d31;text-align:center;padding:14px 7px}
+    .engine-card strong{display:block;font-size:12px}.engine-card small{display:block;margin-top:4px;font-size:10px;line-height:1.4;color:var(--muted)}
+    .note{border-left:3px solid var(--yellow);padding:11px 0 11px 17px;color:#c2ccdf;margin:22px 0;background:linear-gradient(90deg,rgba(244,205,124,.06),transparent);font-size:13px;line-height:1.65}
+    .table-scroll{width:100%;overflow-x:auto;border:1px solid var(--line);border-radius:13px}
+    table{border-collapse:collapse;width:100%;text-align:left;min-width:600px;font-size:13px}
+    th,td{padding:15px 15px;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.55}
+    tr:last-child td{border-bottom:0}
+    th{background:#19263d;color:#bacde5;font-size:10px;letter-spacing:.1em;text-transform:uppercase}
+    td{color:#abbcd5}td:first-child{font-weight:750;color:var(--ink);width:27%}
+    td b{color:var(--ink)}.good{color:var(--mint)}.warn{color:var(--yellow)}
+    .choicebar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:22px 0 16px}
+    .segmented{display:inline-flex;border:1px solid var(--line);border-radius:10px;padding:4px;background:#0e1829}
+    .segmented button{border:0;background:transparent;color:#97a9c5;border-radius:7px;padding:9px 15px;font-size:12px;font-weight:750;cursor:pointer}
+    .segmented button[aria-pressed="true"]{background:#294760;color:#e4faff;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+    .mode-panel{border:1px solid var(--line);border-radius:14px;padding:24px;background:var(--surface)}
+    .mode-panel[hidden]{display:none}
+    .mode-panel .mode-heading{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px}
+    .mode-panel h3{margin:0}.pill{font-size:10px;border:1px solid #426477;background:#173247;color:#a5ebf6;padding:4px 8px;border-radius:99px;font-weight:850;letter-spacing:.06em}
+    .mode-panel p{font-size:13px;line-height:1.7;margin-bottom:15px}
+    .platforms{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:20px}
+    .platform{background:#111d30;border:1px solid #2a3b53;border-radius:12px;padding:18px;display:flex;flex-direction:column}
+    .platform-head{display:flex;gap:11px;align-items:center;margin-bottom:9px}
+    .platform-icon{width:34px;height:34px;display:grid;place-items:center;border-radius:9px;background:#1e324d;color:var(--cyan);font-size:18px}
+    .platform h4{margin:0;font-size:14px}.platform .engine{font-size:12px;font-weight:750;color:var(--cyan);margin-bottom:8px}
+    .platform p{font-size:12px;line-height:1.6;margin:0}
+    .platform-wide{grid-column:1/-1}
+    .milestones{display:grid;gap:0;margin-top:12px}
+    .step{display:grid;grid-template-columns:44px 1fr;gap:16px;position:relative;padding:0 0 25px}
+    .step:not(:last-child):before{content:"";position:absolute;left:19px;top:35px;bottom:0;width:1px;background:#37506a}
+    .step-num{width:39px;height:39px;border:1px solid #3d6274;display:grid;place-items:center;border-radius:11px;color:var(--cyan);font:800 12px ui-monospace,monospace;background:#163144;z-index:1}
+    .step h3{font-size:16px;margin:2px 0 5px}.step p{font-size:12px;line-height:1.7;margin:0}
+    .step .output{display:inline-block;color:var(--mint);font-size:11px;font-weight:700;margin-top:6px}
+    .checklist{padding:0;list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:20px 0}
+    .checklist li{display:flex;gap:10px;border:1px solid var(--line);border-radius:9px;padding:12px;font-size:12px;color:#afc0d8;line-height:1.5}
+    .checklist li:before{content:"✓";font-weight:850;color:var(--mint)}
+    .sources{display:grid;gap:9px}
+    .source{display:flex;justify-content:space-between;gap:15px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:14px 17px;background:#111b2c}
+    .source a{font-weight:730;font-size:12px}.source small{color:var(--soft);font-size:10px;white-space:nowrap}
+    .scope-note{font-size:11px;color:#7f90aa;margin-top:17px}
+    footer{border-top:1px solid var(--line);background:#0c1525;padding:28px 26px;text-align:center;color:#8093ae;font-size:11px;line-height:1.7}
+    footer b{color:#bfcfe5}
+    @media(max-width:880px){.layout{grid-template-columns:minmax(0,1fr);gap:0}.toc{position:relative;top:auto;display:flex;gap:4px;overflow:auto;white-space:nowrap;padding:0 0 15px;margin-bottom:20px;border-bottom:1px solid var(--line)}.toc-label,.toc-foot{display:none}.toc a{flex:none;border-left:0;border-bottom:2px solid transparent;padding:9px 12px}.toc a.active{border-left:0;border-bottom-color:var(--cyan)}}
+    @media(max-width:600px){.topbar{height:60px}.topbar-inner,.hero,.layout{padding-left:18px;padding-right:18px}.toplinks .text-link{display:none}.hero{padding-top:55px;padding-bottom:28px}h1{font-size:clamp(38px,10vw,60px)}.hero-meta{gap:7px}.hero-rule{margin-top:33px}.decision{grid-template-columns:1fr;padding:20px}.decision .stamp{display:none}.three,.platforms,.checklist{grid-template-columns:1fr}.platform-wide{grid-column:auto}.diagram{padding:14px}.diagram-layer{padding:12px}.diagram-grid,.diagram-bottom{gap:5px}.engine-card{padding:12px 3px}.engine-card strong{font-size:10px}.engine-card small{font-size:9px}.section-number{font-size:10px}section{margin-bottom:54px}.source{align-items:flex-start;flex-direction:column;gap:4px}.source small{white-space:normal}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important;animation:none!important}}
+    @media print{ :root{color-scheme:light;--bg:white;--ink:#162238;--muted:#41536c;--line:#cbd3dc;--surface:#f5f8fb;--cyan:#136f87}body{background:#fff;color:#162238}body:before,.topbar,.toc,.choicebar,.outline-btn{display:none!important}.layout{display:block;max-width:100%;padding:0 14mm}.hero{padding:12mm 14mm 5mm;max-width:100%}h1{font-size:38px;color:#162238}.gradient-text{background:none;color:#126886}.hero-rule{margin-top:20px}section{break-inside:avoid;margin-bottom:30px}.diagram,.decision,.mini,.mode-panel,.platform,.source{background:#f8fafc!important;color:#162238!important}.mode-panel[hidden]{display:block}.diagram-layer,.engine-card{background:#edf2f7!important}td,th,p,.mini p,.platform p{color:#334155}th{background:#e9eff5}.checklist li{color:#334155}footer{display:none}}
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="index.html" aria-label="Trở về HTML Lab"><span class="brand-mark">⌘</span> HTML LAB <span style="color:#536c8d;font-weight:600">/ ENGINEERING</span></a>
+      <nav class="toplinks" aria-label="Công cụ tài liệu">
+        <a class="text-link" href="https://github.com/bdx0/html" target="_blank" rel="noopener noreferrer">REPOSITORY ↗</a>
+        <button class="outline-btn" type="button" onclick="window.print()" aria-label="In hoặc lưu tài liệu thành PDF">⎙ &nbsp;In / PDF</button>
+      </nav>
+    </div>
+  </header>
+
+  <div class="hero">
+    <div class="eyebrow">Architecture brief · 15.11.2026</div>
+    <h1>Build WebView<br><span class="gradient-text">trên mọi nền tảng.</span></h1>
+    <p class="hero-lead">Tại sao nên chọn Tauri + WRY thay vì Chromium? Khi nào Chromium/CEF mới là nền tảng đúng? Một bản thiết kế có thể triển khai, không đánh đồng framework ứng dụng với browser engine.</p>
+    <div class="hero-meta">
+      <span class="tag emph">DECISION DOCUMENT</span>
+      <span class="tag">CHROMIUM / CEF</span>
+      <span class="tag">TAURI / WRY</span>
+      <span class="tag">RUST CORE</span>
+      <span class="tag">DESKTOP + MOBILE</span>
+    </div>
+    <hr class="hero-rule">
+  </div>
+
+  <div class="layout">
+    <aside class="toc" aria-label="Mục lục">
+      <div class="toc-label">Nội dung</div>
+      <a href="#overview" class="active">01 &nbsp; Kết luận thiết kế</a>
+      <a href="#layers">02 &nbsp; Phân biệt các tầng</a>
+      <a href="#comparison">03 &nbsp; So sánh kỹ thuật</a>
+      <a href="#strategy">04 &nbsp; Chọn kiến trúc</a>
+      <a href="#platforms">05 &nbsp; Từng nền tảng</a>
+      <a href="#roadmap">06 &nbsp; Lộ trình xây dựng</a>
+      <a href="#security">07 &nbsp; Điều kiện production</a>
+      <a href="#sources">08 &nbsp; Tài liệu nguồn</a>
+      <div class="toc-foot">Tài liệu định hướng kỹ thuật, không phải mã nguồn WebView SDK đã triển khai.</div>
+    </aside>
+
+    <main id="main-content">
+      <section id="overview">
+        <div class="section-number">01 / EXECUTIVE DECISION</div>
+        <h2>Chọn engine theo mục tiêu, không theo trào lưu.</h2>
+        <p class="subhead">Nếu chỉ cần đưa web vào ứng dụng, dùng WebView hệ thống sẽ gọn hơn. Nếu muốn tự xây một <strong>SDK WebView độc lập</strong> để kiểm soát hành vi trình duyệt sâu, Chromium/CEF là lựa chọn đáng ưu tiên trên desktop.</p>
+        <div class="decision">
+          <div>
+            <div class="label">Đề xuất cho dự án SDK đa nền tảng</div>
+            <h3>Hybrid engine. Unified API.</h3>
+            <p>Rust cho tầng điều phối và contract; CEF/Chromium cho desktop khi cần kiểm soát; Android System WebView và WKWebView làm adapter mobile mặc định. Không ép cùng một engine lên mọi hệ điều hành.</p>
+          </div>
+          <div class="stamp" aria-hidden="true">◇</div>
+        </div>
+        <div class="three">
+          <article class="mini"><div class="ordinal">01 / FAST</div><h4>Tauri + WRY</h4><p>Rất hợp để xuất bản ứng dụng đa nền tảng nhanh, giảm kích thước bundle và tận dụng cập nhật engine hệ thống.</p></article>
+          <article class="mini"><div class="ordinal">02 / CONTROL</div><h4>CEF / Chromium</h4><p>Hợp cho SDK desktop, sản phẩm có nhiều phiên, intercept mạng, DevTools và cấu hình browser engine chuyên sâu.</p></article>
+          <article class="mini"><div class="ordinal">03 / PORTABLE</div><h4>Adapter architecture</h4><p>Tách API khỏi engine. Khác biệt tính năng được khai báo rõ, không giả vờ mọi nền tảng hỗ trợ hoàn toàn giống nhau.</p></article>
+        </div>
+      </section>
+
+      <section id="layers">
+        <div class="section-number">02 / TECHNOLOGY STACK</div>
+        <h2>Chúng thực ra không nằm cùng một tầng.</h2>
+        <p class="subhead"><strong>Tauri</strong> quản lý ứng dụng. <strong>WRY</strong> cung cấp lớp API dùng WebView hệ thống. <strong>Chromium</strong> cung cấp phần lớn browser stack, còn <strong>CEF</strong> là framework để nhúng Chromium vào ứng dụng desktop. Đây không phải bốn đối thủ ngang hàng.</p>
+        <div class="diagram" role="img" aria-label="Sơ đồ từ Tauri, xuống WRY, rồi xuống các engine WebView tùy hệ điều hành">
+          <div class="diagram-caption">Đường thực thi khi dùng Tauri / WRY</div>
+          <div class="diagram-layer"><strong>Application UI + Tauri</strong><span>Windowing · Lifecycle · Commands · Plugins</span></div>
+          <div class="diagram-arrow" aria-hidden="true">↓</div>
+          <div class="diagram-layer highlight"><strong>WRY — Unified WebView Binding</strong><span>Navigation · Events · JS communication · Native webview calls</span></div>
+          <div class="diagram-arrow" aria-hidden="true">↓</div>
+          <div class="diagram-grid">
+            <div class="engine-card"><strong>WebView2</strong><small>Windows<br>Chromium-based</small></div>
+            <div class="engine-card"><strong>WebKit</strong><small>macOS · iOS<br>WKWebView</small></div>
+            <div class="engine-card"><strong>System WebView / WebKitGTK</strong><small>Android · Linux<br>Native runtime</small></div>
+          </div>
+        </div>
+        <div class="note">CEF là một <strong>con đường nhúng khác</strong> trên desktop: ứng dụng → CEF → Chromium. CEF không phải bộ engine phổ quát chính thức cho Android và iOS.</div>
+      </section>
+
+      <section id="comparison">
+        <div class="section-number">03 / ENGINE TRADE-OFFS</div>
+        <h2>Đánh đổi nào thực sự quan trọng?</h2>
+        <div class="table-scroll" role="region" aria-label="Bảng so sánh WebView hệ thống và Chromium nhúng" tabindex="0">
+          <table>
+            <thead><tr><th>Tiêu chí</th><th>System WebView / WRY</th><th>CEF / Chromium desktop</th></tr></thead>
+            <tbody>
+              <tr><td>Khả năng kiểm soát</td><td>Giới hạn bởi API của hệ điều hành và WebView.</td><td><span class="good">Sâu hơn:</span> request handling, profiles, process behavior, DevTools.</td></tr>
+              <tr><td>Tính nhất quán render</td><td>Engine và phiên bản khác nhau giữa OS.</td><td><span class="good">Tốt hơn giữa các bản desktop</span> nếu khóa cùng phiên bản Chromium.</td></tr>
+              <tr><td>Dung lượng phân phối</td><td>Thường nhỏ hơn, tận dụng runtime có sẵn.</td><td>Thường lớn hơn do phải mang theo framework và tài nguyên.</td></tr>
+              <tr><td>Bảo trì bảo mật</td><td>Cập nhật engine phụ thuộc nhà cung cấp hệ thống/runtime.</td><td><span class="warn">Tự chịu trách nhiệm</span> nâng cấp CEF/Chromium và phát hành bản vá.</td></tr>
+              <tr><td>Độ phức tạp tích hợp</td><td>Thường thấp hơn; phù hợp ứng dụng thông thường.</td><td>Cao hơn: multi-process, build, đóng gói, GPU, sandbox.</td></tr>
+              <tr><td>Mobile</td><td><span class="good">Có lựa chọn native ổn định</span> trên Android/iOS.</td><td>Không phải giải pháp nhúng phổ quát, sẵn sàng cho mọi mobile OS.</td></tr>
+              <tr><td>Phù hợp nhất</td><td>App hybrid, công cụ nội bộ, sản phẩm nhẹ.</td><td>Browser shell desktop, SDK với quyền điều khiển engine sâu.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="scope-note">Đánh giá mang tính kiến trúc định tính, không phải benchmark CPU/RAM đã đo. Cần thử nghiệm trên thiết bị mục tiêu trước khi kết luận hiệu năng.</p>
+      </section>
+
+      <section id="strategy">
+        <div class="section-number">04 / ARCHITECTURE SWITCH</div>
+        <h2>Hai hướng thiết kế, một quyết định.</h2>
+        <p class="subhead">Chọn mục tiêu sản phẩm để xem cấu hình khuyến nghị. Đây là hai giải pháp có thể cùng tồn tại trong một hệ sinh thái, nhưng không nên bắt đầu bằng cả hai cùng lúc.</p>
+        <div class="choicebar">
+          <div class="segmented" role="group" aria-label="Chọn kiểu dự án">
+            <button type="button" data-mode="sdk" aria-pressed="true">SDK / Framework</button>
+            <button type="button" data-mode="app" aria-pressed="false">Ứng dụng Hybrid</button>
+          </div>
+        </div>
+        <article class="mode-panel" id="panel-sdk">
+          <div class="mode-heading"><h3>Rust Core + Engine Adapters</h3><span class="pill">ĐỀ XUẤT CHO SDK</span></div>
+          <p><strong>Public API</strong> định nghĩa session, navigation, event, profile, permission, bridge. Tầng adapter ánh xạ sang CEF trên desktop và WebView native trên mobile. Chỉ bật capability khi engine đích thực sự hỗ trợ.</p>
+          <div class="diagram">
+            <div class="diagram-layer highlight"><strong>Unified WebView SDK</strong><span>create · navigate · evaluateJS · onEvent · capabilities</span></div>
+            <div class="diagram-arrow" aria-hidden="true">↓</div>
+            <div class="diagram-layer"><strong>Rust Core + FFI Contracts</strong><span>Session · Policies · Permissions · Lifecycle · Telemetry</span></div>
+            <div class="diagram-arrow" aria-hidden="true">↓</div>
+            <div class="diagram-bottom">
+              <div class="engine-card"><strong>CEF</strong><small>Windows · macOS · Linux</small></div>
+              <div class="engine-card"><strong>Android WebView</strong><small>Kotlin / JNI</small></div>
+              <div class="engine-card"><strong>WKWebView</strong><small>Swift / Obj-C</small></div>
+            </div>
+          </div>
+          <p style="margin-top:17px;margin-bottom:0"><strong>Điểm cần giữ:</strong> engine interface ổn định, các phần mở rộng theo capability, và test contract chạy trên từng adapter.</p>
+        </article>
+        <article class="mode-panel" id="panel-app" hidden>
+          <div class="mode-heading"><h3>Tauri + WRY + Native Plugins</h3><span class="pill">NHANH / GỌN</span></div>
+          <p>Một frontend web dùng chung, Tauri quản lý cửa sổ và lifecycle, WRY cung cấp WebView theo OS. Xây plugin native khi ứng dụng cần API thiết bị. Không cần đóng gói Chromium riêng cho mọi máy.</p>
+          <div class="diagram">
+            <div class="diagram-layer highlight"><strong>Web UI — HTML / CSS / JS / React</strong><span>Shared interface and business logic</span></div>
+            <div class="diagram-arrow" aria-hidden="true">↓</div>
+            <div class="diagram-layer"><strong>Tauri Runtime + WRY</strong><span>Window · App state · JS bridge · Plugin layer</span></div>
+            <div class="diagram-arrow" aria-hidden="true">↓</div>
+            <div class="diagram-bottom">
+              <div class="engine-card"><strong>WebView2</strong><small>Windows</small></div>
+              <div class="engine-card"><strong>WebKit / WebKitGTK</strong><small>Apple · Linux</small></div>
+              <div class="engine-card"><strong>System WebView</strong><small>Android</small></div>
+            </div>
+          </div>
+          <p style="margin-top:17px;margin-bottom:0"><strong>Điểm cần giữ:</strong> tính năng cần engine riêng phải được kiểm chứng trước; WRY không biến hệ thống thành Chromium thống nhất trên mọi OS.</p>
+        </article>
+      </section>
+
+      <section id="platforms">
+        <div class="section-number">05 / PLATFORM STRATEGY</div>
+        <h2>Không có một engine nhúng áp dụng giống hệt ở mọi nơi.</h2>
+        <div class="platforms">
+          <article class="platform"><div class="platform-head"><span class="platform-icon" aria-hidden="true">⊞</span><h4>Windows</h4></div><div class="engine">CEF hoặc WebView2</div><p>Chọn CEF khi cần kiểm soát Chromium sâu và tự đóng gói. Chọn WebView2 khi ưu tiên runtime có sẵn, cập nhật theo Microsoft và footprint thấp hơn.</p></article>
+          <article class="platform"><div class="platform-head"><span class="platform-icon" aria-hidden="true">⌘</span><h4>macOS</h4></div><div class="engine">CEF hoặc WKWebView</div><p>CEF mang tính nhất quán với Chromium desktop; WKWebView tích hợp tốt với hệ sinh thái Apple và có footprint vận hành nhỏ hơn.</p></article>
+          <article class="platform"><div class="platform-head"><span class="platform-icon" aria-hidden="true">⌘</span><h4>Linux</h4></div><div class="engine">CEF hoặc WebKitGTK</div><p>Đánh đổi giữa khả năng kiểm soát Chromium và sự phụ thuộc vào GTK/runtime hệ thống. Cần xác nhận distro, kiến trúc CPU, GPU và packaging.</p></article>
+          <article class="platform"><div class="platform-head"><span class="platform-icon" aria-hidden="true">◫</span><h4>Android</h4></div><div class="engine">Android System WebView</div><p>WebView bản địa thuận lợi cho phân phối và tương thích thiết bị. Dù nền tảng dùng công nghệ Chromium, API không tương đương quyền điều khiển Chromium nhúng đầy đủ.</p></article>
+          <article class="platform"><div class="platform-head"><span class="platform-icon" aria-hidden="true">◈</span><h4>iOS / iPadOS</h4></div><div class="engine">WKWebView mặc định</div><p>Engine thay thế chỉ được cho phép trong các điều kiện, khu vực và entitlement cụ thể. EU và Nhật Bản có cơ chế đặc biệt; không được giả định có thể ship Chromium phổ quát tại mọi thị trường.</p></article>
+          <article class="platform"><div class="platform-head"><span class="platform-icon" aria-hidden="true">◎</span><h4>Web browser</h4></div><div class="engine">Browser APIs / iframe có giới hạn</div><p>Nếu SDK phải chạy trong trình duyệt, cần adapter web riêng. Không thể nhúng tùy ý mọi trang bên ngoài vì same-origin, CSP và chính sách frame của trang đích.</p></article>
+        </div>
+        <div class="note"><strong>Quy tắc thiết kế:</strong> “Cross-platform” là một hợp đồng API thống nhất, không phải lời hứa rằng mọi API và hành vi render đều giống nhau 100%.</div>
+      </section>
+
+      <section id="roadmap">
+        <div class="section-number">06 / EXECUTION PLAN</div>
+        <h2>Lộ trình để đi từ ý tưởng đến SDK có thể dùng.</h2>
+        <p class="subhead">Ưu tiên chứng minh kiến trúc bằng một vertical slice thực tế trước. Chưa gán thời lượng hay chi phí vì chưa đo nguồn lực và phạm vi yêu cầu.</p>
+        <div class="milestones">
+          <div class="step"><div class="step-num">00</div><div><h3>Đặc tả contract</h3><p>Chốt nhóm API bắt buộc, nhóm tùy chọn, thread model, async callbacks, error taxonomy, sandbox và lifecycle. Lập ma trận capability theo OS.</p><span class="output">Đầu ra: API spec + compatibility matrix</span></div></div>
+          <div class="step"><div class="step-num">01</div><div><h3>Vertical slice trên desktop</h3><p>Đưa một CEF view chạy trên Windows hoặc Linux, có navigation, DOM/JS bridge, lỗi mạng, profile cô lập và đóng cửa sổ đúng vòng đời.</p><span class="output">Đầu ra: desktop proof-of-concept + smoke tests</span></div></div>
+          <div class="step"><div class="step-num">02</div><div><h3>Rust Core độc lập engine</h3><p>Đóng gói interface và FFI/C ABI, event dispatch, request policies, permissions. Tách mã lõi khỏi CEF implementation.</p><span class="output">Đầu ra: core library + CEF adapter</span></div></div>
+          <div class="step"><div class="step-num">03</div><div><h3>Mobile adapters</h3><p>Thêm Kotlin Android WebView và Swift WKWebView. Viết contract tests để phát hiện những khác biệt thực sự giữa các adapter.</p><span class="output">Đầu ra: demo Android/iOS + capability reports</span></div></div>
+          <div class="step"><div class="step-num">04</div><div><h3>Hardening &amp; distribution</h3><p>Sandbox, origin-based bridge authorization, crash recovery, automated engine upgrades, signed release artifacts, performance profiling, API docs và example apps.</p><span class="output">Đầu ra: SDK release candidate + release checklist</span></div></div>
+        </div>
+      </section>
+
+      <section id="security">
+        <div class="section-number">07 / NON-NEGOTIABLES</div>
+        <h2>Những điều kiện phải đạt trước production.</h2>
+        <p class="subhead">WebView tải nội dung bên ngoài vào tiến trình ứng dụng. Một kiến trúc đẹp nhưng thiếu phòng vệ ở JS bridge, sandbox hay quyền truy cập sẽ tạo ra rủi ro nghiêm trọng.</p>
+        <ul class="checklist">
+          <li>Kiểm soát origin và quyền gọi native APIs theo nguyên tắc tối thiểu.</li>
+          <li>Không cấp bridge đặc quyền cho trang không tin cậy.</li>
+          <li>Chống truy cập file cục bộ, deep link và URL scheme không mong muốn.</li>
+          <li>Tách profile/cookie/storage khi yêu cầu cách ly phiên.</li>
+          <li>Thiết kế sandbox và mô hình process trước khi chạy trang không tin cậy.</li>
+          <li>Có quy trình cập nhật engine và xử lý lỗ hổng bảo mật.</li>
+          <li>Đo memory, startup, FPS, crash rate trên máy và trang web thực.</li>
+          <li>Kiểm thử back/forward, quyền camera, upload, downloads, IME và accessibility.</li>
+        </ul>
+        <div class="decision">
+          <div>
+            <div class="label">Câu hỏi chốt kiến trúc</div>
+            <h3>Đang xây “app dùng WebView” hay “WebView SDK”?</h3>
+            <p>Nếu là app, ưu tiên Tauri/WRY. Nếu là SDK cần kiểm soát engine, ưu tiên CEF trên desktop với hệ adapter mobile. Tự fork Chromium chỉ hợp lý khi đã xác định được thay đổi engine không thể thực hiện bằng CEF/API sẵn có.</p>
+          </div>
+          <div class="stamp" aria-hidden="true">✓</div>
+        </div>
+      </section>
+
+      <section id="sources">
+        <div class="section-number">08 / VERIFIABLE REFERENCES</div>
+        <h2>Nguồn chính thức để đối chiếu.</h2>
+        <p class="subhead">Tổng hợp dựa trên tài liệu dự án và nhà cung cấp. Với hệ sinh thái thay đổi nhanh, hãy kiểm tra lại phiên bản, chính sách phân phối và tình trạng hỗ trợ trước khi triển khai.</p>
+        <div class="sources">
+          <div class="source"><a href="https://github.com/tauri-apps/tauri" target="_blank" rel="noopener noreferrer">Tauri — architecture &amp; supported WebView backends ↗</a><small>Tauri / GitHub</small></div>
+          <div class="source"><a href="https://github.com/tauri-apps/wry" target="_blank" rel="noopener noreferrer">WRY — cross-platform WebView library ↗</a><small>WRY / GitHub</small></div>
+          <div class="source"><a href="https://github.com/chromiumembedded/cef/blob/master/docs/general_usage.md" target="_blank" rel="noopener noreferrer">CEF — general usage &amp; embedding model ↗</a><small>CEF / GitHub</small></div>
+          <div class="source"><a href="https://github.com/chromiumembedded/cef/blob/master/docs/branches_and_building.md" target="_blank" rel="noopener noreferrer">CEF — branches, release cadence &amp; build requirements ↗</a><small>CEF / GitHub</small></div>
+          <div class="source"><a href="https://developer.android.com/develop/ui/views/layout/webapps/webview" target="_blank" rel="noopener noreferrer">Android Developers — WebView &amp; JS bridge security ↗</a><small>Google / Android</small></div>
+          <div class="source"><a href="https://developer.apple.com/support/alternative-browser-engines/" target="_blank" rel="noopener noreferrer">Apple — alternative browser engines in the EU ↗</a><small>Apple Developer</small></div>
+          <div class="source"><a href="https://developer.apple.com/support/alternative-browser-engines-jp/" target="_blank" rel="noopener noreferrer">Apple — alternative browser engines in Japan ↗</a><small>Apple Developer</small></div>
+        </div>
+        <p class="scope-note">Cập nhật tài liệu: 15/11/2026. Trang này là bản thiết kế và phân tích định tính, không tuyên bố đã benchmark hoặc triển khai SDK thực tế.</p>
+      </section>
+    </main>
+  </div>
+
+  <footer><b>HTML LAB / ARCHITECTURE BRIEF</b> · Thiết kế WebView đa nền tảng · <a href="index.html">Về thư viện HTML</a><br>Trang HTML độc lập, không yêu cầu thư viện ngoài, hỗ trợ đọc offline và in tài liệu.</footer>
+  <script>
+    (function () {
+      "use strict";
+      var buttons = Array.prototype.slice.call(document.querySelectorAll("[data-mode]"));
+      buttons.forEach(function (button) {
+        button.addEventListener("click", function () {
+          var selected = button.getAttribute("data-mode");
+          buttons.forEach(function (item) { item.setAttribute("aria-pressed", String(item === button)); });
+          document.getElementById("panel-sdk").hidden = selected !== "sdk";
+          document.getElementById("panel-app").hidden = selected !== "app";
+        });
+      });
+      if ("IntersectionObserver" in window) {
+        var links = Array.prototype.slice.call(document.querySelectorAll(".toc a[href^='#']"));
+        var sections = Array.prototype.slice.call(document.querySelectorAll("main section[id]"));
+        var observer = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            if (!entry.isIntersecting) return;
+            links.forEach(function (link) {
+              var active = link.getAttribute("href") === "#" + entry.target.id;
+              link.classList.toggle("active", active);
+              if (active) link.setAttribute("aria-current", "location");
+              else link.removeAttribute("aria-current");
+            });
+          });
+        }, { rootMargin: "-14% 0px -72% 0px", threshold: 0 });
+        sections.forEach(function (section) { observer.observe(section); });
+      }
+    }());
+  </script>
+</body>
+</html>
