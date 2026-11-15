@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f5f7fb">
-<meta name="description" content="Bảng vẽ vô hạn với nhiều bảng vẽ riêng, lưu tự động, xuất nhập JSON và PNG; vẽ, di chuyển và phóng to tự do.">
+<meta name="description" content="Bảng vẽ vô hạn, luyện viết 29 chữ cái tiếng Việt với nét đứt và dòng kẻ; nhiều bảng vẽ riêng, xuất nhập JSON, lưu PNG.">
 <meta name="catalog:category" content="Công cụ sáng tạo">
-<meta name="catalog:tags" content="Vẽ tự do,Canvas,Whiteboard,Bảng vẽ vô hạn,File,JSON">
+<meta name="catalog:tags" content="Vẽ tự do,Canvas,Whiteboard,Luyện viết,Tiếng Việt,Chữ cái,Cảm ứng">
 <meta name="catalog:icon" content="🎨">
-<title>Nét vẽ — Bảng vẽ vô hạn</title>
+<title>Nét vẽ — Bảng vẽ vô hạn & Tập viết chữ Việt</title>
 <style>
 :root{font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#20283d;background:#f5f7fb;font-synthesis:none;--primary:#4f46e5;--ink:#1d293e;--stroke:#e5e9f1;--muted:#8290a5;--shadow:0 12px 45px rgba(22,36,72,.09),0 2px 8px rgba(22,36,72,.04)}
 *{box-sizing:border-box}
@@ -142,6 +142,45 @@ svg{width:20px;height:20px;flex-shrink:0;display:block;fill:none;stroke:currentC
 @media(max-height:480px){.empty-message{display:none}.topbar{top:6px}.tool-dock{bottom:6px}.settings{bottom:62px}.zoom-panel{top:66px;bottom:auto}}
 @media(max-width:390px){.home{display:none}.board-picker{width:clamp(110px,38vw,155px)}.top-actions .icon-button{width:29px}.top-actions .new-board,.top-actions #export{width:35px;padding:0}}
 @media(max-width:350px){.top-actions #clear{display:none}}
+
+/* Trang tập viết — thanh công cụ nhẹ, bảng thiết lập tách khỏi khu vực vẽ */
+.practice-launcher{color:#5c53cb;background:#f2f0ff}
+.practice-launcher span{font-size:16px;letter-spacing:-.07em;font-weight:860;line-height:1}
+.practice-launcher:hover{background:#e5e2ff}
+.practice-panel{position:fixed;top:0;right:0;bottom:0;z-index:9;display:flex;flex-direction:column;width:min(420px,100vw);padding:22px 18px max(18px,env(safe-area-inset-bottom));background:#fff;box-shadow:-20px 0 80px #14203830;border-left:1px solid #e6eaf2;color:#27364f}
+.practice-head{display:flex;justify-content:space-between;gap:12px;align-items:start;padding:5px 3px 15px}
+.practice-eyebrow{display:block;font-size:10px;color:#7263da;letter-spacing:.16em;font-weight:850}
+.practice-head h2{margin:5px 0 0;font-size:24px;letter-spacing:-.06em}
+.practice-scroll{min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;padding:3px 4px 20px;flex:1}
+.practice-intro{margin:0 0 18px;font-size:12px;color:#8896a8;line-height:1.65}
+.practice-section-label{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:17px 0 9px;font-size:11px;letter-spacing:.045em;font-weight:780;color:#5c6980}
+.practice-section-label small{font-size:10px;color:#99a5b4;font-weight:500}
+.practice-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;padding:4px;background:#f3f5fa;border:1px solid #e6eaf3;border-radius:13px}
+.practice-tab{border:0;background:transparent;color:#79869b;font-size:12px;font-weight:740;border-radius:9px;height:37px;padding:0 3px}
+.practice-tab[aria-pressed="true"]{background:white;box-shadow:0 2px 8px #1e2d4517;color:#5449d3}
+.practice-choices{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:7px}
+.practice-choices.is-words{grid-template-columns:repeat(4,minmax(0,1fr))}
+.practice-choice{height:43px;border:1px solid #e4e9f1;border-radius:10px;background:#fff;color:#485671;font:750 19px/1 ui-sans-serif,system-ui,sans-serif}
+.practice-choices.is-words .practice-choice{font-size:14px}
+.practice-choice[aria-pressed="true"]{background:#efecff;color:#5646df;border-color:#a9a1f7}
+.practice-choice:hover{border-color:#aaa0ed;background:#f8f7ff}
+.practice-input{width:100%;height:43px;border:1px solid #dfe4ed;border-radius:11px;padding:0 13px;color:#27364f;outline:0;font-size:15px}
+.practice-input:focus{border-color:#867bed;box-shadow:0 0 0 3px #8578ed18}
+.practice-preview-wrap{padding:10px;border:1px solid #e3e9f4;background:#f7f9fe;border-radius:15px}
+.practice-preview{display:block;width:100%;height:187px;background:#fdfefe;border-radius:9px}
+.practice-options{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.practice-options label{font-size:11px;font-weight:740;color:#56667e;display:flex;flex-direction:column;gap:9px}
+.practice-options select,.practice-options input{width:100%;min-width:0;height:41px;border:1px solid #e2e7f1;border-radius:10px;background:#fff;padding:0 11px;color:#40516b;accent-color:#6557ea}
+.practice-option-value{font-variant-numeric:tabular-nums;color:#6557ea;font-weight:770}
+.practice-preview-hint{font-size:11px;color:#909cb0;line-height:1.6;margin:8px 0 0}
+.practice-bottom{display:flex;flex-direction:column;gap:9px;border-top:1px solid #edf0f5;padding:15px 4px 1px}
+.practice-create{min-height:46px;border:0;border-radius:12px;background:#5549e5;color:white;font-weight:780;font-size:13px}
+.practice-add{min-height:42px;border:1px solid #dcdcf2;border-radius:12px;background:#f6f5ff;color:#5545cd;font-weight:760;font-size:12px}
+.practice-reset{min-height:40px;border:1px solid #e6eaf1;border-radius:11px;background:#fff;color:#8190a4;font-size:12px;font-weight:680}
+.practice-panel button:focus-visible{outline:3px solid #8379e7;outline-offset:2px}
+@media(max-width:850px){.tool-dock{gap:2px}.tool{width:41px}}
+@media(max-width:600px){.tool-dock{gap:2px;padding:5px}.tool{width:40px;height:42px}.practice-panel{width:min(100%,420px);padding:14px 13px max(13px,env(safe-area-inset-bottom))}.practice-head h2{font-size:21px}.practice-choice{height:41px}.practice-bottom{padding-top:10px}.practice-preview{height:162px}}
+@media(max-width:390px){.tool{width:38px;height:40px}.tool-sep{margin:7px 0}.practice-choices{gap:5px}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -198,6 +237,8 @@ svg{width:20px;height:20px;flex-shrink:0;display:block;fill:none;stroke:currentC
     <button class="tool" data-tool="marker" title="Bút dạ (H)" aria-label="Bút dạ" aria-pressed="false"><svg><use href="#i-marker"/></svg></button>
     <button class="tool" data-tool="eraser" title="Tẩy (E)" aria-label="Tẩy" aria-pressed="false"><svg><use href="#i-eraser"/></svg></button>
     <span class="tool-sep" aria-hidden="true"></span>
+    <button id="practiceLauncher" class="tool practice-launcher" type="button" title="Mẫu tập viết chữ cái tiếng Việt" aria-label="Mở chế độ tập viết chữ Việt"><span>Aa</span></button>
+    <span class="tool-sep" aria-hidden="true"></span>
     <button class="tool" data-tool="line" title="Đường thẳng (L)" aria-label="Đường thẳng" aria-pressed="false"><svg><use href="#i-line"/></svg></button>
     <button class="tool" data-tool="rect" title="Hình chữ nhật (R)" aria-label="Hình chữ nhật" aria-pressed="false"><svg><use href="#i-square"/></svg></button>
     <button class="tool" data-tool="ellipse" title="Hình tròn / elip (O)" aria-label="Hình tròn hoặc elip" aria-pressed="false"><svg><use href="#i-circle"/></svg></button>
@@ -233,12 +274,55 @@ svg{width:20px;height:20px;flex-shrink:0;display:block;fill:none;stroke:currentC
   <div class="drawer-actions">
     <button id="drawerNew" class="drawer-new" type="button"><svg><use href="#i-plus"/></svg>Tạo bảng mới</button>
     <button id="drawerImport" type="button"><svg><use href="#i-upload"/></svg>Nhập file JSON</button>
-    <button id="drawerClear" type="button" class="drawer-clear"><svg><use href="#i-trash"/></svg>Xóa nét trên bảng hiện tại</button>
+    <button id="drawerClear" type="button" class="drawer-clear"><svg><use href="#i-trash"/></svg>Xóa nội dung bảng hiện tại</button>
     <input id="fileInput" type="file" accept=".json,application/json" hidden>
   </div>
   <div id="boardListCaption" class="board-panel-subtitle">BẢN VẼ ĐÃ LƯU</div>
   <div id="boardList" class="board-list" aria-labelledby="boardListCaption"></div>
   <p class="board-panel-footer">Tự lưu trong trình duyệt này. Xuất JSON để sao lưu, chuyển thiết bị hoặc tiếp tục chỉnh sửa sau này. Dữ liệu không tự đồng bộ lên đám mây.</p>
+</aside>
+<div id="practiceBackdrop" class="drawer-backdrop" hidden></div>
+<aside id="practicePanel" class="practice-panel" role="dialog" aria-modal="true" aria-labelledby="practiceTitle" hidden>
+  <div class="practice-head">
+    <div><span class="practice-eyebrow">NÉT VẼ / BÉ TẬP VIẾT</span><h2 id="practiceTitle">Tập viết chữ Việt ✏️</h2></div>
+    <button id="closePractice" type="button" class="icon-button" aria-label="Đóng chế độ tập viết"><svg><use href="#i-close"/></svg></button>
+  </div>
+  <div class="practice-scroll">
+    <p class="practice-intro">Chọn chữ hoặc từ cho bé. Trang có chữ mẫu nét đứt và dòng kẻ để bé dùng bút, ngón tay hoặc chuột tô theo.</p>
+    <div class="practice-tabs" role="group" aria-label="Loại nội dung tập viết">
+      <button class="practice-tab" data-practice-mode="lower" type="button" aria-pressed="true">a b c</button>
+      <button class="practice-tab" data-practice-mode="upper" type="button" aria-pressed="false">A B C</button>
+      <button class="practice-tab" data-practice-mode="words" type="button" aria-pressed="false">Từ đơn</button>
+      <button class="practice-tab" data-practice-mode="numbers" type="button" aria-pressed="false">1 2 3</button>
+    </div>
+    <div class="practice-section-label"><span>Chọn mẫu chữ</span><small>Đầy đủ 29 chữ cái</small></div>
+    <div id="practiceChoices" class="practice-choices" role="group" aria-label="Chữ tập viết"></div>
+    <label class="practice-section-label" for="practiceText"><span>Hoặc nhập chữ / từ muốn tập</span><small>Tối đa 20 ký tự</small></label>
+    <input id="practiceText" class="practice-input" type="text" maxlength="20" value="a" autocomplete="off" spellcheck="false" aria-label="Chữ hoặc từ cần tập viết">
+    <div class="practice-section-label"><span>Xem trước giấy tập viết</span><small>Nét mẫu không bị tẩy</small></div>
+    <div class="practice-preview-wrap">
+      <canvas id="practicePreview" class="practice-preview" width="720" height="330" role="img" aria-label="Xem trước mẫu chữ trên dòng kẻ"></canvas>
+    </div>
+    <p class="practice-preview-hint">Nét mẫu chỉ là hướng dẫn tham khảo, không phải phông chữ viết tay chuẩn của Bộ Giáo dục.</p>
+    <div class="practice-section-label"><span>Tùy chỉnh trang viết</span></div>
+    <div class="practice-options">
+      <label>Số dòng tập viết
+        <select id="practiceRows" aria-label="Số dòng tập viết">
+          <option value="2">2 dòng</option><option value="3" selected>3 dòng</option><option value="4">4 dòng</option><option value="5">5 dòng</option>
+        </select>
+      </label>
+      <label>Cỡ chữ mẫu
+        <select id="practiceSize" aria-label="Cỡ chữ tập viết">
+          <option value="58">Nhỏ</option><option value="70" selected>Vừa</option><option value="86">Lớn</option>
+        </select>
+      </label>
+    </div>
+  </div>
+  <div class="practice-bottom">
+    <button id="practiceNew" type="button" class="practice-create">＋ Tạo bảng tập viết mới</button>
+    <button id="practiceAdd" type="button" class="practice-add">Chèn mẫu vào bảng đang mở</button>
+    <button id="practiceReset" type="button" class="practice-reset">Tẩy mọi nét bút, giữ nguyên mẫu</button>
+  </div>
 </aside>
 <div id="renameDialog" class="dialog-backdrop" hidden>
   <form id="renameForm" class="dialog" role="dialog" aria-modal="true" aria-labelledby="renameTitle">
@@ -273,6 +357,13 @@ svg{width:20px;height:20px;flex-shrink:0;display:block;fill:none;stroke:currentC
   const validTools = new Set(['pen','marker','eraser','line','rect','ellipse','pan']);
   const shapeTools = new Set(['line','rect','ellipse']);
   const drawableTools = new Set(['pen','marker','line','rect','ellipse']);
+  const VIETNAMESE_LETTERS = 'a ă â b c d đ e ê g h i k l m n o ô ơ p q r s t u ư v x y'.split(' ');
+  const PRACTICE_WORDS = ['ba','bà','bé','bố','mẹ','cô','cá','gà','nhà','hoa','bạn','em'];
+  const PRACTICE_FONT = '"Trebuchet MS","Arial Rounded MT Bold",Arial,sans-serif';
+  const PRACTICE_WIDTH = 760;
+  const PRACTICE_ROW_HEIGHT = 112;
+  const PRACTICE_TOP = 91;
+  let practiceMode = 'lower', practiceText = 'a';
   let objects = [], history = [], future = [];
    let boards = [], activeBoardId = '', storageLocked = false, renameTarget = '', pendingAction = null;
   let tool = 'pen', color = '#1f2937', width = 5;
@@ -282,7 +373,7 @@ svg{width:20px;height:20px;flex-shrink:0;display:block;fill:none;stroke:currentC
   const pointers = new Map();
   const clamp = (v,min,max) => Math.max(min,Math.min(max,v));
   const finite = n => Number.isFinite(n);
-  const hasArtwork = () => objects.some(o => drawableTools.has(o.kind));
+  const hasArtwork = () => objects.some(o => drawableTools.has(o.kind) || o.kind==='practice');
 
   function announce(message) {
     const el = $('toast'); el.textContent = message; el.classList.add('show');
@@ -313,12 +404,108 @@ svg{width:20px;height:20px;flex-shrink:0;display:block;fill:none;stroke:currentC
       zoom:finite(v.zoom) ? clamp(v.zoom,MIN_ZOOM,MAX_ZOOM) : 1
     };
   }
+  function practiceHeight(rows) { return PRACTICE_TOP + rows * PRACTICE_ROW_HEIGHT + 24; }
+  function sanitizePracticeText(value) {
+    return String(value||'').replace(/[\u0000-\u001f\u007f]/g,' ')
+      .trim().slice(0,20).normalize('NFC');
+  }
+  function practiceObject(text,rows=3,fontSize=70) {
+    const r=clamp(Number(rows)||3,2,5),f=[58,70,86].includes(+fontSize)?+fontSize:70;
+    return {kind:'practice',x:0,y:0,w:PRACTICE_WIDTH,h:practiceHeight(r),
+      text:sanitizePracticeText(text)||'a',rows:r,fontSize:f};
+  }
+  function drawPractice(c,o) {
+    c.save();
+    c.translate(o.x,o.y);
+    const W=o.w,H=o.h;
+    c.fillStyle='#ffffff';c.strokeStyle='#d8e4f7';c.lineWidth=1;
+    c.beginPath();
+    if(c.roundRect)c.roundRect(0,0,W,H,18);else c.rect(0,0,W,H);
+    c.fill();c.stroke();
+    c.save();c.beginPath();c.rect(0,0,W,H);c.clip();
+    c.fillStyle='#f0f3ff';c.fillRect(0,0,W,70);
+    c.fillStyle='#6554c7';c.font='800 12px Arial,sans-serif';
+    c.textAlign='left';c.textBaseline='alphabetic';
+    c.fillText('BÉ TẬP VIẾT',29,25);
+    c.fillStyle='#27365c';
+    c.font='bold 32px '+PRACTICE_FONT;
+    c.fillText(o.text,29,60,510);
+    c.fillStyle='#8c96b8';c.font='13px Arial,sans-serif';
+    c.textAlign='right';c.fillText('TÔ THEO NÉT ĐỨT ✎',W-28,48);
+    const t=o.text;
+    c.textAlign='center';
+    let font=o.fontSize;
+    c.font='600 '+font+'px '+PRACTICE_FONT;
+    let textW=c.measureText(t).width;
+    if(textW>240){font=Math.max(25,Math.floor(font*(240/textW)));
+      c.font='600 '+font+'px '+PRACTICE_FONT;textW=c.measureText(t).width;}
+    const sampleBox=Math.max(114,Math.min(283,textW+30));
+    const firstX=24+sampleBox/2;
+    const startX=24+sampleBox+25;
+    const step=Math.max(94,textW+26);
+    const count=Math.max(1,Math.floor((W-startX-18)/step));
+    for(let row=0;row<o.rows;row++){
+      const top=PRACTICE_TOP+row*PRACTICE_ROW_HEIGHT;
+      c.save();
+      for(let line=0;line<4;line++){
+        const ly=top+5+29*line;
+        c.beginPath();c.moveTo(23,ly);c.lineTo(W-23,ly);
+        c.strokeStyle=line===2?'#9fbbe4':'#cfe0f5';
+        c.lineWidth=line===2?1.6:1;
+        c.setLineDash(line===1?[4,5]:[]);c.stroke();
+      }
+      c.setLineDash([]);
+      c.font='600 '+font+'px '+PRACTICE_FONT;
+      c.textBaseline='alphabetic';
+      const baseline=top+69;
+      c.fillStyle='#4957a0';c.fillText(t,firstX,baseline,sampleBox-16);
+      c.lineWidth=3.1;c.strokeStyle='#7583bd';c.globalAlpha=.94;
+      c.setLineDash([3,4.5]);
+      for(let i=0;i<count;i++){
+        const x=startX+step*(i+.5);
+        c.fillStyle='rgba(124,139,198,.12)';c.fillText(t,x,baseline,step-12);
+        c.strokeText(t,x,baseline,step-12);
+      }
+      c.restore();
+    }
+    c.restore();c.restore();
+  }
+  function artworkBounds() {
+    let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;
+    for(const o of objects) {
+      if(o.kind==='practice'){
+        minX=Math.min(minX,o.x);minY=Math.min(minY,o.y);
+        maxX=Math.max(maxX,o.x+o.w);maxY=Math.max(maxY,o.y+o.h);
+      }else if(drawableTools.has(o.kind)){
+        const coords=o.points||[o.start,o.end];
+        for(const pt of coords){
+          if(!pt)continue;
+          minX=Math.min(minX,pt.x-o.width);minY=Math.min(minY,pt.y-o.width);
+          maxX=Math.max(maxX,pt.x+o.width);maxY=Math.max(maxY,pt.y+o.width);
+        }
+      }
+    }
+    return finite(minX)?{minX,minY,maxX,maxY}:null;
+  }
   function cleanObjects(raw,strict=false) {
     if (!Array.isArray(raw) || raw.length>12000) throw new Error('Tệp có quá nhiều nét vẽ.');
     const result=[]; let totalPoints=0;
     const isPoint = v => v && finite(v.x) && finite(v.y) &&
       Math.abs(v.x)<1e9 && Math.abs(v.y)<1e9;
     for(const o of raw) {
+      if(o && o.kind==='practice'){
+        const isText=typeof o.text==='string' && o.text.length>0 && o.text.length<=20 &&
+          !/[\u0000-\u001f\u007f]/.test(o.text);
+        const safe= isText && isPoint(o) &&
+          finite(o.w) && o.w===PRACTICE_WIDTH &&
+          Number.isInteger(o.rows) && o.rows>=2 && o.rows<=5 &&
+          [58,70,86].includes(o.fontSize) &&
+          o.h===practiceHeight(o.rows);
+        if(!safe){if(strict)throw new Error('Mẫu tập viết không hợp lệ.');continue;}
+        result.push({kind:'practice',x:o.x,y:o.y,w:PRACTICE_WIDTH,
+          h:practiceHeight(o.rows),rows:o.rows,fontSize:o.fontSize,text:o.text});
+        continue;
+      }
       const validBase = o && drawableTools.has(o.kind) || (o && o.kind==='eraser');
       if (!validBase || !/^#[0-9a-fA-F]{6}$/.test(o.color||'') ||
         !finite(o.width) || o.width<.5 || o.width>500) {
@@ -448,10 +635,11 @@ svg{width:20px;height:20px;flex-shrink:0;display:block;fill:none;stroke:currentC
   function applyAction(action) {
     if (action.type === 'add') objects.push(action.object);
     else if (action.type === 'clear') objects = [];
+    else if (action.type === 'clearInk') objects = objects.filter(o=>o.kind==='practice');
   }
   function revertAction(action) {
     if (action.type === 'add') objects.pop();
-    else if (action.type === 'clear') objects = action.before.slice();
+    else if (action.type === 'clear' || action.type === 'clearInk') objects = action.before.slice();
   }
   function commit(action) {
     applyAction(action); history.push(action); if (history.length>150) history.shift(); future=[];
@@ -517,9 +705,12 @@ svg{width:20px;height:20px;flex-shrink:0;display:block;fill:none;stroke:currentC
     frame=0;
     inkCtx.setTransform(1,0,0,1,0,0); inkCtx.clearRect(0,0,ink.width,ink.height);
     inkCtx.setTransform(dpr*zoom,0,0,dpr*zoom,dpr*panX,dpr*panY);
-    objects.forEach(o=>drawObject(inkCtx,o));
-    if(current) drawObject(inkCtx,current);
-    grid(ctx);ctx.setTransform(1,0,0,1,0,0);ctx.drawImage(ink,0,0);
+    objects.forEach(o=>{if(o.kind!=='practice')drawObject(inkCtx,o);});
+    if(current)drawObject(inkCtx,current);
+    grid(ctx);
+    ctx.setTransform(dpr*zoom,0,0,dpr*zoom,dpr*panX,dpr*panY);
+    objects.forEach(o=>{if(o.kind==='practice')drawPractice(ctx,o);});
+    ctx.setTransform(1,0,0,1,0,0);ctx.drawImage(ink,0,0);
      const center=toWorld({x:vw/2,y:vh/2});
      $('worldStatus').textContent='∞ Không gian vô hạn · X '+Math.round(center.x)+' · Y '+Math.round(center.y);
   }
@@ -623,13 +814,10 @@ svg{width:20px;height:20px;flex-shrink:0;display:block;fill:none;stroke:currentC
     interaction=null;canvas.classList.remove('is-panning');updateActions();requestDraw();
   }
   function exportPNG() {
-    const list=objects.filter(o=>drawableTools.has(o.kind));
-    let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;
-    for(const o of list){
-      const coords=o.points||[o.start,o.end];
-      for(const p of coords){if(!p)continue;minX=Math.min(minX,p.x-o.width);minY=Math.min(minY,p.y-o.width);maxX=Math.max(maxX,p.x+o.width);maxY=Math.max(maxY,p.y+o.width);}
-    }
-    if(!list.length){minX=toWorld({x:0,y:0}).x;minY=toWorld({x:0,y:0}).y;maxX=minX+vw/zoom;maxY=minY+vh/zoom;}
+    const bounds=artworkBounds();
+    let minX,minY,maxX,maxY;
+    if(bounds){({minX,minY,maxX,maxY}=bounds);}
+    else {minX=toWorld({x:0,y:0}).x;minY=toWorld({x:0,y:0}).y;maxX=minX+vw/zoom;maxY=minY+vh/zoom;}
     const pad=65, contentW=Math.max(1,maxX-minX)+pad*2,contentH=Math.max(1,maxY-minY)+pad*2;
     const factor=Math.min(2,4096/contentW,4096/contentH);
     const out=document.createElement('canvas');out.width=Math.max(1,Math.round(contentW*factor));out.height=Math.max(1,Math.round(contentH*factor));
@@ -638,8 +826,11 @@ svg{width:20px;height:20px;flex-shrink:0;display:block;fill:none;stroke:currentC
     const layer=document.createElement('canvas');layer.width=out.width;layer.height=out.height;
     const layerCtx=layer.getContext('2d');
     layerCtx.setTransform(factor,0,0,factor,(pad-minX)*factor,(pad-minY)*factor);
-    objects.forEach(o=>drawObject(layerCtx,o));
-    c.fillStyle='#fff';c.fillRect(0,0,out.width,out.height);c.drawImage(layer,0,0);
+    objects.forEach(o=>{if(o.kind!=='practice')drawObject(layerCtx,o);});
+    c.fillStyle='#fff';c.fillRect(0,0,out.width,out.height);
+    c.setTransform(factor,0,0,factor,(pad-minX)*factor,(pad-minY)*factor);
+    objects.forEach(o=>{if(o.kind==='practice')drawPractice(c,o);});
+    c.setTransform(1,0,0,1,0,0);c.drawImage(layer,0,0);
     const saveBlob=blob=>{
       if(!blob){announce('Không thể xuất PNG.');return;}
       const href=URL.createObjectURL(blob),a=document.createElement('a');
@@ -800,8 +991,8 @@ svg{width:20px;height:20px;flex-shrink:0;display:block;fill:none;stroke:currentC
   }
   function openClear() {
     if(!objects.length)return;
-    openConfirm({type:'clear'},'Xóa toàn bộ nét trên bảng?',
-      'Các nét vẽ trên bảng hiện tại sẽ bị xóa. Bạn vẫn có thể hoàn tác ngay sau đó.','Xóa nét vẽ');
+    openConfirm({type:'clear'},'Xóa toàn bộ nội dung bảng?',
+      'Chữ mẫu tập viết và mọi nét vẽ trên bảng này sẽ bị xóa. Bạn vẫn có thể hoàn tác ngay sau đó.','Xóa toàn bộ');
   }
   function closeConfirm() {
     $('confirmDialog').hidden=true;pendingAction=null;
@@ -812,7 +1003,7 @@ svg{width:20px;height:20px;flex-shrink:0;display:block;fill:none;stroke:currentC
     if(!action)return;
     if(action.type==='clear') {
       if(objects.length)commit({type:'clear',before:objects.slice()});
-      announce('Đã xóa nét vẽ. Có thể hoàn tác.');
+      announce('Đã xóa nội dung bảng. Có thể hoàn tác.');
     }
     if(action.type==='delete') {
       const board=boards.find(b=>b.id===action.id);if(!board)return;
@@ -825,20 +1016,12 @@ svg{width:20px;height:20px;flex-shrink:0;display:block;fill:none;stroke:currentC
     }
   }
   function fitBoard() {
-    const list=objects.filter(o=>drawableTools.has(o.kind));
-    if(!list.length){
+    const bounds=artworkBounds();
+    if(!bounds){
       zoom=1;panX=vw/2;panY=vh/2;
     } else {
-      let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;
-      for(const o of list) {
-        const coords=o.points||[o.start,o.end];
-        for(const point of coords){
-          if(!point)continue;
-          minX=Math.min(minX,point.x-o.width);minY=Math.min(minY,point.y-o.width);
-          maxX=Math.max(maxX,point.x+o.width);maxY=Math.max(maxY,point.y+o.width);
-        }
-      }
-      const margin=vw<700?62:150;
+      const {minX,minY,maxX,maxY}=bounds;
+      const margin=vw<700?42:150;
       const w=Math.max(1,maxX-minX),h=Math.max(1,maxY-minY);
       zoom=clamp(Math.min(1.6,(vw-margin)/w,(vh-margin)/h),MIN_ZOOM,MAX_ZOOM);
       panX=vw/2-((minX+maxX)/2)*zoom;
@@ -866,6 +1049,74 @@ svg{width:20px;height:20px;flex-shrink:0;display:block;fill:none;stroke:currentC
     }
   }
 
+  function practiceChoices() {
+    if(practiceMode==='lower')return VIETNAMESE_LETTERS;
+    if(practiceMode==='upper')return VIETNAMESE_LETTERS.map(x=>x.toLocaleUpperCase('vi-VN'));
+    if(practiceMode==='words')return PRACTICE_WORDS;
+    return '0 1 2 3 4 5 6 7 8 9'.split(' ');
+  }
+  function renderPracticeChoices() {
+    const host=$('practiceChoices');host.replaceChildren();
+    host.classList.toggle('is-words',practiceMode==='words');
+    document.querySelectorAll('[data-practice-mode]').forEach(button=>
+      button.setAttribute('aria-pressed',String(button.dataset.practiceMode===practiceMode)));
+    for(const glyph of practiceChoices()){
+      const b=document.createElement('button');b.type='button';b.className='practice-choice';
+      b.textContent=glyph;b.setAttribute('aria-label','Chọn mẫu '+glyph);
+      b.setAttribute('aria-pressed',String(glyph===practiceText));
+      b.addEventListener('click',()=>{practiceText=glyph;$('practiceText').value=glyph;
+        renderPracticeChoices();renderPracticePreview();});
+      host.appendChild(b);
+    }
+  }
+  function renderPracticePreview() {
+    const canvas=$('practicePreview'),c=canvas.getContext('2d');
+    if(!c)return;
+    const o=practiceObject(practiceText,$('practiceRows').value,$('practiceSize').value);
+    c.clearRect(0,0,canvas.width,canvas.height);
+    const scale=Math.min((canvas.width-10)/o.w,(canvas.height-10)/o.h);
+    c.save();c.translate((canvas.width-o.w*scale)/2,(canvas.height-o.h*scale)/2);
+    c.scale(scale,scale);drawPractice(c,o);c.restore();
+    canvas.setAttribute('aria-label','Xem trước mẫu '+o.text+' với '+o.rows+' dòng kẻ');
+  }
+  function openPractice() {
+    if(!$('boardPanel').hidden)closeBoardPanel();
+    $('practiceBackdrop').hidden=false;$('practicePanel').hidden=false;
+    renderPracticeChoices();renderPracticePreview();$('closePractice').focus();
+  }
+  function closePractice() {
+    const open=!$('practicePanel').hidden;
+    $('practiceBackdrop').hidden=true;$('practicePanel').hidden=true;
+    if(open)$('practiceLauncher').focus();
+  }
+  function practicePosition(obj) {
+    const center=toWorld({x:vw/2,y:vh/2});
+    obj.x=Math.round(center.x-obj.w/2);
+    obj.y=Math.round(center.y-obj.h/2);
+  }
+  function addPractice(newBoard=false) {
+    if(newBoard && boards.length>=100){announce('Đã đủ 100 bảng vẽ, hãy xóa bớt bảng.');return;}
+    const text=sanitizePracticeText($('practiceText').value);
+    if(!text){$('practiceText').focus();announce('Hãy nhập ít nhất một chữ.');return;}
+    const template=practiceObject(text,$('practiceRows').value,$('practiceSize').value);
+    cancelInteraction();
+    if(newBoard){
+      snapshotActive();
+      const board=makeBoard('Tập viết • '+text);
+      boards.unshift(board);activateBoard(board.id);
+    }
+    practicePosition(template);
+    commit({type:'add',object:template});
+    fitBoard();setTool('pen');
+    closePractice();
+    announce(newBoard?'Đã tạo trang tập viết '+text+'.':'Đã chèn mẫu '+text+' vào bảng hiện tại.');
+  }
+  function resetPracticeInk() {
+    if(!objects.some(o=>o.kind!=='practice')){announce('Chưa có nét bút cần xóa.');return;}
+    if(!objects.some(o=>o.kind==='practice')){announce('Bảng này chưa có mẫu tập viết.');return;}
+    commit({type:'clearInk',before:objects.slice()});
+    closePractice();announce('Đã tẩy các nét bút. Chữ mẫu vẫn được giữ.');
+  }
   load();
   setTool(tool);$('customColor').value=color;setWidth(width);setColor(color);
   $('zoomReset').textContent=Math.round(zoom*100)+'%';updateActions();
@@ -897,7 +1148,24 @@ svg{width:20px;height:20px;flex-shrink:0;display:block;fill:none;stroke:currentC
    $('drawerNew').addEventListener('click',createBoard);
    $('drawerImport').addEventListener('click',()=>$('fileInput').click());
    $('drawerClear').addEventListener('click',openClear);
-   $('fileInput').addEventListener('change',async e=>{
+   $('practiceLauncher').addEventListener('click',openPractice);
+  $('closePractice').addEventListener('click',closePractice);
+  $('practiceBackdrop').addEventListener('click',closePractice);
+  document.querySelectorAll('[data-practice-mode]').forEach(button=>button.addEventListener('click',()=>{
+    practiceMode=button.dataset.practiceMode;
+    practiceText=practiceChoices()[0];$('practiceText').value=practiceText;
+    renderPracticeChoices();renderPracticePreview();
+  }));
+  $('practiceText').addEventListener('input',e=>{
+    practiceText=sanitizePracticeText(e.target.value);
+    renderPracticeChoices();renderPracticePreview();
+  });
+  $('practiceRows').addEventListener('change',renderPracticePreview);
+  $('practiceSize').addEventListener('change',renderPracticePreview);
+  $('practiceNew').addEventListener('click',()=>addPractice(true));
+  $('practiceAdd').addEventListener('click',()=>addPractice(false));
+  $('practiceReset').addEventListener('click',resetPracticeInk);
+  $('fileInput').addEventListener('change',async e=>{
      const file=e.target.files && e.target.files[0];e.target.value='';await importBoard(file);
    });
    $('renameForm').addEventListener('submit',renameBoard);
@@ -908,6 +1176,16 @@ svg{width:20px;height:20px;flex-shrink:0;display:block;fill:none;stroke:currentC
        announce('Bản vẽ đã thay đổi ở tab khác. Hãy xuất JSON rồi tải lại để tránh ghi đè.');}
    });
   document.addEventListener('keydown',e=>{
+    if(!$('practicePanel').hidden){
+      if(e.key==='Escape'){e.preventDefault();closePractice();}
+      if(e.key==='Tab'){
+        const els=[...$('practicePanel').querySelectorAll('button:not(:disabled),input:not(:disabled),select:not(:disabled)')];
+        const first=els[0],last=els[els.length-1];
+        if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
+        else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
+      }
+      return;
+    }
     if(!$('renameDialog').hidden){
       if(e.key==='Escape'){e.preventDefault();closeRename();}
       return;
@@ -938,6 +1216,7 @@ svg{width:20px;height:20px;flex-shrink:0;display:block;fill:none;stroke:currentC
       if(shortcuts[key])setTool(shortcuts[key]);
       if(key==='f')fitBoard();
       if(key==='b')openBoardPanel();
+      if(key==='t')openPractice();
     }
   });
   document.addEventListener('keyup',e=>{if(e.key===' '){spaceHeld=false;canvas.classList.toggle('is-pan',tool==='pan');}});
