@@ -201,7 +201,7 @@ button:disabled{opacity:.42;cursor:default}
   <section class="modal help-modal" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
     <h2 id="helpTitle">🎮 Cách chơi</h2>
     <ol><li>Dùng các phím <b>W A S D / mũi tên</b> hoặc cần ảo để điều khiển Gấu Bông.</li><li>Chạm vào chữ nổi trong khu vườn, Gấu sẽ tự đi tới chữ đó. Có thể mở bản đồ 🗺️ để chọn nhanh.</li><li><b>Nghe chậm</b> rồi bấm 🎤 Bé đọc. Trình duyệt có nhận dạng tiếng nói sẽ nghe và trả lời; trên iPad có thể dùng nút 🎙️ của bàn phím để đọc và nhận phản hồi.</li><li><b>Tô chữ</b> trên bảng phép thuật, có thể tẩy và làm lại.</li><li><b>Tìm chữ</b> đúng trong 4 khối 3D, rồi <b>tìm đồ vật</b> tương ứng với từ vừa nghe.</li><li>Hoàn thành 4 thử thách để nhận 1–3 ⭐ và làm một bông hoa trong khu vườn nở rộ!</li></ol>
-    <p>Bảng tập viết có ô ly, điểm đặt bút, mũi tên, tên từng nét và nút mô phỏng cách viết. Các nét SVG được biên dựng để tham khảo mẫu chữ tiểu học Việt Nam; nên đối chiếu thêm với mẫu trường bé đang học.</p>
+    <p>Bảng tập viết có ô ly, điểm đặt bút, mũi tên, tên từng nét và nút mô phỏng cách viết. Các nét vector được biên dựng để tham khảo mẫu chữ tiểu học Việt Nam; nên đối chiếu thêm với mẫu trường bé đang học. Nếu cấp quyền micro, dịch vụ nhận dạng của trình duyệt có thể xử lý âm thanh; game không tự lưu bản ghi âm. Phản hồi giọng nói chỉ dựa vào từ nhận dạng được, chưa đánh giá chính xác phát âm.</p>
     <div class="modal-actions"><button id="helpClose" class="cta" type="button">Đã hiểu, chơi thôi!</button></div>
   </section>
 </div>
@@ -235,7 +235,7 @@ const C=(a,b,c,d,x,y)=>['C',a,b,c,d,x,y];
 const Q=(a,b,x,y)=>['Q',a,b,x,y];
 const S=(title,...commands)=>({title,commands});
 const CLOSED=S('Nét cong kín',M(76,128),C(58,113,29,122,22,150),C(12,178,31,200,54,200),C(77,200,85,169,77,138),C(77,133,76,130,76,128));
-const RIGHT_HOOK=S('Nét móc ngược phải',M(89,120),L(89,184),C(89,201,105,207,117,187),C(126,173,128,164,128,160));
+const RIGHT_HOOK=S('Nét móc ngược phải',M(76,120),L(76,181),C(76,204,94,210,111,192),C(124,177,127,169,128,160));
 const OVAL=S('Nét cong kín',M(94,127),C(78,114,40,114,28,145),C(17,174,32,202,62,200),C(88,198,100,169,95,139),C(95,134,95,130,94,127));
 const BREVE=S('Nét cong dưới nhỏ (dấu ă)',M(53,95),Q(76,122,99,94));
 const HAT1=S('Nét xiên lên (dấu mũ)',M(55,110),L(78,88));
@@ -253,8 +253,8 @@ const GLYPH_STROKES={
  'â':[CLOSED,RIGHT_HOOK,HAT1,HAT2],
  b:[TALL_LOOP,S('Nét thắt và móc phải',M(55,153),C(79,111,113,126,108,156),C(102,185,73,197,56,187),C(63,202,96,206,113,181))],
  c:[S('Nét cong trái',M(91,131),C(77,115,48,118,32,137),C(15,161,28,201,59,200),C(77,200,86,190,92,181))],
- d:[CLOSED,S('Nét móc ngược dài',M(91,40),L(91,181),C(91,207,112,208,130,160))],
- 'đ':[CLOSED,S('Nét móc ngược dài',M(91,40),L(91,181),C(91,207,112,208,130,160)),S('Nét ngang chữ đ',M(67,107),Q(92,102,117,105))],
+ d:[CLOSED,S('Nét móc ngược dài',M(76,40),L(76,181),C(76,204,99,210,130,160))],
+ 'đ':[CLOSED,S('Nét móc ngược dài',M(76,40),L(76,181),C(76,204,99,210,130,160)),S('Nét ngang chữ đ',M(67,107),Q(92,102,117,105))],
  e:[S('Nét cong phải và cong trái',M(94,151),C(76,154,49,165,43,151),C(30,135,48,120,72,124),C(97,130,100,146,81,153),C(64,163,43,169,50,188),C(58,204,79,205,94,184))],
  'ê':[S('Nét cong phải và cong trái',M(94,151),C(76,154,49,165,43,151),C(30,135,48,120,72,124),C(97,130,100,146,81,153),C(64,163,43,169,50,188),C(58,204,79,205,94,184)),HAT1,HAT2],
  g:[OVAL,S('Nét khuyết dưới',M(96,120),L(96,248),C(95,276,62,288,50,270),C(38,254,45,242,58,236))],
@@ -698,27 +698,26 @@ function matchesSpokenWord(s){
   raw===spokenLetter || raw==='chữ '+spokenLetter ||
   raw==='chữ cái '+spokenLetter;
 }
-function praiseSpeech(transcript,correct){
+function praiseSpeech(transcript,correct,viaMic=false){
  const spoken=String(transcript||'').trim().slice(0,100);
  if(!spoken)return;
  const target=LETTERS[level][1];
+ const source=viaMic?'Gấu nghe được':'Gấu nhận được';
  if(correct){
-  const text='Gấu nghe bé nói "'+spoken+'". Đúng rồi! Bé giỏi lắm!';
-  setFeedback('🐻 '+text,'good');
+  setFeedback('🐻 '+source+' từ "'+spoken+'". Đúng rồi! Giỏi lắm!','good');
   chirp('happy');
-  sayInParts([{text:'Gấu nghe rồi! Con đọc đúng từ '+target+'. Giỏi lắm!',
-   caption:'🐻 Gấu đã nghe: "'+spoken+'". Đúng từ '+target+'!'}]);
+  sayInParts([{text:'Gấu nhận được từ '+target+'. Giỏi lắm!',
+   caption:'🐻 '+source+' từ "'+spoken+'". Đúng từ '+target+'!'}]);
  }else{
-  const text='Gấu nghe "'+spoken+'". Bé thử đọc chậm từ "'+target+'" nhé!';
-  setFeedback('🐻 '+text,'warn');
-  sayInParts([{text:'Gấu nghe con rồi. Mình thử từ '+target+' thêm lần nữa nhé!',
-   caption:'🐻 Gấu nghe: "'+spoken+'". Mình thử từ '+target+' nhé!'}]);
+  setFeedback('🐻 '+source+' "'+spoken+'". Bé thử lại từ "'+target+'" nhé!','warn');
+  sayInParts([{text:'Gấu nhận được rồi. Mình thử từ '+target+' thêm lần nữa nhé!',
+   caption:'🐻 '+source+' "'+spoken+'". Mình thử từ '+target+' nhé!'}]);
  }
 }
-function evaluateSpokenInput(spoken){
+function evaluateSpokenInput(spoken,viaMic=false){
  const text=String(spoken||'').trim();
  if(!text){toast('Bé thử nói một từ hoặc dùng nút 🎙️ trên bàn phím nhé!');return;}
- praiseSpeech(text,matchesSpokenWord(text));
+ praiseSpeech(text,matchesSpokenWord(text),viaMic);
 }
 function setMicStatus(active){
  voiceListening=active;
@@ -735,7 +734,7 @@ function openDictation(){
  if(mode!=='listen'&&mode!=='word')return;
  $('dictationOverlay').hidden=false;
  $('dictationInput').value='';
- $('dictationTarget').textContent='Bé thử đọc: "'+LETTERS[level][1]+'". Gấu chỉ kiểm tra văn bản được nhận dạng.';
+ $('dictationTarget').textContent='Bé thử đọc: "'+LETTERS[level][1]+'". Có thể bấm 🎙️ trên bàn phím hoặc nhập chữ. Gấu kiểm tra từ nhận được, không chấm độ chuẩn phát âm.';
  $('dictationInput').focus();
 }
 function closeDictation(){
@@ -775,7 +774,7 @@ function listenToChild(){
   }catch(_){}
   const spoken=alternatives.find(x=>matchesSpokenWord(x))||alternatives[0]||'';
   stopListening();
-  evaluateSpokenInput(spoken);
+  evaluateSpokenInput(spoken,true);
  };
  current.onerror=e=>{
   if(token!==voiceCaptureToken||gotResult)return;
@@ -1759,7 +1758,7 @@ function setupControls(){
  $('dictationCancel').addEventListener('click',closeDictation);
  $('dictationSubmit').addEventListener('click',submitDictation);
  $('dictationInput').addEventListener('keydown',e=>{
-  if(e.key==='Enter'){e.preventDefault();submitDictation();}
+  if(e.key==='Enter'){e.preventDefault();e.stopPropagation();submitDictation();}
  });
  $('dictationOverlay').addEventListener('click',e=>{if(e.target===$('dictationOverlay'))closeDictation();});
  $('speedButton').addEventListener('click',changeVoiceSpeed);
