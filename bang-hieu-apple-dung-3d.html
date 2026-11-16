@@ -128,13 +128,78 @@ button:disabled{cursor:not-allowed;opacity:.5}
  .stand{height:20cqw}
 }
 @media(prefers-reduced-motion:reduce){.pulse{animation:none!important}.toast{transition:none}}
+
+
+/* Real, separate 3D surfaces: front advertising face, left/right side, and top */
+.rig{perspective:1500px;perspective-origin:50% 43%;--rig-width:min(82vw,430px,calc((100dvh - 170px)*.54))}
+.billboard{
+  --box-depth:29cqw;
+  --view-yaw:28deg;
+  --view-pitch:-7deg;
+  position:relative;display:block;width:100%;aspect-ratio:.615;
+  transform-style:preserve-3d;
+  transform:rotateX(var(--view-pitch)) rotateY(var(--view-yaw));
+  transform-origin:50% 56%;transition:transform .25s ease-out;
+  border:0;background:none;box-shadow:none;
+  cursor:grab;touch-action:none;outline-offset:7px;
+}
+.billboard.dragging{cursor:grabbing;transition:none}
+.billboard .face{
+  position:absolute;inset:0;width:100%;height:100%;min-width:0;
+  transform:translateZ(var(--box-depth));backface-visibility:hidden;
+  background:radial-gradient(ellipse at 62% 23%,#18191c 0%,#080909 43%,#010202 92%);
+  border:2px solid #202227;box-shadow:1px 1px 2px #7e849755,4px 6px 2px #050607,8px 12px 20px #000c;
+}
+.billboard .left-strip{
+  position:absolute;top:0;bottom:0;left:0;width:var(--box-depth);height:100%;
+  transform-origin:left center;transform:rotateY(-90deg);
+  background:linear-gradient(90deg,#111315 0%,#040505 47%,#020203 100%);
+  border:1px solid #292c31;box-shadow:inset -12px 0 18px #0008;
+  backface-visibility:hidden;
+}
+.billboard .top-cap{
+  position:absolute;left:0;top:0;width:100%;height:var(--box-depth);
+  transform-origin:top center;transform:rotateX(90deg);
+  background:linear-gradient(180deg,#13161b,#050608 84%);border:1px solid #373b43;
+  box-shadow:inset 0 0 26px #000b;
+  backface-visibility:hidden;
+}
+.billboard .right-strip{
+  position:absolute;top:0;left:100%;height:100%;width:var(--box-depth);
+  transform-origin:left center;transform:translateZ(var(--box-depth)) rotateY(90deg);
+  background:linear-gradient(90deg,#0c0e12,#050506);border:1px solid #383a40;
+  backface-visibility:hidden;
+}
+.left-strip .side-mark{width:59%;height:9%;top:4%}
+.left-strip .vertical-name{font-size:8.6cqw;top:16%;height:43%}
+.left-strip .vertical-tag{font-size:7.4cqw;bottom:4%;height:33%}
+.billboard .face::after{
+  content:"";position:absolute;inset:0;border:1px solid #ffffff0a;
+  background:linear-gradient(105deg,#ffffff0d,transparent 16%,transparent 70%,#ffffff05);
+  pointer-events:none;
+}
+.scene-hint{position:relative;text-align:center;font-size:11px;color:#c9d1e2;letter-spacing:.035em;opacity:.8;margin:12px auto 0;max-width:100%}
+.flat-mode .billboard{transform:none!important;cursor:default}
+.flat-mode .billboard .face{transform:none;box-shadow:none}
+.flat-mode .billboard .left-strip,.flat-mode .billboard .right-strip,.flat-mode .billboard .top-cap{visibility:hidden}
+.flat-mode .rig{--rig-width:min(90vw,580px,calc((100dvh - 130px)*.615))}
+.flat-mode .scene-hint{display:none}
+.stage:fullscreen .billboard{--box-depth:29cqw}
+.stage:fullscreen .rig{--rig-width:min(81vw,650px,calc((100vh - 35px)*.615))}
+@media(max-width:640px){
+  .rig{--rig-width:min(82vw,410px,calc((100dvh - 140px)*.54))}
+  .stage:fullscreen .rig{--rig-width:min(81vw,650px,calc((100vh - 35px)*.615))}
+  .scene-hint{margin:8px auto 0;font-size:10px}
+}
 </style>
 </head>
 <body>
 <main class="stage" id="stage">
  <div class="scene-shadow" aria-hidden="true"></div><div class="stage-floor" aria-hidden="true"></div>
  <div class="rig">
-  <section class="billboard" aria-label="Bảng hiệu quảng cáo đứng Apple Mobile">
+  <section class="billboard" id="billboard" tabindex="0" aria-label="Mô hình bảng hiệu 3D: mặt trước chứa nội dung quảng cáo, mặt trái là chữ dọc. Kéo để xoay."> 
+   <div class="top-cap" aria-hidden="true"></div>
+   <div class="right-strip" aria-hidden="true"></div>
    <div class="left-strip">
     <div class="side-mark" aria-hidden="true">
      <svg class="apple-svg" viewBox="0 0 100 110" role="img" aria-label="Biểu tượng quả táo"><path d="M59 22c-1-8 7-18 15-22 5-2 10-2 12-2-1 10-5 18-13 23-5 3-10 4-14 4-1-1-1-2 0-3Z"/><path d="M83 31c-9-6-16-4-24-1-6 3-10 3-16 0-9-4-18-4-26 2C4 42 5 62 10 76c3 10 9 21 16 28 4 5 9 7 14 6 5-1 10-4 17-4 8 0 12 4 18 4 6 0 10-5 15-11 5-7 9-15 11-24-12-5-18-14-18-25 0-8 4-15 11-20-4-2-7-3-11-4Z" transform="translate(-5 -3) scale(.98)"/></svg>
@@ -170,6 +235,7 @@ button:disabled{cursor:not-allowed;opacity:.5}
     </div>
    </div>
   </section>
+  <div class="scene-hint">Kéo bảng để xoay 3D · Nhấp đúp để về góc ban đầu</div>
   <div class="stand" aria-hidden="true">
     <div class="post a"></div><div class="post b"></div>
     <div class="brace left a"></div><div class="brace right a"></div>
@@ -299,6 +365,47 @@ document.addEventListener('fullscreenchange',()=>{
  $('#fullBtn').textContent=document.fullscreenElement?'⤢ Thu nhỏ':'⛶ Toàn màn hình';
  queueFit();
 });
+
+
+/* Pointer-driven inspection of the real 3D front and side surfaces. */
+const sign=$('#billboard');
+let yaw=28,pitch=-7,drag=null;
+function view(){
+ sign.style.setProperty('--view-yaw',yaw+'deg');
+ sign.style.setProperty('--view-pitch',pitch+'deg');
+}
+function resetView(){yaw=28;pitch=-7;view();}
+sign.addEventListener('pointerdown',e=>{
+ if(document.body.classList.contains('flat-mode')||!editor.hidden||e.button>0)return;
+ drag={id:e.pointerId,x:e.clientX,y:e.clientY,yaw,pitch};
+ sign.classList.add('dragging');
+ sign.setPointerCapture(e.pointerId);
+});
+sign.addEventListener('pointermove',e=>{
+ if(!drag||e.pointerId!==drag.id)return;
+ yaw=Math.max(-35,Math.min(66,drag.yaw+(e.clientX-drag.x)*.24));
+ pitch=Math.max(-19,Math.min(8,drag.pitch-(e.clientY-drag.y)*.13));
+ view();
+});
+function endDrag(e){
+ if(!drag||e.pointerId!==drag.id)return;
+ drag=null;sign.classList.remove('dragging');
+ if(sign.hasPointerCapture(e.pointerId))sign.releasePointerCapture(e.pointerId);
+}
+sign.addEventListener('pointerup',endDrag);
+sign.addEventListener('pointercancel',endDrag);
+sign.addEventListener('dblclick',resetView);
+sign.addEventListener('keydown',e=>{
+ const delta=e.shiftKey?10:4;
+ if(e.key==='ArrowLeft')yaw=Math.max(-35,yaw-delta);
+ else if(e.key==='ArrowRight')yaw=Math.min(66,yaw+delta);
+ else if(e.key==='ArrowUp')pitch=Math.min(8,pitch+delta);
+ else if(e.key==='ArrowDown')pitch=Math.max(-19,pitch-delta);
+ else if(e.key==='Home'){resetView();e.preventDefault();return;}
+ else return;
+ e.preventDefault();view();
+});
+
 window.addEventListener('resize',queueFit,{passive:true});
 render(saved);
 })();
