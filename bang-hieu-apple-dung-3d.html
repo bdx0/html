@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#101216">
+<meta name="description" content="Mô phỏng bảng hiệu đứng 3D dành cho cửa hàng chuyên iPhone và thiết bị Apple: logo trắng, nền đen, dải vàng, hình iPhone và hotline. Có chế độ bảng phẳng, toàn màn hình và chỉnh sửa nội dung.">
+<meta name="catalog:category" content="Thiết kế & Trình diễn">
+<meta name="catalog:tags" content="Apple,iPhone,Bảng hiệu,Quảng cáo,3D,HTML">
+<meta name="catalog:icon" content="📱">
+<title>Bảng hiệu đứng Apple Mobile 3D</title>
+<style>
+:root{color-scheme:dark;--yellow:#ffdf05;--yellow-2:#ffe947;--accent:#ffdf05;--stage:#171b23;--ink:#060707;--white:#f9fbff;--subtle:#b2b9ca}
+*{box-sizing:border-box}
+html{min-height:100%;-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{margin:0;min-height:100vh;overflow-x:hidden;font-family:Arial,"Segoe UI",Helvetica,sans-serif;color:white;background:radial-gradient(ellipse at 48% 28%,#3d4350 0,#222732 37%,#0c1016 75%,#080a0d 100%)}
+button,input{font:inherit}
+button{cursor:pointer}
+button:focus-visible,input:focus-visible{outline:2px solid #fff0ab;outline-offset:3px}
+button:disabled{cursor:not-allowed;opacity:.5}
+.stage{position:relative;isolation:isolate;min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:30px 18px 96px;overflow:hidden}
+.stage:before{content:"";position:absolute;z-index:-2;inset:0;background:linear-gradient(180deg,#ffffff0a 0%,transparent 39%),repeating-linear-gradient(90deg,transparent 0 16.6%,#ffffff04 16.62% 16.7%);pointer-events:none}
+.scene-shadow{position:absolute;z-index:-1;left:50%;bottom:10%;width:min(88vw,650px);height:90px;border-radius:50%;transform:translateX(-50%);background:#000b;filter:blur(28px);pointer-events:none}
+.rig{--rig-width:min(79vw,440px,calc((100dvh - 190px)*.57));width:var(--rig-width);max-width:100%;container-type:inline-size;position:relative;flex:none;filter:drop-shadow(22px 22px 35px #0008)}
+.billboard{width:100%;aspect-ratio:0.615;position:relative;display:grid;grid-template-columns:16% 84%;background:var(--ink);overflow:visible;transform:perspective(1100px) rotateY(-9deg) rotateZ(-.3deg);transform-origin:center bottom;box-shadow:4px 8px 0 #050607,7px 9px 0 #24262a,12px 12px 10px #000a,20px 34px 32px #0007;border:1px solid #313334;border-bottom:3px solid #1c1d20;z-index:2}
+.billboard:before{content:"";position:absolute;z-index:5;inset:0;pointer-events:none;border:2px solid #ffffff0d;box-shadow:inset 0 0 28px #0008}
+.billboard:after{content:"";position:absolute;inset:0;z-index:5;pointer-events:none;background:linear-gradient(125deg,#fff0 38%,#ffffff10 51%,#fff0 66%);opacity:.35;mix-blend-mode:screen}
+.left-strip{position:relative;overflow:hidden;background:linear-gradient(92deg,#010203 0%,#070707 55%,#121214 93%,#252526 100%);border-right:1px solid #393b3e;display:flex;align-items:center;flex-direction:column}
+.side-mark{position:absolute;top:4%;width:48%;height:9%;display:grid;place-items:center}
+.side-mark svg{width:100%;height:100%;filter:drop-shadow(0 0 5px #ffffff4b)}
+.vertical-name{position:absolute;top:16%;height:43%;max-width:100%;writing-mode:vertical-rl;font:900 5.6cqw/.95 Impact,"Arial Narrow",Arial,sans-serif;letter-spacing:-.035em;color:var(--accent);white-space:nowrap;text-shadow:0 0 12px #ffdd0025}
+.vertical-tag{position:absolute;bottom:4%;height:35%;max-width:100%;writing-mode:vertical-rl;font:300 5cqw/.95 "Arial Narrow",Arial,sans-serif;letter-spacing:-.04em;color:#f8f8f9;white-space:nowrap}
+.face{position:relative;display:flex;flex-direction:column;align-items:center;overflow:hidden;background:radial-gradient(ellipse at 62% 23%,#18191c 0%,#080909 43%,#010202 92%);min-width:0}
+.face:before{content:"";position:absolute;inset:-20%;background:radial-gradient(ellipse at 53% 55%,#ffffff09,transparent 48%);pointer-events:none}
+.masthead{position:relative;z-index:1;flex:0 0 31%;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:5% 3% 2%;text-align:center;min-height:0}
+.big-logo{height:57%;width:43%;display:grid;place-items:center;margin:0 auto 3.5%}
+.big-logo svg{height:100%;width:100%;filter:drop-shadow(0 0 14px #ffffff16)}
+.apple-svg{display:block;fill:currentColor;color:#fff}
+.name{width:100%;margin:0;line-height:.96;font-size:6.9cqw;font-weight:950;letter-spacing:-.045em;color:#fff;font-family:Impact,"Arial Narrow",Arial,sans-serif;text-transform:uppercase;white-space:nowrap}
+.tagline{width:100%;font-size:4.45cqw;line-height:1.06;font-weight:500;color:#fff;text-transform:uppercase;white-space:nowrap;letter-spacing:.02em}
+.offers{position:relative;z-index:1;flex:0 0 28%;width:100%;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:space-evenly;padding:1.5% 5% 1%}
+.offer{display:flex;align-items:center;justify-content:center;width:100%;height:29%;border-radius:999px;background:var(--accent);color:#070707;box-shadow:inset 0 -2px 1px #3d280015,0 3px 10px #ffde0030;text-align:center;white-space:nowrap;line-height:1;font-weight:950;font-family:Impact,"Arial Narrow",Arial,sans-serif;letter-spacing:-.015em;font-size:4.45cqw;padding:1% 4%;transform:rotate(1.3deg);text-shadow:none}
+.offer:nth-child(2){transform:rotate(-.4deg)}
+.offer:nth-child(3){transform:rotate(1.6deg)}
+.offer.pulse{animation:yellow-bloom 4.8s ease-in-out infinite}
+.offer:nth-child(2).pulse{animation-delay:-1.4s}
+.offer:nth-child(3).pulse{animation-delay:-2.9s}
+@keyframes yellow-bloom{0%,100%{box-shadow:inset 0 -2px 1px #3d280015,0 3px 10px #ffde0030;filter:brightness(1)}50%{box-shadow:0 0 17px #ffdf056b,0 0 40px #ffdf0521;filter:brightness(1.1)}}
+.phones{position:relative;z-index:1;flex:1 1 auto;width:100%;min-height:0;overflow:hidden;background:radial-gradient(ellipse at 50% 56%,#22262c6b 0%,transparent 61%)}
+.phones:after{content:"";position:absolute;pointer-events:none;left:13%;right:13%;height:15%;bottom:5%;background:#000c;filter:blur(13px);border-radius:50%}
+.phone{position:absolute;bottom:6%;width:23%;height:79%;border:2px solid #777c89;border-radius:11px;background:linear-gradient(115deg,#565b67,#111722 19%,#151922 75%,#6b717a);box-shadow:inset 0 0 0 2px #262a30,2px 6px 7px #000b;overflow:hidden}
+.phone.back{background:linear-gradient(110deg,#555769,#8c91a2 24%,#3b3d4b 78%,#1c202b);border-color:#8c94a4}
+.phone.back .camera-island{position:absolute;top:8%;left:9%;width:48%;aspect-ratio:1;border-radius:22%;background:linear-gradient(125deg,#a7aabe,#545c71);border:1px solid #a7b4c9;box-shadow:1px 1px 3px #0009}
+.camera-island i{position:absolute;width:28%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 54% 43%,#34577d 0 9%,#00050c 24% 48%,#48586a 52% 62%,#c7ceda 68%);box-shadow:0 0 0 1px #252b35}
+.camera-island i:nth-child(1){left:10%;top:9%}
+.camera-island i:nth-child(2){left:55%;top:33%}
+.camera-island i:nth-child(3){left:10%;top:58%}
+.phone.back:after{content:"";position:absolute;top:40%;left:38%;width:23%;aspect-ratio:1;border-radius:50%;background:#ffffff47;mask-image:radial-gradient(circle,#000 0 60%,transparent 62%);opacity:.65}
+.phone.front{background:radial-gradient(ellipse at 62% 54%,#f65f73 0 12%,#f02c5d 26%,#bb174c 37%,#fc6376 48%,#e7827c 58%,#42244e 69%,#171721 80%),linear-gradient(135deg,#3b2c4d,#e75168);border-color:#d0b9a1;box-shadow:inset 0 0 0 2px #20232d,0 5px 14px #000a}
+.phone.front:before{content:"";position:absolute;top:4.5%;left:34%;right:34%;height:5%;border-radius:30px;background:#050507;z-index:3}
+.phone.front:after{content:"";position:absolute;inset:13% 13% 16%;border:5px solid #ffbbb762;border-radius:50%;transform:rotate(-25deg);box-shadow:0 0 0 9px #f73e6c28,0 0 0 21px #fff2;filter:blur(.2px)}
+.phone.screen-blue{background:radial-gradient(ellipse at 45% 62%,#e5f7ff 0 2%,#25a8dc 13%,#125c9e 37%,#161e60 64%,#090a1e 76%)}
+.phone.screen-green{background:radial-gradient(ellipse at 55% 45%,#e3ff96 0,#52cfa0 19%,#219390 34%,#092d3c 65%,#07121c 85%)}
+.phone.screen-orange{background:radial-gradient(ellipse at 50% 45%,#ffd2a0 2%,#ff9338 19%,#ae234a 49%,#351535 73%,#10111c 87%)}
+.phone.screen-purple{background:radial-gradient(ellipse at 65% 42%,#cbc0fa 3%,#7248da 30%,#332e87 55%,#101332 83%)}
+.phone:nth-child(1){left:2%;z-index:1;transform:perspective(450px) rotateY(-24deg) rotateZ(-2deg);height:75%;bottom:8%}
+.phone:nth-child(2){left:16%;z-index:2;transform:perspective(450px) rotateY(-16deg) rotateZ(-1deg);height:83%;bottom:5%}
+.phone:nth-child(3){left:29%;z-index:3;transform:perspective(450px) rotateY(-9deg) rotateZ(-1deg);height:91%;bottom:2%}
+.phone:nth-child(4){left:39%;z-index:7;width:26%;height:96%;bottom:0;transform:translateY(-1%);border-radius:13px}
+.phone:nth-child(5){left:57%;z-index:5;transform:perspective(450px) rotateY(12deg) rotateZ(1deg);height:88%;bottom:4%}
+.phone:nth-child(6){left:72%;z-index:4;transform:perspective(450px) rotateY(19deg) rotateZ(2deg);height:81%;bottom:6%}
+.phone:nth-child(7){left:84%;z-index:2;transform:perspective(450px) rotateY(29deg) rotateZ(3deg);height:72%;bottom:10%}
+.footbar{z-index:2;position:relative;flex:0 0 12.5%;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7%;background:var(--accent);color:#080807;padding:3% 2%;text-align:center;overflow:hidden}
+.hotline{display:block;width:100%;line-height:1.06;font-family:Impact,"Arial Narrow",Arial,sans-serif;font-weight:950;font-size:4.1cqw;white-space:nowrap}
+.address{display:block;width:100%;font-weight:750;line-height:1.15;font-size:2.7cqw;white-space:nowrap}
+.stand{position:relative;height:37cqw;width:100%;z-index:1;margin-top:-2px}
+.post{position:absolute;top:-5%;height:104%;width:3.4%;background:linear-gradient(90deg,#60636a,#e4e5e8 45%,#6e717a 90%);box-shadow:3px 2px 0 #000a}
+.post.a{left:17%}.post.b{right:11%}
+.brace{position:absolute;bottom:7%;height:4.2%;width:30%;background:linear-gradient(#d6d8db,#737983);transform-origin:center center;box-shadow:2px 2px 1px #0006}
+.brace.left.a{left:-1%;transform:rotate(-59deg)}.brace.right.a{left:11%;transform:rotate(58deg)}
+.brace.left.b{right:9%;transform:rotate(-57deg)}.brace.right.b{right:-8%;transform:rotate(57deg)}
+.foot{position:absolute;height:5.5%;bottom:0;background:linear-gradient(#c5c8cc 0 28%,#535963 70%,#272b32);transform:skewX(-18deg);box-shadow:3px 5px 4px #0009}
+.foot.a{left:-1%;width:45%}.foot.b{right:-7%;width:47%}
+.stage-floor{position:absolute;height:1px;background:linear-gradient(90deg,transparent,#ffffff3e,transparent);width:min(90vw,800px);bottom:10%;z-index:-1}
+.toolbar{position:fixed;z-index:30;left:50%;bottom:max(15px,env(safe-area-inset-bottom));transform:translateX(-50%);display:flex;gap:5px;padding:6px;background:#131925e8;border:1px solid #5c667d77;border-radius:17px;box-shadow:0 16px 55px #0009;backdrop-filter:blur(17px);max-width:calc(100vw - 16px)}
+.toolbar button{border:0;border-radius:12px;background:transparent;color:#d8deec;font-size:12px;font-weight:750;white-space:nowrap;padding:11px 14px;min-height:40px}
+.toolbar button:hover,.toolbar button[aria-pressed="true"]{background:#344054;color:#fff}
+.toolbar .primary{background:var(--accent);color:#0b0b0a}
+.toolbar .primary:hover{background:#fff2a0;color:#111}
+.editor{position:fixed;z-index:50;right:18px;top:18px;bottom:18px;width:min(388px,calc(100vw - 36px));overflow:auto;border-radius:20px;border:1px solid #65708463;background:#10151ff5;padding:24px;box-shadow:0 30px 100px #000d;backdrop-filter:blur(20px)}
+.editor[hidden]{display:none}
+.editor-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.editor h2{font-size:22px;letter-spacing:-.045em;margin:0}
+.editor p{font-size:13px;line-height:1.6;color:#acb6c9}
+.close{width:38px;height:38px;border:0;border-radius:10px;background:#293446;color:#fff;font-size:23px}
+.inputs{display:grid;gap:13px;margin-top:21px}
+.input{display:grid;gap:5px;color:#d8dce8;font-size:12px;font-weight:750}
+.input input{width:100%;height:43px;border-radius:10px;border:1px solid #3d4a60;background:#080e17;color:#fff;padding:0 12px;font-size:14px}
+.actions{display:flex;gap:10px;margin-top:22px}
+.actions button{flex:1;padding:12px 10px;border-radius:10px;border:1px solid #3d4a60;color:white;background:#28354a;font-weight:800}
+.actions button[type="submit"]{background:var(--accent);border-color:transparent;color:#12100b}
+.colors{display:flex;gap:9px;margin-top:12px}
+.colors button{border:2px solid transparent;width:35px;height:35px;border-radius:50%;background:var(--tone);color:#161616;font-weight:900}
+.colors button[aria-pressed="true"]{outline:2px solid white;outline-offset:3px}
+.help{margin-top:20px;font-size:11px!important;color:#91a1bc!important}
+.toast{position:fixed;z-index:70;bottom:87px;left:50%;transform:translate(-50%,12px);padding:12px 18px;border:1px solid #566781;background:#1a2534f2;border-radius:12px;opacity:0;pointer-events:none;transition:transform .18s,opacity .18s;max-width:90vw;font-size:13px;text-align:center}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.flat-mode .stand,.flat-mode .stage-floor,.flat-mode .scene-shadow{display:none}
+.flat-mode .stage{background:#050505;padding-bottom:82px}
+.flat-mode .billboard{transform:none;box-shadow:none;border:0}
+.flat-mode .rig{--rig-width:min(96vw,580px,calc((100dvh - 130px)*.615));filter:none}
+.stage:fullscreen{background:#050505;min-height:100vh;width:100vw;padding:0;overflow:hidden}
+.stage:fullscreen .rig{--rig-width:min(90vw,680px,calc((100vh - 65px)*.615))}
+.stage:fullscreen .stand{display:none}
+.stage:fullscreen .billboard{transform:none;box-shadow:none}
+@media(max-width:640px){
+ .stage{padding:16px 6px 83px}
+ .rig{--rig-width:min(90vw,440px,calc((100dvh - 160px)*.615))}
+ .toolbar{gap:1px;border-radius:15px;padding:4px}
+ .toolbar button{padding:11px 10px;font-size:11px}
+ .editor{inset:8px 8px 74px;width:auto;padding:18px}
+ .scene-shadow{bottom:6%}
+ .stage-floor{bottom:7%}
+}
+@media(max-height:650px) and (min-width:641px){
+ .rig{--rig-width:min(410px,calc((100dvh - 110px)*.615))}
+ .stage{padding:6px 12px 55px}
+ .stand{height:20cqw}
+}
+@media(prefers-reduced-motion:reduce){.pulse{animation:none!important}.toast{transition:none}}
+</style>
+</head>
+<body>
+<main class="stage" id="stage">
+ <div class="scene-shadow" aria-hidden="true"></div><div class="stage-floor" aria-hidden="true"></div>
+ <div class="rig">
+  <section class="billboard" aria-label="Bảng hiệu quảng cáo đứng Apple Mobile">
+   <div class="left-strip">
+    <div class="side-mark" aria-hidden="true">
+     <svg class="apple-svg" viewBox="0 0 100 110" role="img" aria-label="Biểu tượng quả táo"><path d="M59 22c-1-8 7-18 15-22 5-2 10-2 12-2-1 10-5 18-13 23-5 3-10 4-14 4-1-1-1-2 0-3Z"/><path d="M83 31c-9-6-16-4-24-1-6 3-10 3-16 0-9-4-18-4-26 2C4 42 5 62 10 76c3 10 9 21 16 28 4 5 9 7 14 6 5-1 10-4 17-4 8 0 12 4 18 4 6 0 10-5 15-11 5-7 9-15 11-24-12-5-18-14-18-25 0-8 4-15 11-20-4-2-7-3-11-4Z" transform="translate(-5 -3) scale(.98)"/></svg>
+    </div>
+    <div class="vertical-name" data-bind="side" data-fit>APPLE MOBILE</div>
+    <div class="vertical-tag">SMART PHONE</div>
+   </div>
+   <div class="face">
+    <div class="masthead">
+     <div class="big-logo" aria-hidden="true">
+      <svg class="apple-svg" viewBox="0 0 100 110"><path d="M59 22c-1-8 7-18 15-22 5-2 10-2 12-2-1 10-5 18-13 23-5 3-10 4-14 4-1-1-1-2 0-3Z"/><path d="M83 31c-9-6-16-4-24-1-6 3-10 3-16 0-9-4-18-4-26 2C4 42 5 62 10 76c3 10 9 21 16 28 4 5 9 7 14 6 5-1 10-4 17-4 8 0 12 4 18 4 6 0 10-5 15-11 5-7 9-15 11-24-12-5-18-14-18-25 0-8 4-15 11-20-4-2-7-3-11-4Z" transform="translate(-5 -3) scale(.98)"/></svg>
+     </div>
+     <h1 class="name" data-bind="shop" data-fit>APPLE MOBILE</h1>
+     <div class="tagline" data-bind="tagline" data-fit>SMART PHONE</div>
+    </div>
+    <div class="offers">
+     <div class="offer pulse" data-bind="offer1" data-fit>MUA BÁN &amp; SỬA CHỮA</div>
+     <div class="offer pulse" data-bind="offer2" data-fit>ÉP KÍNH LẤY NGAY</div>
+     <div class="offer pulse" data-bind="offer3" data-fit>PHỤ KIỆN - DÁN KÍNH</div>
+    </div>
+    <div class="phones" aria-label="Hình minh họa các mẫu điện thoại iPhone" role="img">
+      <div class="phone back"><div class="camera-island"><i></i><i></i><i></i></div></div>
+      <div class="phone screen-purple"></div>
+      <div class="phone screen-blue"></div>
+      <div class="phone front"></div>
+      <div class="phone screen-green"></div>
+      <div class="phone screen-orange"></div>
+      <div class="phone back"><div class="camera-island"><i></i><i></i><i></i></div></div>
+    </div>
+    <div class="footbar">
+      <div class="hotline" data-fit><span aria-hidden="true">☎</span> HOTLINE: <span data-bind="hotline">09xx xxx xxx</span></div>
+      <div class="address" data-fit><span aria-hidden="true">⌖</span> Địa chỉ: <span data-bind="address">Cập nhật tại đây</span></div>
+    </div>
+   </div>
+  </section>
+  <div class="stand" aria-hidden="true">
+    <div class="post a"></div><div class="post b"></div>
+    <div class="brace left a"></div><div class="brace right a"></div>
+    <div class="brace left b"></div><div class="brace right b"></div>
+    <div class="foot a"></div><div class="foot b"></div>
+  </div>
+ </div>
+</main>
+<nav class="toolbar" aria-label="Điều khiển bảng quảng cáo">
+ <button type="button" class="primary" id="editBtn" aria-controls="editor" aria-expanded="false">✎ Chỉnh chữ</button>
+ <button type="button" id="flatBtn" aria-pressed="false">▣ Bảng phẳng</button>
+ <button type="button" id="lightBtn" aria-pressed="true">✦ Hiệu ứng</button>
+ <button type="button" id="fullBtn">⛶ Toàn màn hình</button>
+</nav>
+<aside class="editor" id="editor" hidden aria-label="Chỉnh sửa bảng hiệu">
+ <div class="editor-head"><h2>Chỉnh sửa bảng hiệu</h2><button id="closeBtn" class="close" type="button" aria-label="Đóng">×</button></div>
+ <p>Đổi tên cửa hàng, dịch vụ, hotline và địa chỉ. Nội dung lưu tại trình duyệt hiện tại, không cần đăng nhập.</p>
+ <form id="editForm">
+   <div class="inputs" id="inputs"></div>
+   <p style="margin:20px 0 8px;color:#d8deeb;font-weight:750">Màu dải quảng cáo</p>
+   <div class="colors" role="group" aria-label="Màu nền dải quảng cáo">
+      <button type="button" data-color="#ffdf05" aria-label="Vàng" style="--tone:#ffdf05" aria-pressed="true">✓</button>
+      <button type="button" data-color="#65ed77" aria-label="Xanh lá" style="--tone:#65ed77" aria-pressed="false"></button>
+      <button type="button" data-color="#78dbff" aria-label="Xanh dương" style="--tone:#78dbff" aria-pressed="false"></button>
+   </div>
+   <div class="actions"><button type="submit">Lưu nội dung</button><button type="button" id="resetBtn">Mặc định</button></div>
+   <p class="help">Mẹo: đặt màn hình ở chế độ toàn màn hình để trình chiếu bảng hiệu. Dùng “Bảng phẳng” nếu không muốn hiển thị chân đỡ mô phỏng.</p>
+ </form>
+</aside>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+(()=>{
+'use strict';
+const KEY='apple-mobile-standing-sign-v1';
+const defaults={shop:'APPLE MOBILE',side:'APPLE MOBILE',tagline:'SMART PHONE',offer1:'MUA BÁN & SỬA CHỮA',offer2:'ÉP KÍNH LẤY NGAY',offer3:'PHỤ KIỆN - DÁN KÍNH',hotline:'09xx xxx xxx',address:'Cập nhật tại đây',color:'#ffdf05'};
+const labels={shop:'Tên cửa hàng',side:'Tên dọc bên hông',tagline:'Dòng giới thiệu',offer1:'Dải vàng số 1',offer2:'Dải vàng số 2',offer3:'Dải vàng số 3',hotline:'Số điện thoại',address:'Địa chỉ'};
+const $=s=>document.querySelector(s);
+const $$=s=>Array.from(document.querySelectorAll(s));
+const editor=$('#editor'),inputs=$('#inputs'),editBtn=$('#editBtn'),toast=$('#toast');
+let toastId, saved={...defaults};
+try{
+ const data=JSON.parse(localStorage.getItem(KEY)||'null');
+ if(data&&typeof data==='object'){
+   for(const key of Object.keys(defaults)){
+     if(key==='color'){if(['#ffdf05','#65ed77','#78dbff'].includes(data[key])) saved.color=data[key];}
+     else if(typeof data[key]==='string'&&data[key].trim())saved[key]=data[key].trim().slice(0,95);
+   }
+ }
+}catch(error){}
+let draft={...saved};
+function notify(message){
+ toast.textContent=message;toast.classList.add('show');
+ clearTimeout(toastId);toastId=setTimeout(()=>toast.classList.remove('show'),2700);
+}
+function fit(){
+ $$('[data-fit]').forEach(el=>{
+  el.style.fontSize='';
+  let size=parseFloat(getComputedStyle(el).fontSize);
+  let n=0;
+  while(el.scrollWidth>el.clientWidth+1&&size>7&&n++<85){
+    size=Math.max(7,size-.5);el.style.fontSize=size+'px';
+  }
+ });
+}
+let frame;
+function queueFit(){cancelAnimationFrame(frame);frame=requestAnimationFrame(fit);}
+function render(data){
+ for(const [key,val] of Object.entries(data)){
+  if(key==='color')continue;
+  $$('[data-bind="'+key+'"]').forEach(el=>{el.textContent=val;});
+ }
+ document.documentElement.style.setProperty('--accent',data.color);
+ $$('[data-color]').forEach(btn=>{
+  const on=btn.dataset.color===data.color;
+  btn.setAttribute('aria-pressed',String(on));btn.textContent=on?'✓':'';
+ });
+ queueFit();
+}
+for(const [key,title] of Object.entries(labels)){
+ const label=document.createElement('label');label.className='input';
+ const caption=document.createElement('span');caption.textContent=title;
+ const inp=document.createElement('input');inp.type='text';inp.name=key;inp.value=saved[key];inp.maxLength=95;inp.autocomplete='off';
+ inp.addEventListener('input',()=>{draft[key]=inp.value.trim()||defaults[key];render(draft);});
+ label.append(caption,inp);inputs.append(label);
+}
+function sync(){
+ $$('input[name]').forEach(input=>{input.value=draft[input.name];});
+}
+function toggleEdit(open){
+ if(open){draft={...saved};sync();editor.hidden=false;editBtn.setAttribute('aria-expanded','true');inputs.querySelector('input').focus();}
+ else{editor.hidden=true;draft={...saved};render(saved);editBtn.setAttribute('aria-expanded','false');editBtn.focus();}
+}
+editBtn.addEventListener('click',()=>toggleEdit(editor.hidden));
+$('#closeBtn').addEventListener('click',()=>toggleEdit(false));
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!editor.hidden)toggleEdit(false);});
+$$('[data-color]').forEach(btn=>btn.addEventListener('click',()=>{draft.color=btn.dataset.color;render(draft);}));
+$('#editForm').addEventListener('submit',e=>{
+ e.preventDefault();
+ saved={...draft};
+ try{localStorage.setItem(KEY,JSON.stringify(saved));notify('Đã lưu nội dung và màu sắc bảng hiệu.');}
+ catch(error){notify('Đã áp dụng; trình duyệt không cho phép lưu lâu dài.');}
+ editor.hidden=true;editBtn.setAttribute('aria-expanded','false');editBtn.focus();
+});
+$('#resetBtn').addEventListener('click',()=>{
+ draft={...defaults};saved={...defaults};sync();render(saved);
+ try{localStorage.removeItem(KEY);}catch(error){}
+ notify('Đã khôi phục thiết kế mặc định.');
+});
+const flatBtn=$('#flatBtn');
+flatBtn.addEventListener('click',()=>{
+ const on=document.body.classList.toggle('flat-mode');
+ flatBtn.setAttribute('aria-pressed',String(on));flatBtn.textContent=on?'▤ Dạng đứng':'▣ Bảng phẳng';queueFit();
+});
+let animated=true;
+$('#lightBtn').addEventListener('click',()=>{
+ animated=!animated;
+ $$('.offer').forEach(el=>el.style.animationPlayState=animated?'running':'paused');
+ $('#lightBtn').setAttribute('aria-pressed',String(animated));
+ $('#lightBtn').textContent=animated?'✦ Hiệu ứng':'▶ Bật hiệu ứng';
+});
+$('#fullBtn').addEventListener('click',()=>{
+ if(document.fullscreenElement){document.exitFullscreen().catch(()=>notify('Không thể thoát toàn màn hình.'));}
+ else if($('#stage').requestFullscreen){$('#stage').requestFullscreen().catch(()=>notify('Trình duyệt này không cho phép. Có thể dùng F11 trên máy tính.'));}
+ else notify('Dùng chế độ toàn màn hình trong trình duyệt hoặc F11 trên máy tính.');
+});
+document.addEventListener('fullscreenchange',()=>{
+ $('#fullBtn').textContent=document.fullscreenElement?'⤢ Thu nhỏ':'⛶ Toàn màn hình';
+ queueFit();
+});
+window.addEventListener('resize',queueFit,{passive:true});
+render(saved);
+})();
+</script>
+</body>
+</html>
