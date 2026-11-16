@@ -19,11 +19,11 @@
     button:focus-visible,input:focus-visible{outline:3px solid #ffe18b;outline-offset:3px}
     .stage{min-height:100dvh;display:grid;place-items:center;padding:22px 14px 90px;position:relative;isolation:isolate}
     .stage::before{content:"";pointer-events:none;position:absolute;width:min(110vw,1000px);aspect-ratio:1;top:50%;left:50%;transform:translate(-50%,-49%);background:radial-gradient(ellipse,#2c2e5730 1%,#4c152522 36%,transparent 66%);filter:blur(42px);z-index:-1}
-    .board{width:min(92vw,calc((100dvh - 128px)*.8),740px);aspect-ratio:4/5;position:relative;isolation:isolate;container-type:inline-size;overflow:hidden;border:solid 1px #686975;background:radial-gradient(ellipse at 50% 48%,#16121a 0%,#08090f 49%,#020305 94%);box-shadow:0 0 0 5px #050505,0 0 0 7px #34343b,0 0 0 11px #070809,0 0 0 13px #1d2029,0 30px 90px #000c,0 0 100px #f2ebff13,inset 0 0 50px #000}
+    .board{width:min(92vw,calc(80dvh - 102px),740px);aspect-ratio:4/5;position:relative;isolation:isolate;container-type:inline-size;overflow:hidden;border:solid 1px #686975;background:radial-gradient(ellipse at 50% 48%,#16121a 0%,#08090f 49%,#020305 94%);box-shadow:0 0 0 5px #050505,0 0 0 7px #34343b,0 0 0 11px #070809,0 0 0 13px #1d2029,0 30px 90px #000c,0 0 100px #f2ebff13,inset 0 0 50px #000}
     .board::before{content:"";position:absolute;inset:2%;z-index:1;pointer-events:none;border:1px solid #8da9ee72;box-shadow:0 0 9px #dbe7ff5f,inset 0 0 8px #8ad2ff48,0 0 0 3px #0c1019}
     .board::after{content:"";position:absolute;inset:0;z-index:6;pointer-events:none;opacity:.12;background:repeating-linear-gradient(180deg,transparent 0,transparent 3px,#0008 4px);mix-blend-mode:multiply}
     .bolts{position:absolute;inset:0;z-index:4;pointer-events:none}
-    .bulb{position:absolute;width:1.2cqw;height:1.2cqw;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle at 42% 33%,#fff 0 19%,#e7f2ff 36%,#bfcaff 53%,#51649e 68%,#0000 80%);box-shadow:0 0 3px 1px #fff,0 0 6px 2px #c2d2ff,0 0 13px 4px #dae3ff9e;animation:bulb-glow var(--bulb-speed) infinite ease-in-out;animation-delay:calc(var(--index)*-0.043s)}
+    .bulb{position:absolute;width:1.2cqw;height:1.2cqw;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle at 42% 33%,#fff 0 19%,#e7f2ff 36%,#bfcaff 53%,#51649e 68%,#0000 80%);box-shadow:0 0 3px 1px #fff,0 0 6px 2px #c2d2ff,0 0 13px 4px #dae3ff9e;animation:bulb-glow var(--bulb-speed) infinite ease-in-out;animation-delay:0s}
     .bulb::after{content:"";position:absolute;inset:-70%;border-radius:50%;background:radial-gradient(circle,#e0edff63 0%,transparent 66%);pointer-events:none}
     .frame-inner{position:absolute;inset:4.7% 5.6%;z-index:1;border:1px solid #3a3e4d;box-shadow:inset 0 0 20px #000;pointer-events:none}
     .sign-content{position:absolute;inset:7.3% 7.2% 7.5%;z-index:3;display:flex;flex-direction:column;align-items:center;justify-content:space-around;text-align:center;user-select:none;white-space:nowrap}
@@ -181,11 +181,13 @@
       });
     }
     function togglePanel(open){
+      if(!open){apply(committed);}
       panel.hidden=!open;editBtn.setAttribute('aria-expanded',String(open));
       if(open){syncFields();fields.querySelector('input').focus();}
       else{editBtn.focus();}
     }
-    apply(load());
+    var committed=Object.assign({},original,load());
+    apply(committed);
     buildFields();
     editBtn.addEventListener('click',function(){togglePanel(panel.hidden);});
     document.getElementById('closeBtn').addEventListener('click',function(){togglePanel(false);});
@@ -196,10 +198,10 @@
       event.preventDefault();
       var data={};
       Array.from(fields.querySelectorAll('input')).forEach(function(input){data[input.name]=input.value.trim()||original[input.name];});
-      apply(data);save(data);togglePanel(false);notify('Đã áp dụng nội dung bảng hiệu.');
+      committed=Object.assign({},data);apply(committed);save(committed);togglePanel(false);notify('Đã áp dụng nội dung bảng hiệu.');
     });
     document.getElementById('resetBtn').addEventListener('click',function(){
-      apply(original);syncFields();save({});notify('Đã khôi phục nội dung mặc định.');
+      committed=Object.assign({},original);apply(committed);syncFields();save({});notify('Đã khôi phục nội dung mặc định.');
     });
     var positions=[];
     var horizontal=39,vertical=49;
@@ -214,7 +216,7 @@
       bulb.className='bulb';
       bulb.style.left=pos[0]+'%';
       bulb.style.top=pos[1]+'%';
-      bulb.style.setProperty('--index',index);
+      bulb.style.animationDelay=(-index*0.043)+'s';
       fragment.appendChild(bulb);
     });
     holder.appendChild(fragment);
