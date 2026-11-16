@@ -128,6 +128,16 @@ button:disabled{opacity:.42;cursor:default}
 @media(max-width:375px){.speed-button{font-size:9px;padding:0 5px}.lesson-bottom .game-btn{padding:0 5px}.coach-line{top:calc(106px + env(safe-area-inset-top))}}
 @media(max-width:450px){.lesson-bottom[data-phase="trace"] #checkButton{flex:1 1 100%;min-height:44px}.lesson-bottom[data-phase="trace"] #checkButton span{font-size:12px}}
 @media(max-width:360px){.hud{left:6px;right:6px;gap:4px}.brand{padding:4px 5px;gap:4px;max-width:135px}.logo{width:28px;height:28px;font-size:17px;border-radius:9px}.brand-text strong{font-size:10px}.hud-actions{gap:3px}.hud-pill{height:35px;padding:0 5px;font-size:11px}.hud-btn{width:32px;height:35px;border-radius:10px;font-size:17px}}
+.mic-button{background:#fff0e3;color:#98674b;border-color:#f6dcc3}
+.demo-button{background:#eef7ff;color:#587aaf;border-color:#d8e9fa}
+.stroke-next-button{background:#ecfbf2;color:#468a6c;border-color:#cbeeda}
+.dictation-overlay{z-index:28}
+.dictation-card{max-width:470px}
+.dictation-label{display:block;font-size:12px;font-weight:800;text-align:left;color:#7367a7;margin:16px 0 9px}
+#dictationInput{width:100%;height:49px;border:2px solid #ddd4f1;border-radius:14px;padding:0 15px;font:700 17px ui-rounded,system-ui,sans-serif;background:#fff;color:#3b3b61;user-select:text;-webkit-user-select:text;touch-action:auto}
+#dictationInput:focus{outline:3px solid #dcd4ff}
+.dictation-target{font-size:12px!important;color:#7863bc!important}
+@media(max-width:650px){.lesson-bottom[data-phase="trace"] .demo-button,.lesson-bottom[data-phase="trace"] .stroke-next-button{flex:1 1 auto}.lesson-bottom .mic-button{min-width:74px}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 <script src="./assets/three.min.js"></script>
@@ -149,13 +159,27 @@ button:disabled{opacity:.42;cursor:default}
   <button id="exitLesson" class="game-btn" title="Về khu vườn"><strong>⌂</strong> Về vườn</button>
   <button id="speakButton" class="game-btn yellow" title="Phát lại lời đọc thật chậm"><strong>🔊</strong><span id="speakLabel">Nghe lại</span></button>
   <button id="speedButton" class="game-btn speed-button" type="button" title="Điều chỉnh tốc độ giọng đọc" aria-label="Tốc độ đọc: chậm">🐢 Chậm</button>
+  <button id="speakMic" class="game-btn mic-button" type="button" title="Đọc cho Gấu nghe"><strong>🎤</strong><span id="micText">Bé đọc</span></button>
   <button id="startTrace" class="game-btn primary" type="button"><strong>✏️</strong> Tập tô</button>
+  <button id="demoStroke" class="game-btn demo-button" type="button" title="Xem Gấu vẽ từng nét"><strong>▶</strong> Xem mẫu</button>
+  <button id="nextStroke" class="game-btn stroke-next-button" type="button" title="Xem mũi tên của nét tiếp theo"><strong>➜</strong> Nét sau</button>
   <button id="undoButton" class="game-btn" title="Hoàn tác"><strong>↶</strong> Lùi</button>
   <button id="clearButton" class="game-btn" title="Tô lại"><strong>⌫</strong> Tẩy</button>
   <button id="checkButton" class="game-btn primary"><strong>✓</strong><span id="checkText">Kiểm tra</span></button>
 </div>
 <div id="feedback" class="feedback" role="status" aria-live="polite" hidden>👆 Chạm và tô theo nét chữ nhé!</div>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
+<div id="dictationOverlay" class="overlay dictation-overlay" hidden>
+  <section class="modal dictation-card" role="dialog" aria-modal="true" aria-labelledby="dictationHeading">
+    <span style="font-size:56px" aria-hidden="true">🐻🎤</span>
+    <h2 id="dictationHeading">Gấu nghe bé đọc</h2>
+    <p>Trình duyệt chưa hỗ trợ nghe trực tiếp. Trên iPad hoặc iPhone, hãy chạm vào ô và bấm <strong>🎙️ trên bàn phím</strong> để đọc từ cho Gấu.</p>
+    <label class="dictation-label" for="dictationInput">Bé hãy đọc từ được Gấu hướng dẫn</label>
+    <input id="dictationInput" type="text" inputmode="text" maxlength="70" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Bấm 🎙️ bàn phím để đọc…">
+    <p id="dictationTarget" class="dictation-target"></p>
+    <div class="modal-actions"><button id="dictationCancel" type="button">Đóng</button><button id="dictationSubmit" class="cta" type="button">Gấu trả lời ✨</button></div>
+  </section>
+</div>
 <div id="welcome" class="overlay">
   <section class="welcome" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle">
     <span class="eyebrow">🌈 VƯỜN CHỮ CÁI · 3D ADVENTURE</span>
@@ -176,8 +200,8 @@ button:disabled{opacity:.42;cursor:default}
 <div id="helpOverlay" class="overlay" hidden>
   <section class="modal help-modal" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
     <h2 id="helpTitle">🎮 Cách chơi</h2>
-    <ol><li>Dùng các phím <b>W A S D / mũi tên</b> hoặc cần ảo để điều khiển Gấu Bông.</li><li>Chạm vào chữ nổi trong khu vườn, Gấu sẽ tự đi tới chữ đó. Có thể mở bản đồ 🗺️ để chọn nhanh.</li><li><b>Nghe chậm</b> và đọc theo Gấu. Có thể nghe lại và chọn 🐢 Chậm / 🐇 Vừa / 🚀 Nhanh, không cần bật micro.</li><li><b>Tô chữ</b> trên bảng phép thuật, có thể tẩy và làm lại.</li><li><b>Tìm chữ</b> đúng trong 4 khối 3D, rồi <b>tìm đồ vật</b> tương ứng với từ vừa nghe.</li><li>Hoàn thành 4 thử thách để nhận 1–3 ⭐ và làm một bông hoa trong khu vườn nở rộ!</li></ol>
-    <p>Chữ mẫu sử dụng phông chữ của thiết bị để luyện nét cơ bản, chưa phải mẫu chữ viết tay chuẩn theo chương trình nhà trường.</p>
+    <ol><li>Dùng các phím <b>W A S D / mũi tên</b> hoặc cần ảo để điều khiển Gấu Bông.</li><li>Chạm vào chữ nổi trong khu vườn, Gấu sẽ tự đi tới chữ đó. Có thể mở bản đồ 🗺️ để chọn nhanh.</li><li><b>Nghe chậm</b> rồi bấm 🎤 Bé đọc. Trình duyệt có nhận dạng tiếng nói sẽ nghe và trả lời; trên iPad có thể dùng nút 🎙️ của bàn phím để đọc và nhận phản hồi.</li><li><b>Tô chữ</b> trên bảng phép thuật, có thể tẩy và làm lại.</li><li><b>Tìm chữ</b> đúng trong 4 khối 3D, rồi <b>tìm đồ vật</b> tương ứng với từ vừa nghe.</li><li>Hoàn thành 4 thử thách để nhận 1–3 ⭐ và làm một bông hoa trong khu vườn nở rộ!</li></ol>
+    <p>Bảng tập viết có ô ly, điểm đặt bút, mũi tên, tên từng nét và nút mô phỏng cách viết. Các nét SVG được biên dựng để tham khảo mẫu chữ tiểu học Việt Nam; nên đối chiếu thêm với mẫu trường bé đang học.</p>
     <div class="modal-actions"><button id="helpClose" class="cta" type="button">Đã hiểu, chơi thôi!</button></div>
   </section>
 </div>
@@ -203,6 +227,268 @@ const LETTERS=[
  ['q','quả','🍎'],['r','rùa','🐢'],['s','sao','⭐'],['t','tàu','🚂'],['u','ủng','🥾'],
  ['ư','ước','🌈'],['v','voi','🐘'],['x','xe','🚲'],['y','y tá','👩‍⚕️']
 ];
+// Nét chữ viết thường dựng bằng đường Bézier trên ô ly.
+// Hệ tọa độ: ĐK6 y=0, ĐK5 y=40, ĐK4 y=80, ĐK3 y=120, ĐK2 y=160, ĐK1 y=200.
+// Các nét được vẽ có thứ tự, điểm đặt bút và hướng đi tách rời; không dùng glyph font in.
+const M=(x,y)=>['M',x,y],L=(x,y)=>['L',x,y];
+const C=(a,b,c,d,x,y)=>['C',a,b,c,d,x,y];
+const Q=(a,b,x,y)=>['Q',a,b,x,y];
+const S=(title,...commands)=>({title,commands});
+const CLOSED=S('Nét cong kín',M(76,128),C(58,113,29,122,22,150),C(12,178,31,200,54,200),C(77,200,85,169,77,138),C(77,133,76,130,76,128));
+const RIGHT_HOOK=S('Nét móc ngược phải',M(89,120),L(89,184),C(89,201,105,207,117,187),C(126,173,128,164,128,160));
+const OVAL=S('Nét cong kín',M(94,127),C(78,114,40,114,28,145),C(17,174,32,202,62,200),C(88,198,100,169,95,139),C(95,134,95,130,94,127));
+const BREVE=S('Nét cong dưới nhỏ (dấu ă)',M(53,95),Q(76,122,99,94));
+const HAT1=S('Nét xiên lên (dấu mũ)',M(55,110),L(78,88));
+const HAT2=S('Nét xiên xuống (dấu mũ)',M(78,88),L(101,110));
+const HORN=S('Nét râu nhỏ',M(95,124),Q(125,124,123,100),Q(122,91,112,94));
+const TALL_LOOP=S('Nét khuyết trên',M(54,160),C(42,113,27,30,53,11),C(73,-3,82,24,75,53),C(66,100,52,164,54,200));
+const SHORT_HOOK=S('Nét móc phải',M(50,120),L(50,183),C(55,205,75,203,89,175));
+const DOT=S('Dấu chấm',M(51,91),C(52,88,55,88,57,91));
+const STICK=S('Nét thẳng',M(72,120),L(72,200));
+const ASCEND=S('Nét sổ cao',M(82,40),L(82,200));
+const N_CURVE=S('Nét móc hai đầu',M(29,120),L(29,184),C(31,202,45,204,54,181),C(69,136,79,118,95,132),C(108,144,98,182,104,193),C(113,204,124,198,131,175));
+const GLYPH_STROKES={
+ a:[CLOSED,RIGHT_HOOK],
+ 'ă':[CLOSED,RIGHT_HOOK,BREVE],
+ 'â':[CLOSED,RIGHT_HOOK,HAT1,HAT2],
+ b:[TALL_LOOP,S('Nét thắt và móc phải',M(55,153),C(79,111,113,126,108,156),C(102,185,73,197,56,187),C(63,202,96,206,113,181))],
+ c:[S('Nét cong trái',M(91,131),C(77,115,48,118,32,137),C(15,161,28,201,59,200),C(77,200,86,190,92,181))],
+ d:[CLOSED,S('Nét móc ngược dài',M(91,40),L(91,181),C(91,207,112,208,130,160))],
+ 'đ':[CLOSED,S('Nét móc ngược dài',M(91,40),L(91,181),C(91,207,112,208,130,160)),S('Nét ngang chữ đ',M(67,107),Q(92,102,117,105))],
+ e:[S('Nét cong phải và cong trái',M(94,151),C(76,154,49,165,43,151),C(30,135,48,120,72,124),C(97,130,100,146,81,153),C(64,163,43,169,50,188),C(58,204,79,205,94,184))],
+ 'ê':[S('Nét cong phải và cong trái',M(94,151),C(76,154,49,165,43,151),C(30,135,48,120,72,124),C(97,130,100,146,81,153),C(64,163,43,169,50,188),C(58,204,79,205,94,184)),HAT1,HAT2],
+ g:[OVAL,S('Nét khuyết dưới',M(96,120),L(96,248),C(95,276,62,288,50,270),C(38,254,45,242,58,236))],
+ h:[TALL_LOOP,S('Nét móc hai đầu',M(54,155),C(70,123,96,120,105,137),L(105,184),C(105,206,122,202,131,177))],
+ i:[S('Nét móc ngược',M(49,120),L(49,184),C(49,202,75,207,90,175)),DOT],
+ k:[TALL_LOOP,S('Nét thắt giữa',M(55,164),C(74,148,95,132,111,120),C(102,145,81,160,63,169)),S('Nét móc dưới',M(77,160),C(90,178,98,201,114,199),C(124,198,130,184,132,173))],
+ l:[TALL_LOOP],
+ m:[S('Nét móc đầu',M(20,121),L(20,183),C(20,205,36,205,47,182)),S('Nét móc giữa',M(46,169),C(55,129,72,116,87,134),C(99,148,90,180,98,192),C(108,207,119,194,124,174)),S('Nét móc cuối',M(121,169),C(131,130,149,119,160,141),L(160,182),C(160,204,174,203,182,177))],
+ n:[N_CURVE],
+ o:[OVAL],
+ 'ô':[OVAL,HAT1,HAT2],
+ 'ơ':[OVAL,HORN],
+ p:[S('Nét sổ xuống',M(45,121),L(45,280)),S('Nét cong phải',M(47,139),C(75,113,110,120,113,156),C(112,188,81,203,46,191))],
+ q:[OVAL,S('Nét khuyết dưới',M(97,120),L(97,251),C(99,282,126,281,130,253))],
+ r:[S('Nét móc và thắt',M(29,122),C(26,150,33,168,48,166),C(59,163,59,121,79,121),C(93,120,108,129,108,145))],
+ s:[S('Nét thắt chữ s',M(99,126),C(85,114,65,115,53,131),C(38,151,65,165,84,174),C(109,190,85,210,55,197),C(43,192,40,184,39,176))],
+ t:[S('Nét sổ và móc',M(64,81),L(64,178),C(64,203,90,209,105,175)),S('Nét ngang',M(41,128),Q(77,125,107,127))],
+ u:[S('Nét móc đầu',M(29,120),L(29,177),C(29,205,57,206,72,175)),S('Nét móc cuối',M(73,120),L(73,180),C(73,203,94,207,113,177))],
+ 'ư':[S('Nét móc đầu',M(29,120),L(29,177),C(29,205,57,206,72,175)),S('Nét móc cuối',M(73,120),L(73,180),C(73,203,94,207,113,177)),HORN],
+ v:[S('Nét móc xuôi và xiên',M(26,122),C(30,150,46,192,62,197),C(79,202,95,151,109,125))],
+ x:[S('Nét cong xiên trái',M(24,123),C(46,121,56,172,80,197)),S('Nét cong xiên phải',M(111,121),C(88,130,57,185,34,199))],
+ y:[S('Nét móc trái',M(30,120),L(30,177),C(30,203,56,206,72,173)),S('Nét khuyết dưới',M(83,120),L(83,251),C(83,280,53,288,48,268),C(43,247,57,234,68,235))]
+};
+function sampleBezier(commands){
+ const pts=[];let last={x:0,y:0};
+ const push=(x,y)=>pts.push({x,y});
+ for(const [type,...v] of commands){
+  if(type==='M'){last={x:v[0],y:v[1]};push(last.x,last.y);continue;}
+  if(type==='L'){
+   const n=Math.max(2,Math.ceil(Math.hypot(v[0]-last.x,v[1]-last.y)/3));
+   const start={...last};
+   for(let j=1;j<=n;j++){const t=j/n;push(start.x+(v[0]-start.x)*t,start.y+(v[1]-start.y)*t);}
+   last={x:v[0],y:v[1]};continue;
+  }
+  if(type==='C'){
+   const a={...last};
+   for(let j=1;j<=36;j++){
+    const t=j/36,r=1-t;
+    push(r*r*r*a.x+3*r*r*t*v[0]+3*r*t*t*v[2]+t*t*t*v[4],
+     r*r*r*a.y+3*r*r*t*v[1]+3*r*t*t*v[3]+t*t*t*v[5]);
+   }
+   last={x:v[4],y:v[5]};continue;
+  }
+  if(type==='Q'){
+   const a={...last};
+   for(let j=1;j<=28;j++){
+    const t=j/28,r=1-t;
+    push(r*r*a.x+2*r*t*v[0]+t*t*v[2],r*r*a.y+2*r*t*v[1]+t*t*v[3]);
+   }
+   last={x:v[2],y:v[3]};
+  }
+ }
+ return pts;
+}
+for(const key of Object.keys(GLYPH_STROKES)){
+ for(const stroke of GLYPH_STROKES[key])stroke.samples=sampleBezier(stroke.commands);
+}
+let guideStep=0,guideCanvasState=null,guideDemo=null,guideCompletion=[];
+function letterStrokes(){
+ const glyph=LETTERS[level][0],paths=GLYPH_STROKES[glyph];
+ if(!paths)throw new Error('Thiếu mẫu chữ viết tay: '+glyph);
+ return paths;
+}
+function guideGeometry(){
+ const b=boardSize,paths=letterStrokes();
+ let minY=Infinity,maxY=-Infinity;
+ for(const stroke of paths)for(const p of stroke.samples){minY=Math.min(minY,p.y);maxY=Math.max(maxY,p.y);}
+ const top=Math.min(40,Math.floor((minY+8)/40)*40);
+ const bottom=Math.max(200,Math.ceil(maxY/40)*40);
+ const scale=Math.min((b.w-145)/190,(b.h-200)/(bottom-top));
+ const centerY=(92+(b.h-61))/2;
+ return {top,bottom,scale,ox:b.w/2-74*scale,oy:centerY-(top+bottom)/2*scale,b,paths};
+}
+function lineThroughSamples(c,samples,offset=0,count=samples.length){
+ const end=Math.min(samples.length,offset+count);
+ if(end<=offset)return;
+ c.beginPath();c.moveTo(samples[offset].x,samples[offset].y);
+ for(let i=offset+1;i<end;i++)c.lineTo(samples[i].x,samples[i].y);
+}
+function drawHandwritingGuide(){
+ const c=boardBase.getContext('2d'),b=boardSize,g=guideGeometry();
+ guideCanvasState=g;
+ c.clearRect(0,0,b.w,b.h);
+ c.fillStyle='#fffefa';c.fillRect(0,0,b.w,b.h);
+ c.fillStyle='#e8edff';c.fillRect(0,0,b.w,78);
+ c.fillStyle='#6259ab';c.font='900 '+(b.w<800?26:31)+'px '+FONT;
+ c.textAlign='left';c.textBaseline='middle';
+ c.fillText('✏️ VỞ Ô LY · CHỮ '+LETTERS[level][0].toLocaleUpperCase('vi-VN'),27,40);
+ c.textAlign='right';c.font='700 20px '+FONT;
+ c.fillStyle='#8a7fb4';c.fillText((guideStep+1)+' / '+g.paths.length+' nét',b.w-27,40);
+ c.save();
+ c.translate(g.ox,g.oy);c.scale(g.scale,g.scale);
+ const left=Math.max(-34,(36-g.ox)/g.scale);
+ const right=Math.min(190,(b.w-34-g.ox)/g.scale);
+ for(let j=g.top;j<=g.bottom;j+=40){
+  c.beginPath();c.moveTo(left,j);c.lineTo(right,j);
+  c.strokeStyle=j===200?'#6495df':'#a7caef';
+  c.lineWidth=(j===200?2.1:1.1)/g.scale*2.2;
+  c.setLineDash([]);c.stroke();
+  c.fillStyle='#6f90b9';
+  c.font='800 '+(Math.max(12,19/g.scale))+'px '+FONT;
+  c.textAlign='right';c.textBaseline='middle';
+  const n=(200-j)/40+1;
+  if(n>0)c.fillText(String(n),left-5,j);
+ }
+ c.strokeStyle='#c9e2f8';c.lineWidth=1.2/g.scale*2;
+ const gridStart=Math.floor(left/40)*40;
+ for(let x=gridStart;x<=right;x+=40){
+  c.beginPath();c.moveTo(x,g.top);c.lineTo(x,g.bottom);c.stroke();
+ }
+ c.lineJoin='round';c.lineCap='round';
+ for(let i=0;i<g.paths.length;i++){
+  const stroke=g.paths[i];
+  const active=i===guideStep;
+  lineThroughSamples(c,stroke.samples);
+  c.strokeStyle=active?'#6e5ad0':'#bac7e0';
+  c.lineWidth=(active?8:5)/g.scale;
+  c.setLineDash(active?[2.5,2.1]:[1.2,2.4]);
+  c.stroke();c.setLineDash([]);
+ }
+ // Number and arrow: first segment shows where and in which direction the pencil travels.
+ for(let i=0;i<g.paths.length;i++){
+  const stroke=g.paths[i],a=stroke.samples[0];
+  const arrow=stroke.samples[Math.min(8,stroke.samples.length-1)];
+  if(!a||!arrow)continue;
+  const active=i===guideStep;
+  const angle=Math.atan2(arrow.y-a.y,arrow.x-a.x);
+  const length=active?17:12;
+  const dx=Math.cos(angle),dy=Math.sin(angle);
+  c.beginPath();c.moveTo(a.x,a.y);c.lineTo(a.x+dx*length,a.y+dy*length);
+  c.strokeStyle=active?'#e28843':'#a0abc0';
+  c.lineWidth=(active?3.7:2.2)/g.scale; c.stroke();
+  const tipx=a.x+dx*length,tipy=a.y+dy*length;
+  c.beginPath();c.moveTo(tipx,tipy);
+  c.lineTo(tipx-dx*7-dy*4,tipy-dy*7+dx*4);
+  c.lineTo(tipx-dx*7+dy*4,tipy-dy*7-dx*4);
+  c.closePath();c.fillStyle=active?'#e28843':'#afb6c6';c.fill();
+  const bubbleX=a.x+(i%2===0?-27:27);
+  const bubbleY=a.y-(active?22:17);
+  c.beginPath();c.arc(bubbleX,bubbleY,active?10:7.7,0,Math.PI*2);
+  c.fillStyle=active?'#ffbb69':'#fffdfa';c.fill();
+  c.strokeStyle=active?'#d98340':'#b0bdd7';c.lineWidth=1/g.scale*1.4;c.stroke();
+  c.fillStyle=active?'#763e2a':'#8494b1';
+  c.font='900 '+(active?11:9)+'px '+FONT;c.textAlign='center';c.textBaseline='middle';
+  c.fillText(String(i+1),bubbleX,bubbleY+.1);
+ }
+ c.restore();
+ c.textAlign='center';c.textBaseline='middle';
+ c.fillStyle='#7b6fa8';c.font='800 '+(b.w<800?19:23)+'px '+FONT;
+ c.fillText('NÉT '+(guideStep+1)+': '+g.paths[guideStep].title.toLocaleUpperCase('vi-VN'),b.w/2,b.h-42,b.w-55);
+ drawBoard();
+}
+function drawGuideDemoOverlay(ctx){
+ if(!guideDemo||!guideCanvasState||mode!=='trace')return;
+ const g=guideCanvasState;
+ ctx.save();ctx.translate(g.ox,g.oy);ctx.scale(g.scale,g.scale);
+ const limit=guideDemo.step;
+ for(let i=0;i<=limit&&i<g.paths.length;i++){
+  const stroke=g.paths[i];
+  const count=i===limit?Math.max(1,Math.floor(guideDemo.position)):stroke.samples.length;
+  lineThroughSamples(ctx,stroke.samples,0,count);
+  ctx.lineCap='round';ctx.lineJoin='round';ctx.lineWidth=5/g.scale;
+  ctx.setLineDash([]);ctx.strokeStyle='#22a884';ctx.stroke();
+ }
+ const stroke=g.paths[Math.min(limit,g.paths.length-1)];
+ if(stroke){
+  const idx=Math.min(stroke.samples.length-1,Math.max(0,Math.floor(guideDemo.position)));
+  const dot=stroke.samples[idx];
+  ctx.beginPath();ctx.arc(dot.x,dot.y,7/g.scale,0,Math.PI*2);
+  ctx.fillStyle='#f59a52';ctx.fill();
+  ctx.strokeStyle='#fff';ctx.lineWidth=2/g.scale;ctx.stroke();
+ }
+ ctx.restore();
+}
+function updateGuideDemo(dt){
+ if(!guideDemo||mode!=='trace')return;
+ const stroke=letterStrokes()[guideDemo.step];
+ guideDemo.position+=dt*66;
+ if(guideDemo.position>=stroke.samples.length+12){
+  guideDemo.step++;
+  guideDemo.position=0;
+  if(guideDemo.step>=letterStrokes().length){
+   guideDemo=null;
+   $('demoStroke').innerHTML='<strong>▶</strong> Xem mẫu';
+   drawBoard();
+   setFeedback('🐻 Bé đã xem Gấu viết mẫu. Giờ tô theo các mũi tên nhé!');
+   return;
+  }
+  guideStep=guideDemo.step;drawHandwritingGuide();
+ }
+ drawBoard();
+}
+function showWritingDemo(){
+ if(mode!=='trace')return;
+ if(guideDemo){
+  guideDemo=null;
+  $('demoStroke').innerHTML='<strong>▶</strong> Xem mẫu';
+  drawBoard();
+  return;
+ }
+ guideStep=0;
+ guideDemo={step:0,position:0};
+ $('demoStroke').innerHTML='<strong>⏸</strong> Dừng mẫu';
+ drawHandwritingGuide();
+ setFeedback('✏️ Gấu đang vẽ theo thứ tự nét. Hãy nhìn chấm cam!');
+}
+function nextWritingStroke(){
+ if(mode!=='trace')return;
+ guideDemo=null;$('demoStroke').innerHTML='<strong>▶</strong> Xem mẫu';
+ guideStep=(guideStep+1)%letterStrokes().length;
+ drawHandwritingGuide();
+ setFeedback('➜ Nét '+(guideStep+1)+': '+letterStrokes()[guideStep].title+'. Bắt đầu ở mũi tên vàng.');
+}
+function childStrokeCompleted(stroke){
+ if(mode!=='trace'||!guideCanvasState||!stroke||!stroke.points.length)return;
+ const g=guideCanvasState;
+ const start=stroke.points[0],guide=letterStrokes()[guideStep];
+ const first=guide.samples[0];
+ const px=g.ox+first.x*g.scale,py=g.oy+first.y*g.scale;
+ const d=Math.hypot(start.x*boardSize.w-px,start.y*boardSize.h-py);
+ if(d<Math.max(35,g.scale*20)){
+  if(!guideCompletion.includes(guideStep))guideCompletion.push(guideStep);
+  if(guideStep<letterStrokes().length-1){
+   guideStep++;
+   drawHandwritingGuide();
+   setFeedback('🌟 Tốt lắm! Tiếp theo đặt bút tại mũi tên '+(guideStep+1)+'.');
+  }else{
+   setFeedback('🌼 Bé đã tô nét cuối, hãy bấm Kiểm tra nhé!');
+  }
+ }else if(strokes.length===1){
+  setFeedback('✏️ Bé thử đặt bút gần mũi tên '+(guideStep+1)+' màu cam nhé!');
+ }
+}
+
 const STORAGE_KEY='html-lab:vuon-chu-cai:v1';
 const FONT='Arial,"Trebuchet MS",sans-serif';
 const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
@@ -394,6 +680,128 @@ function changeVoiceSpeed(){
  persist();updateProgress();
  if(mode!=='world')speakLetter();
 }
+// Nhận giọng bé: chỉ phản hồi đúng/sai khi thật sự có văn bản nhận dạng.
+// SpeechRecognition có thể dùng dịch vụ nhận dạng của trình duyệt (không phải dịch vụ riêng của game).
+let voiceRecognition=null,voiceListening=false,voiceCaptureToken=0;
+function normalizedWords(s){
+ return String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+  .replace(/[đĐ]/g,'d').toLocaleLowerCase('vi-VN')
+  .replace(/[^a-z0-9 ]/g,' ').trim().replace(/\s+/g,' ');
+}
+function matchesSpokenWord(s){
+ const candidate=normalizedWords(s),[letter,word]=LETTERS[level];
+ const normalizedWord=normalizedWords(word),normalizedLetter=normalizedWords(letter);
+ const words=' '+candidate+' ';
+ const raw=String(s||'').toLocaleLowerCase('vi-VN').trim().replace(/\s+/g,' ');
+ const spokenLetter=letter.toLocaleLowerCase('vi-VN');
+ return words.includes(' '+normalizedWord+' ') ||
+  raw===spokenLetter || raw==='chữ '+spokenLetter ||
+  raw==='chữ cái '+spokenLetter;
+}
+function praiseSpeech(transcript,correct){
+ const spoken=String(transcript||'').trim().slice(0,100);
+ if(!spoken)return;
+ const target=LETTERS[level][1];
+ if(correct){
+  const text='Gấu nghe bé nói "'+spoken+'". Đúng rồi! Bé giỏi lắm!';
+  setFeedback('🐻 '+text,'good');
+  chirp('happy');
+  sayInParts([{text:'Gấu nghe rồi! Con đọc đúng từ '+target+'. Giỏi lắm!',
+   caption:'🐻 Gấu đã nghe: "'+spoken+'". Đúng từ '+target+'!'}]);
+ }else{
+  const text='Gấu nghe "'+spoken+'". Bé thử đọc chậm từ "'+target+'" nhé!';
+  setFeedback('🐻 '+text,'warn');
+  sayInParts([{text:'Gấu nghe con rồi. Mình thử từ '+target+' thêm lần nữa nhé!',
+   caption:'🐻 Gấu nghe: "'+spoken+'". Mình thử từ '+target+' nhé!'}]);
+ }
+}
+function evaluateSpokenInput(spoken){
+ const text=String(spoken||'').trim();
+ if(!text){toast('Bé thử nói một từ hoặc dùng nút 🎙️ trên bàn phím nhé!');return;}
+ praiseSpeech(text,matchesSpokenWord(text));
+}
+function setMicStatus(active){
+ voiceListening=active;
+ $('micText').textContent=active?'Đang nghe…':'Bé đọc';
+ $('speakMic').setAttribute('aria-pressed',String(active));
+}
+function stopListening(){
+ voiceCaptureToken++;
+ const previous=voiceRecognition;voiceRecognition=null;
+ if(previous)try{previous.abort();}catch(_){}
+ setMicStatus(false);
+}
+function openDictation(){
+ if(mode!=='listen'&&mode!=='word')return;
+ $('dictationOverlay').hidden=false;
+ $('dictationInput').value='';
+ $('dictationTarget').textContent='Bé thử đọc: "'+LETTERS[level][1]+'". Gấu chỉ kiểm tra văn bản được nhận dạng.';
+ $('dictationInput').focus();
+}
+function closeDictation(){
+ $('dictationOverlay').hidden=true;
+ $('dictationInput').blur();
+}
+function submitDictation(){
+ const text=$('dictationInput').value;
+ if(!text.trim()){toast('Bé chạm 🎙️ trên bàn phím rồi đọc một từ nhé!');return;}
+ closeDictation();evaluateSpokenInput(text);
+}
+function listenToChild(){
+ if(mode!=='listen'&&mode!=='word')return;
+ if(voiceListening){stopListening();setFeedback('🎤 Đã dừng nghe. Bé có thể thử lại nhé!');return;}
+ stopSpeech();
+ const Engine=window.SpeechRecognition||window.webkitSpeechRecognition;
+ if(!Engine){openDictation();return;}
+ let current;
+ try{current=new Engine();}catch(_){openDictation();return;}
+ stopListening();
+ voiceRecognition=current;
+ const token=voiceCaptureToken;
+ current.lang='vi-VN';current.interimResults=false;
+ current.continuous=false;current.maxAlternatives=3;
+ let gotResult=false;
+ current.onstart=()=>{
+  if(token!==voiceCaptureToken)return;
+  setMicStatus(true);
+  setFeedback('🎤 Gấu đang lắng nghe. Bé đọc từ "'+LETTERS[level][1]+'" nhé!');
+ };
+ current.onresult=e=>{
+  if(token!==voiceCaptureToken)return;
+  gotResult=true;let alternatives=[];
+  try{
+   const first=e.results[0];
+   for(let i=0;i<Math.min(first.length||1,3);i++)alternatives.push(first[i].transcript);
+  }catch(_){}
+  const spoken=alternatives.find(x=>matchesSpokenWord(x))||alternatives[0]||'';
+  stopListening();
+  evaluateSpokenInput(spoken);
+ };
+ current.onerror=e=>{
+  if(token!==voiceCaptureToken||gotResult)return;
+  const type=e.error||'';
+  stopListening();
+  if(type==='not-allowed'||type==='service-not-allowed'){
+   setFeedback('🎤 Micro chưa được cấp quyền. Có thể dùng 🎙️ trên bàn phím.');
+   openDictation();
+  }else if(type==='network'||type==='language-not-supported'){
+   setFeedback('🎤 Thiết bị chưa nhận được giọng đọc. Bé thử nút 🎙️ bàn phím nhé!');
+   openDictation();
+  }else if(type==='no-speech'){
+   setFeedback('🐻 Gấu chưa nghe rõ, bé đến gần micro và đọc lại nhé!','warn');
+  }else if(type!=='aborted'){
+   setFeedback('🐻 Gấu chưa nghe được. Mình thử lại nhé!');
+   openDictation();
+  }
+ };
+ current.onend=()=>{
+  if(token!==voiceCaptureToken)return;
+  stopListening();
+  if(!gotResult)setFeedback('🐻 Gấu chưa nhận được tiếng bé. Bé thử đọc lại nhé!');
+ };
+ try{current.start();setMicStatus(true);}catch(_){stopListening();openDictation();}
+}
+
 function textureFromCanvas(canvas){
  const tex=new T.CanvasTexture(canvas);
  if('colorSpace'in tex)tex.colorSpace=T.SRGBColorSpace;
@@ -606,7 +1014,7 @@ function initRenderer(){
  buildLessonScene();
  resize();
 }
-function currentModal(){return !$('welcome').hidden||!$('mapOverlay').hidden||!$('helpOverlay').hidden||!$('winOverlay').hidden;}
+function currentModal(){return !$('welcome').hidden||!$('mapOverlay').hidden||!$('helpOverlay').hidden||!$('winOverlay').hidden||!$('dictationOverlay').hidden;}
 function setMode(next){
  mode=next;
  const garden=next==='world',listen=next==='listen',trace=next==='trace';
@@ -620,8 +1028,11 @@ function setMode(next){
  $('lessonBottom').dataset.phase=next;
  $('feedback').hidden=garden;
  $('startTrace').hidden=!listen;
+ $('speakMic').hidden=!(listen||word);
  $('undoButton').hidden=!trace;
  $('clearButton').hidden=!trace;
+ $('demoStroke').hidden=!trace;$('nextStroke').hidden=!trace;
+ $('speakMic').hidden=!(listen||word);
  $('checkButton').hidden=!trace;
  const stages={
   listen:['🔊 NGHE CHỮ ','1/4 · Nghe và đọc'],
@@ -846,54 +1257,14 @@ function drawListeningBoard(){
  drawBoard();
 }
 function drawPracticeTemplate(){
- const b=boardSize,c=boardBase.getContext('2d');
- c.clearRect(0,0,b.w,b.h);
- c.fillStyle='#fffefa';c.fillRect(0,0,b.w,b.h);
- const gradient=c.createLinearGradient(0,0,b.w,b.h);
- gradient.addColorStop(0,'#fffefd');gradient.addColorStop(1,'#fef9f2');
- c.fillStyle=gradient;c.fillRect(0,0,b.w,b.h);
- // 3D notebook visual lives inside the CanvasTexture.
- c.fillStyle='#eee7ff';c.fillRect(0,0,b.w,80);
- c.fillStyle='#7164c8';
- c.textBaseline='middle';c.textAlign='left';
- c.font='900 '+(b.w<800?28:32)+'px '+FONT;
- c.fillText('✨ BÉ TẬP VIẾT',36,44);
- c.font='800 '+(b.w<800?20:24)+'px '+FONT;
- c.textAlign='right';c.fillText('CHỮ '+LETTERS[level][0].toLocaleUpperCase('vi-VN'),b.w-36,45);
- // Four handwriting guide lines.
- const fontSize=b.w<800?430:410;
- const baseline=b.h*.673;
- const guideTop=baseline-fontSize*.84;
- const gap=fontSize*.28;
- for(let i=0;i<4;i++){
-  const y=guideTop+i*gap;
-  c.beginPath();c.moveTo(28,y);c.lineTo(b.w-28,y);
-  c.lineWidth=i===2?3:2;
-  c.strokeStyle=i===2?'#a2bfe3':'#cbdcf6';
-  c.setLineDash(i===1?[6,9]:[]);c.stroke();
- }
- c.setLineDash([]);
- c.font='900 '+fontSize+'px '+FONT;
- c.textAlign='center';c.textBaseline='alphabetic';
- c.fillStyle='#ece8ff';
- c.fillText(LETTERS[level][0],b.w/2,baseline);
- c.lineWidth=6.5;
- c.strokeStyle='#7e6ac6';
- c.setLineDash([3.5,11]);
- c.lineJoin='round';
- c.strokeText(LETTERS[level][0],b.w/2,baseline);
- c.setLineDash([]);
- c.textAlign='center';c.textBaseline='middle';c.fillStyle='#b6abc8';
- c.font='800 '+(b.w<800?19:21)+'px '+FONT;
- c.fillText('👆 Dùng ngón tay hoặc chuột tô theo nét đứt nhé!',b.w/2,b.h-43);
- guideLetterSpec={fontSize,baseline,x:b.w/2};
- drawBoard();
+ drawHandwritingGuide();
 }
 function drawBoard(){
  if(!boardCtx)return;
  boardCtx.setTransform(1,0,0,1,0,0);
  boardCtx.clearRect(0,0,boardSize.w,boardSize.h);
  boardCtx.drawImage(boardBase,0,0);
+ drawGuideDemoOverlay(boardCtx);
  boardCtx.strokeStyle='#7964e9';
  boardCtx.fillStyle='#7964e9';
  boardCtx.lineCap='round';boardCtx.lineJoin='round';
@@ -954,6 +1325,7 @@ function drawPointerUp(e,cancel=false){
   const point=canvasUV(e);
   if(point)currentStroke.points.push(point);
   strokes.push(currentStroke);redo=[];
+  childStrokeCompleted(currentStroke);
  }
  tracePointer=null;currentStroke=null;
  try{worldCanvas.releasePointerCapture(e.pointerId);}catch(_){}
@@ -970,6 +1342,9 @@ function undoStroke(){
 }
 function clearStrokes(){
  strokes=[];redo=[];currentStroke=null;tracePointer=null;
+ guideCompletion=[];guideStep=0;guideDemo=null;
+ $('demoStroke').innerHTML='<strong>▶</strong> Xem mẫu';
+ if(mode==='trace')drawHandwritingGuide();
  attempts=0;traceScore=0;
  setFeedback('🌟 Bảng đã sạch! Bé tô lại từ đầu nhé.','');
  $('checkText').textContent='Kiểm tra';
@@ -980,35 +1355,32 @@ function setFeedback(text,kind=''){
 }
 function computeTraceScore(){
  if(!strokes.length)return 0;
- const b=boardSize,spec=guideLetterSpec;
+ const b=boardSize,g=guideCanvasState||guideGeometry();
  const mask=document.createElement('canvas'),art=document.createElement('canvas');
  mask.width=art.width=b.w;mask.height=art.height=b.h;
  const m=mask.getContext('2d',{willReadFrequently:true});
  const a=art.getContext('2d',{willReadFrequently:true});
  if(!m||!a)return 0;
- m.font='900 '+spec.fontSize+'px '+FONT;
- m.textAlign='center';m.textBaseline='alphabetic';m.strokeStyle='#fff';
- m.lineWidth=62;m.lineJoin='round';
- m.strokeText(LETTERS[level][0],spec.x,spec.baseline);
- a.lineCap='round';a.lineJoin='round';a.lineWidth=b.w<800?28:25;
- a.strokeStyle='#fff';a.fillStyle='#fff';
+ m.save();m.translate(g.ox,g.oy);m.scale(g.scale,g.scale);
+ m.lineWidth=50/g.scale;m.lineJoin='round';m.lineCap='round';m.strokeStyle='#fff';
+ g.paths.forEach(stroke=>{lineThroughSamples(m,stroke.samples);m.stroke();});
+ m.restore();
+ a.lineCap='round';a.lineJoin='round';a.strokeStyle='#fff';a.fillStyle='#fff';
+ a.lineWidth=b.w<800?28:25;
  strokes.forEach(stroke=>drawStroke(a,stroke));
  const mp=m.getImageData(0,0,b.w,b.h).data;
  const ap=a.getImageData(0,0,b.w,b.h).data;
  let target=0,paint=0,overlap=0;
- for(let y=0;y<b.h;y+=4){
-  for(let x=0;x<b.w;x+=4){
-   const i=(y*b.w+x)*4+3;
-   const ma=mp[i]>50,pa=ap[i]>50;
-   if(ma)target++;
-   if(pa)paint++;
-   if(ma&&pa)overlap++;
-  }
+ for(let y=0;y<b.h;y+=4)for(let x=0;x<b.w;x+=4){
+  const i=(y*b.w+x)*4+3,inside=mp[i]>50,drawn=ap[i]>50;
+  if(inside)target++;
+  if(drawn)paint++;
+  if(inside&&drawn)overlap++;
  }
- if(target===0||paint===0)return 0;
- const coverage=overlap/target;
- const precision=overlap/paint;
- return clamp(Math.round((Math.min(1,coverage/.35)*.70+precision*.30)*100),0,100);
+ if(!target||!paint)return 0;
+ const coverage=overlap/target,precision=overlap/paint;
+ const stepBonus=guideCompletion.length/g.paths.length*.12;
+ return clamp(Math.round((Math.min(1,coverage/.34)*.69+precision*.29+stepBonus)*100),0,100);
 }
 function checkTrace(){
  if(!strokes.length){toast('Bé tô vài nét trước nhé!');return;}
@@ -1113,6 +1485,8 @@ function layoutQuiz(){
 }
 function openLesson(i){
  if(i<0||i>=29)return;
+ stopListening();closeDictation();
+ guideDemo=null;guideCanvasState=null;guideStep=0;guideCompletion=[];
  clearTimeout(toastTimer);$('toast').classList.remove('show');
  stopSpeech();
  level=i;targetIndex=-1;autoTarget=null;
@@ -1131,10 +1505,12 @@ function openLesson(i){
 }
 function beginTrace(){
  if(mode!=='listen')return;
+ stopListening();closeDictation();
  stopSpeech();
+ guideStep=0;guideCompletion=[];guideDemo=null;
  setMode('trace');
- setFeedback('✏️ Di bút theo nét đứt; sai thì tẩy, không cần vội nhé!');
- setCoach('Giờ bé dùng ngón tay tô chữ '+LETTERS[level][0]+'.');
+ setFeedback('✏️ Xem số nét và mũi tên màu cam để biết điểm đặt bút nhé!');
+ setCoach('Nét 1: '+letterStrokes()[0].title+'. Bắt đầu tại mũi tên màu cam.');
 }
 function beginQuiz(){
  if(mode!=='trace')return;
@@ -1201,7 +1577,9 @@ function answerWord(choice,index){
  },540);
 }
 function quitLesson(){
+ stopListening();closeDictation();
  stopSpeech();
+ guideDemo=null;
  clearTimeout(winTimer);tracePointer=null;currentStroke=null;quizPointer=null;
  $('winOverlay').hidden=true;
  boardMesh.visible=false;lessonFrame.visible=false;quizGroup.visible=false;
@@ -1343,6 +1721,7 @@ function renderFrame(now){
  lastTime=now;animTime=t;
  if(mode==='world')tickWorld(dt,t);
  else{
+  if(mode==='trace'&&guideDemo)updateGuideDemo(dt);
   for(const item of bobbing)if(item.lesson){
    item.mesh.position.y=item.base+Math.sin(t*1.4+item.phase)*.14;
    item.mesh.rotation.y+=dt*.2;
@@ -1376,10 +1755,19 @@ function setupControls(){
  $('actionButton').addEventListener('click',pressAction);
  $('exitLesson').addEventListener('click',quitLesson);
  $('speakButton').addEventListener('click',speakLetter);
+ $('speakMic').addEventListener('click',listenToChild);
+ $('dictationCancel').addEventListener('click',closeDictation);
+ $('dictationSubmit').addEventListener('click',submitDictation);
+ $('dictationInput').addEventListener('keydown',e=>{
+  if(e.key==='Enter'){e.preventDefault();submitDictation();}
+ });
+ $('dictationOverlay').addEventListener('click',e=>{if(e.target===$('dictationOverlay'))closeDictation();});
  $('speedButton').addEventListener('click',changeVoiceSpeed);
  $('startTrace').addEventListener('click',beginTrace);
  $('undoButton').addEventListener('click',undoStroke);
  $('clearButton').addEventListener('click',clearStrokes);
+ $('demoStroke').addEventListener('click',showWritingDemo);
+ $('nextStroke').addEventListener('click',nextWritingStroke);
  $('checkButton').addEventListener('click',checkTrace);
  $('repeatButton').addEventListener('click',()=>{openLesson(level);});
  $('nextButton').addEventListener('click',nextLesson);
@@ -1402,6 +1790,7 @@ function setupControls(){
  document.addEventListener('keydown',e=>{
   const key=e.key.toLowerCase();
   if(key==='escape'){
+   if(!$('dictationOverlay').hidden){closeDictation();return;}
    if(!$('mapOverlay').hidden||!$('helpOverlay').hidden){closeOverlays();return;}
    if(!$('winOverlay').hidden){quitLesson();return;}
    if(mode!=='world'&&$('welcome').hidden){quitLesson();return;}
