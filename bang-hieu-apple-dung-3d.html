@@ -184,7 +184,7 @@ button:disabled{cursor:not-allowed;opacity:.5}
 .flat-mode .billboard .left-strip,.flat-mode .billboard .right-strip,.flat-mode .billboard .top-cap{visibility:hidden}
 .flat-mode .rig{--rig-width:min(90vw,580px,calc((100dvh - 130px)*.615))}
 .flat-mode .scene-hint{display:none}
-.stage:fullscreen .billboard{--box-depth:29cqw}
+.stage:fullscreen .billboard{--box-depth:29cqw;transform:rotateX(var(--view-pitch)) rotateY(var(--view-yaw))}
 .stage:fullscreen .rig{--rig-width:min(81vw,650px,calc((100vh - 35px)*.615))}
 @media(max-width:640px){
   .rig{--rig-width:min(82vw,410px,calc((100dvh - 140px)*.54))}
@@ -200,14 +200,14 @@ button:disabled{cursor:not-allowed;opacity:.5}
   <section class="billboard" id="billboard" tabindex="0" aria-label="Mô hình bảng hiệu 3D: mặt trước chứa nội dung quảng cáo, mặt trái là chữ dọc. Kéo để xoay."> 
    <div class="top-cap" aria-hidden="true"></div>
    <div class="right-strip" aria-hidden="true"></div>
-   <div class="left-strip">
+   <div class="left-strip" aria-label="Mặt hông trái, chữ dọc">
     <div class="side-mark" aria-hidden="true">
      <svg class="apple-svg" viewBox="0 0 100 110" role="img" aria-label="Biểu tượng quả táo"><path d="M59 22c-1-8 7-18 15-22 5-2 10-2 12-2-1 10-5 18-13 23-5 3-10 4-14 4-1-1-1-2 0-3Z"/><path d="M83 31c-9-6-16-4-24-1-6 3-10 3-16 0-9-4-18-4-26 2C4 42 5 62 10 76c3 10 9 21 16 28 4 5 9 7 14 6 5-1 10-4 17-4 8 0 12 4 18 4 6 0 10-5 15-11 5-7 9-15 11-24-12-5-18-14-18-25 0-8 4-15 11-20-4-2-7-3-11-4Z" transform="translate(-5 -3) scale(.98)"/></svg>
     </div>
     <div class="vertical-name" data-bind="side" data-fit>APPLE MOBILE</div>
     <div class="vertical-tag">SMART PHONE</div>
    </div>
-   <div class="face">
+   <div class="face front-face" aria-label="Mặt trước chứa nội dung quảng cáo chính">
     <div class="masthead">
      <div class="big-logo" aria-hidden="true">
       <svg class="apple-svg" viewBox="0 0 100 110"><path d="M59 22c-1-8 7-18 15-22 5-2 10-2 12-2-1 10-5 18-13 23-5 3-10 4-14 4-1-1-1-2 0-3Z"/><path d="M83 31c-9-6-16-4-24-1-6 3-10 3-16 0-9-4-18-4-26 2C4 42 5 62 10 76c3 10 9 21 16 28 4 5 9 7 14 6 5-1 10-4 17-4 8 0 12 4 18 4 6 0 10-5 15-11 5-7 9-15 11-24-12-5-18-14-18-25 0-8 4-15 11-20-4-2-7-3-11-4Z" transform="translate(-5 -3) scale(.98)"/></svg>
