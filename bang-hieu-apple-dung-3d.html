@@ -323,6 +323,35 @@ button:disabled{cursor:not-allowed;opacity:.5}
   .scene-hint{margin:16px auto 0;font-size:9px}
 }
 
+
+/* Visible structural planes: separate dark side and top outside the advertising face */
+.billboard{--box-depth:24cqw;--view-yaw:31deg}
+.billboard .left-strip{
+  width:var(--box-depth);height:100%;
+  left:0;top:0;right:auto;
+  transform:translateX(calc(-1 * var(--box-depth) + 2px)) skewY(5deg);
+  transform-origin:right center;
+  background:linear-gradient(103deg,#23252b 0%,#0d0f13 22%,#050608 72%,#191b20 100%);
+  border:1px solid #515157;box-shadow:inset 12px 0 18px #0009, -3px 10px 20px #0008;
+  z-index:2;backface-visibility:visible;
+}
+.billboard .left-strip::after{
+  content:"";position:absolute;inset:0 0 0 auto;width:3px;
+  background:linear-gradient(90deg,#6f7788,#070708);opacity:.65;pointer-events:none;
+}
+.billboard .top-cap{
+  position:absolute;left:0;top:calc(-1 * var(--box-depth) * .34);
+  width:100%;height:calc(var(--box-depth) * .35);
+  transform:none;transform-origin:center bottom;
+  clip-path:polygon(0 100%,16% 0,99% 20%,100% 100%);
+  background:linear-gradient(180deg,#32353c 0%,#111418 53%,#060608 100%);
+  border:0;box-shadow:inset 0 0 16px #0008;backface-visibility:visible;
+  z-index:1;
+}
+.billboard .right-strip{visibility:hidden}
+.billboard .offers{grid-template-columns:minmax(0,1fr);justify-content:stretch}
+.flat-mode .billboard .left-strip,.flat-mode .billboard .top-cap{visibility:hidden}
+
 </style>
 </head>
 <body>
@@ -513,12 +542,12 @@ document.addEventListener('fullscreenchange',()=>{
 
 /* Pointer-driven inspection of the real 3D front and side surfaces. */
 const sign=$('#billboard');
-let yaw=-28,pitch=-7,drag=null;
+let yaw=31,pitch=-7,drag=null;
 function view(){
  sign.style.setProperty('--view-yaw',yaw+'deg');
  sign.style.setProperty('--view-pitch',pitch+'deg');
 }
-function resetView(){yaw=-28;pitch=-7;view();}
+function resetView(){yaw=31;pitch=-7;view();}
 sign.addEventListener('pointerdown',e=>{
  if(document.body.classList.contains('flat-mode')||!editor.hidden||e.button>0)return;
  drag={id:e.pointerId,x:e.clientX,y:e.clientY,yaw,pitch};
