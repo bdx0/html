@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#f7f8fc" />
+  <meta name="description" content="NOVA — Trang giới thiệu các dòng iPhone với thiết kế hiện đại, tối giản và tinh tế." />
+  <title>NOVA. — iPhone, theo cách của bạn</title>
+  <style>
+    :root{
+      --ink:#151724;--muted:#818596;--line:#e9ebf1;--canvas:#f7f8fc;--white:#fff;
+      --violet:#6d56ed;--violet2:#a685f3;--radius:24px;--shadow:0 20px 65px rgba(38,42,90,.075);
+      --wrap:1250px;--ease:cubic-bezier(.2,.8,.2,1)
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth;scroll-padding-top:100px}
+    body{margin:0;background:var(--canvas);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+    button,input,select{font:inherit}
+    button{cursor:pointer}
+    a{color:inherit;text-decoration:none}
+    button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #af9cfa;outline-offset:3px}
+    ::selection{background:#e4dcff}
+    .container{max-width:var(--wrap);margin-inline:auto;padding-inline:26px}
+    .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
+    .icon{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;width:20px;height:20px;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;fill:none}
+    .icon.sm{width:17px;height:17px}.icon.lg{width:23px;height:23px}
+    .announcement{height:35px;background:#151622;color:#eeedfa;display:flex;justify-content:center;align-items:center;gap:9px;font-size:11px;letter-spacing:.055em;font-weight:650}
+    .announcement .lightning{font-size:14px;color:#bdb2ff}
+    .announcement a{color:#c9baff;text-decoration:underline;text-underline-offset:3px}
+    .site-header{height:82px;position:sticky;top:0;z-index:70;background:rgba(247,248,252,.88);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(224,227,237,.72)}
+    .header-inner{height:100%;display:flex;align-items:center;gap:34px}
+    .brand{display:inline-flex;align-items:center;gap:11px;white-space:nowrap}
+    .brand-mark{display:grid;place-items:center;width:39px;height:39px;background:#171824;border-radius:13px;color:#fff;box-shadow:0 6px 20px #21203923;font-size:23px;line-height:1;font-weight:800;letter-spacing:-.13em;padding-right:3px}
+    .brand-name{font-size:22px;letter-spacing:-.075em;font-weight:830;line-height:1}
+    .brand-name span{color:var(--violet)}
+    .brand-small{display:block;color:#8d91a1;font-weight:700;font-size:8px;letter-spacing:.25em;line-height:1.8;margin-top:2px}
+    .desktop-nav{display:flex;align-items:center;gap:34px;margin:auto;font-size:13px;color:#606477;font-weight:630}
+    .desktop-nav a{transition:color .2s}.desktop-nav a:hover{color:var(--violet)}
+    .header-actions{margin-left:auto;display:flex;align-items:center;gap:10px}
+    .icon-btn{position:relative;width:43px;height:43px;border:1px solid #e9eaf0;background:#fff;border-radius:14px;display:grid;place-items:center;transition:transform .2s,border-color .2s,background .2s;color:#303343}
+    .icon-btn:hover{transform:translateY(-2px);border-color:#c7c2ed;background:#fbfaff}
+    .count{position:absolute;right:-5px;top:-5px;background:#6e53e8;color:#fff;border:2px solid #f7f8fc;border-radius:99px;min-width:19px;height:19px;padding:0 4px;font-size:10px;display:grid;place-items:center;font-weight:800}.count[hidden]{display:none!important}
+    .mobile-menu-btn{display:none}
+    .search-strip{position:absolute;top:100%;left:0;width:100%;background:#fff;border-bottom:1px solid #ececf2;box-shadow:0 12px 26px #12112b0d;padding:14px 0;display:none}
+    .search-strip.is-open{display:block}
+    .search-inner{display:flex;gap:12px;align-items:center}
+    .search-inner input{flex:1;border:0;outline:0;min-height:36px;color:var(--ink);background:transparent;font-size:15px}
+    .search-inner button{border:0;background:#f1f0fa;padding:8px 13px;border-radius:11px;color:#574cc8}
+    .hero{padding-top:26px}
+    .hero-panel{position:relative;min-height:588px;overflow:hidden;border-radius:32px;background:linear-gradient(113deg,#18182c 2%,#29264c 50%,#473775 100%);color:#fff;isolation:isolate;box-shadow:0 28px 75px #2a245526}
+    .hero-panel:before{content:"";position:absolute;inset:-25%;background:radial-gradient(circle at 80% 47%,#a58bf09c 0%,#7864d956 20%,transparent 40%),radial-gradient(circle at 18% 99%,#434a9a55,transparent 37%);z-index:-1}
+    .hero-panel:after{content:"";position:absolute;right:-90px;top:-280px;width:710px;height:710px;border:1px solid #ffffff18;border-radius:50%;box-shadow:0 0 0 90px #ffffff05,0 0 0 185px #ffffff04;pointer-events:none}
+    .hero-copy{position:relative;z-index:5;padding:78px 0 84px 74px;width:54%;max-width:620px}
+    .hero-kicker{display:inline-flex;align-items:center;gap:9px;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#d8d0ff;font-weight:760}
+    .hero-kicker:before{content:"";width:27px;height:1px;background:#b8a9ff}
+    .hero-title{font-weight:790;font-size:clamp(46px,5.1vw,76px);letter-spacing:-.076em;line-height:1.055;margin:29px 0 22px}
+    .hero-title em{font-style:normal;background:linear-gradient(120deg,#dcd3ff,#a993ff 55%,#e4dbff);color:transparent;background-clip:text;-webkit-background-clip:text}
+    .hero-desc{font-size:15px;line-height:1.85;color:#cecce2;max-width:390px;margin:0}
+    .hero-buttons{display:flex;gap:11px;flex-wrap:wrap;margin-top:33px}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:12px;border:0;border-radius:14px;min-height:49px;padding:0 21px;font-size:13px;font-weight:750;transition:transform .25s var(--ease),box-shadow .25s,background .25s}
+    .btn:hover{transform:translateY(-2px)}
+    .btn-white{color:#282445;background:#fff;box-shadow:0 10px 25px #16132b30}.btn-white:hover{box-shadow:0 12px 30px #0c082a55}
+    .btn-outline{color:#fff;background:#ffffff12;border:1px solid #ffffff42}.btn-outline:hover{background:#ffffff23}
+    .btn-dark{color:#fff;background:#1c1d2a}.btn-dark:hover{background:#343148}
+    .btn-purple{color:#fff;background:#6e55eb}.btn-purple:hover{background:#5d46d8}
+    .hero-proof{display:flex;align-items:center;gap:15px;margin-top:53px;color:#d3d1e8;font-size:11px;font-weight:570}
+    .hero-proof .dots{display:flex;padding-left:5px}.hero-proof .dot{display:grid;place-items:center;width:29px;height:29px;border-radius:100%;border:2px solid #2d2949;margin-left:-6px;background:#8f8bd5;font-size:11px}.hero-proof .dot:nth-child(2){background:#6556a6}.hero-proof .dot:nth-child(3){background:#b7a9ed;color:#28204d}
+    .hero-proof strong{color:#fff}
+    .hero-stage{position:absolute;z-index:2;top:0;bottom:0;left:49%;right:0;perspective:1100px;pointer-events:none}
+    .hero-halo{position:absolute;width:490px;height:490px;left:16%;top:12%;border-radius:50%;background:radial-gradient(circle,#c3a6ff5c,transparent 64%);filter:blur(12px)}
+    .hero-floor{position:absolute;bottom:31px;left:8%;width:93%;height:90px;background:radial-gradient(ellipse,#0908198a 0%,transparent 68%);filter:blur(10px)}
+    .phone{position:relative;display:block;aspect-ratio: .49;flex-shrink:0;border-radius:13% / 6.5%;background:linear-gradient(128deg,color-mix(in srgb,var(--phone-color) 74%,#fff),var(--phone-color) 43%,color-mix(in srgb,var(--phone-color) 72%,#000));border:4px solid color-mix(in srgb,var(--phone-color) 57%,#fff);box-shadow:inset 0 0 0 1.5px #ffffff70, inset -9px 0 14px #0000000a,10px 18px 36px #0000003c}
+    .phone:before{content:"";position:absolute;inset:3px;border-radius:11% / 5.5%;border:1px solid #ffffff67;pointer-events:none}
+    .phone:after{content:"";position:absolute;top:27%;left:45%;width:28%;height:13%;border-radius:50%;background:linear-gradient(145deg,#ffffff28,#00000015);filter:blur(.3px);transform:rotate(-31deg);opacity:.45}
+    .side-button{position:absolute;left:-5px;top:23%;width:3px;height:12%;background:#bab5b9;border-radius:3px 0 0 3px}
+    .side-button.two{top:38%;height:10%}
+    .camera-bump{position:absolute;left:7%;top:4%;width:48%;aspect-ratio:1;border-radius:26%;background:linear-gradient(135deg,color-mix(in srgb,var(--phone-color) 80%,#fff),color-mix(in srgb,var(--phone-color) 90%,#000));border:1.5px solid #ffffff70;box-shadow:inset 1px 1px 6px #ffffff62,2px 3px 8px #11111125}
+    .camera{position:absolute;width:38%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 47% 45%,#263a5c 0 12%,#0b1120 24%,#030609 48%,#181b20 53%,#02050a 59%,#808995 64%,#292c32 73%,#c4bcc3 78%,#333036 85%);box-shadow:inset 1px 2px 4px #111d3e,0 1px 2px #ffffff6b}
+    .camera.c1{left:8%;top:7%}.camera.c2{right:8%;top:24%}.camera.c3{left:8%;bottom:7%}
+    .flash{position:absolute;right:13%;top:9%;width:15%;aspect-ratio:1;background:radial-gradient(circle,#fff9db 0 25%,#e1dcc0 35%,#99958a 60%,#aaa6a0 68%);border-radius:50%;border:1px solid #bbb7ab}
+    .sensor{position:absolute;right:13%;bottom:14%;width:12%;aspect-ratio:1;background:#3a343d;border-radius:50%;box-shadow:inset 1px 1px 3px #000}
+    .phone.dual .camera-bump{width:43%;height:23%;aspect-ratio:auto}.phone.dual .camera{width:40%}.phone.dual .camera.c1{left:10%;top:8%}.phone.dual .camera.c2{left:10%;top:auto;bottom:8%}.phone.dual .camera.c3{display:none}.phone.dual .flash{right:13%;top:29%;width:18%}.phone.dual .sensor{right:15%;bottom:18%;width:12%}
+    .phone.single .camera-bump{width:34%;height:16%;aspect-ratio:auto}.phone.single .camera{width:54%}.phone.single .camera.c2,.phone.single .camera.c3,.phone.single .sensor{display:none}.phone.single .flash{width:18%;right:9%;top:47%}
+    .phone.screen{background:linear-gradient(135deg,#141526,#050713);border-color:#ae9fc2;overflow:hidden}
+    .phone.screen:before{inset:5px;border:1px solid #ffffff30;background:radial-gradient(ellipse at 71% 88%,#ffb4cd,transparent 39%),radial-gradient(ellipse at 38% 34%,#caa6ff,transparent 48%),radial-gradient(ellipse at 84% 14%,#6c78d9,transparent 41%),#302153;border-radius:11% / 5.5%}
+    .phone.screen:after{content:"";position:absolute;left:34%;top:3%;width:32%;height:3.8%;background:#0b0a13;border-radius:99px;opacity:1;transform:none}
+    .phone.screen .camera-bump{display:none}
+    .hero-phone{position:absolute;animation:float 7s ease-in-out infinite}
+    .hero-phone.main{width:235px;height:480px;left:37%;top:10%;transform:rotate(13deg);z-index:4;--phone-color:#b9abc9;animation-name:heroFloatMain}
+    .hero-phone.left{width:205px;height:420px;left:12%;top:24%;transform:rotate(-15deg);z-index:2;--phone-color:#a9b5d8;animation-name:heroFloatLeft;filter:brightness(.92)}
+    .hero-phone.right{width:200px;height:410px;left:66%;top:23%;transform:rotate(25deg);z-index:3;--phone-color:#e0a6b1;animation-name:heroFloatRight}
+    @keyframes heroFloatMain{0%,100%{transform:translateY(0) rotate(13deg)}50%{transform:translateY(-16px) rotate(13deg)}}
+    @keyframes heroFloatLeft{0%,100%{transform:translateY(0) rotate(-15deg)}50%{transform:translateY(12px) rotate(-15deg)}}
+    @keyframes heroFloatRight{0%,100%{transform:translateY(0) rotate(25deg)}50%{transform:translateY(-10px) rotate(25deg)}}
+    .hero-sticker{position:absolute;z-index:5;right:5%;top:15%;display:flex;align-items:center;gap:9px;padding:13px 16px;background:#ffffff22;border:1px solid #ffffff4b;backdrop-filter:blur(16px);border-radius:15px;color:#fff;box-shadow:0 12px 22px #21183825;font-size:11px;font-weight:750;transform:rotate(6deg)}
+    .hero-sticker .star{font-size:20px;color:#f6d8ff}
+    .scroll-hint{position:absolute;right:37px;bottom:30px;z-index:5;font-size:10px;font-weight:700;letter-spacing:.18em;color:#ddd7f7;display:flex;align-items:center;gap:10px}
+    .scroll-hint .line{width:34px;height:1px;background:#ddd7f7}
+    .trust-row{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin-top:18px}
+    .trust-item{display:flex;align-items:center;gap:14px;background:#fff;border:1px solid #ececf3;border-radius:18px;padding:18px 21px;min-height:80px}
+    .trust-icon{display:grid;place-items:center;flex:0 0 41px;width:41px;height:41px;border-radius:13px;background:#f0eeff;color:#7665df}
+    .trust-item strong{display:block;font-size:12px;font-weight:790;white-space:nowrap}.trust-item span{display:block;font-size:11px;color:#9598a8;margin-top:5px}
+    .section{padding-top:103px}
+    .section-head{display:flex;align-items:end;justify-content:space-between;gap:20px;margin-bottom:34px}
+    .eyebrow{text-transform:uppercase;letter-spacing:.19em;font-size:10px;color:var(--violet);font-weight:850}
+    .heading{font-size:clamp(32px,3.5vw,49px);letter-spacing:-.064em;line-height:1.14;margin:13px 0 0;font-weight:800}
+    .heading em{font-style:normal;color:#8170eb}
+    .head-desc{color:#8c90a0;line-height:1.7;font-size:13px;max-width:330px;margin:0 0 4px}
+    .collection-toolbar{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:23px;flex-wrap:wrap}
+    .filters{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+    .filter{background:#fff;color:#787b8b;border:1px solid #e7e8f0;border-radius:11px;padding:12px 16px;font-size:12px;font-weight:750;transition:.2s}
+    .filter:hover{border-color:#aea2f7;color:#5d4ad0}.filter.is-active{background:#222234;color:#fff;border-color:#222234;box-shadow:0 7px 15px #27233f20}
+    .sort-group{display:flex;align-items:center;gap:8px;color:#9194a2;font-size:12px;font-weight:650}.sort-group select{background:#fff;border:1px solid #e8eaf2;border-radius:10px;padding:11px 29px 11px 12px;color:#414458;font-weight:650;font-size:12px;cursor:pointer}
+    .product-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:19px}
+    .product-card{background:#fff;border:1px solid #e9eaf1;border-radius:23px;overflow:hidden;min-width:0;transition:transform .34s var(--ease),box-shadow .34s,border-color .34s}
+    .product-card:hover{transform:translateY(-6px);box-shadow:0 24px 50px #32345614;border-color:#dcd9ed}
+    .product-visual{position:relative;height:308px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:var(--product-bg);isolation:isolate}
+    .product-visual:before{content:"";position:absolute;width:230px;height:230px;border-radius:50%;background:#ffffff80;filter:blur(2px);top:34px;left:calc(50% - 115px);z-index:-1}
+    .product-visual:after{content:"";position:absolute;bottom:23px;left:50%;transform:translateX(-50%);width:170px;height:22px;border-radius:50%;background:#24203322;filter:blur(13px);z-index:0}
+    .product-visual .phone{width:128px;height:258px;transform:translateY(24px) rotate(-10deg);z-index:2;transition:transform .45s var(--ease);box-shadow:inset 0 0 0 1.5px #ffffff70,8px 16px 25px #00000024}
+    .product-card:hover .product-visual .phone{transform:translateY(10px) rotate(-5deg)}
+    .product-visual .phone.ghost{position:absolute;width:121px;height:246px;transform:translate(50px,23px) rotate(13deg);z-index:1;filter:brightness(1.04)}
+    .product-card:hover .product-visual .phone.ghost{transform:translate(56px,15px) rotate(17deg)}
+    .product-badge{position:absolute;top:17px;left:17px;z-index:6;background:#ffffffde;padding:8px 11px;border-radius:9px;font-size:10px;font-weight:820;color:#6257a6;letter-spacing:.01em;box-shadow:0 6px 20px #00000008}
+    .wish-btn{position:absolute;top:14px;right:15px;z-index:6;border:1px solid #ffffff92;border-radius:11px;width:37px;height:37px;background:#ffffffbe;color:#5d5e70;display:grid;place-items:center;backdrop-filter:blur(10px);transition:.2s}
+    .wish-btn:hover{transform:scale(1.06)}.wish-btn.is-active{background:#f9dff0;color:#e2578f}.wish-btn.is-active svg{fill:currentColor}
+    .product-body{padding:23px 23px 22px}
+    .product-sub{display:flex;align-items:center;justify-content:space-between;font-size:10px;letter-spacing:.09em;text-transform:uppercase;font-weight:750;color:#a1a4b1}
+    .product-name{font-size:20px;letter-spacing:-.04em;font-weight:810;margin:8px 0 6px}
+    .product-desc{color:#9195a3;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .product-meta{display:flex;align-items:center;justify-content:space-between;margin-top:18px;gap:8px}
+    .price{font-weight:820;font-size:20px;letter-spacing:-.042em;white-space:nowrap}.price-note{display:block;font-size:10px;font-weight:600;color:#a1a4b1;letter-spacing:0;margin-bottom:4px}
+    .swatches{display:flex;gap:5px;align-items:center}.swatch{width:17px;height:17px;border-radius:50%;padding:0;border:3px solid #fff;background:var(--swatch);box-shadow:0 0 0 1px #dbdce4;transition:.2s}.swatch:hover{transform:scale(1.12)}.swatch.is-active{box-shadow:0 0 0 2px #6556da}
+    .product-actions{display:grid;grid-template-columns:1fr 49px;gap:8px;margin-top:19px}.product-actions .btn{min-height:43px;font-size:12px;border-radius:11px}.add-btn{border:0;border-radius:11px;background:#f0eeff;color:#6250cf;display:grid;place-items:center;transition:background .2s}.add-btn:hover{background:#dfd9ff}
+    .empty-state{padding:50px 15px;text-align:center;background:#fff;border:1px dashed #d5d6e3;border-radius:20px;color:#74798a;display:none}
+    .notice-small{text-align:center;color:#9a9ca8;font-size:11px;margin:23px 0 0}
+    .feature-section{padding-top:105px}
+    .feature-grid{display:grid;grid-template-columns:1.14fr .86fr;gap:20px;margin-top:30px}
+    .feature-main{position:relative;min-height:405px;overflow:hidden;border-radius:28px;background:linear-gradient(135deg,#e5e2f7 0%,#c9c7f7 52%,#a6a0e3);padding:42px 48px;isolation:isolate}
+    .feature-main:after{content:"";position:absolute;width:470px;height:470px;right:-160px;bottom:-230px;border-radius:50%;border:75px solid #ffffff27;z-index:-1}
+    .feature-main h3,.feature-side h3{margin:17px 0 11px;font-size:clamp(29px,3.1vw,42px);line-height:1.11;letter-spacing:-.065em;max-width:400px}
+    .feature-main p,.feature-side p{font-size:13px;line-height:1.8;max-width:300px;color:#66617f}
+    .feature-main a,.feature-side a{display:inline-flex;align-items:center;gap:7px;border-bottom:1px solid currentColor;padding-bottom:5px;margin-top:14px;font-size:12px;font-weight:820}
+    .feature-phone{position:absolute;--phone-color:#69648e;width:195px;height:388px;right:14%;bottom:-95px;transform:rotate(20deg);box-shadow:15px 25px 45px #3d356655}
+    .feature-side{position:relative;overflow:hidden;min-height:405px;padding:42px 42px;background:linear-gradient(140deg,#eeeef5,#f9dcdc 120%);border-radius:28px;isolation:isolate}
+    .feature-side h3{max-width:280px}.feature-side p{max-width:245px}.feature-side .mini-pill{display:inline-block;background:#fff9;border:1px solid #fff;border-radius:99px;padding:8px 13px;font-size:10px;letter-spacing:.11em;font-weight:800;color:#a17985}
+    .feature-side .phone{position:absolute;--phone-color:#f1c4c3;width:158px;height:315px;right:-11px;bottom:-125px;transform:rotate(-24deg)}
+    .feature-side:before{content:"";position:absolute;width:230px;height:230px;right:-60px;bottom:-40px;background:#eab1bf70;border-radius:50%;filter:blur(19px);z-index:-1}
+    .bottom-cta{margin-top:100px;margin-bottom:90px;position:relative;overflow:hidden;background:#1c1b2b;border-radius:30px;color:#fff;padding:58px 65px;display:flex;justify-content:space-between;align-items:center;gap:35px}
+    .bottom-cta:after{content:"";position:absolute;width:410px;height:410px;right:8%;top:-260px;border:80px solid #a59afa0d;border-radius:50%}
+    .bottom-cta h2{font-size:clamp(29px,3.1vw,42px);line-height:1.12;margin:10px 0;letter-spacing:-.055em}.bottom-cta p{color:#b7b5cc;font-size:13px;line-height:1.7;margin-bottom:0}.bottom-cta .btn{position:relative;z-index:2;white-space:nowrap}
+    .site-footer{border-top:1px solid #e6e8f1;background:#fff;padding:38px 0 26px}
+    .footer-top{display:flex;gap:30px;justify-content:space-between;align-items:start}.footer-top p{max-width:370px;font-size:12px;color:#9497a5;line-height:1.8}.footer-links{display:flex;gap:26px;font-size:12px;color:#747889;font-weight:650;margin-top:13px}.footer-links a:hover{color:var(--violet)}
+    .footer-bottom{display:flex;justify-content:space-between;gap:15px;align-items:center;margin-top:35px;border-top:1px solid #f0f0f5;padding-top:24px;color:#afb1bc;font-size:10px;line-height:1.6}
+    .overlay{position:fixed;inset:0;background:#0c10256b;z-index:90;opacity:0;visibility:hidden;transition:opacity .25s,visibility .25s;backdrop-filter:blur(3px)}.overlay.is-open{opacity:1;visibility:visible}
+    .drawer{position:fixed;z-index:100;right:0;top:0;bottom:0;width:min(425px,100vw);background:#fff;box-shadow:-10px 0 60px #15152d29;transform:translateX(105%);transition:transform .4s var(--ease);display:flex;flex-direction:column}.drawer.is-open{transform:translateX(0)}
+    .drawer-head{display:flex;align-items:center;justify-content:space-between;padding:29px 27px;border-bottom:1px solid #eeeef3}.drawer-head h3{margin:0;font-size:22px;letter-spacing:-.035em}.plain-icon-btn{border:0;background:#f3f3f8;border-radius:11px;width:37px;height:37px;display:grid;place-items:center;color:#515366}
+    .drawer-list{overflow:auto;flex:1;padding:18px 25px}.cart-row{display:flex;gap:14px;padding:15px 0;border-bottom:1px solid #f0f0f3}.cart-thumb{width:69px;height:78px;flex-shrink:0;background:var(--product-bg);border-radius:13px;display:grid;place-items:center;overflow:hidden}.cart-thumb .phone{width:31px;height:61px;box-shadow:2px 4px 10px #0003;border-width:2px}.cart-thumb .camera-bump{border-width:0}.cart-detail{flex:1;min-width:0}.cart-detail strong{display:block;font-size:13px;margin:3px 0 7px}.cart-detail .cart-price{font-size:13px;font-weight:800}.qty-control{display:inline-flex;align-items:center;border:1px solid #e9e9ef;border-radius:9px;margin-top:9px;gap:7px}.qty-control button{width:27px;height:28px;border:0;background:transparent;color:#535468}.qty-control span{font-size:11px;font-weight:750;min-width:12px;text-align:center}.remove-item{margin-left:auto;border:0;background:transparent;color:#a5a5b1}
+    .drawer-foot{padding:24px 27px 28px;border-top:1px solid #eeeef3;box-shadow:0 -6px 20px #00000004}.total{display:flex;justify-content:space-between;font-size:13px;margin-bottom:17px}.total strong{font-size:19px}.drawer-foot .btn{width:100%}.drawer-foot .tiny{font-size:10px;color:#a0a3af;margin-top:12px;line-height:1.6;text-align:center}
+    .cart-empty{padding:55px 10px;text-align:center;color:#8d90a0}.cart-empty .big-icon{font-size:43px;display:block;margin-bottom:13px}.cart-empty strong{display:block;color:#313345;font-size:16px;margin-bottom:7px}.cart-empty p{font-size:12px;line-height:1.7}
+    .dialog{position:fixed;z-index:101;top:50%;left:50%;width:min(790px,calc(100vw - 30px));max-height:min(90vh,850px);overflow:auto;background:#fff;border-radius:26px;box-shadow:0 35px 90px #12112745;opacity:0;visibility:hidden;transform:translate(-50%,-46%) scale(.97);transition:opacity .25s,transform .25s,visibility .25s}.dialog.is-open{opacity:1;visibility:visible;transform:translate(-50%,-50%) scale(1)}
+    .dialog-close{position:absolute;z-index:5;right:18px;top:18px}.dialog-content{display:grid;grid-template-columns:.92fr 1.08fr;min-height:440px}.dialog-visual{display:grid;place-items:center;position:relative;background:var(--product-bg);overflow:hidden;border-radius:26px 0 0 26px}.dialog-visual:before{content:"";position:absolute;width:330px;height:330px;border-radius:50%;background:#ffffff77}.dialog-visual .phone{width:173px;height:350px;transform:rotate(-10deg)}.dialog-details{padding:52px 34px 36px}.dialog-details h2{font-size:31px;line-height:1.07;letter-spacing:-.05em;margin:12px 0}.dialog-details p{color:#878b9a;line-height:1.75;font-size:13px}.dialog-details .price{font-size:28px;margin:22px 0}.option-label{font-size:11px;font-weight:800;color:#555767;margin:14px 0 9px}.storage-options{display:flex;gap:8px;flex-wrap:wrap}.storage-option{border:1px solid #e6e7ed;color:#5e6170;background:#fff;padding:10px 13px;border-radius:10px;font-size:11px;font-weight:760}.storage-option.is-active{border-color:#6d56ed;color:#5e4ada;background:#f2efff}.dialog-details .btn{margin-top:26px;width:100%}
+    .toast{position:fixed;z-index:130;bottom:27px;left:50%;transform:translate(-50%,25px);border-radius:13px;padding:13px 19px;background:#222337;color:#fff;box-shadow:0 14px 36px #11111e38;font-size:12px;font-weight:660;opacity:0;visibility:hidden;transition:all .27s;max-width:calc(100vw - 32px);text-align:center}.toast.is-visible{opacity:1;visibility:visible;transform:translate(-50%,0)}
+    .mobile-nav{display:none}
+    @media(max-width:1100px){.hero-copy{padding-left:48px}.hero-title{font-size:clamp(45px,5vw,65px)}.hero-phone.main{left:35%;width:205px;height:418px;top:18%}.hero-phone.left{left:8%;width:177px;height:361px;top:28%}.hero-phone.right{left:66%;width:170px;height:348px;top:27%}.hero-sticker{right:3%}.trust-item{padding:15px 14px;gap:10px}.trust-item strong{font-size:11px}.trust-item span{font-size:10px}.feature-phone{right:5%}}
+    @media(max-width:900px){.desktop-nav{gap:20px;font-size:12px}.hero-panel{min-height:545px}.hero-copy{width:58%;padding:65px 0 50px 42px}.hero-title{font-size:52px}.hero-stage{left:53%}.hero-phone.main{left:26%;top:19%}.hero-phone.left{left:-4%;top:29%}.hero-phone.right{left:57%;top:27%}.hero-sticker{right:3%;top:13%}.hero-proof{margin-top:34px}.product-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.trust-row{grid-template-columns:repeat(2,1fr)}.trust-item{padding:16px 23px}.feature-main{padding:34px}.feature-side{padding:34px}.feature-phone{right:-15px}}
+    @media(max-width:650px){.container{padding-inline:17px}.announcement{font-size:10px;letter-spacing:.01em;padding-inline:12px;gap:6px}.site-header{height:68px}.header-inner{gap:11px}.brand-mark{height:36px;width:36px;border-radius:11px}.brand-name{font-size:20px}.brand-small{font-size:7px}.desktop-nav{display:none}.header-actions{gap:7px}.icon-btn{width:38px;height:38px;border-radius:12px}.mobile-menu-btn{display:grid}.search-inner input{font-size:13px}.mobile-nav{position:fixed;z-index:75;top:103px;left:0;right:0;display:none;padding:13px 18px 19px;background:#fff;border-bottom:1px solid #eeeef4;box-shadow:0 20px 25px #20203215}.mobile-nav.is-open{display:grid;gap:5px}.mobile-nav a{padding:13px 11px;border-radius:10px;color:#55576c;font-size:13px;font-weight:700}.mobile-nav a:active{background:#f0edff}.hero{padding-top:14px}.hero-panel{border-radius:24px;min-height:730px}.hero-copy{width:100%;padding:45px 28px 0;max-width:550px}.hero-kicker{font-size:10px}.hero-title{font-size:clamp(43px,11vw,65px);margin-top:23px;margin-bottom:15px;max-width:500px}.hero-desc{font-size:13px;max-width:345px;line-height:1.75}.hero-buttons{margin-top:24px;gap:8px}.hero-buttons .btn{min-height:45px;padding:0 15px;font-size:11px}.hero-proof{margin-top:24px;font-size:10px}.hero-proof .dot{width:26px;height:26px}.hero-stage{left:0;top:310px;bottom:0;right:0}.hero-halo{width:420px;height:420px;left:10%;top:0}.hero-phone.main{left:41%;top:15%;width:187px;height:382px}.hero-phone.left{left:18%;top:24%;width:161px;height:330px}.hero-phone.right{left:65%;top:23%;width:153px;height:313px}.hero-sticker{top:6%;right:7%;padding:9px 12px;font-size:10px;z-index:5}.scroll-hint{display:none}.trust-row{margin-top:12px;gap:9px}.trust-item{min-height:76px;padding:12px;gap:9px;border-radius:14px}.trust-icon{width:34px;height:34px;flex-basis:34px;border-radius:10px}.trust-icon .icon{width:18px;height:18px}.trust-item strong{font-size:10px}.trust-item span{font-size:9px;line-height:1.35}.section{padding-top:75px}.section-head{display:block;margin-bottom:24px}.head-desc{margin-top:13px;font-size:12px}.eyebrow{font-size:9px}.heading{font-size:35px}.collection-toolbar{align-items:stretch}.filters{gap:6px}.filter{font-size:11px;padding:10px 12px;border-radius:9px}.sort-group{margin-left:auto}.product-grid{gap:12px}.product-card{border-radius:17px}.product-visual{height:225px}.product-visual:before{width:170px;height:170px;left:calc(50% - 85px)}.product-visual .phone{width:89px;height:182px;border-width:3px;transform:translateY(14px) rotate(-10deg)}.product-visual .phone.ghost{width:85px;height:174px;transform:translate(34px,19px) rotate(13deg)}.product-card:hover .product-visual .phone.ghost{transform:translate(36px,10px) rotate(15deg)}.product-badge{top:10px;left:10px;padding:6px 8px;font-size:8px;border-radius:7px}.wish-btn{top:8px;right:8px;width:30px;height:30px;border-radius:9px}.wish-btn svg{width:16px;height:16px}.product-body{padding:15px 12px 14px}.product-sub{font-size:8px}.product-name{font-size:15px;margin:7px 0 5px;letter-spacing:-.04em}.product-desc{font-size:10px}.product-meta{margin-top:14px;align-items:end}.price{font-size:16px}.price-note{font-size:9px}.swatches{gap:2px}.swatch{width:13px;height:13px;border-width:2px}.product-actions{grid-template-columns:1fr 37px;gap:6px;margin-top:15px}.product-actions .btn{padding:0 6px;font-size:10px;min-height:38px}.add-btn{border-radius:9px}.add-btn .icon{width:17px;height:17px}.notice-small{line-height:1.65}.feature-section{padding-top:76px}.feature-grid{grid-template-columns:1fr;gap:13px}.feature-main{min-height:350px;padding:29px;border-radius:22px}.feature-main h3,.feature-side h3{font-size:34px}.feature-main p{max-width:240px}.feature-phone{width:148px;height:296px;right:14px;bottom:-110px}.feature-side{min-height:300px;padding:30px;border-radius:22px}.feature-side .phone{width:128px;height:255px;right:2%;bottom:-115px}.bottom-cta{margin-top:78px;margin-bottom:70px;border-radius:23px;padding:37px 30px;display:block}.bottom-cta h2{font-size:34px}.bottom-cta .btn{margin-top:24px}.footer-top{display:block}.footer-links{gap:17px;flex-wrap:wrap}.footer-bottom{display:block}.footer-bottom span{display:block;margin:6px 0}.dialog-content{display:block}.dialog-visual{height:280px;border-radius:25px 25px 0 0}.dialog-visual .phone{width:117px;height:235px}.dialog-details{padding:24px}.dialog-details h2{font-size:26px}.dialog-details .price{font-size:25px}.drawer-head{padding:22px}.drawer-list{padding:15px 20px}.drawer-foot{padding:20px}}
+    @media(max-width:380px){.brand-small{display:none}.brand-name{font-size:19px}.header-actions{gap:4px}.hero-panel{min-height:705px}.hero-title{font-size:42px}.hero-stage{top:310px}.hero-phone.main{left:39%;top:20%;width:157px;height:322px}.hero-phone.left{left:15%;top:28%;width:141px;height:287px}.hero-phone.right{left:64%;top:28%;width:130px;height:266px}.trust-item{padding:9px}.trust-icon{display:none}.product-visual{height:195px}.product-name{font-size:14px}.price{font-size:15px}.swatches{display:none}}
+    @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
+  </style>
+</head>
+<body>
+  <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden">
+    <symbol id="i-bag" viewBox="0 0 24 24"><path d="M5 8h14l1 12H4L5 8Z"/><path d="M9 9V6a3 3 0 0 1 6 0v3"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m16.5 16.5 4 4"/></symbol>
+    <symbol id="i-heart" viewBox="0 0 24 24"><path d="M20.8 4.9a5.5 5.5 0 0 0-7.8 0L12 6 11 4.9a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.3a5.5 5.5 0 0 0 0-7.8Z"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h16m-7-7 7 7-7 7"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="m5 5 14 14M19 5 5 19"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></symbol>
+    <symbol id="i-box" viewBox="0 0 24 24"><path d="m12 2 9 5-9 5-9-5 9-5ZM3 7v10l9 5 9-5V7M12 12v10"/></symbol>
+    <symbol id="i-spark" viewBox="0 0 24 24"><path d="m12 2 2.1 7.9L22 12l-7.9 2.1L12 22l-2.1-7.9L2 12l7.9-2.1L12 2Z"/></symbol>
+    <symbol id="i-chat" viewBox="0 0 24 24"><path d="M20 11a8 8 0 0 1-8 8 9 9 0 0 1-4-.9L3 20l1.9-5A8 8 0 1 1 20 11Z"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  </svg>
+  <div class="announcement"><span class="lightning">✦</span> iPHONE COLLECTION — TÌM PHIÊN BẢN DÀNH RIÊNG CHO BẠN <a href="#collection">Khám phá ngay</a></div>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="#top" aria-label="NOVA - Trang chủ"><span class="brand-mark" aria-hidden="true">N</span><span><span class="brand-name">nova<span>.</span></span><span class="brand-small">IPHONE CONCEPT STORE</span></span></a>
+      <nav class="desktop-nav" aria-label="Điều hướng chính"><a href="#top">Trang chủ</a><a href="#collection">Bộ sưu tập</a><a href="#explore">Khám phá</a><a href="#contact">Liên hệ</a></nav>
+      <div class="header-actions">
+        <button class="icon-btn" id="searchToggle" aria-label="Tìm kiếm" aria-expanded="false"><svg class="icon"><use href="#i-search"/></svg></button>
+        <button class="icon-btn" id="wishToggle" aria-label="Xem sản phẩm yêu thích"><svg class="icon"><use href="#i-heart"/></svg><span class="count" id="wishCount" hidden>0</span></button>
+        <button class="icon-btn" id="cartToggle" aria-label="Xem giỏ hàng"><svg class="icon"><use href="#i-bag"/></svg><span class="count" id="cartCount" hidden>0</span></button>
+        <button class="icon-btn mobile-menu-btn" id="menuToggle" aria-label="Mở menu" aria-expanded="false"><svg class="icon"><use href="#i-menu"/></svg></button>
+      </div>
+    </div>
+    <div class="search-strip" id="searchStrip"><div class="container search-inner"><svg class="icon"><use href="#i-search"/></svg><input type="search" id="searchInput" placeholder="Tìm iPhone Pro, Air, màu sắc..." aria-label="Tìm sản phẩm"/><button id="searchClear" type="button">Xóa</button></div></div>
+  </header>
+  <nav class="mobile-nav" id="mobileNav" aria-label="Menu trên điện thoại"><a href="#top">Trang chủ</a><a href="#collection">Bộ sưu tập iPhone</a><a href="#explore">Khám phá</a><a href="#contact">Liên hệ</a></nav>
+  <main id="top">
+    <div class="container hero">
+      <section class="hero-panel" aria-label="Bộ sưu tập iPhone">
+        <div class="hero-copy">
+          <div class="hero-kicker">THE iPHONE EDIT / NOVA 2026</div>
+          <h1 class="hero-title">Đúng chiếc<br/>iPhone.<br/><em>Đúng chất bạn.</em></h1>
+          <p class="hero-desc">Từ sức mạnh của dòng Pro đến sự tinh gọn đầy cá tính. Khám phá một chiếc iPhone hợp gu, hợp nhu cầu, hợp từng khoảnh khắc.</p>
+          <div class="hero-buttons"><a class="btn btn-white" href="#collection">Khám phá ngay <svg class="icon sm"><use href="#i-arrow"/></svg></a><a class="btn btn-outline" href="#explore">Xem bộ sưu tập <span aria-hidden="true">↗</span></a></div>
+          <div class="hero-proof"><div class="dots" aria-hidden="true"><span class="dot">✧</span><span class="dot">✦</span><span class="dot">✳</span></div><span><strong>Pro · Air · Classic</strong><br/>Từng phong cách, một lựa chọn</span></div>
+        </div>
+        <div class="hero-stage" aria-hidden="true"><div class="hero-halo"></div><div class="hero-floor"></div>
+          <div class="phone hero-phone left dual" style="--phone-color:#a9b5d8"><i class="side-button"></i><div class="camera-bump"><b class="camera c1"></b><b class="camera c2"></b><b class="camera c3"></b><i class="flash"></i><i class="sensor"></i></div></div>
+          <div class="phone hero-phone main" style="--phone-color:#b9abc9"><i class="side-button"></i><i class="side-button two"></i><div class="camera-bump"><b class="camera c1"></b><b class="camera c2"></b><b class="camera c3"></b><i class="flash"></i><i class="sensor"></i></div></div>
+          <div class="phone hero-phone right screen"><i class="side-button"></i><div class="camera-bump"></div></div>
+        </div>
+        <div class="hero-sticker"><span class="star">✦</span> Your phone, your vibe.</div>
+        <span class="scroll-hint"><span class="line"></span> SCROLL TO EXPLORE</span>
+      </section>
+      <div class="trust-row">
+        <div class="trust-item"><div class="trust-icon"><svg class="icon"><use href="#i-shield"/></svg></div><div><strong>Chọn máy dễ dàng</strong><span>Thông tin rõ ràng, dễ xem</span></div></div>
+        <div class="trust-item"><div class="trust-icon"><svg class="icon"><use href="#i-box"/></svg></div><div><strong>Đa dạng phiên bản</strong><span>Pro, Air &amp; tiêu chuẩn</span></div></div>
+        <div class="trust-item"><div class="trust-icon"><svg class="icon"><use href="#i-spark"/></svg></div><div><strong>Thiết kế có gu</strong><span>Tìm màu bạn yêu thích</span></div></div>
+        <div class="trust-item"><div class="trust-icon"><svg class="icon"><use href="#i-chat"/></svg></div><div><strong>Tư vấn theo nhu cầu</strong><span>So sánh và chọn lựa</span></div></div>
+      </div>
+    </div>
+
+    <section class="container section" id="collection">
+      <div class="section-head"><div><div class="eyebrow">THE COLLECTION</div><h2 class="heading">Chiếc iPhone <em>hợp gu</em> của bạn.</h2></div><p class="head-desc">Từ cảm hứng sáng tạo, phong cách tối giản đến trải nghiệm hằng ngày. Mỗi phiên bản đều có một nét riêng.</p></div>
+      <div class="collection-toolbar"><div class="filters" aria-label="Bộ lọc dòng máy"><button class="filter is-active" data-filter="all" aria-pressed="true">Tất cả</button><button class="filter" data-filter="Pro" aria-pressed="false">iPhone Pro</button><button class="filter" data-filter="Air" aria-pressed="false">iPhone Air</button><button class="filter" data-filter="Standard" aria-pressed="false">iPhone tiêu chuẩn</button><button class="filter" data-filter="Value" aria-pressed="false">Giá dễ tiếp cận</button></div><label class="sort-group">Sắp xếp <select id="sortSelect"><option value="featured">Nổi bật</option><option value="low">Giá tăng dần</option><option value="high">Giá giảm dần</option><option value="name">Tên A – Z</option></select></label></div>
+      <div class="product-grid" id="productGrid" aria-live="polite"></div>
+      <div class="empty-state" id="emptyState">Không tìm thấy sản phẩm phù hợp. Hãy thử từ khóa hoặc bộ lọc khác.</div>
+      <p class="notice-small">* Đây là trang web mẫu. Giá và hình minh họa chỉ để trình bày giao diện, không phải báo giá bán thực tế.</p>
+    </section>
+
+    <section class="container feature-section" id="explore">
+      <div class="eyebrow">FIND YOUR MATCH</div><h2 class="heading">Một thế giới. <em>Nhiều cá tính.</em></h2>
+      <div class="feature-grid">
+        <article class="feature-main"><div class="eyebrow" style="color:#7966be">DÀNH CHO NGƯỜI MUỐN HƠN THẾ</div><h3>Think big.<br/>Go Pro.</h3><p>Một lựa chọn dành cho những ai thích trải nghiệm cao cấp và không ngừng sáng tạo.</p><a href="#collection" data-jump-filter="Pro">Khám phá dòng Pro <svg class="icon sm"><use href="#i-arrow"/></svg></a><div class="phone feature-phone" aria-hidden="true"><div class="camera-bump"><b class="camera c1"></b><b class="camera c2"></b><b class="camera c3"></b><i class="flash"></i><i class="sensor"></i></div></div></article>
+        <article class="feature-side"><span class="mini-pill">EVERYDAY ESSENTIAL</span><h3>Nhẹ nhàng.<br/>Đủ nổi bật.</h3><p>Chọn sắc màu, chọn cảm hứng, và mang theo phong cách của chính bạn.</p><a href="#collection" data-jump-filter="Standard">Xem dòng tiêu chuẩn <svg class="icon sm"><use href="#i-arrow"/></svg></a><div class="phone dual" aria-hidden="true"><div class="camera-bump"><b class="camera c1"></b><b class="camera c2"></b><b class="camera c3"></b><i class="flash"></i><i class="sensor"></i></div></div></article>
+      </div>
+    </section>
+    <section class="container" id="contact"><div class="bottom-cta"><div><div class="eyebrow" style="color:#bcadff">YOUR NEXT iPHONE</div><h2>Đã tìm thấy phiên bản<br/>mình thích chưa?</h2><p>Lưu lại những mẫu ưng ý, thêm vào giỏ và sao chép danh sách để hỏi giá tại cửa hàng.</p></div><a class="btn btn-white" href="#collection">Chọn iPhone ngay <svg class="icon sm"><use href="#i-arrow"/></svg></a></div></section>
+  </main>
+  <footer class="site-footer"><div class="container"><div class="footer-top"><div><a class="brand" href="#top"><span class="brand-mark">N</span><span><span class="brand-name">nova<span>.</span></span><span class="brand-small">IPHONE CONCEPT STORE</span></span></a><p>Không chỉ chọn một chiếc điện thoại. Hãy chọn thứ thật sự phù hợp với phong cách của bạn.</p></div><div class="footer-links"><a href="#top">Trang chủ</a><a href="#collection">Bộ sưu tập</a><a href="#explore">Khám phá</a><a href="#contact">Liên hệ</a></div></div><div class="footer-bottom"><span>© 2026 NOVA. Giao diện trưng bày mẫu.</span><span>Không phải trang web chính thức của Apple. Tên sản phẩm là nhãn hiệu của chủ sở hữu tương ứng.</span></div></div></footer>
+
+  <div class="overlay" id="overlay"></div>
+  <aside class="drawer" id="cartDrawer" role="dialog" aria-modal="true" aria-labelledby="cartTitle" aria-hidden="true"><div class="drawer-head"><h3 id="cartTitle">Giỏ hàng <span id="drawerItemCount" style="color:#aaaaba;font-size:14px">(0)</span></h3><button class="plain-icon-btn" id="cartClose" aria-label="Đóng giỏ hàng"><svg class="icon"><use href="#i-close"/></svg></button></div><div class="drawer-list" id="cartItems"></div><div class="drawer-foot"><div class="total"><span>Tạm tính (giá demo)</span><strong id="cartTotal">0₫</strong></div><button class="btn btn-purple" id="copyOrder">Sao chép danh sách mua <svg class="icon sm"><use href="#i-arrow"/></svg></button><div class="tiny">Trang demo không xử lý thanh toán. Bạn có thể sao chép danh sách và gửi cho cửa hàng khi bổ sung thông tin liên hệ.</div></div></aside>
+  <div class="dialog" id="productDialog" role="dialog" aria-modal="true" aria-labelledby="dialogTitle" aria-hidden="true"><button class="plain-icon-btn dialog-close" id="dialogClose" aria-label="Đóng chi tiết"><svg class="icon"><use href="#i-close"/></svg></button><div class="dialog-content" id="dialogContent"></div></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script>
+  (()=>{
+    'use strict';
+    const products=[
+      {id:'17pm',name:'iPhone 17 Pro Max',group:'Pro',series:'PRO SERIES',tag:'Được quan tâm',desc:'Màn hình lớn · Trải nghiệm Pro',price:34990000,colors:[['Cam ánh kim','#d69d79'],['Xanh đậm','#586578'],['Bạc','#d9dbe0']],bg:'#eae3e8',color:'#c6a9a2',type:'triple',double:true,storages:['256GB','512GB','1TB']},
+      {id:'17p',name:'iPhone 17 Pro',group:'Pro',series:'PRO SERIES',tag:'Dòng cao cấp',desc:'Gọn gàng · Sáng tạo không giới hạn',price:31990000,colors:[['Xanh đậm','#51627a'],['Cam ánh kim','#c98c6f'],['Bạc','#d1d5da']],bg:'#e2e8f4',color:'#7886a0',type:'triple',double:false,storages:['256GB','512GB','1TB']},
+      {id:'air',name:'iPhone Air',group:'Air',series:'AIR SERIES',tag:'Thanh thoát',desc:'Thiết kế mỏng · Cảm giác nhẹ nhàng',price:25990000,colors:[['Xanh nhạt','#b4cada'],['Vàng nhạt','#e7d8b5'],['Đen','#454852']],bg:'#e9f1f3',color:'#bbd4dc',type:'single',double:false,storages:['256GB','512GB']},
+      {id:'17',name:'iPhone 17',group:'Standard',series:'EVERYDAY SERIES',tag:'Màu sắc mới',desc:'Đa sắc màu · Đủ đầy mỗi ngày',price:22990000,colors:[['Tím dịu','#c9bbdf'],['Xanh nhạt','#c0d8d5'],['Đen','#343743']],bg:'#ede8f7',color:'#c9b7df',type:'dual',double:true,storages:['256GB','512GB']},
+      {id:'16',name:'iPhone 16',group:'Standard',series:'EVERYDAY SERIES',tag:'Lựa chọn yêu thích',desc:'Cân bằng hiệu năng và phong cách',price:17990000,colors:[['Hồng','#e8b6c7'],['Xanh','#a9c7db'],['Đen','#4c4c55']],bg:'#f6e8ef',color:'#e8b6c7',type:'dual',double:false,storages:['128GB','256GB','512GB']},
+      {id:'16e',name:'iPhone 16e',group:'Value',series:'ESSENTIAL SERIES',tag:'Tối giản',desc:'Thiết yếu · Tinh gọn · Dễ chọn',price:14990000,colors:[['Trắng','#ededee'],['Đen','#3d4046']],bg:'#eaebed',color:'#d1d3d7',type:'single',double:false,storages:['128GB','256GB','512GB']}
+    ];
+    const $=sel=>document.querySelector(sel), $$=sel=>[...document.querySelectorAll(sel)];
+    const storageKey='nova-iphone-demo-v2';
+    let stored={};try{stored=JSON.parse(localStorage.getItem(storageKey))||{}}catch(e){}
+    let cart=Array.isArray(stored.cart)?stored.cart.filter(x=>products.some(p=>p.id===x.id)&&Number.isInteger(x.qty)&&x.qty>0):[];
+    let wishes=Array.isArray(stored.wishes)?stored.wishes.filter(x=>products.some(p=>p.id===x)):[];
+    let colorSelections={},activeFilter='all',searchTerm='',wishOnly=false,selectedProduct=null,selectedStorage='';
+    let toastTimeout=null,priorFocus=null;
+    const money=n=>new Intl.NumberFormat('vi-VN').format(n)+'₫';
+    const icon=(id,extra='')=>`<svg class="icon ${extra}" aria-hidden="true"><use href="#i-${id}"/></svg>`;
+    const cameraMarkup=`<div class="camera-bump"><b class="camera c1"></b><b class="camera c2"></b><b class="camera c3"></b><i class="flash"></i><i class="sensor"></i></div>`;
+    function phoneMarkup(p,extra='',color){return `<div class="phone ${p.type==='dual'?'dual':p.type==='single'?'single':''} ${extra}" style="--phone-color:${color||p.color}" aria-hidden="true"><i class="side-button"></i>${cameraMarkup}</div>`}
+    function store(){try{localStorage.setItem(storageKey,JSON.stringify({cart,wishes}))}catch(e){}}
+    function toast(message){const el=$('#toast');el.textContent=message;el.classList.add('is-visible');clearTimeout(toastTimeout);toastTimeout=setTimeout(()=>el.classList.remove('is-visible'),3100)}
+    function render(){let arr=products.filter(p=>(activeFilter==='all'||p.group===activeFilter)&&(p.name+' '+p.desc+' '+p.colors.map(c=>c[0]).join(' ')).toLowerCase().includes(searchTerm));if(wishOnly)arr=arr.filter(p=>wishes.includes(p.id));const mode=$('#sortSelect').value;if(mode==='low')arr.sort((a,b)=>a.price-b.price);if(mode==='high')arr.sort((a,b)=>b.price-a.price);if(mode==='name')arr.sort((a,b)=>a.name.localeCompare(b.name));$('#emptyState').style.display=arr.length?'none':'block';$('#productGrid').innerHTML=arr.map(p=>{
+      const sel=colorSelections[p.id]??0;const color=p.colors[sel][1];return `<article class="product-card" data-id="${p.id}"><div class="product-visual" style="--product-bg:${p.bg}"><span class="product-badge">✦ ${p.tag}</span><button class="wish-btn ${wishes.includes(p.id)?'is-active':''}" data-wish="${p.id}" aria-pressed="${wishes.includes(p.id)}" aria-label="${wishes.includes(p.id)?'Bỏ yêu thích':'Thêm yêu thích'} ${p.name}">${icon('heart','sm')}</button>${p.double?phoneMarkup(p,'ghost',p.colors[Math.min(1,p.colors.length-1)][1]):''}${phoneMarkup(p,'',color)}</div><div class="product-body"><div class="product-sub"><span>${p.series}</span><span>✦ NOVA</span></div><h3 class="product-name">${p.name}</h3><div class="product-desc">${p.desc}</div><div class="product-meta"><div><span class="price-note">Giá minh họa từ</span><strong class="price">${money(p.price)}</strong></div><div class="swatches" aria-label="Chọn màu">${p.colors.map((c,i)=>`<button class="swatch ${i===sel?'is-active':''}" data-color="${p.id}:${i}" style="--swatch:${c[1]}" aria-label="Màu ${c[0]}" aria-pressed="${i===sel}" title="${c[0]}"></button>`).join('')}</div></div><div class="product-actions"><button class="btn btn-dark" data-detail="${p.id}">Xem chi tiết ${icon('arrow','sm')}</button><button class="add-btn" data-add="${p.id}" aria-label="Thêm ${p.name} vào giỏ">${icon('plus')}</button></div></div></article>`}).join('');
+      updateCounts();
+    }
+    function updateCounts(){const count=cart.reduce((n,x)=>n+x.qty,0);$('#cartCount').textContent=count;$('#cartCount').hidden=count===0;$('#wishCount').textContent=wishes.length;$('#wishCount').hidden=wishes.length===0;$('#wishToggle').style.color=wishOnly?'#6d56ed':''}
+    function setFilter(f){activeFilter=f;$$('[data-filter]').forEach(el=>{const active=el.dataset.filter===f;el.classList.toggle('is-active',active);el.setAttribute('aria-pressed',String(active))});wishOnly=false;render()}
+    function addToCart(id,storage){const p=products.find(x=>x.id===id);if(!p)return;const selected=storage||p.storages[0];const key=id+'-'+selected;let item=cart.find(x=>x.key===key);if(item)item.qty++;else cart.push({key,id,storage:selected,qty:1});store();updateCounts();toast(`Đã thêm ${p.name} (${selected}) vào giỏ`)}
+    function showOverlay(){priorFocus=document.activeElement;$('#overlay').classList.add('is-open');document.body.style.overflow='hidden'}
+    function hideOverlay(){if($('#cartDrawer').classList.contains('is-open'))closeCart();if($('#productDialog').classList.contains('is-open'))closeDialog()}
+    function resetOverlay(){if(!$('#cartDrawer').classList.contains('is-open')&&!$('#productDialog').classList.contains('is-open')){$('#overlay').classList.remove('is-open');document.body.style.overflow='';if(priorFocus&&typeof priorFocus.focus==='function')priorFocus.focus()}}
+    function openCart(){closeDialog();showOverlay();$('#cartDrawer').classList.add('is-open');$('#cartDrawer').setAttribute('aria-hidden','false');renderCart();$('#cartClose').focus()}
+    function closeCart(){$('#cartDrawer').classList.remove('is-open');$('#cartDrawer').setAttribute('aria-hidden','true');resetOverlay()}
+    function renderCart(){const count=cart.reduce((n,x)=>n+x.qty,0);$('#drawerItemCount').textContent=`(${count})`;$('#cartTotal').textContent=money(cart.reduce((sum,x)=>sum+products.find(p=>p.id===x.id).price*x.qty,0));$('#copyOrder').disabled=!count;$('#copyOrder').style.opacity=count?1:.45;$('#cartItems').innerHTML=count?cart.map((x,index)=>{const p=products.find(p=>p.id===x.id);return `<div class="cart-row"><div class="cart-thumb" style="--product-bg:${p.bg}">${phoneMarkup(p,'',p.color)}</div><div class="cart-detail"><strong>${p.name}</strong><span style="font-size:11px;color:#999aa9">${x.storage}</span><div class="cart-price">${money(p.price)}</div><div class="qty-control"><button data-qty="${index}:-1" aria-label="Giảm số lượng">−</button><span>${x.qty}</span><button data-qty="${index}:1" aria-label="Tăng số lượng">+</button></div></div><button class="remove-item" data-remove="${index}" title="Xóa sản phẩm" aria-label="Xóa ${p.name}">${icon('close','sm')}</button></div>`}).join(''):`<div class="cart-empty"><span class="big-icon">◌</span><strong>Giỏ hàng vẫn còn trống</strong><p>Khám phá bộ sưu tập và thêm mẫu iPhone bạn yêu thích nhé.</p><button class="btn btn-dark" id="continueShopping">Xem sản phẩm ${icon('arrow','sm')}</button></div>`}
+    function openDialog(id){const p=products.find(p=>p.id===id);if(!p)return;closeCart();selectedProduct=p;selectedStorage=p.storages[0];showOverlay();const idx=colorSelections[id]??0;$('#dialogContent').innerHTML=`<div class="dialog-visual" style="--product-bg:${p.bg}">${phoneMarkup(p,'',p.colors[idx][1])}</div><div class="dialog-details"><div class="eyebrow">${p.series}</div><h2 id="dialogTitle">${p.name}</h2><p>${p.desc}. Chọn cấu hình để thêm vào danh sách quan tâm của bạn.</p><div class="price"><span class="price-note">Giá demo (bản tiêu chuẩn)</span>${money(p.price)}</div><div class="option-label">DUNG LƯỢNG</div><div class="storage-options">${p.storages.map((s,i)=>`<button class="storage-option ${i===0?'is-active':''}" data-storage="${s}" aria-pressed="${i===0}">${s}</button>`).join('')}</div><div class="option-label">MÀU SẮC: ${p.colors[idx][0]}</div><div class="swatches">${p.colors.map((c,i)=>`<button class="swatch ${i===idx?'is-active':''}" data-modal-color="${i}" style="--swatch:${c[1]};width:23px;height:23px" title="${c[0]}" aria-label="${c[0]}"></button>`).join('')}</div><button class="btn btn-purple" id="modalAdd">Thêm vào giỏ ${icon('bag','sm')}</button><p style="font-size:10px;margin-top:15px">* Cấu hình và mức giá ở đây chỉ dùng để minh họa giao diện.</p></div>`;$('#productDialog').classList.add('is-open');$('#productDialog').setAttribute('aria-hidden','false');$('#dialogClose').focus()}
+    function closeDialog(){$('#productDialog').classList.remove('is-open');$('#productDialog').setAttribute('aria-hidden','true');resetOverlay()}
+    async function copyText(t){try{await navigator.clipboard.writeText(t);toast('Đã sao chép danh sách!')}catch(e){const area=document.createElement('textarea');area.value=t;document.body.appendChild(area);area.select();try{document.execCommand('copy');toast('Đã sao chép danh sách!')}catch(err){toast('Không thể sao chép tự động. Hãy thử lại trên HTTPS.')}area.remove()}}
+    $('#productGrid').addEventListener('click',e=>{const wish=e.target.closest('[data-wish]');if(wish){const id=wish.dataset.wish;wishes=wishes.includes(id)?wishes.filter(x=>x!==id):[...wishes,id];store();render();return}const swatch=e.target.closest('[data-color]');if(swatch){const [id,index]=swatch.dataset.color.split(':');colorSelections[id]=Number(index);render();return}const add=e.target.closest('[data-add]');if(add){addToCart(add.dataset.add);return}const detail=e.target.closest('[data-detail]');if(detail)openDialog(detail.dataset.detail)});
+    $$('.filter').forEach(el=>el.addEventListener('click',()=>setFilter(el.dataset.filter)));
+    $('#sortSelect').addEventListener('change',render);
+    $('#searchToggle').addEventListener('click',()=>{const strip=$('#searchStrip');const open=!strip.classList.contains('is-open');strip.classList.toggle('is-open',open);$('#searchToggle').setAttribute('aria-expanded',open);if(open){wishOnly=false;render();setTimeout(()=>$('#searchInput').focus(),30)}});
+    $('#searchInput').addEventListener('input',e=>{searchTerm=e.target.value.toLowerCase().trim();render()});
+    $('#searchClear').addEventListener('click',()=>{$('#searchInput').value='';searchTerm='';render();$('#searchInput').focus()});
+    $('#wishToggle').addEventListener('click',()=>{wishOnly=!wishOnly;activeFilter='all';$$('.filter').forEach(el=>{const yes=el.dataset.filter==='all';el.classList.toggle('is-active',yes);el.setAttribute('aria-pressed',String(yes))});render();$('#collection').scrollIntoView({behavior:'smooth'});toast(wishOnly?'Đang xem sản phẩm yêu thích':'Đang xem tất cả sản phẩm')});
+    $('#cartToggle').addEventListener('click',openCart);$('#cartClose').addEventListener('click',closeCart);$('#overlay').addEventListener('click',hideOverlay);$('#dialogClose').addEventListener('click',closeDialog);
+    $('#cartItems').addEventListener('click',e=>{const qty=e.target.closest('[data-qty]');if(qty){const [index,delta]=qty.dataset.qty.split(':').map(Number);cart[index].qty+=delta;if(cart[index].qty<=0)cart.splice(index,1);store();renderCart();updateCounts();return}const rm=e.target.closest('[data-remove]');if(rm){cart.splice(Number(rm.dataset.remove),1);store();renderCart();updateCounts();return}if(e.target.closest('#continueShopping')){closeCart();$('#collection').scrollIntoView({behavior:'smooth'})}});
+    $('#dialogContent').addEventListener('click',e=>{const s=e.target.closest('[data-storage]');if(s){selectedStorage=s.dataset.storage;$$('.storage-option').forEach(el=>{const active=el===s;el.classList.toggle('is-active',active);el.setAttribute('aria-pressed',String(active))});return}const c=e.target.closest('[data-modal-color]');if(c){colorSelections[selectedProduct.id]=Number(c.dataset.modalColor);openDialog(selectedProduct.id);render();return}if(e.target.closest('#modalAdd')){addToCart(selectedProduct.id,selectedStorage);closeDialog();openCart()}});
+    $('#copyOrder').addEventListener('click',()=>{if(!cart.length)return;const lines=['DANH SÁCH QUAN TÂM — NOVA (GIÁ MINH HỌA)','',...cart.map((x,i)=>{const p=products.find(p=>p.id===x.id);return `${i+1}. ${p.name} · ${x.storage} · SL: ${x.qty} · ${money(x.qty*p.price)}`}),`\nTổng minh họa: ${money(cart.reduce((sum,x)=>sum+products.find(p=>p.id===x.id).price*x.qty,0))}`,'Vui lòng xác nhận giá và tình trạng máy thực tế.'];copyText(lines.join('\n'))});
+    $('#menuToggle').addEventListener('click',()=>{const isOpen=$('#mobileNav').classList.toggle('is-open');$('#menuToggle').setAttribute('aria-expanded',String(isOpen))});$$('#mobileNav a').forEach(a=>a.addEventListener('click',()=>{$('#mobileNav').classList.remove('is-open');$('#menuToggle').setAttribute('aria-expanded','false')}));
+    $$('[data-jump-filter]').forEach(a=>a.addEventListener('click',()=>setFilter(a.dataset.jumpFilter)));
+    document.addEventListener('keydown',e=>{if(e.key==='Escape'){hideOverlay();$('#mobileNav').classList.remove('is-open');$('#searchStrip').classList.remove('is-open');$('#searchToggle').setAttribute('aria-expanded','false')}if(e.key==='/'&&!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)){e.preventDefault();$('#searchStrip').classList.add('is-open');$('#searchInput').focus()}});
+    render();
+  })();
+  </script>
+</body>
+</html>
