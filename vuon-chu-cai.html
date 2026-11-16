@@ -1015,6 +1015,7 @@ function initRenderer(){
 }
 function currentModal(){return !$('welcome').hidden||!$('mapOverlay').hidden||!$('helpOverlay').hidden||!$('winOverlay').hidden||!$('dictationOverlay').hidden;}
 function setMode(next){
+ if(mode!==next){clearTimeout(toastTimer);$('toast').classList.remove('show');}
  mode=next;
  const garden=next==='world',listen=next==='listen',trace=next==='trace';
  const quiz=next==='quiz',word=next==='word';
