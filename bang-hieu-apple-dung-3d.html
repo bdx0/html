@@ -352,6 +352,19 @@ button:disabled{cursor:not-allowed;opacity:.5}
 .billboard .offers{grid-template-columns:minmax(0,1fr);justify-content:stretch}
 .flat-mode .billboard .left-strip,.flat-mode .billboard .top-cap{visibility:hidden}
 
+
+/* Final optical sizing: preserve side readability without clipping narrow displays */
+.billboard{--box-depth:18cqw}
+.rig{--rig-width:min(82vw,410px,calc((100dvh - 175px)*.49))}
+.scene-hint{display:none}
+@media(max-width:640px){
+  .rig{
+    --rig-width:min(78vw,390px,calc((100dvh - 130px)*.53));
+    margin-left:4vw;
+  }
+  .billboard{--box-depth:18cqw}
+}
+
 </style>
 </head>
 <body>
