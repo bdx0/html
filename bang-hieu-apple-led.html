@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#070707">
+  <meta name="description" content="Bảng hiệu quảng cáo LED chuyên Apple: mua bán iPhone, iPad, sửa chữa, ép kính, thay màn hình, thay pin và thu cũ đổi mới. Một file HTML chạy trực tiếp, không cần Internet.">
+  <meta name="catalog:category" content="Thiết kế &amp; Trình diễn">
+  <meta name="catalog:tags" content="Bảng hiệu,LED,Apple,iPhone,Quảng cáo,HTML">
+  <meta name="catalog:icon" content="💡">
+  <title>Bảng hiệu LED Apple – iPhone, iPad, MacBook</title>
+  <style>
+    :root{color-scheme:dark;--panel:#111620;--accent:#fbcb59;--body:#06080e;--bulb-speed:2.5s}
+    *{box-sizing:border-box}
+    html,body{margin:0;min-height:100%;font-family:Arial,"Segoe UI",sans-serif}
+    body{color:#f5f6fb;background:radial-gradient(ellipse at 50% 45%,#11192a 0%,#080b13 49%,#030408 100%);overflow-x:hidden}
+    button,input{font:inherit}
+    button{cursor:pointer}
+    button:focus-visible,input:focus-visible{outline:3px solid #ffe18b;outline-offset:3px}
+    .stage{min-height:100dvh;display:grid;place-items:center;padding:22px 14px 90px;position:relative;isolation:isolate}
+    .stage::before{content:"";pointer-events:none;position:absolute;width:min(110vw,1000px);aspect-ratio:1;top:50%;left:50%;transform:translate(-50%,-49%);background:radial-gradient(ellipse,#2c2e5730 1%,#4c152522 36%,transparent 66%);filter:blur(42px);z-index:-1}
+    .board{width:min(92vw,calc((100dvh - 128px)*.8),740px);aspect-ratio:4/5;position:relative;isolation:isolate;container-type:inline-size;overflow:hidden;border:solid 1px #686975;background:radial-gradient(ellipse at 50% 48%,#16121a 0%,#08090f 49%,#020305 94%);box-shadow:0 0 0 5px #050505,0 0 0 7px #34343b,0 0 0 11px #070809,0 0 0 13px #1d2029,0 30px 90px #000c,0 0 100px #f2ebff13,inset 0 0 50px #000}
+    .board::before{content:"";position:absolute;inset:2%;z-index:1;pointer-events:none;border:1px solid #8da9ee72;box-shadow:0 0 9px #dbe7ff5f,inset 0 0 8px #8ad2ff48,0 0 0 3px #0c1019}
+    .board::after{content:"";position:absolute;inset:0;z-index:6;pointer-events:none;opacity:.12;background:repeating-linear-gradient(180deg,transparent 0,transparent 3px,#0008 4px);mix-blend-mode:multiply}
+    .bolts{position:absolute;inset:0;z-index:4;pointer-events:none}
+    .bulb{position:absolute;width:1.2cqw;height:1.2cqw;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle at 42% 33%,#fff 0 19%,#e7f2ff 36%,#bfcaff 53%,#51649e 68%,#0000 80%);box-shadow:0 0 3px 1px #fff,0 0 6px 2px #c2d2ff,0 0 13px 4px #dae3ff9e;animation:bulb-glow var(--bulb-speed) infinite ease-in-out;animation-delay:calc(var(--index)*-0.043s)}
+    .bulb::after{content:"";position:absolute;inset:-70%;border-radius:50%;background:radial-gradient(circle,#e0edff63 0%,transparent 66%);pointer-events:none}
+    .frame-inner{position:absolute;inset:4.7% 5.6%;z-index:1;border:1px solid #3a3e4d;box-shadow:inset 0 0 20px #000;pointer-events:none}
+    .sign-content{position:absolute;inset:7.3% 7.2% 7.5%;z-index:3;display:flex;flex-direction:column;align-items:center;justify-content:space-around;text-align:center;user-select:none;white-space:nowrap}
+    .sign-content [data-line]{display:block;max-width:100%;line-height:1.04;font-weight:1000;text-transform:uppercase;letter-spacing:-.045em;filter:drop-shadow(0 0 2px currentColor)}
+    .topmark{font-size:3.5cqw;letter-spacing:.22em!important;font-weight:900!important;color:#add7ff;text-shadow:0 0 7px #a7cfff,0 0 18px #448aff}
+    .topmark::before,.topmark::after{content:"✦";font-size:.76em;vertical-align:middle;margin:0 .7em;color:#c7fbff}
+    .green{font-size:10.9cqw;color:#66ff23;text-shadow:0 0 2px #f4ffe4,0 0 10px #38ff16,0 0 22px #1ee500,0 0 46px #0f9f00}
+    .red{font-size:9.1cqw;color:#ff2945;text-shadow:0 0 3px #ffd0da,0 0 9px #ff334e,0 0 20px #e5002c,0 0 42px #a40027}
+    .white-big{font-size:12cqw;color:#fff;text-shadow:0 0 2px #fff,0 0 8px #f5f8ff,0 0 20px #c4dcff,0 0 32px #758fff}
+    .cyan{font-size:5.2cqw;color:#7be8ff;letter-spacing:.04em!important;text-shadow:0 0 9px #74e0ff,0 0 20px #00bbff}
+    .gold{font-size:5.45cqw;color:#ffe82a;text-shadow:0 0 2px #fff1a2,0 0 8px #ffdd24,0 0 20px #ff9800,0 0 37px #dc6a00}
+    .white-mid{font-size:5.05cqw;color:#fff;text-shadow:0 0 4px #fff,0 0 14px #b3dcff,0 0 23px #4f9bff}
+    .white-small{font-size:4.6cqw;color:#fff;text-shadow:0 0 5px #fff,0 0 17px #bdd5ff}
+    .trade{font-size:8.0cqw;color:#ffdd30;text-shadow:0 0 3px #fff9aa,0 0 10px #ffd433,0 0 23px #ff9900,0 0 44px #ff6f00}
+    .bottommark{font-size:3.05cqw;color:#a6b5d5;letter-spacing:.08em!important;text-shadow:0 0 8px #759cff}
+    .separator{width:68%;height:1px;background:linear-gradient(90deg,transparent,#a7cbffb2,transparent);box-shadow:0 0 7px #84adff;flex-shrink:0}
+    .animated{animation:text-bright 4s ease-in-out infinite}
+    .animated.red{animation-delay:-.8s}
+    .animated.green{animation-delay:-2s}
+    .animated.trade{animation-delay:-1.3s}
+    @keyframes text-bright{0%,100%{opacity:1;filter:brightness(1)}48%{opacity:.91;filter:brightness(.85)}50%{opacity:.99;filter:brightness(1.18)}52%{opacity:.94;filter:brightness(.95)}}
+    @keyframes bulb-glow{0%,68%,100%{opacity:.77;filter:brightness(.9)}9%,14%{opacity:1;filter:brightness(1.6)}28%{opacity:.95;filter:brightness(1.06)}}
+    .toolbar{position:fixed;z-index:15;bottom:max(18px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);display:flex;gap:8px;padding:6px;border-radius:999px;background:#101522d9;border:1px solid #3a435b;box-shadow:0 12px 40px #0009;backdrop-filter:blur(14px);white-space:nowrap}
+    .toolbar button{background:transparent;border:0;border-radius:999px;color:#e4e7f6;padding:10px 15px;font-size:13px;font-weight:700;min-height:38px}
+    .toolbar button:hover,.toolbar button[aria-pressed=true]{background:#333d55;color:white}
+    .toolbar .primary{background:#f5cc66;color:#14120e}
+    .toolbar .primary:hover{background:#ffdf89;color:#14120e}
+    .edit-panel{position:fixed;z-index:20;right:18px;top:18px;bottom:18px;width:min(380px,calc(100vw - 36px));overflow:auto;padding:24px;background:#111722f5;border:1px solid #374158;border-radius:20px;box-shadow:0 24px 95px #000d;backdrop-filter:blur(18px)}
+    .edit-panel[hidden]{display:none}
+    .panel-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+    .edit-panel h2{margin:0;font-size:22px;letter-spacing:-.04em}
+    .close{width:36px;height:36px;border-radius:10px;background:#253044;border:0;color:white;font-size:24px;line-height:1}
+    .edit-panel p{color:#aeb9cd;font-size:13px;line-height:1.6;margin:0 0 20px}
+    .fields{display:grid;gap:13px}
+    .field{display:grid;gap:6px;color:#d1d9e8;font-size:12px;font-weight:700}
+    .field input{display:block;width:100%;height:42px;border-radius:9px;border:1px solid #38455c;background:#080d16;color:white;padding:0 12px;font-size:14px}
+    .field input:focus{border-color:#e7bc65}
+    .panel-actions{display:flex;gap:10px;margin-top:20px}
+    .panel-actions button{border:1px solid #3d4960;border-radius:10px;padding:12px 15px;font-weight:700;background:#283247;color:#fff}
+    .panel-actions button[type=submit]{background:#ffdb78;color:#1c1605;border-color:#ffdb78;flex:1}
+    .hint{font-size:11px!important;color:#8b9ab4!important;margin:16px 0 0!important}
+    .toast{pointer-events:none;position:fixed;z-index:40;left:50%;bottom:85px;transform:translate(-50%,10px);background:#1c2839;border:1px solid #62738c;padding:10px 17px;border-radius:12px;color:white;font-size:13px;opacity:0;transition:opacity .2s,transform .2s;max-width:90vw;text-align:center}
+    .toast.show{opacity:1;transform:translate(-50%,0)}
+    .paused .bulb,.paused .animated{animation-play-state:paused}
+    .stage:fullscreen{padding:0;background:#000;min-height:100vh;width:100vw}
+    .stage:fullscreen .board{width:min(98vw,80vh,980px)}
+    @media(max-width:520px){
+      .stage{padding:13px 6px 80px}
+      .toolbar{gap:1px}
+      .toolbar button{padding:9px 11px;font-size:12px}
+      .edit-panel{inset:8px 8px 76px;width:auto;padding:18px}
+    }
+    @media(prefers-reduced-motion:reduce){.animated,.bulb{animation:none!important}.toast{transition:none}}
+  </style>
+</head>
+<body>
+  <main class="stage" id="stage">
+    <section class="board" id="board" aria-label="Bảng hiệu đèn LED mua bán và sửa chữa thiết bị Apple">
+      <div class="frame-inner" aria-hidden="true"></div>
+      <div class="bolts" id="bulbs" aria-hidden="true"></div>
+      <div class="sign-content">
+        <div class="topmark" data-line="top">CHUYÊN APPLE</div>
+        <div class="green animated" data-line="buy">MUA BÁN</div>
+        <div class="red animated" data-line="device">iPHONE - iPAD</div>
+        <div class="separator" aria-hidden="true"></div>
+        <div class="white-big animated" data-line="repair">SỬA CHỮA</div>
+        <div class="cyan" data-line="specialty">iPHONE - MACBOOK</div>
+        <div class="separator" aria-hidden="true"></div>
+        <div class="gold" data-line="glass">ÉP KÍNH - THAY MÀN HÌNH</div>
+        <div class="white-mid" data-line="service">PIN - FACE ID - CAMERA</div>
+        <div class="white-small" data-line="accessory">DÁN CƯỜNG LỰC - PHỤ KIỆN</div>
+        <div class="trade animated" data-line="trade">THU CŨ ĐỔI MỚI</div>
+        <div class="bottommark" data-line="bottom">iPHONE • iPAD • MACBOOK • WATCH</div>
+      </div>
+    </section>
+  </main>
+
+  <nav class="toolbar" aria-label="Điều khiển bảng quảng cáo">
+    <button class="primary" type="button" id="editBtn" aria-expanded="false" aria-controls="editPanel">✎ Chỉnh chữ</button>
+    <button type="button" id="pauseBtn" aria-pressed="false">⏸ Tạm dừng</button>
+    <button type="button" id="fullBtn">⛶ Toàn màn hình</button>
+  </nav>
+
+  <aside class="edit-panel" id="editPanel" hidden aria-label="Chỉnh sửa nội dung bảng hiệu">
+    <div class="panel-top"><h2>Chỉnh nội dung LED</h2><button type="button" class="close" id="closeBtn" aria-label="Đóng bảng chỉnh sửa">×</button></div>
+    <p>Thay chữ trực tiếp trên bảng hiệu. Dữ liệu được lưu trong trình duyệt này, không cần máy chủ.</p>
+    <form id="editForm">
+      <div class="fields" id="fields"></div>
+      <div class="panel-actions">
+        <button type="submit">Lưu và áp dụng</button>
+        <button type="button" id="resetBtn">Mặc định</button>
+      </div>
+      <p class="hint">Mẹo: chữ ngắn sẽ sáng rõ và dễ đọc từ xa. Nhấn “Toàn màn hình” để trình chiếu trên màn hình cửa hàng.</p>
+    </form>
+  </aside>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+  (function(){
+    'use strict';
+    var storageKey = 'apple-led-sign-v1';
+    var labelMap = {
+      top:'Dòng nhỏ phía trên',buy:'Dòng xanh lá',device:'Dòng đỏ',
+      repair:'Dòng chữ trắng lớn',specialty:'Dòng xanh dương',
+      glass:'Dịch vụ ép kính',service:'Dịch vụ sửa chữa',
+      accessory:'Dòng phụ kiện',trade:'Thu cũ đổi mới',bottom:'Dòng nhỏ phía dưới'
+    };
+    var nodes = Array.from(document.querySelectorAll('[data-line]'));
+    var original = {};
+    nodes.forEach(function(el){original[el.dataset.line]=el.textContent;});
+    var panel=document.getElementById('editPanel');
+    var editBtn=document.getElementById('editBtn');
+    var fields=document.getElementById('fields');
+    var toast=document.getElementById('toast');
+    var toastTimeout;
+    function notify(message){
+      toast.textContent=message;toast.classList.add('show');
+      clearTimeout(toastTimeout);
+      toastTimeout=setTimeout(function(){toast.classList.remove('show');},2700);
+    }
+    function load(){
+      try {return JSON.parse(localStorage.getItem(storageKey)||'{}')||{};}
+      catch(e){return {};}
+    }
+    function save(data){
+      try {localStorage.setItem(storageKey,JSON.stringify(data));return true;}
+      catch(e){notify('Trình duyệt không cho phép lưu; nội dung vẫn được áp dụng.');return false;}
+    }
+    function apply(data){
+      nodes.forEach(function(el){
+        var key=el.dataset.line;
+        var val=data[key];
+        el.textContent=typeof val==='string'&&val.trim()?val.trim():original[key];
+      });
+    }
+    function buildFields(){
+      nodes.forEach(function(node){
+        var key=node.dataset.line;
+        var label=document.createElement('label');
+        label.className='field';
+        var title=document.createElement('span');title.textContent=labelMap[key]||key;
+        var input=document.createElement('input');
+        input.type='text';input.name=key;input.maxLength=46;input.value=node.textContent;
+        input.autocomplete='off';input.setAttribute('aria-label',labelMap[key]||key);
+        input.addEventListener('input',function(){
+          node.textContent=input.value.trim()||original[key];
+        });
+        label.append(title,input);fields.appendChild(label);
+      });
+    }
+    function syncFields(){
+      Array.from(fields.querySelectorAll('input')).forEach(function(input){
+        var node=document.querySelector('[data-line="'+input.name+'"]');
+        input.value=node.textContent;
+      });
+    }
+    function togglePanel(open){
+      panel.hidden=!open;editBtn.setAttribute('aria-expanded',String(open));
+      if(open){syncFields();fields.querySelector('input').focus();}
+      else{editBtn.focus();}
+    }
+    apply(load());
+    buildFields();
+    editBtn.addEventListener('click',function(){togglePanel(panel.hidden);});
+    document.getElementById('closeBtn').addEventListener('click',function(){togglePanel(false);});
+    document.addEventListener('keydown',function(event){
+      if(event.key==='Escape'&&!panel.hidden){togglePanel(false);}
+    });
+    document.getElementById('editForm').addEventListener('submit',function(event){
+      event.preventDefault();
+      var data={};
+      Array.from(fields.querySelectorAll('input')).forEach(function(input){data[input.name]=input.value.trim()||original[input.name];});
+      apply(data);save(data);togglePanel(false);notify('Đã áp dụng nội dung bảng hiệu.');
+    });
+    document.getElementById('resetBtn').addEventListener('click',function(){
+      apply(original);syncFields();save({});notify('Đã khôi phục nội dung mặc định.');
+    });
+    var positions=[];
+    var horizontal=39,vertical=49;
+    for(var i=0;i<horizontal;i++) positions.push([3.4+93.2*i/(horizontal-1),2.8]);
+    for(var j=1;j<vertical-1;j++) positions.push([97.0,2.8+94.4*j/(vertical-1)]);
+    for(var k=horizontal-1;k>=0;k--) positions.push([3.4+93.2*k/(horizontal-1),97.2]);
+    for(var h=vertical-2;h>=1;h--) positions.push([3.0,2.8+94.4*h/(vertical-1)]);
+    var holder=document.getElementById('bulbs');
+    var fragment=document.createDocumentFragment();
+    positions.forEach(function(pos,index){
+      var bulb=document.createElement('i');
+      bulb.className='bulb';
+      bulb.style.left=pos[0]+'%';
+      bulb.style.top=pos[1]+'%';
+      bulb.style.setProperty('--index',index);
+      fragment.appendChild(bulb);
+    });
+    holder.appendChild(fragment);
+    var paused=false;
+    var pauseBtn=document.getElementById('pauseBtn');
+    pauseBtn.addEventListener('click',function(){
+      paused=!paused;
+      document.getElementById('board').classList.toggle('paused',paused);
+      pauseBtn.textContent=paused?'▶ Tiếp tục':'⏸ Tạm dừng';
+      pauseBtn.setAttribute('aria-pressed',String(paused));
+    });
+    document.getElementById('fullBtn').addEventListener('click',function(){
+      var stage=document.getElementById('stage');
+      if(document.fullscreenElement){
+        document.exitFullscreen().catch(function(){notify('Không thể thoát chế độ toàn màn hình.');});
+      }else if(stage.requestFullscreen){
+        stage.requestFullscreen().catch(function(){notify('Hãy thử F11 hoặc chế độ toàn màn hình của trình duyệt.');});
+      }else{
+        notify('Thiết bị này chưa hỗ trợ toàn màn hình. Có thể dùng chế độ kiosk của trình duyệt.');
+      }
+    });
+    document.addEventListener('fullscreenchange',function(){
+      document.getElementById('fullBtn').textContent=document.fullscreenElement?'⤢ Thu nhỏ':'⛶ Toàn màn hình';
+    });
+  })();
+  </script>
+</body>
+</html>
