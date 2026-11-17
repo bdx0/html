@@ -4,6 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
 <meta name="theme-color" content="#b8e9f2">
+<link rel="manifest" href="./vuon-chu-cai.webmanifest">
+<link rel="apple-touch-icon" href="./assets/vuon-chu-cai-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="description" content="Vườn Chữ Cái 3D — game WebGL tương tác, bé điều khiển Gấu khám phá 29 chữ cái, tô chữ trên bảng 3D, tìm chữ và nhận sao.">
 <meta name="catalog:category" content="Trò chơi 3D">
 <meta name="catalog:tags" content="WebGL,Three.js,3D,29 chữ cái,Tiếng Việt,Game giáo dục,Cảm ứng">
@@ -138,6 +141,12 @@ button:disabled{opacity:.42;cursor:default}
 #dictationInput:focus{outline:3px solid #dcd4ff}
 .dictation-target{font-size:12px!important;color:#7863bc!important}
 @media(max-width:650px){.lesson-bottom[data-phase="trace"] .demo-button,.lesson-bottom[data-phase="trace"] .stroke-next-button{flex:1 1 auto}.lesson-bottom .mic-button{min-width:74px}}
+ .explore-tools{position:fixed;z-index:6;right:max(14px,env(safe-area-inset-right));top:calc(146px + env(safe-area-inset-top));display:flex;flex-direction:column;gap:7px;align-items:flex-end;pointer-events:none}
+.explore-tools button{pointer-events:auto;min-height:39px;padding:0 12px;background:#fffffff0;color:#595c82;border:1px solid #fff;border-radius:13px;font-size:12px;font-weight:850;box-shadow:0 5px 18px #3a68922a}
+.explore-tools button:hover{background:#fff}.explore-tools button[aria-pressed="false"]{color:#9c94ae}
+#installOverlay{z-index:29}.install-link{display:block;margin:13px auto 0;border:1px solid #e6dcf5;border-radius:12px;background:#fff;color:#7367a9;min-height:43px;padding:0 15px;font-size:12px;font-weight:850}
+@media(max-width:650px){.explore-tools{right:10px;top:calc(112px + env(safe-area-inset-top));gap:5px}.explore-tools button{min-height:36px;font-size:11px;padding:0 9px;border-radius:11px}}
+@media(max-height:550px){.explore-tools{top:calc(112px + env(safe-area-inset-top));gap:3px}.explore-tools button{min-height:30px;font-size:10px}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 <script src="./assets/three.min.js"></script>
@@ -149,6 +158,12 @@ button:disabled{opacity:.42;cursor:default}
   <div class="brand"><span class="logo">🌈</span><span class="brand-text"><strong>VƯỜN CHỮ CÁI 3D</strong><small>HÀNH TRÌNH CÙNG GẤU</small></span></div>
   <div class="hud-actions"><div class="hud-pill" title="Tổng số sao"><span>⭐</span><span id="starTotal">0</span></div><button id="mapButton" class="hud-btn" title="Bản đồ chữ cái" aria-label="Mở bản đồ 29 chữ">🗺️</button><button id="soundButton" class="hud-btn" title="Âm thanh" aria-label="Bật hoặc tắt âm thanh" aria-pressed="true">🔊</button><button id="helpButton" class="hud-btn" title="Cách chơi" aria-label="Cách chơi">❔</button></div>
 </header>
+<div id="exploreTools" class="explore-tools" hidden>
+ <button id="homeShortcut" type="button">🏡 Nhà Gấu</button>
+ <button id="seaShortcut" type="button">🌊 Ra biển</button>
+ <button id="leaveHouseButton" type="button" hidden>🚪 Ra vườn</button>
+ <button id="musicToggle" type="button" aria-pressed="true">♫ Nhạc: bật</button>
+</div>
 <div id="worldTag" class="world-tag" hidden>🐻 Dùng cần điều khiển để khám phá</div>
 <div id="bottomHelp" class="bottom-help" hidden>W A S D hoặc cần ảo để di chuyển · Chạm chữ để đến gần</div>
 <div id="joystick" class="stick" aria-label="Cần điều khiển di chuyển" hidden><span class="stick-caption">DI CHUYỂN</span><div id="joystickKnob" class="stick-knob"></div></div>
@@ -180,6 +195,14 @@ button:disabled{opacity:.42;cursor:default}
     <div class="modal-actions"><button id="dictationCancel" type="button">Đóng</button><button id="dictationSubmit" class="cta" type="button">Gấu trả lời ✨</button></div>
   </section>
 </div>
+<div id="installOverlay" class="overlay" hidden>
+ <section class="modal" role="dialog" aria-modal="true" aria-labelledby="installHeading">
+  <span style="font-size:50px">📲</span><h2 id="installHeading">Cài Vườn Chữ Cái</h2>
+  <p>Trên Android, mở trò chơi bằng Chrome. Chạm ⋮ ở góc trên, chọn <strong>Cài đặt ứng dụng</strong> hoặc <strong>Thêm vào màn hình chính</strong>. Nếu đang dùng trình duyệt trong ứng dụng khác, hãy mở bằng Chrome trước.</p>
+  <p>Trên iPhone/iPad: Safari → Chia sẻ → Thêm vào màn hình chính.</p>
+  <div class="modal-actions"><button id="installClose" class="cta" type="button">Đã hiểu</button></div>
+ </section>
+</div>
 <div id="welcome" class="overlay">
   <section class="welcome" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle">
     <span class="eyebrow">🌈 VƯỜN CHỮ CÁI · 3D ADVENTURE</span>
@@ -188,6 +211,7 @@ button:disabled{opacity:.42;cursor:default}
     <p>Đi cùng Gấu Bông khám phá một thế giới 3D đầy màu sắc, lắng nghe, tô chữ, nhận diện chữ, tìm đồ vật và làm vườn nở hoa!</p>
     <div class="instructions"><span>🎮 Điều khiển Gấu</span><span>🔊 Nghe chậm & nhắc lại</span><span>✏️ Tô chữ 3D</span><span>🌼 Trồng hoa nhận sao</span></div>
     <button id="playButton" type="button" class="cta">✨ BẮT ĐẦU KHÁM PHÁ</button>
+  <button id="installWelcome" type="button" class="install-link">📲 Cài game vào màn hình chính</button>
   </section>
 </div>
 <div id="mapOverlay" class="overlay" hidden>
@@ -202,7 +226,8 @@ button:disabled{opacity:.42;cursor:default}
     <h2 id="helpTitle">🎮 Cách chơi</h2>
     <ol><li>Dùng các phím <b>W A S D / mũi tên</b> hoặc cần ảo để điều khiển Gấu Bông.</li><li>Chạm vào chữ nổi trong khu vườn, Gấu sẽ tự đi tới chữ đó. Có thể mở bản đồ 🗺️ để chọn nhanh.</li><li><b>Nghe chậm</b> rồi bấm 🎤 Bé đọc. Trình duyệt có nhận dạng tiếng nói sẽ nghe và trả lời; trên iPad có thể dùng nút 🎙️ của bàn phím để đọc và nhận phản hồi.</li><li><b>Tô chữ</b> trên bảng phép thuật, có thể tẩy và làm lại.</li><li><b>Tìm chữ</b> đúng trong 4 khối 3D, rồi <b>tìm đồ vật</b> tương ứng với từ vừa nghe.</li><li>Hoàn thành 4 thử thách để nhận 1–3 ⭐ và làm một bông hoa trong khu vườn nở rộ!</li></ol>
     <p>Bảng tập viết có ô ly, điểm đặt bút, mũi tên, tên từng nét và nút mô phỏng cách viết. Các nét vector được biên dựng để tham khảo mẫu chữ tiểu học Việt Nam; nên đối chiếu thêm với mẫu trường bé đang học. Nếu cấp quyền micro, dịch vụ nhận dạng của trình duyệt có thể xử lý âm thanh; game không tự lưu bản ghi âm. Phản hồi giọng nói chỉ dựa vào từ nhận dạng được, chưa đánh giá chính xác phát âm.</p>
-    <div class="modal-actions"><button id="helpClose" class="cta" type="button">Đã hiểu, chơi thôi!</button></div>
+    <p>🏡 Vào nhà Gấu để khám phá đồ vật. 🌊 Đi xuống biển để bơi; những phao đánh dấu vùng bơi. ♫ Tắt/bật nhạc nền riêng.</p>
+ <div class="modal-actions"><button id="installButton" type="button">📲 Cài game</button><button id="helpClose" class="cta" type="button">Đã hiểu, chơi thôi!</button></div>
   </section>
 </div>
 <div id="winOverlay" class="overlay" hidden>
@@ -499,7 +524,7 @@ const VOICE_SPEEDS=[
  {id:'medium',label:'🐇 Vừa',rate:.76,pause:650},
  {id:'fast',label:'🚀 Nhanh',rate:.92,pause:450}
 ];
-let progress={best:{},sound:true,speechSpeed:'slow'};
+let progress={best:{},sound:true,speechSpeed:'slow',music:true};
 let mode='world',level=0,traceScore=0,attempts=0,quizMistakes=0,wordMistakes=0,won=false;
 let quizSolved=false,wordSolved=false,previouslyLearned=false,speechToken=0,speechTimer=0,voiceWarning=false;
 let targetIndex=-1,actionIndex=-1,autoTarget=null;
@@ -536,6 +561,7 @@ function loadProgress(){
   const data=JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}');
   if(data&&typeof data==='object'){
    if(typeof data.sound==='boolean')progress.sound=data.sound;
+   if(typeof data.music==='boolean')progress.music=data.music;
    if(VOICE_SPEEDS.some(item=>item.id===data.speechSpeed))progress.speechSpeed=data.speechSpeed;
    if(data.best&&typeof data.best==='object')for(let i=0;i<29;i++){
     const n=data.best[String(i)];
@@ -551,6 +577,7 @@ function persist(){
 }
 function updateProgress(){
  $('starTotal').textContent=totals();
+ updateMusicButton();
  $('soundButton').textContent=progress.sound?'🔊':'🔇';
  $('soundButton').setAttribute('aria-pressed',String(progress.sound));
  if($('speedButton')){
@@ -932,7 +959,9 @@ function makeAvatar(){
  bearHead.add(sphere(.05,0xfffbf8,.19,.02,.81));
  const leftArm=sphere(.29,0xd8a079,-.87,1.15,.05,.8,1.27,.8);
  const rightArm=sphere(.29,0xd8a079,.87,1.15,.05,.8,1.27,.8);
- player.add(leftArm,rightArm);
+ player.add(leftArm,rightArm);arms=[leftArm,rightArm];
+ swimRing=new T.Mesh(new T.TorusGeometry(.79,.18,10,32),mat(0xffb85c));
+ swimRing.rotation.x=Math.PI/2;swimRing.position.y=.68;swimRing.visible=false;player.add(swimRing);
  const backpack=box(.94,1.16,.34,0x9a84ef,0,1.27,-.72);backpack.rotation.x=.12;player.add(backpack);
  const flap=box(.95,.26,.4,0xc8bafa,0,1.63,-.76);player.add(flap);
  playerShadow=new T.Mesh(new T.CircleGeometry(.97,20),new T.MeshBasicMaterial({color:0x527e68,transparent:true,opacity:.22,depthWrite:false}));
@@ -978,11 +1007,234 @@ function addLetterTokens(){
   }
  }
 }
+// Exploration expansion: separate house scene and ocean, no external assets.
+const HOUSE={x:19,z:2,doorX:19,doorZ:5.75};
+const ISLAND_RADIUS=29.0,MAX_RADIUS=44,SEA_Y=-.56;
+let houseScene,houseCamera,houseDoor,housePickers=[],houseItems=[],visitedHouseItems=new Set(),seaMesh,seaWaves=[],swimRing,arms=[],swimming=false,insideReturn=null,houseTarget=null;
+let musicTimer=null,musicBus=null,musicStep=0,musicNext=0,musicContext=null,musicNodes=new Set();
+const exploring=()=>mode==='world'||mode==='house';
+const seaAt=(x,z)=>Math.hypot(x,z)>ISLAND_RADIUS;
+function addOcean(){
+ const geo=new T.PlaneGeometry(260,260,1,1);
+ const material=new T.MeshPhongMaterial({color:0x55c5e7,shininess:70,specular:0x9deef4,transparent:true,opacity:.85,depthWrite:false});
+ seaMesh=new T.Mesh(geo,material);seaMesh.rotation.x=-Math.PI/2;seaMesh.position.y=SEA_Y;seaMesh.renderOrder=1;worldScene.add(seaMesh);
+ const sand=cylinder(30.3,29.1,.30,0xffdfa2,0,-.42,0,96);worldScene.add(sand);
+ const foam=new T.Mesh(new T.RingGeometry(29.5,30.2,96),new T.MeshBasicMaterial({color:0xe6ffff,transparent:true,opacity:.62,side:T.DoubleSide,depthWrite:false}));
+ foam.rotation.x=-Math.PI/2;foam.position.y=SEA_Y+.045;foam.renderOrder=2;worldScene.add(foam);
+ for(let i=0;i<48;i++){
+  const a=i*2.39996,r=31+deterministic(i+310)*24;
+  const mesh=new T.Mesh(new T.TorusGeometry(.72+deterministic(i+40)*.34,.025,5,18,Math.PI*1.12),new T.MeshBasicMaterial({color:0xe9ffff,transparent:true,opacity:.45,depthWrite:false}));
+  mesh.rotation.x=-Math.PI/2;mesh.rotation.z=a;mesh.position.set(Math.cos(a)*r,SEA_Y+.05,Math.sin(a)*r);mesh.scale.set(1.7,.62,1);mesh.renderOrder=2;
+  seaWaves.push({mesh,phase:i*.71,x:mesh.position.x,z:mesh.position.z});worldScene.add(mesh);
+ }
+ // Decorative buoys mark the safe swimming area.
+ for(let i=0;i<8;i++){const a=i*Math.PI/4;
+  const buoy=new T.Group();buoy.position.set(Math.cos(a)*42,SEA_Y,Math.sin(a)*42);
+  buoy.add(sphere(.42,0xffb05f,0,.22,0,1,.78,1),cylinder(.055,.055,.8,0xfff5dc,0,.58,0,8),sphere(.13,0xff777e,0,1,0));
+  worldScene.add(buoy);bobbing.push({mesh:buoy,base:SEA_Y,phase:i});
+ }
+}
+function roofMesh(w,d,h,color){
+ const v=new Float32Array([-w/2,0,-d/2,w/2,0,-d/2,0,h,-d/2,-w/2,0,d/2,0,h,d/2,w/2,0,d/2,-w/2,0,-d/2,0,h,-d/2,0,h,d/2,-w/2,0,-d/2,0,h,d/2,-w/2,0,d/2,w/2,0,-d/2,w/2,0,d/2,0,h,d/2,w/2,0,-d/2,0,h,d/2,0,h,-d/2]);
+ const g=new T.BufferGeometry();g.setAttribute('position',new T.BufferAttribute(v,3));g.computeVertexNormals();return new T.Mesh(g,mat(color,{side:T.DoubleSide}));
+}
+function sceneLabel(text,w=3.4,h=.9,color='#624e9a'){
+ const c=document.createElement('canvas');c.width=512;c.height=144;
+ const cx=c.getContext('2d');cx.fillStyle='#fff8e7';cx.fillRect(0,0,512,144);cx.strokeStyle='#f1c88a';cx.lineWidth=12;cx.strokeRect(6,6,500,132);cx.fillStyle=color;cx.font='900 48px Arial,sans-serif';cx.textAlign='center';cx.textBaseline='middle';cx.fillText(text,256,72,470);
+ return new T.Mesh(new T.PlaneGeometry(w,h),new T.MeshBasicMaterial({map:textureFromCanvas(c),side:T.DoubleSide,toneMapped:false}));
+}
+function makeHouseExterior(){
+ const g=new T.Group();g.position.set(HOUSE.x,0,HOUSE.z);worldScene.add(g);
+ g.add(box(7.9,.39,6.9,0xffdfac,0,.19,0));
+ g.add(box(7.1,3.9,5.8,0xffe0b5,0,2.2,0));
+ const roof=roofMesh(8.3,6.9,2.25,0xc987c6);roof.position.set(0,4.14,0);g.add(roof);
+ g.add(box(.83,2.05,.95,0x9b7da5,2.3,5,-1.4));
+ g.add(box(1.75,2.85,.19,0xcb8b5a,0,1.61,3.01),box(1.98,.20,.32,0xfff6dc,0,.26,3.18),sphere(.10,0xffd574,.58,1.46,3.14));
+ for(const x of [-2.22,2.22]){
+  g.add(box(1.62,1.63,.18,0xffffff,x,2.36,3.01),box(1.34,1.32,.19,0x84d5ed,x,2.36,3.13),box(.09,1.32,.06,0xfff9e9,x,2.36,3.25),box(1.34,.09,.06,0xfff9e9,x,2.36,3.25));
+  g.add(box(1.8,.32,.52,0xbc946e,x,1.45,3.26));
+  for(let i=0;i<3;i++)g.add(sphere(.22,[0xfa8eb0,0xffca76,0xb598e7][i],x+(i-1)*.48,1.74,3.35));
+ }
+ const sign=sceneLabel('NHÀ CỦA GẤU',3.6,.92);sign.position.set(0,3.65,3.13);g.add(sign);
+ for(let i=0;i<4;i++)worldScene.add(box(1.75,.065,.62,0xffeac4,HOUSE.x,.28,HOUSE.doorZ+i*.75));
+ houseDoor=new T.Mesh(new T.BoxGeometry(7.8,6.4,6.9),new T.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));houseDoor.position.set(0,3.2,0);g.add(houseDoor);
+}
+function addHouseItem(name,emoji,x,z,builder){
+ const g=new T.Group();g.position.set(x,0,z);builder(g);houseScene.add(g);
+ const hit=new T.Mesh(new T.BoxGeometry(2.75,3.1,2.4),new T.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));hit.position.y=1.45;hit.userData.item=houseItems.length;g.add(hit);housePickers.push(hit);
+ const label=sceneLabel(emoji+' '+name,2.65,.66);label.position.set(0,3.25,.20);label.userData.item=houseItems.length;g.add(label);housePickers.push(label);
+ houseItems.push({name,emoji,x,z,g,label});
+}
+function buildHouseInterior(){
+ houseScene=new T.Scene();houseScene.background=new T.Color(0xece4fb);
+ houseCamera=new T.PerspectiveCamera(45,innerWidth/innerHeight,.1,80);
+ houseScene.add(new T.HemisphereLight(0xffffff,0xb1a0cb,1.45));
+ const light=new T.DirectionalLight(0xfff0ce,1.45);light.position.set(2,15,12);houseScene.add(light);
+ houseScene.add(box(16,.42,13,0xf3d8ae,0,-.25,0));
+ for(let x=-7.5;x<=7.5;x+=1.5)houseScene.add(box(.025,.025,12.9,0xdba982,x,.005,0));
+ houseScene.add(box(16,5.5,.35,0xffe4c7,0,2.65,-6.5),box(.35,5.5,13,0xffe9d2,-8,2.65,0),box(.35,1.15,13,0xffe9d2,8,.51,0));
+ houseScene.add(box(5.1,.18,3.4,0xe8b9e8,0,.035,1.1));
+ for(let i=0;i<5;i++)houseScene.add(box(4.9,.012,.075,0xffeaf4,0,.135,-.3+i*.67));
+ // Back wall window and framed art.
+ houseScene.add(box(3.5,2.5,.13,0xffffff,0,3.35,-6.26),box(3.16,2.16,.15,0x92d5ef,0,3.35,-6.13),box(.12,2.17,.18,0xfff8ee,0,3.35,-6.0),box(3.18,.12,.18,0xfff8ee,0,3.35,-6.0));
+ const sign=sceneLabel('NHÀ CỦA GẤU',4.0,.94);sign.position.set(0,4.93,-6.04);houseScene.add(sign);
+ addHouseItem('giường','🛏️',-5,-4,g=>{
+  g.add(box(2.9,.55,3.4,0xc09276,0,.4,0),box(2.8,.42,3.3,0xfff5e7,0,.88,0),box(2.8,.24,2.0,0xc3afea,0,1.13,.47),box(2.86,1.35,.23,0xd098c5,0,1.14,-1.6),box(1.7,.36,.82,0xffffff,0,1.21,-.89));
+ });
+ addHouseItem('sách','📚',4.8,-4.1,g=>{
+  g.add(box(2.7,2.95,.6,0xc89970,0,1.48,0),box(2.55,.12,1.0,0xf0c89e,0,.8,.25),box(2.55,.12,1.0,0xf0c89e,0,1.7,.25));
+  for(let j=0;j<6;j++)g.add(box(.32,.60+(j%3)*.11,.56,COLORS[j],-1.06+j*.39,2.09,.39),box(.32,.51+(j%3)*.09,.56,COLORS[(j+2)%6],-1.06+j*.39,1.14,.39));
+ });
+ addHouseItem('bàn','🖍️',-4.6,.7,g=>{
+  g.add(box(2.5,.20,1.65,0xffcc8e,0,1.28,0));
+  for(const x of [-1,1])for(const z of [-.6,.6])g.add(box(.16,1.2,.16,0xc69c72,x,.62,z));
+  g.add(box(.8,.07,.65,0xfff9f4,-.3,1.41,0),cylinder(.16,.20,.45,0xaf9de6,.57,1.58,-.3));
+  for(let i=0;i<3;i++)g.add(cylinder(.035,.035,.45,COLORS[i],.47+i*.09,1.94,-.3,6));
+ });
+ addHouseItem('đèn','💡',4.8,.2,g=>{
+  g.add(cylinder(.44,.54,.12,0xc6a8dc,0,.10,0),cylinder(.1,.1,2.1,0xc99ac5,0,1.15,0),cylinder(.45,.86,.62,0xffc574,0,2.15,0),sphere(.20,0xfff9c8,0,1.83,0));
+ });
+ addHouseItem('gấu đồ chơi','🧸',3.7,3.5,g=>{
+  g.add(box(2.0,.7,1.5,0x8edcc0,0,.35,0),sphere(.55,0xcda07d,0,1.18,0),sphere(.50,0xe3b18a,0,1.95,0));
+  for(const x of [-.38,.38])g.add(sphere(.19,0xd39672,x,2.29,0),sphere(.07,0x382f42,x*.55,1.98,.43));
+  g.add(sphere(.18,0xf8dfc6,0,1.80,.43));
+ });
+ const exit=sceneLabel('🚪 RA VƯỜN',3.5,.9);exit.position.set(0,1.15,6.25);houseScene.add(exit);
+ const exitHit=new T.Mesh(new T.BoxGeometry(3.4,2.5,1.5),new T.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));exitHit.position.set(0,1.1,6);exitHit.userData.item=-1;houseScene.add(exitHit);housePickers.push(exitHit);
+}
+function stopMotion(){keys.clear();joystickX=joystickY=0;stickPointer=null;autoTarget=null;houseTarget=null;window.__worldDrag=null;$('joystickKnob').style.transform='translate(0,0)';}
+function enterHouse(){
+ if(mode!=='world')return;
+ insideReturn={x:HOUSE.doorX,z:HOUSE.doorZ+1.4,yaw:cameraYaw};
+ stopMotion();swimming=false;player.position.set(0,0,2.7);player.rotation.set(0,Math.PI,0);swimRing.visible=false;
+ houseScene.add(player,playerShadow);playerShadow.visible=true;cameraYaw=0;cameraPitch=10.2;
+ houseCamera.position.set(0,11,17);houseCamera.lookAt(0,1.1,0);
+ setMode('house');toast('🏡 Chào mừng bé đến nhà Gấu! Chạm đồ vật để khám phá.');
+}
+function leaveHouse(){
+ if(mode!=='house')return;
+ stopMotion();worldScene.add(player,playerShadow);
+ player.position.set(insideReturn?.x??HOUSE.doorX,0,insideReturn?.z??HOUSE.doorZ+1.4);
+ cameraYaw=insideReturn?.yaw??0;cameraPitch=13.4;
+ worldCamera.position.set(player.position.x+Math.sin(cameraYaw)*19,cameraPitch,player.position.z+Math.cos(cameraYaw)*19);
+ setMode('world');updateNearby();toast('🌼 Gấu đã trở về khu vườn!');
+}
+function inspectHouseItem(index){
+ if(index===-1){leaveHouse();return;}
+ const item=houseItems[index];if(!item)return;
+ visitedHouseItems.add(index);
+ toast(item.emoji+' Đây là '+item.name+' của Gấu! ('+visitedHouseItems.size+'/5 đồ vật)');chirp('happy');
+ if(progress.sound&&window.speechSynthesis){stopSpeech();try{const u=new SpeechSynthesisUtterance('Đây là '+item.name+' của Gấu.');u.lang='vi-VN';u.rate=voiceSpeed().rate;const v=speechSynthesis.getVoices().find(v=>v.lang.toLowerCase().startsWith('vi'));if(v)u.voice=v;speechSynthesis.speak(u);}catch(_){}}
+}
+function nearHome(){return Math.hypot(player.position.x-HOUSE.doorX,player.position.z-HOUSE.doorZ)<3.7;}
+function headHome(){if(mode!=='world')return;if(nearHome()){enterHouse();return;}
+ const x=player.position.x,z=player.position.z,front=HOUSE.doorZ+.4;
+ const side=HOUSE.x+(x<HOUSE.x?-4.65:4.65);
+ const waypoints=z<HOUSE.z+3.3?[{x:side,z:Math.min(z,front)},{x:side,z:front},{x:HOUSE.doorX,z:front}]:[{x:HOUSE.doorX,z:front}];
+ const first=waypoints.shift();autoTarget={...first,index:-2,waypoints};toast('🐻 Gấu đang đi về nhà!');}
+
+function headSea(){if(mode!=='world')return;let a=Math.hypot(player.position.x,player.position.z)>.1?Math.atan2(player.position.z,player.position.x):Math.PI/2;
+ // Keep the exit from the cottage clear of its exterior walls.
+ if(!swimming&&Math.abs(player.position.x-HOUSE.x)<6&&player.position.z>HOUSE.z)a=Math.max(a,.48);
+ const r=swimming?26:35;autoTarget={x:Math.cos(a)*r,z:Math.sin(a)*r,index:-1};toast(swimming?'🏝️ Gấu đang bơi về bờ!':'🌊 Cùng Gấu xuống biển!');}
+
+function updateHouseHint(){
+ let nearest=-2,dist=Infinity;
+ houseItems.forEach((it,i)=>{const d=Math.hypot(player.position.x-it.x,player.position.z-it.z);if(d<dist){dist=d;nearest=i;}});
+ const exitD=Math.hypot(player.position.x,player.position.z-6);
+ if(exitD<2.1){nearest=-1;dist=exitD;}
+ const close=dist<2.25;
+ $('actionButton').hidden=!close;
+ if(close){$('actionText').textContent=nearest===-1?'RA VƯỜN':'XEM '+houseItems[nearest].name.toLocaleUpperCase('vi-VN');}
+ $('worldTag').textContent=close?(nearest===-1?'🚪 Ra khỏi nhà':'✨ Chạm để khám phá '+houseItems[nearest].name):'🏡 Nhà Gấu · chạm đồ vật hoặc đi khám phá';
+ return close?nearest:-2;
+}
+function tickHouse(dt,t){
+ if(mode!=='house')return;
+ let dx=joystickX,dz=joystickY;
+ if(keys.has('w')||keys.has('arrowup'))dz--;if(keys.has('s')||keys.has('arrowdown'))dz++;
+ if(keys.has('a')||keys.has('arrowleft'))dx--;if(keys.has('d')||keys.has('arrowright'))dx++;
+ if(currentModal()){dx=dz=0;}else if(Math.hypot(dx,dz)>.05){houseTarget=null;const n=Math.hypot(dx,dz);dx/=n;dz/=n;}
+ else if(houseTarget){dx=houseTarget.x-player.position.x;dz=houseTarget.z-player.position.z;const d=Math.hypot(dx,dz);if(d<.35){const item=houseTarget.item;houseTarget=null;if(item!=null)inspectHouseItem(item);dx=dz=0;}else{dx/=d;dz/=d;}}
+ else{dx=dz=0;}
+ if(mode!=='house')return;
+ if(dx||dz){
+  player.position.x=clamp(player.position.x+dx*dt*5,-6.8,6.8);player.position.z=clamp(player.position.z+dz*dt*5,-5.1,5.8);
+  player.rotation.y=Math.atan2(dx,dz);walkingTime+=dt*12;legs.forEach((l,i)=>l.position.y=.37+Math.sin(walkingTime+i*Math.PI)*.14);
+ }else legs.forEach(l=>l.position.y=smooth(l.position.y,.37,dt*8));
+ player.position.y=0;playerShadow.position.set(player.position.x,.08,player.position.z);
+ const aspect=innerWidth/innerHeight,mobile=aspect<.85;const dist=mobile?Math.max(18,16/aspect):13.3;
+ houseCamera.position.lerp(new T.Vector3(player.position.x*(mobile?.10:.36), mobile?dist*.64:10.2,player.position.z*.18+dist),clamp(dt*5,0,1));
+ houseCamera.lookAt(player.position.x*(mobile?.08:.25),1.25,player.position.z*.12);
+ houseItems.forEach(it=>it.label.quaternion.copy(houseCamera.quaternion));
+ updateHouseHint();
+}
+function houseClick(e){
+ const r=targetWorldPoint(e);const hits=r.intersectObjects(housePickers,false);
+ if(hits.length){const i=hits[0].object.userData.item;if(i===-1){houseTarget={x:0,z:5.7,item:-1};return;}
+  const item=houseItems[i];houseTarget={x:item.x,z:Math.min(5.6,item.z+1.6),item:i};return;}
+ const d=new T.Vector3();if(r.ray.intersectPlane(new T.Plane(new T.Vector3(0,1,0),0),d))houseTarget={x:clamp(d.x,-6.8,6.8),z:clamp(d.z,-5.1,5.8)};
+}
+function tickOcean(t){
+ seaMesh.position.y=SEA_Y+Math.sin(t*.7)*.035;
+ for(const w of seaWaves){w.mesh.position.y=SEA_Y+.08+Math.sin(t*1.25+w.phase)*.025;w.mesh.position.x=w.x+Math.sin(t*.45+w.phase)*.45;w.mesh.position.z=w.z+Math.cos(t*.4+w.phase)*.28;w.mesh.material.opacity=.25+.18*(1+Math.sin(t+w.phase));}
+}
+// Original gentle procedural tune. Only plays during exploration and after user gesture.
+function musicNote(midi,at,duration,volume,kind='sine'){
+ const c=musicContext,o=c.createOscillator(),g=c.createGain();o.type=kind;o.frequency.value=440*Math.pow(2,(midi-69)/12);
+ g.gain.setValueAtTime(.0001,at);g.gain.exponentialRampToValueAtTime(volume,at+.035);g.gain.exponentialRampToValueAtTime(.0001,at+duration);
+ o.connect(g).connect(musicBus);musicNodes.add(o);o.onended=()=>{musicNodes.delete(o);o.disconnect();g.disconnect();};o.start(at);o.stop(at+duration+.03);
+}
+function musicSchedule(){
+ if(!musicContext||!musicBus||!exploring()||!progress.sound||!progress.music||document.hidden||currentModal()||(window.speechSynthesis&&speechSynthesis.speaking))return;
+ const melody=[72,76,79,76,74,77,81,77,76,79,84,79,74,77,79,74,72,76,79,84,81,77,74,77,76,74,72,69,67,72,74,71];
+ const roots=[48,50,52,55,48,50,45,55];
+ const beat=.385;
+ if(musicNext<musicContext.currentTime+.04)musicNext=musicContext.currentTime+.06;
+ while(musicNext<musicContext.currentTime+.20){
+  const n=melody[musicStep%melody.length];musicNote(n,musicNext,.43,.075,'sine');musicNote(n+12,musicNext,.20,.014,'sine');
+  if(musicStep%4===0){const root=roots[Math.floor(musicStep/4)%roots.length];musicNote(root,musicNext,.88,.047,'triangle');musicNote(root+7,musicNext+.06,.70,.029,'sine');}
+  musicStep++;musicNext+=beat;
+ }
+}
+function syncMusic(){
+ const should=exploring()&&progress.sound&&progress.music&&!document.hidden&&$('welcome').hidden;
+ if(!should){
+  if(musicTimer){clearInterval(musicTimer);musicTimer=null;}
+  if(musicBus&&musicContext)musicBus.gain.setTargetAtTime(0,musicContext.currentTime,.035);
+  for(const x of musicNodes)try{x.stop();}catch(_){}musicNodes.clear();return;
+ }
+ const Audio=window.AudioContext||window.webkitAudioContext;
+ if(!Audio)return;
+ try{
+  if(!musicContext){musicContext=new Audio();musicBus=musicContext.createGain();musicBus.gain.value=.27;musicBus.connect(musicContext.destination);}
+  if(musicContext.state==='suspended')musicContext.resume().catch(()=>{});
+  musicBus.gain.setTargetAtTime(.27,musicContext.currentTime,.12);
+  if(!musicTimer){musicNext=musicContext.currentTime+.06;musicTimer=setInterval(musicSchedule,110);musicSchedule();}
+ }catch(_){}
+}
+function toggleMusic(){progress.music=!progress.music;persist();updateMusicButton();syncMusic();}
+function updateMusicButton(){$('musicToggle').textContent=progress.music?'♫ Nhạc: bật':'♫ Nhạc: tắt';$('musicToggle').setAttribute('aria-pressed',String(progress.music));}
+let installPrompt=null;
+function installed(){return matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;}
+function updateInstall(){const b=$('installButton');b.hidden=installed();$('installWelcome').hidden=installed();}
+async function installGame(){
+ if(installed())return;
+ if(installPrompt){const ev=installPrompt;installPrompt=null;try{await ev.prompt();await ev.userChoice;}catch(_){}updateInstall();return;}
+ $('installOverlay').hidden=false;
+}
+function setupPWA(){
+ updateInstall();
+ window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();installPrompt=e;updateInstall();});
+ window.addEventListener('appinstalled',()=>{installPrompt=null;updateInstall();$('installOverlay').hidden=true;toast('🎉 Game đã được cài đặt!');});
+ if('serviceWorker'in navigator&&window.isSecureContext)navigator.serviceWorker.register('./vuon-chu-cai-sw.js',{scope:'./vuon-chu-cai.html',updateViaCache:'none'}).catch(error=>console.warn('Game offline unavailable:',error));
+}
+
 function buildWorld(){
- createSky();addIsland();makeRainbow();makeAvatar();addLetterTokens();
+ createSky();addIsland();addOcean();makeRainbow();makeAvatar();addLetterTokens();makeHouseExterior();buildHouseInterior();
  for(let i=0;i<32;i++){
   const a=i*Math.PI*2/32+.12;const r=24.0+(i%4)*.75;
-  makeTree(Math.cos(a)*r,Math.sin(a)*r,.86+deterministic(i+4)*.6,i%3);
+  if(Math.hypot(Math.cos(a)*r-HOUSE.x,Math.sin(a)*r-HOUSE.z)>6)makeTree(Math.cos(a)*r,Math.sin(a)*r,.86+deterministic(i+4)*.6,i%3);
  }
  for(let i=0;i<68;i++){
   const a=i*2.399963;const r=17.5+deterministic(i*.7)*6.1;
@@ -1013,11 +1265,16 @@ function initRenderer(){
  buildLessonScene();
  resize();
 }
-function currentModal(){return !$('welcome').hidden||!$('mapOverlay').hidden||!$('helpOverlay').hidden||!$('winOverlay').hidden||!$('dictationOverlay').hidden;}
+function currentModal(){return !$('installOverlay').hidden||!$('welcome').hidden||!$('mapOverlay').hidden||!$('helpOverlay').hidden||!$('winOverlay').hidden||!$('dictationOverlay').hidden;}
 function setMode(next){
  if(mode!==next){clearTimeout(toastTimer);$('toast').classList.remove('show');}
  mode=next;
- const garden=next==='world',listen=next==='listen',trace=next==='trace';
+ const garden=next==='world'||next==='house',listen=next==='listen',trace=next==='trace';
+ const interior=next==='house';
+ $('exploreTools').hidden=!garden;
+ $('homeShortcut').hidden=interior;$('seaShortcut').hidden=interior;$('leaveHouseButton').hidden=!interior;
+ $('mapButton').hidden=interior;
+ syncMusic();
  const quiz=next==='quiz',word=next==='word';
  $('worldTag').hidden=!garden;
  $('bottomHelp').hidden=!garden;
@@ -1050,7 +1307,7 @@ function setMode(next){
  }
 }
 function positionLessonFeedback(){
- if(mode==='world')return;
+ if(exploring())return;
  const height=$('lessonBottom').getBoundingClientRect().height;
  $('feedback').style.bottom='calc('+Math.round(height+(innerWidth<=650?28:32))+'px + env(safe-area-inset-bottom))';
 }
@@ -1059,7 +1316,7 @@ function targetWorldPoint(e){
  const x=((e.clientX-rect.left)/rect.width)*2-1;
  const y=-((e.clientY-rect.top)/rect.height)*2+1;
  mouse.set(x,y);
- raycaster.setFromCamera(mouse,worldCamera);
+ raycaster.setFromCamera(mouse,mode==='house'?houseCamera:worldCamera);
  return raycaster;
 }
 function navigateTo(i,quick=false){
@@ -1067,7 +1324,8 @@ function navigateTo(i,quick=false){
  const tile=letterTokens[i];
  targetIndex=i;
  if(quick){
-  player.position.set(tile.x+1.6,0,tile.z+1.9);autoTarget=null;
+  $('seaShortcut').textContent='🌊 Ra biển';
+  player.position.set(tile.x+1.6,0,tile.z+1.9);swimming=false;swimRing.visible=false;playerShadow.visible=true;autoTarget=null;
   openLesson(i);
  }else{
   const distance=Math.hypot(player.position.x-tile.x,player.position.z-tile.z);
@@ -1088,23 +1346,23 @@ function nearestLetter(){
 }
 function updateNearby(){
  const near=nearestLetter();
- const index=near.dist<=3.6?near.index:-1;
- if(index!==actionIndex){
-  actionIndex=index;
-  $('actionButton').hidden=mode!=='world'||index<0;
-  if(index>=0)$('actionText').textContent='CHỮ '+LETTERS[index][0];
- }
+ const home=nearHome(),index=near.dist<=3.6&&!swimming?near.index:-1;
+ actionIndex=index;
+ $('actionButton').hidden=mode!=='world'||(!home&&index<0);
+ if(home)$('actionText').textContent='VÀO NHÀ';
+ else if(index>=0)$('actionText').textContent='CHỮ '+LETTERS[index][0];
  if(autoTarget)return;
- $('worldTag').textContent=index>=0?'✨ Chạm HỌC CHỮ để luyện chữ '+LETTERS[index][0] :
-  '🌼 Điều khiển Gấu đến chữ hoặc mở bản đồ 🗺️';
+ $('worldTag').textContent=swimming?'🌊 Gấu đang bơi · hướng vào bờ để lên đảo':home?'🏡 Chạm VÀO NHÀ để khám phá':index>=0?'✨ Chạm HỌC CHỮ để luyện chữ '+LETTERS[index][0]:'🌼 Khám phá vườn, nhà Gấu và biển xanh';
 }
 function tickWorld(dt,t){
  if(mode!=='world')return;
+ tickOcean(t);
  let dx=joystickX,dz=joystickY;
  if(keys.has('w')||keys.has('arrowup'))dz-=1;
  if(keys.has('s')||keys.has('arrowdown'))dz+=1;
  if(keys.has('a')||keys.has('arrowleft'))dx-=1;
  if(keys.has('d')||keys.has('arrowright'))dx+=1;
+ if(currentModal()){dx=dz=0;} 
  const manual=Math.hypot(dx,dz);
  if(manual>.06)autoTarget=null;
  if(manual>.05){
@@ -1112,19 +1370,28 @@ function tickWorld(dt,t){
   const directionX=Math.cos(cameraYaw)*nx+Math.sin(cameraYaw)*nz;
   const directionZ=-Math.sin(cameraYaw)*nx+Math.cos(cameraYaw)*nz;
   dx=directionX;dz=directionZ;
- }else if(autoTarget){
+ }else if(autoTarget&&!currentModal()){
   dx=autoTarget.x-player.position.x;dz=autoTarget.z-player.position.z;
   const distance=Math.hypot(dx,dz);
   if(distance<.3){
-   const index=autoTarget.index;autoTarget=null;openLesson(index);
+   const index=autoTarget.index;
+   if(index===-2&&autoTarget.waypoints?.length){const waypoints=autoTarget.waypoints;autoTarget={...waypoints.shift(),index:-2,waypoints};return;}
+   autoTarget=null;
+   if(index===-2){enterHouse();return;}if(index>=0){openLesson(index);return;}dx=dz=0;
    return;
   }
   dx/=distance;dz/=distance;
  }else{dx=0;dz=0;}
- const speed=autoTarget?9.5:7.3;
+ const speed=swimming?4.6:autoTarget?9.5:7.3;
  if(dx||dz){
-  player.position.x=clamp(player.position.x+dx*speed*dt,-22.5,22.5);
-  player.position.z=clamp(player.position.z+dz*speed*dt,-22.5,22.5);
+  let px=player.position.x+dx*speed*dt,pz=player.position.z+dz*speed*dt;
+  const radius=Math.hypot(px,pz);if(radius>MAX_RADIUS){px=px/radius*MAX_RADIUS;pz=pz/radius*MAX_RADIUS;}
+  // Keep the bear outside the solid exterior. Auto approach stays near the front door.
+  if(Math.abs(px-HOUSE.x)<3.85&&Math.abs(pz-HOUSE.z)<3.25){
+    if(Math.abs(player.position.x-HOUSE.x)>=3.85)px=player.position.x;
+    if(Math.abs(player.position.z-HOUSE.z)>=3.25)pz=player.position.z;
+  }
+  player.position.x=px;player.position.z=pz;
   const a=Math.atan2(dx,dz);
   player.rotation.y=smooth(player.rotation.y,a,dt*10);
   walkingTime+=dt*13;
@@ -1135,6 +1402,12 @@ function tickWorld(dt,t){
   legs.forEach(leg=>leg.position.y=smooth(leg.position.y,.37,dt*8));
   bearHead.rotation.z*=.91;
  }
+ const wasSwimming=swimming;swimming=seaAt(player.position.x,player.position.z);
+ if(wasSwimming!==swimming){chirp('happy');toast(swimming?'🌊 Gấu xuống nước và bắt đầu bơi!':'🏝️ Gấu đã lên bờ!');}
+ player.position.y=smooth(player.position.y,swimming?SEA_Y-.66+Math.sin(t*3)*.10:0,dt*9);
+ swimRing.visible=swimming;playerShadow.visible=!swimming;
+ $('seaShortcut').textContent=swimming?'🏝️ Lên bờ':'🌊 Ra biển';
+ arms.forEach((arm,i)=>{arm.rotation.x=swimming?Math.sin(t*5+i*Math.PI)*.8:0;arm.rotation.z=swimming?(i?-.68:.68):0});
  playerShadow.position.set(player.position.x,.08,player.position.z);
  const targetPosition=new T.Vector3(
   player.position.x+Math.sin(cameraYaw)*19,cameraPitch,
@@ -1485,6 +1758,8 @@ function layoutQuiz(){
 }
 function openLesson(i){
  if(i<0||i>=29)return;
+ if(mode==='house')leaveHouse();
+ stopMotion();
  stopListening();closeDictation();
  guideDemo=null;guideCanvasState=null;guideStep=0;guideCompletion=[];
  clearTimeout(toastTimer);$('toast').classList.remove('show');
@@ -1595,7 +1870,8 @@ function resize(){
  lessonCamera.updateProjectionMatrix();
  updateLessonLayout();
  requestAnimationFrame(positionLessonFeedback);
- $('joystick').hidden=mode!=='world'||!(matchMedia('(pointer:coarse)').matches||innerWidth<900);
+ if(houseCamera){houseCamera.aspect=innerWidth/innerHeight;houseCamera.updateProjectionMatrix();}
+ $('joystick').hidden=!exploring()||!(matchMedia('(pointer:coarse)').matches||innerWidth<900);
 }
 
 
@@ -1603,18 +1879,18 @@ function pointerDown(e){
  if(currentModal())return;
  if(mode==='trace'){drawPointerDown(e);return;}
  if(mode==='quiz'||mode==='word'){quizPointer={id:e.pointerId,startX:e.clientX,startY:e.clientY};return;}
- if(mode!=='world')return;
+ if(!exploring())return;
  if(e.pointerType==='mouse'&&e.button!==0)return;
  worldCanvas.setPointerCapture(e.pointerId);
  window.__worldDrag={id:e.pointerId,startX:e.clientX,startY:e.clientY,lastX:e.clientX,moved:0};
 }
 function pointerMove(e){
  if(mode==='trace'){drawPointerMove(e);return;}
- if(mode!=='world'||!window.__worldDrag||window.__worldDrag.id!==e.pointerId)return;
+ if(!exploring()||!window.__worldDrag||window.__worldDrag.id!==e.pointerId)return;
  const drag=window.__worldDrag;
  const dx=e.clientX-drag.lastX;drag.lastX=e.clientX;
  drag.moved=Math.max(drag.moved,Math.hypot(e.clientX-drag.startX,e.clientY-drag.startY));
- if(drag.moved>10)cameraYaw=clamp(cameraYaw+dx*.007,-Math.PI*4,Math.PI*4);
+ if(mode==='world'&&drag.moved>10)cameraYaw=clamp(cameraYaw+dx*.007,-Math.PI*4,Math.PI*4);
 }
 function pointerUp(e,cancel=false){
  if(mode==='trace'){drawPointerUp(e,cancel);return;}
@@ -1635,11 +1911,15 @@ function pointerUp(e,cancel=false){
   return;
  }
  const drag=window.__worldDrag;
- if(mode!=='world'||!drag||drag.id!==e.pointerId)return;
+ if(!exploring()||!drag||drag.id!==e.pointerId)return;
  window.__worldDrag=null;
  try{worldCanvas.releasePointerCapture(e.pointerId);}catch(_){}
  if(cancel||drag.moved>10)return;
- const hits=targetWorldPoint(e).intersectObjects(tokenPickers,false);
+ if(mode==='house'){houseClick(e);return;}
+ const ray=targetWorldPoint(e);
+ const homeHit=ray.intersectObject(houseDoor,false);
+ const hits=ray.intersectObjects(tokenPickers,false);
+ if(homeHit.length&&(!hits.length||homeHit[0].distance<hits[0].distance)){headHome();return;}
  if(hits.length){
   const index=hits[0].object.userData.level;
   chirp('happy');navigateTo(index);
@@ -1650,21 +1930,23 @@ function pointerUp(e,cancel=false){
  const destination=new T.Vector3();
  if(raycaster.ray.intersectPlane(hitPlane,destination)){
   const r=Math.hypot(destination.x,destination.z);
-  if(r<23.5){
+  if(r<=MAX_RADIUS){
    autoTarget={x:destination.x,z:destination.z,index:-1};
    $('worldTag').textContent='🐾 Gấu đang di chuyển tới vị trí bé chọn';
   }
  }
 }
 function pressAction(){
+ if(mode==='house'){const index=updateHouseHint();if(index!==-2)inspectHouseItem(index);return;}
  if(mode!=='world')return;
+ if(nearHome()){enterHouse();return;}
  const near=nearestLetter();
  if(near.index>=0&&near.dist<=4.1)openLesson(near.index);
  else if(targetIndex>=0)navigateTo(targetIndex);
  else toast('🌻 Hãy đến gần một chữ cái nhé!');
 }
 function stickDown(e){
- if(mode!=='world')return;
+ if(!exploring()||currentModal())return;
  e.preventDefault();stickPointer=e.pointerId;
  try{$('joystick').setPointerCapture(e.pointerId);}catch(_){}
  stickMove(e);
@@ -1720,6 +2002,7 @@ function renderFrame(now){
  const t=now*.001,dt=clamp((now-lastTime)*.001||.016,0,.07);
  lastTime=now;animTime=t;
  if(mode==='world')tickWorld(dt,t);
+ else if(mode==='house')tickHouse(dt,t);
  else{
   if(mode==='trace'&&guideDemo)updateGuideDemo(dt);
   for(const item of bobbing)if(item.lesson){
@@ -1733,6 +2016,7 @@ function renderFrame(now){
  }
  try{
   if(mode==='world')renderer.render(worldScene,worldCamera);
+  else if(mode==='house')renderer.render(houseScene,houseCamera);
   else renderer.render(lessonScene,lessonCamera);
  }catch(error){
   // A lost WebGL context is handled by the browser's restoration hooks.
@@ -1741,6 +2025,14 @@ function renderFrame(now){
 }
 function setupControls(){
  $('playButton').addEventListener('click',beginPlay);
+ $('homeShortcut').addEventListener('click',headHome);
+ $('seaShortcut').addEventListener('click',headSea);
+ $('leaveHouseButton').addEventListener('click',leaveHouse);
+ $('musicToggle').addEventListener('click',toggleMusic);
+ $('installButton').addEventListener('click',installGame);
+ $('installWelcome').addEventListener('click',installGame);
+ $('installClose').addEventListener('click',()=>$('installOverlay').hidden=true);
+ setupPWA();
  $('mapButton').addEventListener('click',openMap);
  $('mapClose').addEventListener('click',()=>{$('mapOverlay').hidden=true;});
  $('mapOverlay').addEventListener('click',e=>{if(e.target===$('mapOverlay'))$('mapOverlay').hidden=true;});
@@ -1750,7 +2042,7 @@ function setupControls(){
  $('soundButton').addEventListener('click',()=>{
   progress.sound=!progress.sound;
   if(!progress.sound)stopSpeech();
-  persist();updateProgress();
+  persist();updateProgress();syncMusic();
  });
  $('actionButton').addEventListener('click',pressAction);
  $('exitLesson').addEventListener('click',quitLesson);
@@ -1790,16 +2082,18 @@ function setupControls(){
  document.addEventListener('keydown',e=>{
   const key=e.key.toLowerCase();
   if(key==='escape'){
+   if(!$('installOverlay').hidden){$('installOverlay').hidden=true;return;}
    if(!$('dictationOverlay').hidden){closeDictation();return;}
    if(!$('mapOverlay').hidden||!$('helpOverlay').hidden){closeOverlays();return;}
    if(!$('winOverlay').hidden){quitLesson();return;}
+   if(mode==='house'){leaveHouse();return;}
    if(mode!=='world'&&$('welcome').hidden){quitLesson();return;}
   }
   if(currentModal())return;
   if(['arrowleft','arrowright','arrowup','arrowdown',' '].includes(key))e.preventDefault();
   keys.add(key);
-  if(mode==='world'){
-   if(key==='m'){openMap();return;}
+  if(exploring()){
+   if(key==='m'&&mode==='world'){openMap();return;}
    if((key===' '||key==='enter')&&!e.repeat)pressAction();
   }else if(mode==='listen'){
    if((key==='enter'||key===' ')&&!e.repeat)beginTrace();
@@ -1811,7 +2105,8 @@ function setupControls(){
  document.addEventListener('keyup',e=>keys.delete(e.key.toLowerCase()));
  window.addEventListener('blur',()=>{keys.clear();joystickX=joystickY=0;});
  document.addEventListener('visibilitychange',()=>{
-  if(document.hidden)stopSpeech();
+  if(document.hidden){stopSpeech();stopListening();keys.clear();joystickX=joystickY=0;}
+  syncMusic();
  });
  worldCanvas.addEventListener('webglcontextlost',e=>{e.preventDefault();toast('Thiết bị tạm ngưng đồ họa 3D.');});
  worldCanvas.addEventListener('webglcontextrestored',()=>{toast('Đồ họa 3D đã được khôi phục.');resize();});

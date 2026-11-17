@@ -1,0 +1,26 @@
+{
+  "id": "./vuon-chu-cai.html",
+  "name": "Vườn Chữ Cái 3D — Hành trình cùng Gấu",
+  "short_name": "Vườn Chữ Cái",
+  "description": "Game khám phá 3D, tập viết và học 29 chữ cái tiếng Việt.",
+  "lang": "vi",
+  "start_url": "./vuon-chu-cai.html",
+  "scope": "./vuon-chu-cai.html",
+  "display": "standalone",
+  "background_color": "#b8e9f2",
+  "theme_color": "#b8e9f2",
+  "icons": [
+    {
+      "src": "./assets/vuon-chu-cai-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/vuon-chu-cai-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
