@@ -29,7 +29,7 @@ Các giá trị theme hỗ trợ: `cyan`, `violet`, `emerald`, `amber`, `rose`.
 
 Nhóm chính: AI & Phần mềm; Khoa học & Điện tử; GIS & Digital Twin; Thế giới 3D & Mô phỏng; Thiết kế & Sáng tạo; Trò chơi & Giải trí; Giáo dục & Luyện tập. Nhóm Khác dành cho trang chưa phân loại. Các tên nhóm cũ được chuẩn hóa trong builder.
 
-Dùng `"parent": "du-an/index.html"` trong override (hoặc meta `catalog:parent`) để nhóm trang chức năng dưới mục chính cùng chủ đề. Tìm kiếm vẫn bao gồm trang chức năng; mọi URL giữ nguyên. Trang mới mặc định độc lập.
+Dùng `"parent": "du-an/index.html"` trong override (hoặc meta `catalog:parent`) để nhóm trang chức năng dưới mục chính cùng chủ đề. Tìm kiếm vẫn bao gồm trang chức năng; mọi URL giữ nguyên. Trang mới mặc định độc lập. Với cùng nội dung hoặc các phiên bản, đặt groupTitle và groupDescription trên trang đại diện, linkTitle để đặt nhãn từng phiên bản. Thẻ nhóm chứa tất cả liên kết, kể cả trang đại diện; danh sách có thể thu gọn.
 
 ## Cấu trúc
 

@@ -27,6 +27,6 @@ Working sequence: **real observation → context and anomaly → plausible mecha
 
 ## Root catalog contract
 - Keep every existing HTML page URL. The root library groups pages by purpose using the canonical categories in `scripts/build_catalog.py`.
-- Use `_catalog.json` or page meta for title, description, tags, category and optional `parent` (same-category root page). Children stay searchable and link directly; never list them twice.
+- Use `_catalog.json` or page meta for title, description, tags, category and optional `parent` (same-category root page). Children stay searchable and link directly; never list them twice. Group pages sharing a concrete subject or alternative versions, not merely a technology. Use groupTitle/groupDescription on the representative root and linkTitle on members; the group card exposes every member URL, including the root.
 - Regenerate and commit `catalog.js` with catalog-affecting changes: `python3 scripts/build_catalog.py --root . --output /tmp/html-lab-catalog.json --snapshot catalog.js`. GitHub Pages regenerates both outputs; static hosts and file:// use the committed snapshot.
 - Verify catalog coverage, valid parent relationships, and browser search/filter/navigation before publishing changes to the index.

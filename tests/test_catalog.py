@@ -26,7 +26,15 @@ class CatalogTests(unittest.TestCase):
                     parent = by_path[page["parent"]]
                     self.assertFalse(parent["parent"])
                     self.assertEqual(parent["category"], page["category"])
-            self.assertEqual(sum(p["parent"] == "bo-ho-ben-tre/index.html" for p in pages), 5)
+            expected = {
+                "bo-ho-ben-tre/index.html": 6, "little-tokyo.html": 1,
+                "vua-phap-thuat-2009.html": 1, "apple-iphone-banner.html": 2,
+                "vuon-chu-cai.html": 1,
+            }
+            for root, count in expected.items():
+                self.assertEqual(sum(p["parent"] == root for p in pages), count)
+                self.assertTrue(by_path[root]["groupTitle"])
+                self.assertFalse(by_path[root]["parent"])
 
     def test_new_pages_and_aliases(self):
         with tempfile.TemporaryDirectory() as tmp:

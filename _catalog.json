@@ -74,7 +74,10 @@
   "bo-ho-ben-tre/index.html": {
     "category": "GIS & Digital Twin",
     "theme": "emerald",
-    "order": 0
+    "order": 0,
+    "groupTitle": "Hồ Trúc Giang · Bến Tre",
+    "groupDescription": "Digital Twin, dữ liệu GIS/CAD và phiên bản diorama minh họa của cùng địa điểm.",
+    "linkTitle": "Digital Twin 3D"
   },
   "bo-ho-ben-tre/cad-gis.html": {
     "category": "GIS & Digital Twin",
@@ -150,7 +153,9 @@
   "ho-truc-giang-diorama.html": {
     "category": "GIS & Digital Twin",
     "theme": "emerald",
-    "order": 6
+    "order": 6,
+    "parent": "bo-ho-ben-tre/index.html",
+    "linkTitle": "Diorama 3D — minh họa"
   },
   "warestack-3d.html": {
     "title": "WareStack 3D — Warehouse Explorer v4",
@@ -182,12 +187,17 @@
   "little-tokyo.html": {
     "category": "Thế giới 3D & Mô phỏng",
     "theme": "cyan",
-    "order": 3
+    "order": 3,
+    "groupTitle": "Little Tokyo 3D",
+    "groupDescription": "Hai phiên bản khám phá phố Nhật thu nhỏ bằng WebGL.",
+    "linkTitle": "Miniature 3D World"
   },
   "little-tokyo-rare3d-inspired.html": {
     "category": "Thế giới 3D & Mô phỏng",
     "theme": "cyan",
-    "order": 4
+    "order": 4,
+    "parent": "little-tokyo.html",
+    "linkTitle": "Rare 3D Inspired"
   },
   "archcad-3d-studio.html": {
     "category": "Thiết kế & Sáng tạo",
@@ -206,17 +216,24 @@
       "Landing page",
       "Quảng cáo"
     ],
-    "icon": "📱"
+    "icon": "📱",
+    "groupTitle": "Apple / iPhone — Quảng cáo",
+    "groupDescription": "Landing page giới thiệu iPhone và các thiết kế bảng hiệu cửa hàng Apple.",
+    "linkTitle": "NOVA — Landing page"
   },
   "bang-hieu-apple-led.html": {
     "category": "Thiết kế & Sáng tạo",
     "theme": "rose",
-    "order": 2
+    "order": 2,
+    "parent": "apple-iphone-banner.html",
+    "linkTitle": "Bảng hiệu LED Apple"
   },
   "bang-hieu-apple-dung-3d.html": {
     "category": "Thiết kế & Sáng tạo",
     "theme": "rose",
-    "order": 3
+    "order": 3,
+    "parent": "apple-iphone-banner.html",
+    "linkTitle": "Bảng hiệu đứng Apple 3D"
   },
   "len-chua-cau-an/index.html": {
     "title": "Lên Chùa Cầu An — Chùa An Lạc",
@@ -238,21 +255,31 @@
   "vua-phap-thuat-2009.html": {
     "category": "Trò chơi & Giải trí",
     "theme": "amber",
-    "order": 1
+    "order": 1,
+    "groupTitle": "Vua Pháp Thuật",
+    "groupDescription": "Các bản thử nghiệm tái hiện webgame nhập vai 2.5D.",
+    "linkTitle": "Retro Lab 2009"
   },
   "vua-phap-thuat-webgl.html": {
     "category": "Trò chơi & Giải trí",
     "theme": "amber",
-    "order": 2
+    "order": 2,
+    "parent": "vua-phap-thuat-2009.html",
+    "linkTitle": "WebGL 2.5D Prototype"
   },
   "vuon-chu-cai.html": {
     "category": "Giáo dục & Luyện tập",
     "theme": "emerald",
-    "order": 0
+    "order": 0,
+    "groupTitle": "Học & luyện viết chữ Việt",
+    "groupDescription": "Học 29 chữ cái qua trò chơi 3D và luyện viết trên bảng vẽ tương tác.",
+    "linkTitle": "Vườn Chữ Cái 3D"
   },
   "bang-ve-tu-do.html": {
     "category": "Giáo dục & Luyện tập",
     "theme": "emerald",
-    "order": 1
+    "order": 1,
+    "parent": "vuon-chu-cai.html",
+    "linkTitle": "Nét vẽ — bảng vẽ & luyện viết"
   }
 }
