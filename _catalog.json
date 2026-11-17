@@ -1,4 +1,20 @@
 {
+  "mausbot.html": {
+    "title": "MausBot — Hồ sơ kỹ thuật",
+    "description": "Nghiên cứu MausBot: Agent Harness, CLI drivers, multi-agent, delegation, self-hosting và hướng áp dụng cho Alpha.",
+    "category": "AI & Phần mềm",
+    "tags": [
+      "MausBot",
+      "AI Agent",
+      "Codex",
+      "Claude Code",
+      "OpenCode",
+      "Agent Harness"
+    ],
+    "icon": "🤖",
+    "theme": "violet",
+    "order": 0
+  },
   "paperclip.html": {
     "category": "AI & Phần mềm",
     "theme": "violet",

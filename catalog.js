@@ -123,6 +123,28 @@ window.HTML_LAB_CATALOG = {
       "order": 0
     },
     {
+      "path": "mausbot.html",
+      "title": "MausBot — Hồ sơ kỹ thuật",
+      "description": "Nghiên cứu MausBot: Agent Harness, CLI drivers, multi-agent, delegation, self-hosting và hướng áp dụng cho Alpha.",
+      "category": "AI & Phần mềm",
+      "parent": "",
+      "groupTitle": "",
+      "groupDescription": "",
+      "linkTitle": "",
+      "tags": [
+        "MausBot",
+        "AI Agent",
+        "Codex",
+        "Claude Code",
+        "OpenCode",
+        "Agent Harness"
+      ],
+      "icon": "🤖",
+      "theme": "violet",
+      "featured": false,
+      "order": 0
+    },
+    {
       "path": "paperclip.html",
       "title": "Paperclip — AI Agent Runtime Lab",
       "description": "Khám phá cách Paperclip điều phối AI agent, gọi Codex, Claude, Gemini, quản lý session, adapter, heartbeat và task checkout bằng mô phỏng tương tác.",
