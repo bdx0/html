@@ -1,8 +1,28 @@
 {
+  "paperclip.html": {
+    "category": "AI & Phần mềm",
+    "theme": "violet",
+    "order": 0
+  },
+  "dark-software-factory.html": {
+    "category": "AI & Phần mềm",
+    "theme": "violet",
+    "order": 1
+  },
+  "webview-architecture.html": {
+    "category": "AI & Phần mềm",
+    "theme": "violet",
+    "order": 2
+  },
+  "github-repo-status.html": {
+    "category": "AI & Phần mềm",
+    "theme": "violet",
+    "order": 3
+  },
   "wifi-csi-24ghz.html": {
     "title": "Wi-Fi CSI 2,4 GHz",
     "description": "Phòng thí nghiệm tương tác về OFDM, multipath và Channel State Information. Thử di chuyển người, đổi kênh Wi-Fi và quan sát biên độ, pha, heatmap CSI.",
-    "category": "Mô phỏng khoa học",
+    "category": "Khoa học & Điện tử",
     "tags": [
       "Wi-Fi",
       "ESP32",
@@ -13,12 +33,129 @@
     "icon": "📡",
     "theme": "cyan",
     "featured": true,
-    "order": 1
+    "order": 0
+  },
+  "radar-dual/index.html": {
+    "category": "Khoa học & Điện tử",
+    "theme": "cyan",
+    "order": 1,
+    "title": "Mô phỏng 2 radar LD2410C",
+    "description": "Mô phỏng bố trí và vùng theo dõi của hai radar LD2410C.",
+    "tags": [
+      "Radar",
+      "LD2410C",
+      "RF"
+    ],
+    "icon": "📡"
+  },
+  "yx325-circuit-atlas.html": {
+    "category": "Khoa học & Điện tử",
+    "theme": "cyan",
+    "order": 2,
+    "title": "YX-325 — Circuit Atlas",
+    "description": "Sơ đồ mạch và bản đồ linh kiện tương tác của PCB YX-325 và bo phụ 202R, dựng sơ bộ từ ảnh chụp.",
+    "tags": [
+      "PCB",
+      "Điện tử",
+      "Sơ đồ mạch"
+    ],
+    "icon": "🔌"
+  },
+  "baum-welch-hai-dong-xu.html": {
+    "category": "Khoa học & Điện tử",
+    "theme": "cyan",
+    "order": 3
+  },
+  "shake-random-lab.html": {
+    "category": "Khoa học & Điện tử",
+    "theme": "cyan",
+    "order": 4
+  },
+  "bo-ho-ben-tre/index.html": {
+    "category": "GIS & Digital Twin",
+    "theme": "emerald",
+    "order": 0
+  },
+  "bo-ho-ben-tre/cad-gis.html": {
+    "category": "GIS & Digital Twin",
+    "theme": "emerald",
+    "order": 1,
+    "title": "CAD / GIS",
+    "description": "Đối chiếu bản vẽ CAD và dữ liệu bản đồ Hồ Trúc Giang.",
+    "tags": [
+      "CAD",
+      "GIS",
+      "Bến Tre"
+    ],
+    "icon": "🗺️",
+    "parent": "bo-ho-ben-tre/index.html"
+  },
+  "bo-ho-ben-tre/hybrid-preview.html": {
+    "category": "GIS & Digital Twin",
+    "theme": "emerald",
+    "order": 2,
+    "title": "OSM + CAD Preview",
+    "description": "Duyệt bản nháp hình học đường bờ từ OSM và CAD; chưa khảo sát thực địa.",
+    "tags": [
+      "OSM",
+      "CAD",
+      "GIS"
+    ],
+    "icon": "🗺️",
+    "parent": "bo-ho-ben-tre/index.html"
+  },
+  "bo-ho-ben-tre/model.html": {
+    "category": "GIS & Digital Twin",
+    "theme": "emerald",
+    "order": 3,
+    "title": "Model Data",
+    "description": "Khám phá đối tượng, tọa độ, ảnh chứng cứ và quan hệ từ SQLite.",
+    "tags": [
+      "SQLite",
+      "Data model",
+      "GIS"
+    ],
+    "icon": "🧱",
+    "parent": "bo-ho-ben-tre/index.html"
+  },
+  "bo-ho-ben-tre/object-review.html": {
+    "category": "GIS & Digital Twin",
+    "theme": "emerald",
+    "order": 4,
+    "title": "Object Review Studio",
+    "description": "Duyệt từng đối tượng và đường bao CAD nháp, lưu các phiên bản ghi chú.",
+    "tags": [
+      "CAD",
+      "GIS",
+      "SQLite",
+      "Review"
+    ],
+    "icon": "🧭",
+    "parent": "bo-ho-ben-tre/index.html"
+  },
+  "bo-ho-ben-tre/sqlite.html": {
+    "category": "GIS & Digital Twin",
+    "theme": "emerald",
+    "order": 5,
+    "title": "SQLite Explorer",
+    "description": "Tra cứu bảng, cột và bản ghi gốc của mô hình ở chế độ chỉ đọc.",
+    "tags": [
+      "SQLite",
+      "Database",
+      "GIS"
+    ],
+    "icon": "🗃️",
+    "parent": "bo-ho-ben-tre/index.html"
+  },
+  "ho-truc-giang-diorama.html": {
+    "category": "GIS & Digital Twin",
+    "theme": "emerald",
+    "order": 6
   },
   "warestack-3d.html": {
     "title": "WareStack 3D — Warehouse Explorer v4",
     "description": "Khám phá khu logistics WebGL 3D có nhà kho, xe nâng, xe tải, 240 ô chứa pallet, minimap và Debug Panel. Xoay camera, zoom, ẩn mái, chọn hàng hóa và theo dõi trạng thái mô phỏng.",
-    "category": "Mô phỏng 3D",
+    "category": "Thế giới 3D & Mô phỏng",
     "tags": [
       "3D",
       "WebGL",
@@ -28,14 +165,63 @@
       "Interactive"
     ],
     "icon": "🏭",
-    "theme": "emerald",
+    "theme": "cyan",
     "featured": true,
+    "order": 0
+  },
+  "future-house-3d.html": {
+    "category": "Thế giới 3D & Mô phỏng",
+    "theme": "cyan",
+    "order": 1
+  },
+  "tiny-town.html": {
+    "category": "Thế giới 3D & Mô phỏng",
+    "theme": "cyan",
     "order": 2
+  },
+  "little-tokyo.html": {
+    "category": "Thế giới 3D & Mô phỏng",
+    "theme": "cyan",
+    "order": 3
+  },
+  "little-tokyo-rare3d-inspired.html": {
+    "category": "Thế giới 3D & Mô phỏng",
+    "theme": "cyan",
+    "order": 4
+  },
+  "archcad-3d-studio.html": {
+    "category": "Thiết kế & Sáng tạo",
+    "theme": "rose",
+    "order": 0
+  },
+  "apple-iphone-banner.html": {
+    "category": "Thiết kế & Sáng tạo",
+    "theme": "rose",
+    "order": 1,
+    "title": "NOVA — iPhone",
+    "description": "Trang giới thiệu các dòng iPhone với thiết kế hiện đại, tối giản.",
+    "tags": [
+      "Apple",
+      "iPhone",
+      "Landing page",
+      "Quảng cáo"
+    ],
+    "icon": "📱"
+  },
+  "bang-hieu-apple-led.html": {
+    "category": "Thiết kế & Sáng tạo",
+    "theme": "rose",
+    "order": 2
+  },
+  "bang-hieu-apple-dung-3d.html": {
+    "category": "Thiết kế & Sáng tạo",
+    "theme": "rose",
+    "order": 3
   },
   "len-chua-cau-an/index.html": {
     "title": "Lên Chùa Cầu An — Chùa An Lạc",
     "description": "Dạo bước trong chùa Việt 3D lúc hoàng hôn, thắp hương, thỉnh chuông, gõ mõ, viết lời cầu an và xin quẻ giải trí. Có tay cầm ảo và sổ lưu trên máy.",
-    "category": "Trò chơi 3D",
+    "category": "Trò chơi & Giải trí",
     "tags": [
       "Three.js",
       "WebGL",
@@ -48,5 +234,25 @@
     "theme": "amber",
     "featured": true,
     "order": 0
+  },
+  "vua-phap-thuat-2009.html": {
+    "category": "Trò chơi & Giải trí",
+    "theme": "amber",
+    "order": 1
+  },
+  "vua-phap-thuat-webgl.html": {
+    "category": "Trò chơi & Giải trí",
+    "theme": "amber",
+    "order": 2
+  },
+  "vuon-chu-cai.html": {
+    "category": "Giáo dục & Luyện tập",
+    "theme": "emerald",
+    "order": 0
+  },
+  "bang-ve-tu-do.html": {
+    "category": "Giáo dục & Luyện tập",
+    "theme": "emerald",
+    "order": 1
   }
 }

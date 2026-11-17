@@ -23,3 +23,10 @@ Working sequence: **real observation → context and anomaly → plausible mecha
 - For this subproject the source of truth is the SQLite database generated from the catalog blueprint and survey observations. Do not edit browser JSON in isolation.
 - New work follows: collect evidence → update data source → regenerate SQLite/scene → validate checks → update the HTML viewer → publish. Keep provenance and licensing metadata.
 - GitHub Pages cannot process SQLite SQL queries dynamically. Build static `data/scene.json` for the browser and publish the SQLite file for download/auditing.
+
+
+## Root catalog contract
+- Keep every existing HTML page URL. The root library groups pages by purpose using the canonical categories in `scripts/build_catalog.py`.
+- Use `_catalog.json` or page meta for title, description, tags, category and optional `parent` (same-category root page). Children stay searchable and link directly; never list them twice.
+- Regenerate and commit `catalog.js` with catalog-affecting changes: `python3 scripts/build_catalog.py --root . --output /tmp/html-lab-catalog.json --snapshot catalog.js`. GitHub Pages regenerates both outputs; static hosts and file:// use the committed snapshot.
+- Verify catalog coverage, valid parent relationships, and browser search/filter/navigation before publishing changes to the index.
