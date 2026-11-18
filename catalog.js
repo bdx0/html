@@ -675,6 +675,28 @@ window.HTML_LAB_CATALOG = {
       "theme": "emerald",
       "featured": false,
       "order": 6
+    },
+    {
+      "path": "static-web-cloudflare-webrtc.html",
+      "title": "Static Web, Cloudflare Tunnel & WebRTC",
+      "description": "Cẩm nang kiến trúc static web, API, WebRTC, STUN/TURN, giới hạn Cloudflare Tunnel và phân phối video, file lớn.",
+      "category": "AI & Phần mềm",
+      "parent": "",
+      "groupTitle": "",
+      "groupDescription": "",
+      "linkTitle": "",
+      "tags": [
+        "Cloudflare",
+        "WebRTC",
+        "GitHub Pages",
+        "WebSocket",
+        "P2P",
+        "Networking"
+      ],
+      "icon": "🌐",
+      "theme": "cyan",
+      "featured": false,
+      "order": 999
     }
   ]
 };
