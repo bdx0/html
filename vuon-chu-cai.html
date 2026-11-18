@@ -152,6 +152,61 @@ button:disabled{opacity:.42;cursor:default}
 .fish-card strong{font-size:12px;color:#544a87}.fish-card small{grid-column:1/-1;font-size:11px;line-height:1.4;color:#79728f}
 .fish-icon{width:35px;height:35px;display:grid;place-items:center;border-radius:11px;font-size:19px;color:white;font-weight:900}
 .fish-card:not(.found) .fish-icon{background:#bdb4d2!important}.fish-modal{max-width:530px;max-height:87vh;overflow:auto}
+
+/* Picture-first interface for children who cannot read. Accessible names remain. */
+[data-icon]{font-size:0!important;gap:0!important;line-height:1!important}
+[data-icon] > *{font-size:0!important;display:none!important}
+button[data-icon]::before{content:attr(data-icon);font-size:26px;font-weight:900;display:block;line-height:1.1}
+.brand{padding:6px;border-radius:17px}.brand-text{display:none}.logo{width:40px;height:40px}
+.world-tag,.bottom-help{display:none!important}
+.explore-tools{top:calc(79px + env(safe-area-inset-top));right:max(12px,env(safe-area-inset-right));gap:9px}
+.explore-tools button{width:53px;height:53px;min-height:53px;padding:0;border-radius:18px;font-size:22px;display:grid;place-items:center}
+#fishAlbumButton{position:relative;line-height:1}#fishCount{font-size:11px;position:absolute;right:2px;bottom:2px;background:#fff1d6;border:1px solid #fff;color:#92692c;min-width:18px;height:18px;border-radius:20px;display:grid;place-items:center;font-weight:900}
+.action-btn::before{font-size:45px!important}.action-btn{width:90px;height:90px}
+#roomNav{position:fixed;z-index:7;top:calc(78px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);display:flex;gap:6px;align-items:center;padding:6px;background:#fffffff1;border:2px solid white;border-radius:20px;box-shadow:0 8px 25px #7462a32b}
+#roomNav button{width:47px;height:47px;border-radius:13px;border:2px solid transparent;background:#f5f0ff;font-size:27px;padding:0;display:grid;place-items:center}
+#roomNav button.active{background:#fff1cf;border-color:#f5bf67;box-shadow:0 3px 0 #eac688}
+#roomChallenge{position:fixed;z-index:7;top:calc(145px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);min-width:80px;height:48px;border:2px solid #fff;background:#fff2cb;border-radius:18px;box-shadow:0 6px 15px #7f689e33;font-size:28px;padding:0 14px}
+#roomCounter{font-size:11px;font-weight:900;color:#8e7ca8;white-space:nowrap;padding:0 3px}
+body[data-mode="house"] .explore-tools{top:calc(151px + env(safe-area-inset-top))}
+.lesson-top{top:calc(76px + env(safe-area-inset-top));padding:7px 15px;border-radius:18px}
+.lesson-title{font-size:26px;font-weight:950;min-width:55px;text-align:center}.lesson-phase{font-size:16px;letter-spacing:3px}
+.lesson-bottom{gap:7px;padding:7px;width:max-content;max-width:calc(100vw - 16px)}
+.lesson-bottom .game-btn,.lesson-bottom .speed-button{width:53px;min-width:0;height:53px;min-height:53px;padding:0!important;border-radius:15px}
+.lesson-bottom .speed-button{font-size:24px!important}
+.lesson-bottom .game-btn.primary{width:70px}
+.lesson-bottom[data-phase="trace"] #checkButton{flex:0 0 70px!important;min-height:53px}
+#demoStroke[data-playing="true"]::before{content:'⏸'}
+#speakMic[data-listening="true"]::before{content:'🔴';animation:micpulse 1s alternate infinite}
+@keyframes micpulse{to{opacity:.55;transform:scale(.85)}}
+.feedback,.toast{font-size:0;min-width:55px;min-height:40px;padding:6px 14px;white-space:normal;overflow:visible}
+.feedback::before,.toast::before{content:attr(data-symbol);font-size:25px;line-height:1.2;display:block}
+.feedback.good{background:#edfff0}.feedback.warn{background:#fff4da}
+.welcome>p,.map-modal>p,.fish-modal>p:last-of-type,.win-stars+#winText,#winText{display:none}
+.welcome .hero-mascot{font-size:100px}.welcome h1{font-size:27px;margin:5px 0}
+.welcome .instructions{gap:10px;margin:14px 0}.welcome .instructions span{font-size:27px;padding:10px;background:white}
+#playButton{width:112px;height:69px;border-radius:24px}#playButton::before{font-size:36px}
+#installWelcome{width:52px;height:45px;margin-top:12px}
+.modal-actions button[data-icon]{min-width:58px;height:52px;padding:0!important}
+.fish-card{display:flex;min-height:94px;align-items:center;justify-content:center;padding:10px;cursor:default}
+.fish-card.found{cursor:pointer}.fish-card strong,.fish-card small{display:none}.fish-icon{width:66px;height:66px;font-size:34px;border-radius:20px}
+#fishAlbumSummary{display:block!important;font-size:18px;font-weight:900}
+#helpOverlay .help-modal{max-height:85dvh;overflow:auto}
+#winOverlay h2{font-size:23px}.win-stars{font-size:36px}
+@media(max-width:650px){
+ .brand .logo{width:34px;height:34px}.explore-tools button{width:46px;height:46px;min-height:46px;border-radius:15px}
+ .explore-tools{top:calc(67px + env(safe-area-inset-top));gap:7px}
+ #roomNav{top:calc(65px + env(safe-area-inset-top));gap:4px;max-width:calc(100vw - 14px);padding:5px}
+ #roomNav button{width:42px;height:42px;font-size:24px}#roomCounter{font-size:10px}
+ body[data-mode="house"] .explore-tools{top:calc(127px + env(safe-area-inset-top))}#roomChallenge{top:calc(125px + env(safe-area-inset-top));height:44px;font-size:24px}
+ .lesson-top{top:calc(64px + env(safe-area-inset-top))}
+ .lesson-bottom{width:max-content;max-width:calc(100vw - 14px);gap:5px;flex-wrap:wrap}
+ .lesson-bottom .game-btn,.lesson-bottom .speed-button{width:46px;height:46px;min-height:46px}
+ .lesson-bottom .game-btn.primary{width:59px}
+ .lesson-bottom[data-phase="trace"] #checkButton{flex:0 0 59px!important;min-height:46px}
+ .feedback::before,.toast::before{font-size:23px}.action-btn{width:76px;height:76px}.action-btn::before{font-size:37px!important}
+}
+@media(max-width:345px){#roomNav button{width:38px;height:38px;font-size:21px}.lesson-bottom .game-btn,.lesson-bottom .speed-button{width:43px}.lesson-bottom{gap:4px}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 <script src="./assets/three.min.js"></script>
@@ -164,30 +219,34 @@ button:disabled{opacity:.42;cursor:default}
   <div class="hud-actions"><div class="hud-pill" title="Tổng số sao"><span>⭐</span><span id="starTotal">0</span></div><button id="mapButton" class="hud-btn" title="Bản đồ chữ cái" aria-label="Mở bản đồ 29 chữ">🗺️</button><button id="soundButton" class="hud-btn" title="Âm thanh" aria-label="Bật hoặc tắt âm thanh" aria-pressed="true">🔊</button><button id="helpButton" class="hud-btn" title="Cách chơi" aria-label="Cách chơi">❔</button></div>
 </header>
 <div id="exploreTools" class="explore-tools" hidden>
- <button id="homeShortcut" type="button">🏡 Nhà Gấu</button>
- <button id="seaShortcut" type="button">🌊 Ra biển</button>
- <button id="findFishButton" type="button" hidden>🐟 Tìm cá</button>
- <button id="fishAlbumButton" type="button">🐟 Sổ cá <span id="fishCount">0</span></button>
- <button id="leaveHouseButton" type="button" hidden>🚪 Ra vườn</button>
- <button id="musicToggle" type="button" aria-pressed="true">♫ Nhạc: bật</button>
+ <button id="homeShortcut" type="button" data-icon="🏡" aria-label="Nhà Gấu">🏡 Nhà Gấu</button>
+ <button id="seaShortcut" type="button" data-icon="🌊" aria-label="Ra biển">🌊 Ra biển</button>
+ <button id="findFishButton" type="button" hidden data-icon="🐟" aria-label="Tìm cá">🐟 Tìm cá</button>
+ <button id="fishAlbumButton" type="button">🐟 <span id="fishCount">0</span></button>
+ <button id="roomGameButton" type="button" aria-label="Tìm đồ vật" title="Tìm đồ vật" hidden>🧩</button>
+ <button id="roomLessonButton" type="button" aria-label="Học chữ" title="Học chữ" hidden>🔤</button>
+ <button id="leaveHouseButton" type="button" hidden data-icon="🚪" aria-label="Ra vườn">🚪 Ra vườn</button>
+ <button id="musicToggle" type="button" aria-pressed="true" data-icon="🎵" aria-label="Nhạc nền">♫ Nhạc: bật</button>
 </div>
+<button id="roomChallenge" type="button" aria-label="Nghe lại đồ vật cần tìm" hidden></button>
+<nav id="roomNav" aria-label="Các phòng của Gấu" hidden><output id="roomCounter" aria-label="Vật dụng đã khám phá">0/8</output></nav>
 <div id="worldTag" class="world-tag" hidden>🐻 Dùng cần điều khiển để khám phá</div>
 <div id="bottomHelp" class="bottom-help" hidden>W A S D hoặc cần ảo để di chuyển · Chạm chữ để đến gần</div>
-<div id="joystick" class="stick" aria-label="Cần điều khiển di chuyển" hidden><span class="stick-caption">DI CHUYỂN</span><div id="joystickKnob" class="stick-knob"></div></div>
-<button id="actionButton" class="action-btn" type="button" hidden><span>✋</span><span id="actionText">HỌC CHỮ</span></button>
+<div id="joystick" class="stick" aria-label="Cần điều khiển di chuyển" hidden><span class="stick-caption" aria-hidden="true">✥</span><div id="joystickKnob" class="stick-knob"></div></div>
+<button id="actionButton" class="action-btn" type="button" hidden data-icon="✋" aria-label="Tương tác"><span>✋</span><span id="actionText">HỌC CHỮ</span></button>
 <div id="lessonTop" class="lesson-top" hidden><span id="lessonTitle" class="lesson-title">🔊 NGHE CHỮ a</span><span id="lessonPhase" class="lesson-phase">1/4 · Nghe và đọc</span></div>
 
 <div id="lessonBottom" class="lesson-bottom" hidden>
-  <button id="exitLesson" class="game-btn" title="Về khu vườn"><strong>⌂</strong> Về vườn</button>
-  <button id="speakButton" class="game-btn yellow" title="Phát lại lời đọc thật chậm"><strong>🔊</strong><span id="speakLabel">Nghe lại</span></button>
+  <button id="exitLesson" class="game-btn" title="Về khu vườn" data-icon="🌼"><strong>⌂</strong> Về vườn</button>
+  <button id="speakButton" class="game-btn yellow" title="Phát lại lời đọc thật chậm" data-icon="🔊"><strong>🔊</strong><span id="speakLabel">Nghe lại</span></button>
   <button id="speedButton" class="game-btn speed-button" type="button" title="Điều chỉnh tốc độ giọng đọc" aria-label="Tốc độ đọc: chậm">🐢 Chậm</button>
-  <button id="speakMic" class="game-btn mic-button" type="button" title="Đọc cho Gấu nghe"><strong>🎤</strong><span id="micText">Bé đọc</span></button>
-  <button id="startTrace" class="game-btn primary" type="button"><strong>✏️</strong> Tập tô</button>
-  <button id="demoStroke" class="game-btn demo-button" type="button" title="Xem Gấu vẽ từng nét"><strong>▶</strong> Xem mẫu</button>
-  <button id="nextStroke" class="game-btn stroke-next-button" type="button" title="Xem mũi tên của nét tiếp theo"><strong>➜</strong> Nét sau</button>
-  <button id="undoButton" class="game-btn" title="Hoàn tác"><strong>↶</strong> Lùi</button>
-  <button id="clearButton" class="game-btn" title="Tô lại"><strong>⌫</strong> Tẩy</button>
-  <button id="checkButton" class="game-btn primary"><strong>✓</strong><span id="checkText">Kiểm tra</span></button>
+  <button id="speakMic" class="game-btn mic-button" type="button" title="Đọc cho Gấu nghe" data-icon="🎤"><strong>🎤</strong><span id="micText">Bé đọc</span></button>
+  <button id="startTrace" class="game-btn primary" type="button" data-icon="✏️"><strong>✏️</strong> Tập tô</button>
+  <button id="demoStroke" class="game-btn demo-button" type="button" title="Xem Gấu vẽ từng nét" data-icon="▶"><strong>▶</strong> Xem mẫu</button>
+  <button id="nextStroke" class="game-btn stroke-next-button" type="button" title="Xem mũi tên của nét tiếp theo" data-icon="➜"><strong>➜</strong> Nét sau</button>
+  <button id="undoButton" class="game-btn" title="Hoàn tác" data-icon="↶"><strong>↶</strong> Lùi</button>
+  <button id="clearButton" class="game-btn" title="Tô lại" data-icon="⌫"><strong>⌫</strong> Tẩy</button>
+  <button id="checkButton" class="game-btn primary" data-icon="✓"><strong>✓</strong><span id="checkText">Kiểm tra</span></button>
 </div>
 <div id="feedback" class="feedback" role="status" aria-live="polite" hidden>👆 Chạm và tô theo nét chữ nhé!</div>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
@@ -199,15 +258,15 @@ button:disabled{opacity:.42;cursor:default}
     <label class="dictation-label" for="dictationInput">Bé hãy đọc từ được Gấu hướng dẫn</label>
     <input id="dictationInput" type="text" inputmode="text" maxlength="70" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Bấm 🎙️ bàn phím để đọc…">
     <p id="dictationTarget" class="dictation-target"></p>
-    <div class="modal-actions"><button id="dictationCancel" type="button">Đóng</button><button id="dictationSubmit" class="cta" type="button">Gấu trả lời ✨</button></div>
+    <div class="modal-actions"><button id="dictationCancel" type="button" data-icon="✕" aria-label="Đóng">Đóng</button><button id="dictationSubmit" class="cta" type="button" data-icon="✓" aria-label="Gửi câu trả lời">Gấu trả lời ✨</button></div>
   </section>
 </div>
 <div id="fishAlbum" class="overlay" hidden>
  <section class="modal fish-modal" role="dialog" aria-modal="true" aria-labelledby="fishAlbumTitle">
- <h2 id="fishAlbumTitle">🐠 Sổ khám phá đại dương</h2>
+ <h2 id="fishAlbumTitle">🐠</h2>
  <p id="fishAlbumSummary"></p><div id="fishGrid" class="fish-grid"></div>
  <p>Gấu quan sát cá, rồi thả cá về biển. Hãy khám phá đủ 6 loài!</p>
- <div class="modal-actions"><button id="fishAlbumClose" class="cta" type="button">Tiếp tục khám phá</button></div>
+ <div class="modal-actions"><button id="fishAlbumClose" class="cta" type="button" data-icon="✓" aria-label="Tiếp tục khám phá">Tiếp tục khám phá</button></div>
  </section>
 </div>
 <div id="installOverlay" class="overlay" hidden>
@@ -220,18 +279,18 @@ button:disabled{opacity:.42;cursor:default}
 </div>
 <div id="welcome" class="overlay">
   <section class="welcome" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle">
-    <span class="eyebrow">🌈 VƯỜN CHỮ CÁI · 3D ADVENTURE</span>
+    <span class="eyebrow">🌈</span>
     <span class="hero-mascot">🐻🌻</span>
-    <h1 id="welcomeTitle">Chào mừng bé<br>đến vườn chữ!</h1>
+    <h1 id="welcomeTitle">Vườn chữ cái</h1>
     <p>Đi cùng Gấu Bông khám phá một thế giới 3D đầy màu sắc, lắng nghe, tô chữ, nhận diện chữ, tìm đồ vật và làm vườn nở hoa!</p>
-    <div class="instructions"><span>🎮 Điều khiển Gấu</span><span>🔊 Nghe chậm & nhắc lại</span><span>✏️ Tô chữ 3D</span><span>🌼 Trồng hoa nhận sao</span></div>
-    <button id="playButton" type="button" class="cta">✨ BẮT ĐẦU KHÁM PHÁ</button>
-  <button id="installWelcome" type="button" class="install-link">📲 Cài game vào màn hình chính</button>
+    <div class="instructions" aria-hidden="true"><span>🎮</span><span>🔊</span><span>✏️</span><span>🌼</span></div>
+    <button id="playButton" type="button" class="cta" data-icon="▶" aria-label="Bắt đầu chơi">✨ BẮT ĐẦU KHÁM PHÁ</button>
+  <button id="installWelcome" type="button" class="install-link" data-icon="📲" aria-label="Cài trò chơi">📲 Cài game vào màn hình chính</button>
   </section>
 </div>
 <div id="mapOverlay" class="overlay" hidden>
   <section class="modal map-modal" role="dialog" aria-modal="true" aria-labelledby="mapTitle">
-    <div class="map-head"><div><span class="eyebrow">🗺️ BẢN ĐỒ NHIỆM VỤ</span><h2 id="mapTitle">29 chữ cái</h2></div><button id="mapClose" class="icon-x" title="Đóng">×</button></div>
+    <div class="map-head"><div><h2 id="mapTitle">🔤</h2></div><button id="mapClose" class="icon-x" title="Đóng">×</button></div>
     <p>Chạm vào chữ để Gấu đến đó. Những chữ đã vượt qua sẽ có sao vàng!</p>
     <div id="letterGrid" class="letter-grid" aria-label="Chọn chữ"></div>
   </section>
@@ -242,7 +301,7 @@ button:disabled{opacity:.42;cursor:default}
     <ol><li>Dùng các phím <b>W A S D / mũi tên</b> hoặc cần ảo để điều khiển Gấu Bông.</li><li>Chạm vào chữ nổi trong khu vườn, Gấu sẽ tự đi tới chữ đó. Có thể mở bản đồ 🗺️ để chọn nhanh.</li><li><b>Nghe chậm</b> rồi bấm 🎤 Bé đọc. Trình duyệt có nhận dạng tiếng nói sẽ nghe và trả lời; trên iPad có thể dùng nút 🎙️ của bàn phím để đọc và nhận phản hồi.</li><li><b>Tô chữ</b> trên bảng phép thuật, có thể tẩy và làm lại.</li><li><b>Tìm chữ</b> đúng trong 4 khối 3D, rồi <b>tìm đồ vật</b> tương ứng với từ vừa nghe.</li><li>Hoàn thành 4 thử thách để nhận 1–3 ⭐ và làm một bông hoa trong khu vườn nở rộ!</li></ol>
     <p>Bảng tập viết có ô ly, điểm đặt bút, mũi tên, tên từng nét và nút mô phỏng cách viết. Các nét vector được biên dựng để tham khảo mẫu chữ tiểu học Việt Nam; nên đối chiếu thêm với mẫu trường bé đang học. Nếu cấp quyền micro, dịch vụ nhận dạng của trình duyệt có thể xử lý âm thanh; game không tự lưu bản ghi âm. Phản hồi giọng nói chỉ dựa vào từ nhận dạng được, chưa đánh giá chính xác phát âm.</p>
     <p>🏡 Vào nhà Gấu để khám phá đồ vật. 🌊 Đi xuống biển để bơi, chạm cá để Gấu đuổi bắt hoặc nhấn Bắt cá khi đến gần; cá được thả lại biển và ghi vào Sổ cá. ♫ Tắt/bật nhạc nền riêng.</p>
- <div class="modal-actions"><button id="installButton" type="button">📲 Cài game</button><button id="helpClose" class="cta" type="button">Đã hiểu, chơi thôi!</button></div>
+ <div class="modal-actions"><button id="installButton" type="button" data-icon="📲" aria-label="Cài game">📲 Cài game</button><button id="helpClose" class="cta" type="button" data-icon="✓" aria-label="Đóng hướng dẫn">Đã hiểu, chơi thôi!</button></div>
   </section>
 </div>
 <div id="winOverlay" class="overlay" hidden>
@@ -250,7 +309,7 @@ button:disabled{opacity:.42;cursor:default}
     <span style="font-size:80px;line-height:1.2">🏆</span>
     <h2 id="winTitle">Giỏi quá bé ơi!</h2><p id="winText">Gấu Bông rất tự hào về bé!</p>
     <div id="winStars" class="win-stars">⭐⭐⭐</div>
-    <div class="modal-actions"><button id="repeatButton" type="button">↺ Luyện lại</button><button id="gardenButton" type="button">🌼 Về vườn</button><button id="nextButton" class="cta" type="button">Chữ tiếp theo ✨</button></div>
+    <div class="modal-actions"><button id="repeatButton" type="button" data-icon="↺" aria-label="Luyện lại">↺ Luyện lại</button><button id="gardenButton" type="button" data-icon="🌼" aria-label="Về vườn">🌼 Về vườn</button><button id="nextButton" class="cta" type="button" data-icon="➡" aria-label="Chữ tiếp theo">Chữ tiếp theo ✨</button></div>
   </section>
 </div>
 <div id="error" class="error" hidden><div><h2>Không thể mở thế giới 3D</h2><p>Thiết bị cần trình duyệt hỗ trợ WebGL. Hãy bật tăng tốc đồ họa hoặc thử một trình duyệt khác.</p><a href="./bang-ve-tu-do.html">Mở bảng vẽ 2D</a></div></div>
@@ -382,9 +441,9 @@ function drawHandwritingGuide(){
  c.fillStyle='#e8edff';c.fillRect(0,0,b.w,78);
  c.fillStyle='#6259ab';c.font='900 '+(b.w<800?26:31)+'px '+FONT;
  c.textAlign='left';c.textBaseline='middle';
- c.fillText('✏️ VỞ Ô LY · CHỮ '+LETTERS[level][0].toLocaleUpperCase('vi-VN'),27,40);
+ c.fillText('✏️ '+LETTERS[level][0],27,40);
  c.textAlign='right';c.font='700 20px '+FONT;
- c.fillStyle='#8a7fb4';c.fillText((guideStep+1)+' / '+g.paths.length+' nét',b.w-27,40);
+ c.fillStyle='#8a7fb4';c.fillText((guideStep+1)+' / '+g.paths.length,b.w-27,40);
  c.save();
  c.translate(g.ox,g.oy);c.scale(g.scale,g.scale);
  const left=Math.max(-34,(36-g.ox)/g.scale);
@@ -444,7 +503,7 @@ function drawHandwritingGuide(){
  c.restore();
  c.textAlign='center';c.textBaseline='middle';
  c.fillStyle='#7b6fa8';c.font='800 '+(b.w<800?19:23)+'px '+FONT;
- c.fillText('NÉT '+(guideStep+1)+': '+g.paths[guideStep].title.toLocaleUpperCase('vi-VN'),b.w/2,b.h-42,b.w-55);
+ c.fillText('✏️  '+(guideStep+1)+' / '+g.paths.length,b.w/2,b.h-42,b.w-55);
  drawBoard();
 }
 function drawGuideDemoOverlay(ctx){
@@ -478,7 +537,7 @@ function updateGuideDemo(dt){
   guideDemo.position=0;
   if(guideDemo.step>=letterStrokes().length){
    guideDemo=null;
-   $('demoStroke').innerHTML='<strong>▶</strong> Xem mẫu';
+   $('demoStroke').innerHTML='<strong>▶</strong> Xem mẫu';$('demoStroke').dataset.playing='false';
    drawBoard();
    setFeedback('🐻 Bé đã xem Gấu viết mẫu. Giờ tô theo các mũi tên nhé!');
    return;
@@ -491,22 +550,22 @@ function showWritingDemo(){
  if(mode!=='trace')return;
  if(guideDemo){
   guideDemo=null;
-  $('demoStroke').innerHTML='<strong>▶</strong> Xem mẫu';
+  $('demoStroke').innerHTML='<strong>▶</strong> Xem mẫu';$('demoStroke').dataset.playing='false';
   drawBoard();
   return;
  }
  guideStep=0;
  guideDemo={step:0,position:0};
- $('demoStroke').innerHTML='<strong>⏸</strong> Dừng mẫu';
+ $('demoStroke').innerHTML='<strong>⏸</strong> Dừng mẫu';$('demoStroke').dataset.playing='true';
  drawHandwritingGuide();
  setFeedback('✏️ Gấu đang vẽ theo thứ tự nét. Hãy nhìn chấm cam!');
 }
 function nextWritingStroke(){
  if(mode!=='trace')return;
- guideDemo=null;$('demoStroke').innerHTML='<strong>▶</strong> Xem mẫu';
+ guideDemo=null;$('demoStroke').innerHTML='<strong>▶</strong> Xem mẫu';$('demoStroke').dataset.playing='false';
  guideStep=(guideStep+1)%letterStrokes().length;
  drawHandwritingGuide();
- setFeedback('➜ Nét '+(guideStep+1)+': '+letterStrokes()[guideStep].title+'. Bắt đầu ở mũi tên vàng.');
+ setFeedback('➜ Nét '+(guideStep+1)+': '+letterStrokes()[guideStep].title+'. Bắt đầu ở mũi tên vàng.');narrate('Nét '+(guideStep+1)+'. '+letterStrokes()[guideStep].title+'.');
 }
 function childStrokeCompleted(stroke){
  if(mode!=='trace'||!guideCanvasState||!stroke||!stroke.points.length)return;
@@ -539,7 +598,7 @@ const VOICE_SPEEDS=[
  {id:'medium',label:'🐇 Vừa',rate:.76,pause:650},
  {id:'fast',label:'🚀 Nhanh',rate:.92,pause:450}
 ];
-let progress={best:{},sound:true,speechSpeed:'slow',music:true,fish:{}};
+let progress={best:{},sound:true,speechSpeed:'slow',music:true,fish:{},rooms:{}};
 let mode='world',level=0,traceScore=0,attempts=0,quizMistakes=0,wordMistakes=0,won=false;
 let quizSolved=false,wordSolved=false,previouslyLearned=false,speechToken=0,speechTimer=0,voiceWarning=false;
 let targetIndex=-1,actionIndex=-1,autoTarget=null;
@@ -577,6 +636,7 @@ function loadProgress(){
   if(data&&typeof data==='object'){
    if(typeof data.sound==='boolean')progress.sound=data.sound;
    if(typeof data.music==='boolean')progress.music=data.music;
+   if(data.rooms&&typeof data.rooms==='object')for(let r=0;r<5;r++)for(let i=0;i<8;i++)if(data.rooms[r+':'+i]===true)progress.rooms[r+':'+i]=true;
    if(data.fish&&typeof data.fish==='object')for(let i=0;i<6;i++){const n=data.fish[i];if(Number.isInteger(n)&&n>0)progress.fish[i]=Math.min(99999,n);}
    if(VOICE_SPEEDS.some(item=>item.id===data.speechSpeed))progress.speechSpeed=data.speechSpeed;
    if(data.best&&typeof data.best==='object')for(let i=0;i<29;i++){
@@ -599,7 +659,7 @@ function updateProgress(){
  $('soundButton').setAttribute('aria-pressed',String(progress.sound));
  if($('speedButton')){
   const selected=VOICE_SPEEDS.find(item=>item.id===progress.speechSpeed)||VOICE_SPEEDS[0];
-  $('speedButton').textContent=selected.label;
+  $('speedButton').textContent=selected.label.split(' ')[0];
   $('speedButton').setAttribute('aria-label','Tốc độ đọc: '+selected.label.replace(/^.*? /,''));
  }
  for(let i=0;i<letterTokens.length;i++){
@@ -627,7 +687,7 @@ function updateProgress(){
  });
 }
 function toast(message){
- const el=$('toast');el.textContent=message;el.classList.add('show');
+ const el=$('toast');el.textContent=message;el.dataset.symbol=(message.match(/\p{Extended_Pictographic}(?:\uFE0F)?/gu)||['💡']).slice(0,2).join(' ');el.classList.add('show');
  clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),2300);
 }
 function chirp(kind='happy'){
@@ -697,6 +757,7 @@ function sayInParts(parts){
 }
 function speakLetter(){
  const [letter,word]=LETTERS[level];
+ if(mode==='trace'){narrate('Nét '+(guideStep+1)+'. '+letterStrokes()[guideStep].title+'. Bé đặt bút ở mũi tên màu cam nhé!');return;}
  if(mode==='word'){
   sayInParts([
    {text:'Hãy tìm hình phù hợp với từ sau.',caption:'Hãy tìm đồ vật hoặc hình ảnh Gấu vừa đọc.'},
@@ -765,7 +826,7 @@ function evaluateSpokenInput(spoken,viaMic=false){
 }
 function setMicStatus(active){
  voiceListening=active;
- $('micText').textContent=active?'Đang nghe…':'Bé đọc';
+ $('micText').textContent=active?'Đang nghe…':'Bé đọc';$('speakMic').dataset.listening=String(active);
  $('speakMic').setAttribute('aria-pressed',String(active));
 }
 function stopListening(){
@@ -872,7 +933,7 @@ function makeTextTexture(text,width=512,height=512,options={}){
 function labelTexture(i){
  const base=COLORS[i%COLORS.length];
  const hex=['#6f56be','#c66e62','#2f947c','#af7d26','#4e79b1','#a56696'][i%6];
- return makeTextTexture(LETTERS[i][0],400,400,{color:hex,footer:progress.best[String(i)]?'★ ĐÃ HỌC':'CHẠM ĐỂ HỌC'});
+ return makeTextTexture(LETTERS[i][0],400,400,{color:hex,footer:progress.best[String(i)]?'★':''});
 }
 function createSky(){
  worldScene=new T.Scene();
@@ -1072,53 +1133,191 @@ function makeHouseExterior(){
   g.add(box(1.8,.32,.52,0xbc946e,x,1.45,3.26));
   for(let i=0;i<3;i++)g.add(sphere(.22,[0xfa8eb0,0xffca76,0xb598e7][i],x+(i-1)*.48,1.74,3.35));
  }
- const sign=sceneLabel('NHÀ CỦA GẤU',3.6,.92);sign.position.set(0,3.65,3.13);g.add(sign);
+ const sign=sceneLabel('🏡',3.6,.92);sign.position.set(0,3.65,3.13);g.add(sign);
  for(let i=0;i<4;i++)worldScene.add(box(1.75,.065,.62,0xffeac4,HOUSE.x,.28,HOUSE.doorZ+i*.75));
  houseDoor=new T.Mesh(new T.BoxGeometry(7.8,6.4,6.9),new T.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));houseDoor.position.set(0,3.2,0);g.add(houseDoor);
 }
-function addHouseItem(name,emoji,x,z,builder){
- const g=new T.Group();g.position.set(x,0,z);builder(g);houseScene.add(g);
- const hit=new T.Mesh(new T.BoxGeometry(2.75,3.1,2.4),new T.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));hit.position.y=1.45;hit.userData.item=houseItems.length;g.add(hit);housePickers.push(hit);
- const label=sceneLabel(emoji+' '+name,2.65,.66);label.position.set(0,3.25,.20);label.userData.item=houseItems.length;g.add(label);housePickers.push(label);
- houseItems.push({name,emoji,x,z,g,label});
+// Five connected dollhouse rooms; actual mesh furniture and picture-first navigation.
+const ROOMS=[
+ ['Phòng khách','🛋️',0xffdfb6,0xe5ad77,0xf7c5a2],
+ ['Phòng ngủ','🛏️',0xf4d8f1,0xdcb9db,0xc7b8ee],
+ ['Nhà bếp','🍳',0xffe7b0,0xe9c699,0xffb67c],
+ ['Phòng tắm','🛁',0xd2eff8,0xb5dce8,0x99d9d9],
+ ['Phòng học','🎨',0xe0edc7,0xc1d5a3,0xb7c5ef]
+];
+const ROOM_OBJECTS=[
+ [['sofa','🛋️','sofa'],['tivi','📺','tv'],['kệ sách','📚','shelf'],['chậu cây','🪴','plant'],['đồng hồ','🕒','clock'],['bàn trà','☕','table'],['quả bóng','⚽','ball'],['gấu bông','🧸','teddy']],
+ [['giường','🛏️','bed'],['tủ quần áo','👕','wardrobe'],['đèn ngủ','💡','lamp'],['gối','🛌','pillow'],['gương','🪞','mirror'],['hộp đồ chơi','🧰','chest'],['đồng hồ báo thức','⏰','clock'],['gấu bông','🧸','teddy']],
+ [['tủ lạnh','🧊','fridge'],['bếp','🍳','stove'],['bồn rửa','🚰','sink'],['bàn ăn','🍽️','table'],['ghế','🪑','chair'],['quả táo','🍎','apple'],['quả chuối','🍌','banana'],['ấm nước','🫖','kettle']],
+ [['bồn tắm','🛁','bath'],['bồn rửa mặt','🚰','sink'],['gương','🪞','mirror'],['vòi sen','🚿','shower'],['bàn chải','🪥','brush'],['bánh xà phòng','🧼','soap'],['khăn','🧻','towel'],['vịt cao su','🐥','duck']],
+ [['bàn học','✏️','desk'],['kệ sách','📚','shelf'],['bảng chữ cái','🔤','board'],['bút màu','🖍️','crayons'],['sách','📖','book'],['khối xếp hình','🧩','blocks'],['đàn','🎹','piano'],['quả địa cầu','🌍','globe']]
+];
+let activeRoom=0,rooms=[],roomChallengeIndex=null,roomChallengeLast=-1,roomGuide='',roomHintAt=0,roomEffect=null;
+function narrate(text,interrupt=true){
+ if(!progress.sound||!window.speechSynthesis||!window.SpeechSynthesisUtterance||voiceListening)return;
+ try{
+  if(!interrupt&&speechSynthesis.speaking)return;
+  stopSpeech();
+  const u=new SpeechSynthesisUtterance(text);u.lang='vi-VN';u.rate=voiceSpeed().rate;u.pitch=1.08;
+  const v=speechSynthesis.getVoices().find(v=>/^vi/i.test(v.lang));if(v)u.voice=v;
+  speechSynthesis.speak(u);
+ }catch(_){}
+}
+function pictureTexture(emoji){
+ const c=document.createElement('canvas');c.width=c.height=256;
+ const cx=c.getContext('2d');cx.fillStyle='#fffdf5';cx.beginPath();cx.arc(128,128,118,0,Math.PI*2);cx.fill();cx.strokeStyle='#ffffff';cx.lineWidth=7;cx.stroke();
+ cx.font='148px "Apple Color Emoji","Noto Color Emoji","Segoe UI Emoji",sans-serif';cx.textAlign='center';cx.textBaseline='middle';cx.fillText(emoji,128,134,192);
+ return textureFromCanvas(c);
+}
+function pictureMesh(emoji,size=.95){
+ return new T.Mesh(new T.PlaneGeometry(size,size),new T.MeshBasicMaterial({map:pictureTexture(emoji),transparent:true,alphaTest:.04,side:T.DoubleSide,toneMapped:false}));
+}
+function furniture(kind,g){
+ const B=(w,h,d,c,x=0,y=0,z=0)=>{const m=box(w,h,d,c,x,y,z);g.add(m);return m;};
+ const S=(r,c,x=0,y=0,z=0,w=1,h=1,d=1)=>{const m=sphere(r,c,x,y,z,w,h,d);g.add(m);return m;};
+ const C=(r,b,h,c,x=0,y=0,z=0)=>{const m=cylinder(r,b,h,c,x,y,z,16);g.add(m);return m;};
+ const wood=0xc58d65,cream=0xfff4da,pink=0xf4a9bf,blue=0x78cce5,mint=0x9bddbe,lilac=0xb4a1df;
+ const legs=(w,d,h)=>{for(const x of [-w,w])for(const z of [-d,d])B(.14,h,.14,wood,x,h/2,z);};
+ const panel=(w,h,y,c=cream)=>B(w,h,.14,c,0,y,.15);
+ switch(kind){
+ case 'sofa': B(2.8,.63,1.45,lilac,0,.55);B(2.8,1.2,.35,lilac,0,1.05,-.6);for(const x of [-1.22,1.22])B(.38,.82,1.5,0xa18ace,x,.8);for(const x of [-.55,.55])B(.95,.22,.98,cream,x,.99,.12);break;
+ case 'tv':B(2.5,.63,1.0,wood,0,.38);B(2.3,1.48,.27,0x39435f,0,1.62,-.08);g.userData.screen=B(2.04,1.24,.04,0x6687a6,0,1.62,.075);C(.10,.18,.25,0x424255,0,.84);break;
+ case 'shelf': B(2.3,2.65,.65,wood,0,1.33,-.18);for(let y of [.37,1.15,1.94]){B(2.24,.13,.83,cream,0,y,.0);for(let i=0;i<5;i++)B(.31,.48+(i%3)*.10,.46,COLORS[(i+Math.round(y*2))%6],-.83+i*.38,y+.35,.16);}break;
+ case 'plant':C(.55,.40,.70,0xdc9c81,0,.36);for(let i=0;i<7;i++){const a=i*2.4;S(.41,0x6cad78,Math.cos(a)*.38,1.0+(i%3)*.28,Math.sin(a)*.30,.75,1.35,.65);}break;
+ case 'clock':case 'alarm':B(.65,.22,.55,wood,0,.11);const face=C(.66,.66,.19,pink,0,.93,.04);face.rotation.x=Math.PI/2;const disk=C(.55,.55,.12,cream,0,.93,.18);disk.rotation.x=Math.PI/2;B(.065,.38,.05,0x59516c,0,1.10,.28);B(.32,.06,.05,0x59516c,.12,.93,.28);break;
+ case 'table':case 'desk':B(kind==='desk'?2.6:2.05,.20,1.48,wood,0,1.13);legs(.82,.52,1.08);B(.78,.06,.58,cream,-.35,1.26,.05);C(.17,.17,.28,blue,.55,1.38,-.15);if(kind==='desk'){for(let j=0;j<4;j++)C(.032,.032,.38,COLORS[j],.47+j*.055,1.59,-.15);}break;
+ case 'ball':S(.68,0xffffff,0,.69);for(let i=0;i<5;i++){const a=i*Math.PI*2/5;S(.19,0x4b526c,Math.cos(a)*.56,.85,Math.sin(a)*.56);}break;
+ case 'teddy':S(.51,wood,0,.61);S(.49,0xe6ae82,0,1.37);for(let x of [-.37,.37]){S(.19,wood,x,1.73);S(.07,0x483447,x*.60,1.4,.40);S(.22,wood,x,.44,.28);}S(.22,cream,0,1.25,.4,1,.65,.50);break;
+ case 'bed':B(2.45,.43,2.7,wood,0,.35);B(2.36,.35,2.6,cream,0,.72);B(2.36,.2,1.66,lilac,0,.99,.41);B(2.4,1.16,.23,pink,0,1.05,-1.2);B(1.55,.23,.63,0xffffff,0,1.04,-.73);break;
+ case 'wardrobe':case 'fridge': {const isFridge=kind==='fridge';B(2.03,2.65,1.1,isFridge?mint:wood,0,1.38,-.15);
+ const door=new T.Group();door.position.set(-.98,.14,.43);g.add(door);door.add(box(1.94,2.49,.15,isFridge?0xb9eddd:0xffd6b4,.98,1.24,0),box(.10,.48,.11,0x8b9cac,1.62,1.43,.14));g.userData.door=door;
+ if(isFridge){B(1.62,.08,.8,cream,0,1.15,0);S(.25,0xf07166,-.39,1.47,.05);C(.20,.20,.45,blue,.45,1.45,.05);}break;}
+ case 'lamp':C(.39,.52,.15,wood,0,.13);C(.085,.085,1.71,wood,0,.99);g.userData.light=C(.38,.72,.64,0xffcf7d,0,1.98);break;
+ case 'pillow':B(1.55,.43,1.16,pink,0,.26);B(1.45,.16,1.08,0xffc9dc,0,.51);break;
+ case 'mirror':B(1.45,2.2,.18,wood,0,1.28,-.1);B(1.27,2.02,.12,0xc4e9f4,0,1.28,.04);B(.12,1.8,.035,0xeafaff,-.35,1.35,.12).rotation.z=-.27;break;
+ case 'chest':B(1.8,.98,1.23,wood,0,.53);g.userData.lid=B(1.87,.19,1.3,blue,0,1.10);B(.28,.23,.10,0xffd376,0,.94,.65);break;
+ case 'stove':B(2.45,1.17,1.38,cream,0,.61);B(2.4,.12,1.35,0x65768b,0,1.26);for(let x of [-.65,.65])C(.40,.40,.055,0x373a4a,x,1.34,-.1);B(1.65,.67,.09,0x879bb7,0,.62,.73);g.userData.light=C(.35,.35,.20,0x52566d,-.65,1.41,-.1);break;
+ case 'sink':B(2.2,1.10,1.35,mint,0,.58);B(2.25,.16,1.4,cream,0,1.21);B(1.28,.035,.76,0x83bfd6,0,1.31,.05);C(.09,.09,.65,0x9ca9b8,0,1.57,-.4);B(.20,.12,.48,0x9ca9b8,0,1.86,-.2);g.userData.water=B(.10,.50,.10,blue,0,1.53,.04);g.userData.water.visible=false;break;
+ case 'chair':B(1.14,.18,1.04,lilac,0,.87);legs(.43,.39,.82);B(1.13,.85,.16,lilac,0,1.31,-.45);break;
+ case 'apple':S(.64,0xf36c68,0,.72,0,1,.88,1);C(.06,.08,.30,wood,0,1.38);S(.24,0x6dbd77,.20,1.45,0,1.25,.25,.7);break;
+ case 'banana':{const m=new T.Mesh(new T.TorusGeometry(.66,.20,10,22,Math.PI*1.25),mat(0xffd75a));m.rotation.z=.35;m.position.set(0,.85,0);g.add(m);break;}
+ case 'kettle':S(.65,blue,0,.70);C(.35,.37,.20,cream,0,1.33);B(.28,.37,.29,blue,.63,.77,0).rotation.z=-.45;const h=new T.Mesh(new T.TorusGeometry(.32,.07,8,16,Math.PI*1.6),mat(wood));h.position.set(-.56,.81,0);g.add(h);break;
+ case 'bath':B(2.5,.56,1.55,0xfdfcf2,0,.44);B(2.26,.08,1.29,blue,0,.75);for(const x of [-1.14,1.14])B(.19,.38,1.60,cream,x,.84);for(const z of [-.72,.72])B(2.23,.38,.18,cream,0,.84,z);g.userData.water=B(2.04,.08,1.12,0x62d5ed,0,.92);g.userData.water.visible=false;break;
+ case 'shower':B(1.42,.12,1.42,blue,0,.10);C(.07,.07,2.55,0x9daeba,-.36,1.35,-.2);B(.6,.10,.12,0x9daeba,-.12,2.61,-.2);C(.30,.28,.12,0xa9b9c7,.18,2.55,-.2);g.userData.water=new T.Group();for(let i=0;i<7;i++)g.userData.water.add(box(.04,.85,.04,blue,.18+(i%3-1)*.17,1.94,-.2+(Math.floor(i/3)-1)*.15));g.add(g.userData.water);g.userData.water.visible=false;break;
+ case 'brush':B(.25,1.58,.32,blue,0,.88);B(.41,.47,.34,cream,0,1.76);for(let i=0;i<5;i++)B(.07,.30,.13,0xbedbc9,-.18+i*.09,1.77,.22);break;
+ case 'soap':B(1.28,.13,.83,wood,0,.11);S(.60,pink,0,.43,0,1,.46,.75);break;
+ case 'towel':C(.07,.07,.95,wood,0,.52);B(1.32,.10,.14,wood,0,1.43);B(1.10,1.05,.18,0xe6a0d1,0,.92);B(1.1,.08,.20,cream,0,.54);break;
+ case 'duck':S(.58,0xffcf46,0,.59,0,1.15,.8,1);S(.38,0xffd65b,0,1.17,.32);S(.22,0xf8994e,0,1.12,.66,1.25,.45,.6);for(const x of [-.20,.20])S(.06,0x493e50,x,1.27,.62);break;
+ case 'board':B(2.6,1.85,.19,wood,0,1.47);B(2.35,1.60,.1,0x6fae9c,0,1.47,.14);{const l=sceneLabel('a ă â',2.13,.70);l.position.set(0,1.45,.23);g.add(l);}break;
+ case 'crayons':B(1.35,.20,1.05,wood,0,.11);for(let i=0;i<6;i++){const c=C(.12,.12,1.11,COLORS[i],-.43+i*.18,.76);const cone=new T.Mesh(new T.ConeGeometry(.12,.28,10),mat(COLORS[i]));cone.position.set(c.position.x,1.45,0);g.add(cone);}break;
+ case 'book':B(1.5,.30,1.15,blue,0,.22);B(1.35,.19,1.03,cream,0,.23,.08);B(1.50,.08,1.15,blue,0,.41);break;
+ case 'blocks':for(let i=0;i<5;i++)B(.62,.62,.62,COLORS[i],(i%3-1)*.7,.31+Math.floor(i/3)*.65,i<3?0:-.15);break;
+ case 'piano':B(2.40,.25,.85,0xab91d9,0,1.00);legs(.98,.28,.85);for(let i=0;i<10;i++)B(.205,.07,.63,cream,-.99+i*.22,1.17,.04);for(let i=0;i<7;i++)B(.11,.10,.36,0x4e4868,-.89+i*.29,1.24,-.13);break;
+ case 'globe':C(.40,.55,.15,wood,0,.10);C(.10,.13,.67,wood,0,.41);S(.73,blue,0,1.27);for(let j=0;j<5;j++){const a=j*2.4;S(.29,0x8cc77d,Math.cos(a)*.59,1.27+Math.sin(j)*.31,Math.sin(a)*.59,.85,.55,.4);}break;
+ }
+}
+function addHouseItem(name,emoji,x,z,kind){
+ const g=new T.Group();g.position.set(x,0,z);furniture(kind,g);houseScene.add(g);
+ const hit=new T.Mesh(new T.BoxGeometry(2.45,2.9,2.1),new T.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));hit.position.y=1.34;hit.userData.item=houseItems.length;g.add(hit);housePickers.push(hit);
+ const label=pictureMesh(emoji,.92);label.position.set(0,kind==='bed'?1.95:kind==='fridge'||kind==='wardrobe'||kind==='shelf'||kind==='shower'?3.02:2.57,.18);label.userData.item=houseItems.length;g.add(label);housePickers.push(label);
+ const halo=new T.Mesh(new T.RingGeometry(.94,1.09,30),new T.MeshBasicMaterial({color:0xffdb75,side:T.DoubleSide,transparent:true,opacity:.9}));halo.rotation.x=-Math.PI/2;halo.position.y=.035;halo.visible=false;g.add(halo);
+ houseItems.push({name,emoji,x,z,g,label,kind,halo,selectedAt:0});
+}
+function roomDoor(x,target){
+ const r=ROOMS[target],g=new T.Group();g.position.set(x,0,5.57);houseScene.add(g);
+ g.add(box(2.0,2.57,.32,0xfff5dd,0,1.28),box(1.68,2.28,.23,r[3],0,1.18,.2),sphere(.12,0xffdc76,.56,1.12,.38));
+ const icon=pictureMesh(r[1],1.12);icon.position.set(0,1.69,.39);g.add(icon);
+ const hit=new T.Mesh(new T.BoxGeometry(2.2,2.9,.9),new T.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));hit.position.y=1.4;hit.userData.item=-10-target;g.add(hit);housePickers.push(hit);
 }
 function buildHouseInterior(){
- houseScene=new T.Scene();houseScene.background=new T.Color(0xece4fb);
- houseCamera=new T.PerspectiveCamera(45,innerWidth/innerHeight,.1,80);
- houseScene.add(new T.HemisphereLight(0xffffff,0xb1a0cb,1.45));
- const light=new T.DirectionalLight(0xfff0ce,1.45);light.position.set(2,15,12);houseScene.add(light);
- houseScene.add(box(16,.42,13,0xf3d8ae,0,-.25,0));
- for(let x=-7.5;x<=7.5;x+=1.5)houseScene.add(box(.025,.025,12.9,0xdba982,x,.005,0));
- houseScene.add(box(16,5.5,.35,0xffe4c7,0,2.65,-6.5),box(.35,5.5,13,0xffe9d2,-8,2.65,0),box(.35,1.15,13,0xffe9d2,8,.51,0));
- houseScene.add(box(5.1,.18,3.4,0xe8b9e8,0,.035,1.1));
- for(let i=0;i<5;i++)houseScene.add(box(4.9,.012,.075,0xffeaf4,0,.135,-.3+i*.67));
- // Back wall window and framed art.
- houseScene.add(box(3.5,2.5,.13,0xffffff,0,3.35,-6.26),box(3.16,2.16,.15,0x92d5ef,0,3.35,-6.13),box(.12,2.17,.18,0xfff8ee,0,3.35,-6.0),box(3.18,.12,.18,0xfff8ee,0,3.35,-6.0));
- const sign=sceneLabel('NHÀ CỦA GẤU',4.0,.94);sign.position.set(0,4.93,-6.04);houseScene.add(sign);
- addHouseItem('giường','🛏️',-5,-4,g=>{
-  g.add(box(2.9,.55,3.4,0xc09276,0,.4,0),box(2.8,.42,3.3,0xfff5e7,0,.88,0),box(2.8,.24,2.0,0xc3afea,0,1.13,.47),box(2.86,1.35,.23,0xd098c5,0,1.14,-1.6),box(1.7,.36,.82,0xffffff,0,1.21,-.89));
- });
- addHouseItem('sách','📚',4.8,-4.1,g=>{
-  g.add(box(2.7,2.95,.6,0xc89970,0,1.48,0),box(2.55,.12,1.0,0xf0c89e,0,.8,.25),box(2.55,.12,1.0,0xf0c89e,0,1.7,.25));
-  for(let j=0;j<6;j++)g.add(box(.32,.60+(j%3)*.11,.56,COLORS[j],-1.06+j*.39,2.09,.39),box(.32,.51+(j%3)*.09,.56,COLORS[(j+2)%6],-1.06+j*.39,1.14,.39));
- });
- addHouseItem('bàn','🖍️',-4.6,.7,g=>{
-  g.add(box(2.5,.20,1.65,0xffcc8e,0,1.28,0));
-  for(const x of [-1,1])for(const z of [-.6,.6])g.add(box(.16,1.2,.16,0xc69c72,x,.62,z));
-  g.add(box(.8,.07,.65,0xfff9f4,-.3,1.41,0),cylinder(.16,.20,.45,0xaf9de6,.57,1.58,-.3));
-  for(let i=0;i<3;i++)g.add(cylinder(.035,.035,.45,COLORS[i],.47+i*.09,1.94,-.3,6));
- });
- addHouseItem('đèn','💡',4.8,.2,g=>{
-  g.add(cylinder(.44,.54,.12,0xc6a8dc,0,.10,0),cylinder(.1,.1,2.1,0xc99ac5,0,1.15,0),cylinder(.45,.86,.62,0xffc574,0,2.15,0),sphere(.20,0xfff9c8,0,1.83,0));
- });
- addHouseItem('gấu đồ chơi','🧸',3.7,3.5,g=>{
-  g.add(box(2.0,.7,1.5,0x8edcc0,0,.35,0),sphere(.55,0xcda07d,0,1.18,0),sphere(.50,0xe3b18a,0,1.95,0));
-  for(const x of [-.38,.38])g.add(sphere(.19,0xd39672,x,2.29,0),sphere(.07,0x382f42,x*.55,1.98,.43));
-  g.add(sphere(.18,0xf8dfc6,0,1.80,.43));
- });
- const exit=sceneLabel('🚪 RA VƯỜN',3.5,.9);exit.position.set(0,1.15,6.25);houseScene.add(exit);
- const exitHit=new T.Mesh(new T.BoxGeometry(3.4,2.5,1.5),new T.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));exitHit.position.set(0,1.1,6);exitHit.userData.item=-1;houseScene.add(exitHit);housePickers.push(exitHit);
+ houseCamera=new T.PerspectiveCamera(45,innerWidth/innerHeight,.1,100);
+ buildRoom(0);
 }
+function buildRoom(index){
+ const room=ROOMS[index];
+ houseScene=new T.Scene();houseScene.background=new T.Color(room[2]);
+ houseItems=[];housePickers=[];
+ houseScene.add(new T.HemisphereLight(0xffffff,0xb4a4c6,1.45));
+ const light=new T.DirectionalLight(0xfff0d9,1.40);light.position.set(3,15,11);houseScene.add(light);
+ houseScene.add(box(16,.42,13,room[3],0,-.25),box(16,4.6,.35,room[2],0,2.20,-6.5),box(.35,4.6,13,room[2],-8,2.20),box(.35,.96,13,room[2],8,.45));
+ for(let x=-7.5;x<=7.5;x+=1.5)houseScene.add(box(.027,.025,12.9,0xffffff,x,.008));
+ houseScene.add(box(4.2,.085,3.4,room[4],0,.02,1.1));
+ houseScene.add(box(3.35,2.1,.13,0xfffdf3,0,3.28,-6.24),box(3.05,1.82,.15,0x91d7ed,0,3.28,-6.11),box(.10,1.82,.17,0xfff8ee,0,3.28,-5.99),box(3.06,.10,.17,0xfff8ee,0,3.28,-5.99));
+ // Walkable central aisle and three object rows.
+ const slots=[[-5,-4],[0,-4],[5,-4],[-5,-.2],[5,-.2],[-5,3.45],[0,3.45],[5,3.45]];
+ ROOM_OBJECTS[index].forEach(([name,emoji,kind],i)=>addHouseItem(name,emoji,...slots[i],kind));
+ roomDoor(-6.5,(index+4)%5);roomDoor(6.5,(index+1)%5);
+ rooms[index]={scene:houseScene,items:houseItems,pickers:housePickers};
+}
+function updateRoomUI(){
+ $('roomNav').hidden=mode!=='house';$('roomGameButton').hidden=mode!=='house';$('roomLessonButton').hidden=mode!=='house'||activeRoom!==4;$('roomNav').querySelectorAll('button').forEach((b,i)=>{b.setAttribute('aria-pressed',String(i===activeRoom));b.classList.toggle('active',i===activeRoom);});
+ $('roomCounter').textContent=ROOM_OBJECTS[activeRoom].filter((_,i)=>progress.rooms[activeRoom+':'+i]).length+'/8';
+}
+function setRoomChallenge(index){
+ roomChallengeIndex=index;
+ const b=$('roomChallenge');b.hidden=index===null||mode!=='house';
+ if(index!==null){const item=houseItems[index];b.textContent='🔎 '+item.emoji;b.setAttribute('aria-label','Nghe lại: '+item.name);}
+}
+function replayRoomChallenge(){
+ if(mode==='house'&&roomChallengeIndex!==null)narrate('Bé tìm '+houseItems[roomChallengeIndex].name+' nhé!');
+}
+function startRoomChallenge(){
+ if(mode!=='house')return;
+ if(roomChallengeIndex!==null){replayRoomChallenge();return;}
+ const unvisited=houseItems.map((_,i)=>i).filter(i=>!progress.rooms[activeRoom+':'+i]&&i!==roomChallengeLast);
+ const all=houseItems.map((_,i)=>i).filter(i=>i!==roomChallengeLast);
+ const pool=unvisited.length?unvisited:all;
+ const n=pool[Math.floor(Math.random()*pool.length)];roomChallengeLast=n;setRoomChallenge(n);chirp();replayRoomChallenge();
+}
+function switchRoom(index,announce=true){
+ if(mode!=='house'||index<0||index>=ROOMS.length)return;
+ stopMotion();stopSpeech();setRoomChallenge(null);roomChallengeLast=-1;activeRoom=index;
+ if(!rooms[index])buildRoom(index);
+ const r=rooms[index];houseScene=r.scene;houseItems=r.items;housePickers=r.pickers;
+ houseScene.add(player,playerShadow);player.position.set(0,0,1.25);player.rotation.set(0,Math.PI,0);playerShadow.visible=true;playerShadow.position.set(0,.08,1.25);
+ roomGuide='';updateRoomUI();updateHouseHint();
+ if(announce){chirp();narrate('Đây là '+ROOMS[index][0]+'. Bé chạm vào đồ vật nhé.');toast(ROOMS[index][1]);}
+}
+function inspectHouseItem(index){
+ if(index===-1){leaveHouse();return;}
+ if(index<=-10){switchRoom(-10-index);return;}
+ const item=houseItems[index];if(!item)return;
+ progress.rooms[activeRoom+':'+index]=true;persist();updateRoomUI();item.selectedAt=performance.now();
+ const m=item.g.userData;
+ if(m.door){m.open=!m.open;m.door.rotation.y=m.open?-1.35:0;}
+ if(m.screen){m.on=!m.on;m.screen.material.color.setHex(m.on?0x96dfc8:0x6687a6);}
+ if(m.light){m.on=!m.on;m.light.material.color.setHex(m.on?0xffef90:0xcb9872);m.light.material.emissive?.setHex(m.on?0xffbc58:0x000000);m.light.material.emissiveIntensity=m.on?.52:0;}
+ if(m.water)m.water.visible=!m.water.visible;
+ if(m.lid){m.open=!m.open;m.lid.position.y=m.open?1.52:1.10;m.lid.rotation.x=m.open?-.65:0;}
+ item.halo.visible=true;roomEffect=index;chirp('happy');
+ if(roomChallengeIndex!==null){
+  if(index===roomChallengeIndex){setRoomChallenge(null);chirp('win');toast('🌟 ✨');narrate('Đúng rồi! Đây là '+item.name+'. Giỏi quá!');}
+  else{chirp('wrong');toast('💛');narrate('Đây là '+item.name+'. Mình tìm '+houseItems[roomChallengeIndex].name+' nhé!');}
+ }else{toast(item.emoji+' ✨');narrate('Đây là '+item.name+'.');}
+ if(item.kind==='piano'&&progress.sound)chirp('win');
+ if(item.kind==='clock'&&progress.sound)chirp();
+}
+function updateHouseHint(){
+ let nearest=-2,dist=Infinity;
+ houseItems.forEach((it,i)=>{const d=Math.hypot(player.position.x-it.x,player.position.z-it.z);if(d<dist){dist=d;nearest=i;}});
+ const close=dist<2.1;$('actionButton').hidden=!close;
+ if(close){$('actionText').textContent=houseItems[nearest].emoji;$('actionButton').dataset.icon=houseItems[nearest].emoji;$('actionButton').setAttribute('aria-label','Khám phá '+houseItems[nearest].name);}
+ $('worldTag').textContent=ROOMS[activeRoom][1];
+ return close?nearest:-2;
+}
+function tickRoomEffects(t){
+ for(const item of houseItems){
+  const age=(performance.now()-item.selectedAt)/1000,active=item.selectedAt>0&&age<1.1;
+  const scale=active?1+Math.sin(Math.min(1,age/1.1)*Math.PI)*.10:1;
+  item.g.scale.setScalar(scale);item.halo.visible=active;item.label.position.z=.18;
+  if(active&&item.kind==='ball')item.g.rotation.y+=.14;
+  if(active&&item.kind==='duck')item.g.position.y=Math.sin(age*9)*.12;else item.g.position.y=0;
+ }
+}
+function setupRooms(){
+ const nav=$('roomNav');ROOMS.forEach(([name,emoji],i)=>{const b=document.createElement('button');b.type='button';b.dataset.room=i;b.textContent=emoji;b.title=name;b.setAttribute('aria-label',name);b.addEventListener('click',()=>switchRoom(i));nav.insertBefore(b,$('roomCounter'));});
+}
+
 function stopMotion(){fishChase=null;keys.clear();joystickX=joystickY=0;stickPointer=null;autoTarget=null;houseTarget=null;window.__worldDrag=null;$('joystickKnob').style.transform='translate(0,0)';}
 function enterHouse(){
  if(mode!=='world')return;
@@ -1126,46 +1325,28 @@ function enterHouse(){
  stopMotion();swimming=false;player.position.set(0,0,2.7);player.rotation.set(0,Math.PI,0);swimRing.visible=false;
  houseScene.add(player,playerShadow);playerShadow.visible=true;cameraYaw=0;cameraPitch=10.2;
  houseCamera.position.set(0,11,17);houseCamera.lookAt(0,1.1,0);
- setMode('house');toast('🏡 Chào mừng bé đến nhà Gấu! Chạm đồ vật để khám phá.');
+ setMode('house');switchRoom(0);
 }
 function leaveHouse(){
  if(mode!=='house')return;
- stopMotion();worldScene.add(player,playerShadow);
+ stopMotion();stopSpeech();worldScene.add(player,playerShadow);
  player.position.set(insideReturn?.x??HOUSE.doorX,0,insideReturn?.z??HOUSE.doorZ+1.4);
  cameraYaw=insideReturn?.yaw??0;cameraPitch=13.4;
  worldCamera.position.set(player.position.x+Math.sin(cameraYaw)*19,cameraPitch,player.position.z+Math.cos(cameraYaw)*19);
- setMode('world');updateNearby();toast('🌼 Gấu đã trở về khu vườn!');
-}
-function inspectHouseItem(index){
- if(index===-1){leaveHouse();return;}
- const item=houseItems[index];if(!item)return;
- visitedHouseItems.add(index);
- toast(item.emoji+' Đây là '+item.name+' của Gấu! ('+visitedHouseItems.size+'/5 đồ vật)');chirp('happy');
- if(progress.sound&&window.speechSynthesis){stopSpeech();try{const u=new SpeechSynthesisUtterance('Đây là '+item.name+' của Gấu.');u.lang='vi-VN';u.rate=voiceSpeed().rate;const v=speechSynthesis.getVoices().find(v=>v.lang.toLowerCase().startsWith('vi'));if(v)u.voice=v;speechSynthesis.speak(u);}catch(_){}}
+ setMode('world');updateNearby();toast('🌼');narrate('Mình về vườn rồi!');
 }
 function nearHome(){return Math.hypot(player.position.x-HOUSE.doorX,player.position.z-HOUSE.doorZ)<3.7;}
 function headHome(){if(mode!=='world')return;fishChase=null;if(nearHome()){enterHouse();return;}
  const x=player.position.x,z=player.position.z,front=HOUSE.doorZ+.4;
  const side=HOUSE.x+(x<HOUSE.x?-4.65:4.65);
  const waypoints=z<HOUSE.z+3.3?[{x:side,z:Math.min(z,front)},{x:side,z:front},{x:HOUSE.doorX,z:front}]:[{x:HOUSE.doorX,z:front}];
- const first=waypoints.shift();autoTarget={...first,index:-2,waypoints};toast('🐻 Gấu đang đi về nhà!');}
+ const first=waypoints.shift();autoTarget={...first,index:-2,waypoints};toast('🏡');narrate('Mình về nhà nhé!');}
 
 function headSea(){if(mode!=='world')return;fishChase=null;let a=Math.hypot(player.position.x,player.position.z)>.1?Math.atan2(player.position.z,player.position.x):Math.PI/2;
  // Keep the exit from the cottage clear of its exterior walls.
  if(!swimming&&Math.abs(player.position.x-HOUSE.x)<6&&player.position.z>HOUSE.z)a=Math.max(a,.48);
- const r=swimming?26:35;autoTarget={x:Math.cos(a)*r,z:Math.sin(a)*r,index:-1};toast(swimming?'🏝️ Gấu đang bơi về bờ!':'🌊 Cùng Gấu xuống biển!');}
+ const r=swimming?26:35;autoTarget={x:Math.cos(a)*r,z:Math.sin(a)*r,index:-1};toast(swimming?'🏝️':'🌊');narrate(swimming?'Mình bơi về bờ nhé!':'Mình xuống biển nào!');}
 
-function updateHouseHint(){
- let nearest=-2,dist=Infinity;
- houseItems.forEach((it,i)=>{const d=Math.hypot(player.position.x-it.x,player.position.z-it.z);if(d<dist){dist=d;nearest=i;}});
- const exitD=Math.hypot(player.position.x,player.position.z-6);
- if(exitD<2.1){nearest=-1;dist=exitD;}
- const close=dist<2.25;
- $('actionButton').hidden=!close;
- if(close){$('actionText').textContent=nearest===-1?'RA VƯỜN':'XEM '+houseItems[nearest].name.toLocaleUpperCase('vi-VN');}
- $('worldTag').textContent=close?(nearest===-1?'🚪 Ra khỏi nhà':'✨ Chạm để khám phá '+houseItems[nearest].name):'🏡 Nhà Gấu · chạm đồ vật hoặc đi khám phá';
- return close?nearest:-2;
-}
 function tickHouse(dt,t){
  if(mode!=='house')return;
  let dx=joystickX,dz=joystickY;
@@ -1180,16 +1361,16 @@ function tickHouse(dt,t){
   player.rotation.y=Math.atan2(dx,dz);walkingTime+=dt*12;legs.forEach((l,i)=>l.position.y=.37+Math.sin(walkingTime+i*Math.PI)*.14);
  }else legs.forEach(l=>l.position.y=smooth(l.position.y,.37,dt*8));
  player.position.y=0;playerShadow.position.set(player.position.x,.08,player.position.z);
- const aspect=innerWidth/innerHeight,mobile=aspect<.85;const dist=mobile?Math.max(18,16/aspect):13.3;
+ const aspect=innerWidth/innerHeight,mobile=aspect<.85;const dist=mobile?Math.max(18,17/aspect):14.7;
  houseCamera.position.lerp(new T.Vector3(player.position.x*(mobile?.10:.36), mobile?dist*.64:10.2,player.position.z*.18+dist),clamp(dt*5,0,1));
  houseCamera.lookAt(player.position.x*(mobile?.08:.25),1.25,player.position.z*.12);
  houseItems.forEach(it=>it.label.quaternion.copy(houseCamera.quaternion));
- updateHouseHint();
+ tickRoomEffects(t);updateHouseHint();
 }
 function houseClick(e){
  const r=targetWorldPoint(e);const hits=r.intersectObjects(housePickers,false);
- if(hits.length){const i=hits[0].object.userData.item;if(i===-1){houseTarget={x:0,z:5.7,item:-1};return;}
-  const item=houseItems[i];houseTarget={x:item.x,z:Math.min(5.6,item.z+1.6),item:i};return;}
+ if(hits.length){const i=hits[0].object.userData.item;if(i<=-10){inspectHouseItem(i);return;}
+  if(i>=0){const item=houseItems[i];inspectHouseItem(i);houseTarget={x:item.x,z:Math.min(5.6,item.z+1.85)};return;}}
  const d=new T.Vector3();if(r.ray.intersectPlane(new T.Plane(new T.Vector3(0,1,0),0),d))houseTarget={x:clamp(d.x,-6.8,6.8),z:clamp(d.z,-5.1,5.8)};
 }
 function tickOcean(t){
@@ -1231,7 +1412,7 @@ function syncMusic(){
  }catch(_){}
 }
 function toggleMusic(){progress.music=!progress.music;persist();updateMusicButton();syncMusic();}
-function updateMusicButton(){$('musicToggle').textContent=progress.music?'♫ Nhạc: bật':'♫ Nhạc: tắt';$('musicToggle').setAttribute('aria-pressed',String(progress.music));}
+function updateMusicButton(){$('musicToggle').textContent=progress.music?'♫ Nhạc: bật':'♫ Nhạc: tắt';$('musicToggle').dataset.icon=progress.music?'🎵':'🔕';$('musicToggle').setAttribute('aria-pressed',String(progress.music));}
 let installPrompt=null;
 function installed(){return matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;}
 function updateInstall(){const b=$('installButton');b.hidden=installed();$('installWelcome').hidden=installed();}
@@ -1300,14 +1481,14 @@ function addFish(){for(let i=0;i<24;i++)makeFish(i%FISH_TYPES.length,i);}
 function fishCount(){return Object.values(progress.fish).reduce((a,b)=>a+b,0);}
 function updateFishAlbum(){
  const count=fishCount(),found=FISH_TYPES.filter((_,i)=>progress.fish[i]>0).length;
- $('fishCount').textContent=String(count);$('fishAlbumSummary').textContent='Đã gặp '+found+'/'+FISH_TYPES.length+' loài · '+count+' lượt bắt và thả cá';
+ $('fishCount').textContent=String(count);$('fishAlbumSummary').textContent=found+'/'+FISH_TYPES.length+' 🐟 · '+count+' ✨';
  const host=$('fishGrid');host.replaceChildren();
  FISH_TYPES.forEach((type,i)=>{
   const n=progress.fish[i]||0,card=document.createElement('div');card.className='fish-card'+(n?' found':'');
-  const swatch=document.createElement('span');swatch.className='fish-icon';swatch.style.background='#'+type.color.toString(16).padStart(6,'0');swatch.textContent=n?'🐟':'?';
+  const swatch=document.createElement('span');swatch.className='fish-icon';swatch.style.background='#'+type.color.toString(16).padStart(6,'0');swatch.textContent=n?['🐠','🐟','🐠','🐡','🐟','🐠'][i]:'?';
   const title=document.createElement('strong');title.textContent=n?type.name:'Chưa khám phá';
   const desc=document.createElement('small');desc.textContent=n?type.fact+' · '+n+' lượt':'Bơi ra biển để gặp cá này.';
-  card.append(swatch,title,desc);host.append(card);
+  card.append(swatch,title,desc);if(n){card.tabIndex=0;card.setAttribute('role','button');card.setAttribute('aria-label',type.name);const say=()=>narrate(type.name+'. '+type.fact);card.addEventListener('click',say);card.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();e.stopPropagation();say();}});}host.append(card);
  });
 }
 function nearestFish(){
@@ -1326,7 +1507,7 @@ function catchFish(i){
  f.cooldown=7;f.g.visible=false;
  const fresh=!progress.fish[f.type];progress.fish[f.type]=Math.min(99999,(progress.fish[f.type]||0)+1);persist();updateFishAlbum();chirp('win');
  const label=FISH_TYPES[f.type].name;
- toast((fresh?'✨ Loài mới: ':'🐟 Bắt được ')+label+'! Gấu thả cá về biển.');
+ toast('🐟 ✨');narrate('Gấu bắt được '+label+'. Mình thả cá về biển nhé!');
  const ripple=new T.Mesh(new T.RingGeometry(.6,.84,30),new T.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.85,side:T.DoubleSide,depthWrite:false}));ripple.rotation.x=-Math.PI/2;ripple.position.set(f.g.position.x,SEA_Y+.12,f.g.position.z);worldScene.add(ripple);fishRipples.push({mesh:ripple,life:0});
  return true;
 }
@@ -1382,7 +1563,9 @@ function initRenderer(){
 function currentModal(){return !$('fishAlbum').hidden||!$('installOverlay').hidden||!$('welcome').hidden||!$('mapOverlay').hidden||!$('helpOverlay').hidden||!$('winOverlay').hidden||!$('dictationOverlay').hidden;}
 function setMode(next){
  if(mode!==next){clearTimeout(toastTimer);$('toast').classList.remove('show');}
- mode=next;
+ mode=next;document.body.dataset.mode=next;
+ if(next!=='house'){setRoomChallenge(null);$('roomGameButton').hidden=true;$('roomLessonButton').hidden=true;}
+ $('roomNav').hidden=next!=='house';
  const garden=next==='world'||next==='house',listen=next==='listen',trace=next==='trace';
  const interior=next==='house';
  $('exploreTools').hidden=!garden;
@@ -1414,8 +1597,7 @@ function setMode(next){
  };
  if(!garden){
   const stage=stages[next];
-  $('lessonTitle').textContent=stage[0]+LETTERS[level][0];
-  $('lessonPhase').textContent=stage[1];
+  const step=['listen','trace','quiz','word'].indexOf(next);$('lessonTitle').textContent=['🔊','✏️','🔎','🎁'][step]+' '+LETTERS[level][0];$('lessonPhase').textContent='●'.repeat(step+1)+'○'.repeat(3-step);$('lessonPhase').setAttribute('aria-label',stage[1]);
   $('speakLabel').textContent=word?'Nghe từ':'Nghe lại';
   updateLessonLayout();
   requestAnimationFrame(positionLessonFeedback);
@@ -1440,7 +1622,7 @@ function navigateTo(i,quick=false){
  const tile=letterTokens[i];
  targetIndex=i;
  if(quick){
-  $('seaShortcut').textContent='🌊 Ra biển';$('findFishButton').hidden=true;
+  $('seaShortcut').textContent='🌊 Ra biển';$('seaShortcut').dataset.icon='🌊';$('findFishButton').hidden=true;
   player.position.set(tile.x+1.6,0,tile.z+1.9);swimming=false;swimRing.visible=false;playerShadow.visible=true;autoTarget=null;
   openLesson(i);
  }else{
@@ -1465,15 +1647,15 @@ function updateNearby(){
  if(swimming){
   const fish=nearestFish();const close=fish.index!==null&&fish.dist<=FISH_RADIUS;
   $('actionButton').hidden=!close;
-  if(close)$('actionText').textContent='BẮT CÁ';
+  if(close){$('actionText').textContent='BẮT CÁ';$('actionButton').dataset.icon='🐟';$('actionButton').setAttribute('aria-label','Bắt cá');}
   $('worldTag').textContent=fishChase!==null?'🐟 Gấu đang đuổi theo cá!':close?'🐟 Bấm BẮT CÁ hoặc chạm vào cá':'🌊 Gấu đang bơi · chạm cá để bắt';
   return;
  }
  const home=nearHome(),index=near.dist<=3.6&&!swimming?near.index:-1;
  actionIndex=index;
  $('actionButton').hidden=mode!=='world'||(!home&&index<0);
- if(home)$('actionText').textContent='VÀO NHÀ';
- else if(index>=0)$('actionText').textContent='CHỮ '+LETTERS[index][0];
+ if(home){$('actionText').textContent='VÀO NHÀ';$('actionButton').dataset.icon='🏡';$('actionButton').setAttribute('aria-label','Vào nhà');}
+ else if(index>=0){$('actionText').textContent='CHỮ '+LETTERS[index][0];$('actionButton').dataset.icon=LETTERS[index][0];$('actionButton').setAttribute('aria-label','Học chữ '+LETTERS[index][0]);}
  if(autoTarget)return;
  $('worldTag').textContent=swimming?'🌊 Gấu đang bơi · hướng vào bờ để lên đảo':home?'🏡 Chạm VÀO NHÀ để khám phá':index>=0?'✨ Chạm HỌC CHỮ để luyện chữ '+LETTERS[index][0]:'🌼 Khám phá vườn, nhà Gấu và biển xanh';
 }
@@ -1538,7 +1720,7 @@ function tickWorld(dt,t){
  if(wasSwimming!==swimming){if(swimming&&autoTarget)cameraYaw=Math.atan2(-player.position.x,-player.position.z);chirp('happy');toast(swimming?'🌊 Gấu xuống nước và bắt đầu bơi!':'🏝️ Gấu đã lên bờ!');}
  player.position.y=smooth(player.position.y,swimming?SEA_Y-.66+Math.sin(t*3)*.10:0,dt*9);
  swimRing.visible=swimming;playerShadow.visible=!swimming;
- $('seaShortcut').textContent=swimming?'🏝️ Lên bờ':'🌊 Ra biển';
+ $('seaShortcut').textContent=swimming?'🏝️ Lên bờ':'🌊 Ra biển';$('seaShortcut').dataset.icon=swimming?'🏝️':'🌊';$('seaShortcut').setAttribute('aria-label',swimming?'Lên bờ':'Ra biển');
  $('findFishButton').hidden=!swimming;
  arms.forEach((arm,i)=>{arm.rotation.x=swimming?Math.sin(t*5+i*Math.PI)*.8:0;arm.rotation.z=swimming?(i?-.68:.68):0});
  playerShadow.position.set(player.position.x,.08,player.position.z);
@@ -1647,7 +1829,7 @@ function drawListeningBoard(){
  c.fillStyle='#ece9ff';c.fillRect(0,0,w,85);
  c.font='900 '+(portrait?23:28)+'px '+FONT;
  c.textBaseline='middle';c.textAlign='left';c.fillStyle='#7163c7';
- c.fillText('🐻 NGHE & NÓI CÙNG GẤU',31,44,w-65);
+ c.fillText('🐻  🔊',31,44,w-65);
  const big=portrait?320:290;
  c.textAlign='center';c.textBaseline='middle';
  c.fillStyle='#f1edff';
@@ -1659,7 +1841,7 @@ function drawListeningBoard(){
  c.fillStyle='#526181';c.font='900 '+(portrait?66:58)+'px '+FONT;
  c.fillText(word,w/2,h*.85,w*.8);
  c.fillStyle='#a59ab9';c.font='800 '+(portrait?22:25)+'px '+FONT;
- c.fillText('🔊 NGHE CHẬM · ĐỌC THEO · RỒI TẬP TÔ',w/2,h-32,w-40);
+ 
  drawBoard();
 }
 function drawPracticeTemplate(){
@@ -1749,7 +1931,7 @@ function undoStroke(){
 function clearStrokes(){
  strokes=[];redo=[];currentStroke=null;tracePointer=null;
  guideCompletion=[];guideStep=0;guideDemo=null;
- $('demoStroke').innerHTML='<strong>▶</strong> Xem mẫu';
+ $('demoStroke').innerHTML='<strong>▶</strong> Xem mẫu';$('demoStroke').dataset.playing='false';
  if(mode==='trace')drawHandwritingGuide();
  attempts=0;traceScore=0;
  setFeedback('🌟 Bảng đã sạch! Bé tô lại từ đầu nhé.','');
@@ -1757,7 +1939,7 @@ function clearStrokes(){
  drawBoard();updateInkButtons();
 }
 function setFeedback(text,kind=''){
- $('feedback').textContent=text;$('feedback').className='feedback'+(kind?' '+kind:'');
+ const f=$('feedback');f.textContent=text;f.className='feedback'+(kind?' '+kind:'');f.dataset.symbol=kind==='good'?'🌟':kind==='warn'?'💛':mode==='listen'?'👂':mode==='trace'?'✏️':mode==='quiz'?'🔎 '+LETTERS[level][0]:mode==='word'?'🔎 '+LETTERS[level][2]:'🐻';
 }
 function computeTraceScore(){
  if(!strokes.length)return 0;
@@ -1789,7 +1971,7 @@ function computeTraceScore(){
  return clamp(Math.round((Math.min(1,coverage/.34)*.69+precision*.29+stepBonus)*100),0,100);
 }
 function checkTrace(){
- if(!strokes.length){toast('Bé tô vài nét trước nhé!');return;}
+ if(!strokes.length){toast('✏️');narrate('Bé tô chữ trước nhé!');return;}
  if(attempts>=2){beginQuiz();return;}
  traceScore=computeTraceScore();attempts++;
  if(traceScore>=44){
@@ -1799,10 +1981,10 @@ function checkTrace(){
   chirp('wrong');
   if(attempts>=2){
    $('checkText').textContent='Tiếp tục';
-   setFeedback('💛 Bé đã cố gắng rồi! Mình chơi tìm chữ tiếp nhé!','warn');
+   setFeedback('💛 Bé đã cố gắng rồi! Mình chơi tìm chữ tiếp nhé!','warn');narrate('Bé cố gắng rồi! Bấm dấu tích để chơi tiếp nhé.');
   }else{
    $('checkText').textContent='Thử lại';
-   setFeedback('🌻 Tô thêm một chút theo đường nét đứt nhé!','warn');
+   setFeedback('🌻 Tô thêm một chút theo đường nét đứt nhé!','warn');narrate('Bé tô thêm theo nét đứt nhé.');
   }
  }
 }
@@ -1841,11 +2023,11 @@ function objectCardTexture(index){
  c.fillStyle='#f4efff';c.beginPath();c.arc(210,165,133,0,2*Math.PI);c.fill();
  c.font='175px Arial,"Apple Color Emoji","Segoe UI Emoji",sans-serif';
  c.textAlign='center';c.textBaseline='middle';
- c.fillText(entry[2],210,173,345);
+ c.fillText(entry[2],210,210,345);
  c.fillStyle='#6253b1';c.font='900 64px '+FONT;
- c.fillText(entry[1],210,332,378);
+ 
  c.fillStyle='#a699c7';c.font='800 20px '+FONT;
- c.fillText('CHẠM ĐỂ CHỌN',210,393);
+ 
  return textureFromCanvas(canvas);
 }
 function createQuizChoices(){
@@ -1870,7 +2052,7 @@ function createQuizChoices(){
   group.add(block);
   const tex=wordMode?objectCardTexture(value):
    makeTextTexture(letter,420,420,{color:['#7060c9','#dd8b72','#499b88','#b98e4b'][i],
-   bg:'#fffefd',bg2:'#fff9f5',footer:'CHỌN CHỮ'});
+   bg:'#fffefd',bg2:'#fff9f5',footer:''});
   const label=new T.Mesh(new T.PlaneGeometry(portrait?2.58:2.20,portrait?2.56:2.65),
    new T.MeshBasicMaterial({map:tex,transparent:true,alphaTest:.02,toneMapped:false}));
   label.position.z=.075;group.add(label);
@@ -1909,16 +2091,16 @@ function openLesson(i){
  $('checkText').textContent='Kiểm tra';
  setFeedback('👂 Nghe chữ, nhìn hình, rồi đọc theo Gấu nhé!');
  setCoach('Bấm 🔊 Nghe lại. Bé có thể đọc theo thật chậm!');
- updateInkButtons();
+ updateInkButtons();speakLetter();
 }
 function beginTrace(){
  if(mode!=='listen')return;
  stopListening();closeDictation();
  stopSpeech();
- guideStep=0;guideCompletion=[];guideDemo=null;
+ guideStep=0;guideCompletion=[];guideDemo=null;$('demoStroke').dataset.playing='false';
  setMode('trace');
  setFeedback('✏️ Xem số nét và mũi tên màu cam để biết điểm đặt bút nhé!');
- setCoach('Nét 1: '+letterStrokes()[0].title+'. Bắt đầu tại mũi tên màu cam.');
+ setCoach('Nét 1: '+letterStrokes()[0].title+'. Bắt đầu tại mũi tên màu cam.');narrate('Bé nhìn mũi tên màu cam. Đặt bút ở đó, rồi tô theo nét nhé.');
 }
 function beginQuiz(){
  if(mode!=='trace')return;
@@ -1927,13 +2109,13 @@ function beginQuiz(){
  boardMesh.visible=false;lessonFrame.visible=false;
  lessonScene.userData.shadow.visible=false;quizGroup.visible=true;
  setFeedback('🔎 Bé hãy tìm chữ '+LETTERS[level][0]+' trong bốn khối 3D nhé!');
- setCoach('Nhìn các chữ, bé chạm vào chữ đúng.');
+ setCoach('Nhìn các chữ, bé chạm vào chữ đúng.');narrate('Bé tìm chữ '+LETTERS[level][0]+' nhé!');
 }
 function answerQuiz(letter,index){
  if(mode!=='quiz'||won||quizSolved)return;
  if(letter!==LETTERS[level][0]){
   quizMistakes++;
-  chirp('wrong');
+  chirp('wrong');narrate('Thử lại nhé. Tìm chữ '+LETTERS[level][0]+'.');
   setFeedback(quizMistakes>=2?'💛 Gợi ý: tìm chữ '+LETTERS[level][0]+' nhé!':
    '🌻 Chưa phải chữ Gấu hỏi, bé nhìn lại nhé!','warn');
   const group=quizGroup.children[index];
@@ -1952,13 +2134,13 @@ function beginWordChallenge(){
  boardMesh.visible=false;lessonFrame.visible=false;
  lessonScene.userData.shadow.visible=false;quizGroup.visible=true;
  setFeedback('🎁 Từ "'+LETTERS[level][1]+'". Bé tìm hình đúng trong 4 khối nhé!');
- setCoach('Con tìm hình: '+LETTERS[level][1]+'. Bấm Nghe từ để nghe lại.');
+ setCoach('Con tìm hình: '+LETTERS[level][1]+'. Bấm Nghe từ để nghe lại.');narrate('Bé tìm hình '+LETTERS[level][1]+' nhé!');
 }
 function answerWord(choice,index){
  if(mode!=='word'||wordSolved||won)return;
  if(choice!==level){
   wordMistakes++;
-  chirp('wrong');
+  chirp('wrong');narrate('Thử lại nhé. Bé tìm '+LETTERS[level][1]+'.');
   setFeedback('🌷 Bé hãy tìm hình "'+LETTERS[level][1]+'". Thử lại nhé!','warn');
   const group=quizGroup.children[index];
   if(group&&group.children[0])group.children[0].material.color.setHex(0xf490a6);
@@ -1970,7 +2152,7 @@ function answerWord(choice,index){
  progress.best[String(level)]=Math.max(stars,progress.best[String(level)]||0);
  persist();updateProgress();
  setFeedback('🌼 Hoa đã nở! Bé đã hoàn thành cả 4 thử thách!','good');
- setCoach('Rất giỏi! Gấu tặng bé hoa và ngôi sao!');
+ setCoach('Rất giỏi! Gấu tặng bé hoa và ngôi sao!');narrate('Giỏi quá! Bé nhận được '+stars+' ngôi sao!');
  winTimer=setTimeout(()=>{
   if(mode!=='word'||!won)return;
   $('winText').textContent=
@@ -2131,7 +2313,7 @@ function beginPlay(){
  $('welcome').hidden=true;
  setMode('world');
  updateNearby();
- toast('🌈 Hãy điều khiển Gấu khám phá khu vườn!');
+ toast('🌈');narrate('Chào bé! Chạm vào chữ cái, ngôi nhà hoặc biển để chơi cùng Gấu nhé.');
 }
 function renderFrame(now){
  requestAnimationFrame(renderFrame);
@@ -2163,7 +2345,7 @@ function renderFrame(now){
  }
 }
 function setupControls(){
- $('playButton').addEventListener('click',beginPlay);
+ setupRooms();$('roomGameButton').addEventListener('click',startRoomChallenge);$('roomChallenge').addEventListener('click',replayRoomChallenge);$('roomLessonButton').addEventListener('click',()=>{const i=LETTERS.findIndex((_,n)=>!progress.best[n]);openLesson(i<0?0:i);});$('playButton').addEventListener('click',beginPlay);
  $('homeShortcut').addEventListener('click',headHome);
  $('seaShortcut').addEventListener('click',headSea);
  $('findFishButton').addEventListener('click',findFish);
