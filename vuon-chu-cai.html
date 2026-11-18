@@ -207,6 +207,24 @@ body[data-mode="house"] .explore-tools{top:calc(151px + env(safe-area-inset-top)
  .feedback::before,.toast::before{font-size:23px}.action-btn{width:76px;height:76px}.action-btn::before{font-size:37px!important}
 }
 @media(max-width:345px){#roomNav button{width:38px;height:38px;font-size:21px}.lesson-bottom .game-btn,.lesson-bottom .speed-button{width:43px}.lesson-bottom{gap:4px}}
+
+.sr-only{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
+#adventureOverlay{z-index:31;background:#40366b88}
+.quest-card{width:min(100%,440px);background:#fffdf7;border:3px solid white;border-radius:32px;padding:18px;box-shadow:0 20px 80px #211b5740;text-align:center}
+.quest-top{display:flex;gap:12px;align-items:center;justify-content:center}.quest-top>span{font-size:36px;margin-right:auto}
+.quest-top button{border:0;background:#ece7fa;width:54px;height:54px;border-radius:17px;font-size:28px}
+#adventureSkip{width:38px;height:38px;font-size:21px;background:#f3f0f4;color:#a39bb0}
+#adventureClue{font-size:clamp(60px,17vw,96px);min-height:126px;display:grid;place-content:center;background:#f4efff;border-radius:24px;margin:14px 0;line-height:1.25}
+#adventureOptions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+#adventureOptions button{width:100%;aspect-ratio:1;display:grid;place-items:center;border:3px solid white;border-radius:23px;background:#eaf5fc;box-shadow:0 5px 0 #cbdfe9;font-size:clamp(39px,13vw,66px);padding:0;color:#555}
+#adventureOptions button:nth-child(2){background:#fff0dd;box-shadow:0 5px 0 #ead6b4}
+#adventureOptions button:nth-child(3){background:#edf7e5;box-shadow:0 5px 0 #c9e1ba}
+#adventureOptions button.correct{border-color:#4bc897;background:#e5fbe6;opacity:1;box-shadow:0 5px 0 #81caaa}
+#adventureOptions button.retry{border-color:#f3ba8a}#adventureOptions button.hint{outline:4px solid #ffce59;outline-offset:2px}
+#adventureContinue{width:94px;height:58px;background:#8b75e8;color:#fff;border:2px solid #fff;border-radius:20px;margin:18px 0 2px;font-size:36px;box-shadow:0 5px 0 #6f5ecd}
+.quest-count{min-width:58px;font-variant-numeric:tabular-nums}
+@media(max-width:420px){.hud-actions{gap:4px}.hud-pill.quest-count{padding:0 6px;min-width:35px}.quest-count span{font-size:12px}.quest-card{padding:13px;border-radius:27px}.quest-top button{width:48px;height:48px}#adventureSkip{width:35px;height:35px}}
+@media(max-height:530px){.quest-card{max-width:390px;padding:9px}.quest-top button{width:35px;height:35px;font-size:21px}#adventureClue{min-height:65px;font-size:50px;margin:7px 0}#adventureOptions button{max-height:85px;font-size:43px}#adventureContinue{height:45px;margin:10px 0 0;font-size:28px}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 <script src="./assets/three.min.js"></script>
@@ -216,7 +234,7 @@ body[data-mode="house"] .explore-tools{top:calc(151px + env(safe-area-inset-top)
 <div id="shade"></div>
 <header class="hud">
   <div class="brand"><span class="logo">🌈</span><span class="brand-text"><strong>VƯỜN CHỮ CÁI 3D</strong><small>HÀNH TRÌNH CÙNG GẤU</small></span></div>
-  <div class="hud-actions"><div class="hud-pill" title="Tổng số sao"><span>⭐</span><span id="starTotal">0</span></div><button id="mapButton" class="hud-btn" title="Bản đồ chữ cái" aria-label="Mở bản đồ 29 chữ">🗺️</button><button id="soundButton" class="hud-btn" title="Âm thanh" aria-label="Bật hoặc tắt âm thanh" aria-pressed="true">🔊</button><button id="helpButton" class="hud-btn" title="Cách chơi" aria-label="Cách chơi">❔</button></div>
+  <div class="hud-actions"><div class="hud-pill" title="Tổng số sao"><span>⭐</span><span id="starTotal">0</span></div><div class="hud-pill quest-count" title="Câu đố đã giải" aria-label="Câu đố đã giải"><span>🧩</span><span id="adventureCount">0</span></div><button id="mapButton" class="hud-btn" title="Bản đồ chữ cái" aria-label="Mở bản đồ 29 chữ">🗺️</button><button id="soundButton" class="hud-btn" title="Âm thanh" aria-label="Bật hoặc tắt âm thanh" aria-pressed="true">🔊</button><button id="helpButton" class="hud-btn" title="Cách chơi" aria-label="Cách chơi">❔</button></div>
 </header>
 <div id="exploreTools" class="explore-tools" hidden>
  <button id="homeShortcut" type="button" data-icon="🏡" aria-label="Nhà Gấu">🏡 Nhà Gấu</button>
@@ -277,6 +295,15 @@ body[data-mode="house"] .explore-tools{top:calc(151px + env(safe-area-inset-top)
   <div class="modal-actions"><button id="installClose" class="cta" type="button">Đã hiểu</button></div>
  </section>
 </div>
+<div id="adventureOverlay" class="overlay" hidden>
+ <section class="quest-card" role="dialog" aria-modal="true" aria-labelledby="adventureQuestionText">
+ <span id="adventureQuestionText" class="sr-only">Câu đố</span>
+ <div class="quest-top"><span id="adventureResult" aria-live="polite">❔</span><button id="adventureReplay" type="button" aria-label="Nghe lại câu hỏi">🔊</button><button id="adventureSkip" type="button" aria-label="Bỏ qua câu đố">✕</button></div>
+ <div id="adventureClue" aria-hidden="true">🐻</div>
+ <div id="adventureOptions" role="group" aria-label="Chọn hình trả lời"></div>
+ <button id="adventureContinue" type="button" aria-label="Tiếp tục khám phá" hidden>➡</button>
+ </section>
+</div>
 <div id="welcome" class="overlay">
   <section class="welcome" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle">
     <span class="eyebrow">🌈</span>
@@ -300,7 +327,7 @@ body[data-mode="house"] .explore-tools{top:calc(151px + env(safe-area-inset-top)
     <h2 id="helpTitle">🎮 Cách chơi</h2>
     <ol><li>Dùng các phím <b>W A S D / mũi tên</b> hoặc cần ảo để điều khiển Gấu Bông.</li><li>Chạm vào chữ nổi trong khu vườn, Gấu sẽ tự đi tới chữ đó. Có thể mở bản đồ 🗺️ để chọn nhanh.</li><li><b>Nghe chậm</b> rồi bấm 🎤 Bé đọc. Trình duyệt có nhận dạng tiếng nói sẽ nghe và trả lời; trên iPad có thể dùng nút 🎙️ của bàn phím để đọc và nhận phản hồi.</li><li><b>Tô chữ</b> trên bảng phép thuật, có thể tẩy và làm lại.</li><li><b>Tìm chữ</b> đúng trong 4 khối 3D, rồi <b>tìm đồ vật</b> tương ứng với từ vừa nghe.</li><li>Hoàn thành 4 thử thách để nhận 1–3 ⭐ và làm một bông hoa trong khu vườn nở rộ!</li></ol>
     <p>Bảng tập viết có ô ly, điểm đặt bút, mũi tên, tên từng nét và nút mô phỏng cách viết. Các nét vector được biên dựng để tham khảo mẫu chữ tiểu học Việt Nam; nên đối chiếu thêm với mẫu trường bé đang học. Nếu cấp quyền micro, dịch vụ nhận dạng của trình duyệt có thể xử lý âm thanh; game không tự lưu bản ghi âm. Phản hồi giọng nói chỉ dựa vào từ nhận dạng được, chưa đánh giá chính xác phát âm.</p>
-    <p>🏡 Vào nhà Gấu để khám phá đồ vật. 🌊 Đi xuống biển để bơi, chạm cá để Gấu đuổi bắt hoặc nhấn Bắt cá khi đến gần; cá được thả lại biển và ghi vào Sổ cá. ♫ Tắt/bật nhạc nền riêng.</p>
+    <p>🏡 Vào nhà Gấu để khám phá đồ vật. 🌊 Đi xuống biển để bơi, chạm cá để Gấu đuổi bắt hoặc nhấn Bắt cá khi đến gần; cá được thả lại biển và ghi vào Sổ cá. ♫ Tắt/bật nhạc nền riêng. 🧩 Sau khi khám phá hoặc chuyển cảnh, bé nghe và chọn một trong ba hình để trả lời; có thể nghe lại hoặc bỏ qua.</p>
  <div class="modal-actions"><button id="installButton" type="button" data-icon="📲" aria-label="Cài game">📲 Cài game</button><button id="helpClose" class="cta" type="button" data-icon="✓" aria-label="Đóng hướng dẫn">Đã hiểu, chơi thôi!</button></div>
   </section>
 </div>
@@ -598,7 +625,7 @@ const VOICE_SPEEDS=[
  {id:'medium',label:'🐇 Vừa',rate:.76,pause:650},
  {id:'fast',label:'🚀 Nhanh',rate:.92,pause:450}
 ];
-let progress={best:{},sound:true,speechSpeed:'slow',music:true,fish:{},rooms:{}};
+let progress={best:{},sound:true,speechSpeed:'slow',music:true,fish:{},rooms:{},adventureCount:0};
 let mode='world',level=0,traceScore=0,attempts=0,quizMistakes=0,wordMistakes=0,won=false;
 let quizSolved=false,wordSolved=false,previouslyLearned=false,speechToken=0,speechTimer=0,voiceWarning=false;
 let targetIndex=-1,actionIndex=-1,autoTarget=null;
@@ -636,6 +663,7 @@ function loadProgress(){
   if(data&&typeof data==='object'){
    if(typeof data.sound==='boolean')progress.sound=data.sound;
    if(typeof data.music==='boolean')progress.music=data.music;
+   if(Number.isInteger(data.adventureCount)&&data.adventureCount>=0)progress.adventureCount=Math.min(99999,data.adventureCount);
    if(data.rooms&&typeof data.rooms==='object')for(let r=0;r<5;r++)for(let i=0;i<8;i++)if(data.rooms[r+':'+i]===true)progress.rooms[r+':'+i]=true;
    if(data.fish&&typeof data.fish==='object')for(let i=0;i<6;i++){const n=data.fish[i];if(Number.isInteger(n)&&n>0)progress.fish[i]=Math.min(99999,n);}
    if(VOICE_SPEEDS.some(item=>item.id===data.speechSpeed))progress.speechSpeed=data.speechSpeed;
@@ -652,7 +680,7 @@ function persist(){
  catch(_){toast('Tiến độ chưa được lưu trên trình duyệt này.');}
 }
 function updateProgress(){
- $('starTotal').textContent=totals();
+ $('starTotal').textContent=totals();setText('adventureCount',String(progress.adventureCount));
  updateFishAlbum();
  updateMusicButton();
  $('soundButton').textContent=progress.sound?'🔊':'🔇';
@@ -667,10 +695,7 @@ function updateProgress(){
   letterTokens[i].ring.material.color.setHex(p?0xf8c55b:COLORS[i%COLORS.length]);
   letterTokens[i].badge.visible=p>0;
   if(letterTokens[i].flower)letterTokens[i].flower.visible=p>0;
-  const old=letterTokens[i].label.material.map;
-  letterTokens[i].label.material.map=labelTexture(i);
-  if(old)old.dispose();
-  letterTokens[i].label.material.map.needsUpdate=true;
+  if(letterTokens[i].lastBest!==p){const old=letterTokens[i].label.material.map;letterTokens[i].label.material.map=labelTexture(i);if(old)old.dispose();letterTokens[i].lastBest=p;}
  }
  const host=$('letterGrid');
  host.replaceChildren();
@@ -1081,7 +1106,7 @@ function addLetterTokens(){
    pick.position.set(0,1.85,0);pick.userData.level=i;group.add(pick);
    worldScene.add(group);
    tokenPickers.push(pick);
-   letterTokens.push({group,label,topper,ring,badge,flower:rewardFlower,pick,index:i,x,z,seed:i*1.83});
+   letterTokens.push({group,label,topper,ring,badge,flower:rewardFlower,pick,index:i,x,z,seed:i*1.83,lastBest:progress.best[String(i)]||0});
   }
  }
 }
@@ -1247,7 +1272,7 @@ function buildRoom(index){
  const slots=[[-5,-4],[0,-4],[5,-4],[-5,-.2],[5,-.2],[-5,3.45],[0,3.45],[5,3.45]];
  ROOM_OBJECTS[index].forEach(([name,emoji,kind],i)=>addHouseItem(name,emoji,...slots[i],kind));
  roomDoor(-6.5,(index+4)%5);roomDoor(6.5,(index+1)%5);
- rooms[index]={scene:houseScene,items:houseItems,pickers:housePickers};
+ optimizeRoom();rooms[index]={scene:houseScene,items:houseItems,pickers:housePickers};
 }
 function updateRoomUI(){
  $('roomNav').hidden=mode!=='house';$('roomGameButton').hidden=mode!=='house';$('roomLessonButton').hidden=mode!=='house'||activeRoom!==4;$('roomNav').querySelectorAll('button').forEach((b,i)=>{b.setAttribute('aria-pressed',String(i===activeRoom));b.classList.toggle('active',i===activeRoom);});
@@ -1270,13 +1295,14 @@ function startRoomChallenge(){
  const n=pool[Math.floor(Math.random()*pool.length)];roomChallengeLast=n;setRoomChallenge(n);chirp();replayRoomChallenge();
 }
 function switchRoom(index,announce=true){
- if(mode!=='house'||index<0||index>=ROOMS.length)return;
+ if(mode!=='house'||index<0||index>=ROOMS.length||currentModal())return;
  stopMotion();stopSpeech();setRoomChallenge(null);roomChallengeLast=-1;activeRoom=index;
  if(!rooms[index])buildRoom(index);
  const r=rooms[index];houseScene=r.scene;houseItems=r.items;housePickers=r.pickers;
  houseScene.add(player,playerShadow);player.position.set(0,0,1.25);player.rotation.set(0,Math.PI,0);playerShadow.visible=true;playerShadow.position.set(0,.08,1.25);
- roomGuide='';updateRoomUI();updateHouseHint();
- if(announce){chirp();narrate('Đây là '+ROOMS[index][0]+'. Bé chạm vào đồ vật nhé.');toast(ROOMS[index][1]);}
+ const aspect=innerWidth/innerHeight,mobile=aspect<.85,dist=mobile?Math.max(18,17/aspect):14.7;houseCamera.position.set(0,mobile?dist*.64:10.2,dist+.23);houseCamera.lookAt(0,1.25,.15);houseItems.forEach(it=>it.label.quaternion.copy(houseCamera.quaternion));
+ roomGuide='';updateRoomUI();updateHouseHint();perfDirty=true;
+ if(announce){openAdventure('room',index);}
 }
 function inspectHouseItem(index){
  if(index===-1){leaveHouse();return;}
@@ -1293,16 +1319,15 @@ function inspectHouseItem(index){
  if(roomChallengeIndex!==null){
   if(index===roomChallengeIndex){setRoomChallenge(null);chirp('win');toast('🌟 ✨');narrate('Đúng rồi! Đây là '+item.name+'. Giỏi quá!');}
   else{chirp('wrong');toast('💛');narrate('Đây là '+item.name+'. Mình tìm '+houseItems[roomChallengeIndex].name+' nhé!');}
- }else{toast(item.emoji+' ✨');narrate('Đây là '+item.name+'.');}
+ }else{if(!openAdventure('object',index)){toast(item.emoji+' ✨');narrate('Đây là '+item.name+'.');}}
  if(item.kind==='piano'&&progress.sound)chirp('win');
  if(item.kind==='clock'&&progress.sound)chirp();
 }
 function updateHouseHint(){
  let nearest=-2,dist=Infinity;
  houseItems.forEach((it,i)=>{const d=Math.hypot(player.position.x-it.x,player.position.z-it.z);if(d<dist){dist=d;nearest=i;}});
- const close=dist<2.1;$('actionButton').hidden=!close;
- if(close){$('actionText').textContent=houseItems[nearest].emoji;$('actionButton').dataset.icon=houseItems[nearest].emoji;$('actionButton').setAttribute('aria-label','Khám phá '+houseItems[nearest].name);}
- $('worldTag').textContent=ROOMS[activeRoom][1];
+ const close=dist<2.1;setHidden('actionButton',!close);
+ if(close){setText('actionText',houseItems[nearest].emoji);setIcon('actionButton',houseItems[nearest].emoji,'Khám phá '+houseItems[nearest].name);}
  return close?nearest:-2;
 }
 function tickRoomEffects(t){
@@ -1315,7 +1340,7 @@ function tickRoomEffects(t){
  }
 }
 function setupRooms(){
- const nav=$('roomNav');ROOMS.forEach(([name,emoji],i)=>{const b=document.createElement('button');b.type='button';b.dataset.room=i;b.textContent=emoji;b.title=name;b.setAttribute('aria-label',name);b.addEventListener('click',()=>switchRoom(i));nav.insertBefore(b,$('roomCounter'));});
+ const nav=$('roomNav');ROOMS.forEach(([name,emoji],i)=>{const b=document.createElement('button');b.type='button';b.dataset.room=i;b.textContent=emoji;b.title=name;b.setAttribute('aria-label',name);b.addEventListener('click',()=>{if(i!==activeRoom)switchRoom(i);});nav.insertBefore(b,$('roomCounter'));});
 }
 
 function stopMotion(){fishChase=null;keys.clear();joystickX=joystickY=0;stickPointer=null;autoTarget=null;houseTarget=null;window.__worldDrag=null;$('joystickKnob').style.transform='translate(0,0)';}
@@ -1327,13 +1352,13 @@ function enterHouse(){
  houseCamera.position.set(0,11,17);houseCamera.lookAt(0,1.1,0);
  setMode('house');switchRoom(0);
 }
-function leaveHouse(){
+function leaveHouse(ask=true){
  if(mode!=='house')return;
  stopMotion();stopSpeech();worldScene.add(player,playerShadow);
  player.position.set(insideReturn?.x??HOUSE.doorX,0,insideReturn?.z??HOUSE.doorZ+1.4);
  cameraYaw=insideReturn?.yaw??0;cameraPitch=13.4;
  worldCamera.position.set(player.position.x+Math.sin(cameraYaw)*19,cameraPitch,player.position.z+Math.cos(cameraYaw)*19);
- setMode('world');updateNearby();toast('🌼');narrate('Mình về vườn rồi!');
+ setMode('world');updateSeaUI();updateNearby();if(ask!==false)openAdventure('return');
 }
 function nearHome(){return Math.hypot(player.position.x-HOUSE.doorX,player.position.z-HOUSE.doorZ)<3.7;}
 function headHome(){if(mode!=='world')return;fishChase=null;if(nearHome()){enterHouse();return;}
@@ -1362,15 +1387,15 @@ function tickHouse(dt,t){
  }else legs.forEach(l=>l.position.y=smooth(l.position.y,.37,dt*8));
  player.position.y=0;playerShadow.position.set(player.position.x,.08,player.position.z);
  const aspect=innerWidth/innerHeight,mobile=aspect<.85;const dist=mobile?Math.max(18,17/aspect):14.7;
- houseCamera.position.lerp(new T.Vector3(player.position.x*(mobile?.10:.36), mobile?dist*.64:10.2,player.position.z*.18+dist),clamp(dt*5,0,1));
+ houseCamera.position.lerp(perfCameraTarget.set(player.position.x*(mobile?.10:.36),mobile?dist*.64:10.2,player.position.z*.18+dist),clamp(dt*5,0,1));
  houseCamera.lookAt(player.position.x*(mobile?.08:.25),1.25,player.position.z*.12);
  houseItems.forEach(it=>it.label.quaternion.copy(houseCamera.quaternion));
- tickRoomEffects(t);updateHouseHint();
+ tickRoomEffects(t);if(t-lastRoomHudTick>.09){lastRoomHudTick=t;updateHouseHint();}
 }
 function houseClick(e){
  const r=targetWorldPoint(e);const hits=r.intersectObjects(housePickers,false);
  if(hits.length){const i=hits[0].object.userData.item;if(i<=-10){inspectHouseItem(i);return;}
-  if(i>=0){const item=houseItems[i];inspectHouseItem(i);houseTarget={x:item.x,z:Math.min(5.6,item.z+1.85)};return;}}
+  if(i>=0){const item=houseItems[i];inspectHouseItem(i);if(!currentModal())houseTarget={x:item.x,z:Math.min(5.6,item.z+1.85)};return;}}
  const d=new T.Vector3();if(r.ray.intersectPlane(new T.Plane(new T.Vector3(0,1,0),0),d))houseTarget={x:clamp(d.x,-6.8,6.8),z:clamp(d.z,-5.1,5.8)};
 }
 function tickOcean(t){
@@ -1507,9 +1532,9 @@ function catchFish(i){
  f.cooldown=7;f.g.visible=false;
  const fresh=!progress.fish[f.type];progress.fish[f.type]=Math.min(99999,(progress.fish[f.type]||0)+1);persist();updateFishAlbum();chirp('win');
  const label=FISH_TYPES[f.type].name;
- toast('🐟 ✨');narrate('Gấu bắt được '+label+'. Mình thả cá về biển nhé!');
+ toast('🐟 ✨');
  const ripple=new T.Mesh(new T.RingGeometry(.6,.84,30),new T.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.85,side:T.DoubleSide,depthWrite:false}));ripple.rotation.x=-Math.PI/2;ripple.position.set(f.g.position.x,SEA_Y+.12,f.g.position.z);worldScene.add(ripple);fishRipples.push({mesh:ripple,life:0});
- return true;
+ openAdventure('fish',f.type);return true;
 }
 function findFish(){if(mode!=='world')return;const n=nearestFish();if(n.index!==null)chaseFish(n.index);else toast('🐟 Cá đang bơi trở lại, bé đợi một chút nhé!');}
 function tickFish(dt,t){
@@ -1524,6 +1549,157 @@ function tickFish(dt,t){
  for(let i=fishRipples.length-1;i>=0;i--){const r=fishRipples[i];r.life+=dt;r.mesh.scale.setScalar(1+r.life*2);r.mesh.material.opacity=Math.max(0,.85-r.life);if(r.life>1){worldScene.remove(r.mesh);r.mesh.geometry.dispose();r.mesh.material.dispose();fishRipples.splice(i,1);}}
 }
 function fishAlbum(open){$('fishAlbum').hidden=!open;if(open){clearTimeout(toastTimer);$('toast').classList.remove('show');fishChase=null;stopMotion();updateFishAlbum();$('fishAlbumClose').focus();}}
+
+// Static opaque meshes are batched by spatial cell and material side.
+// Original vertices, normals, object transforms and linear material colors are preserved.
+const perfBatchMaterials=new Map(),perfMatrix=T?new T.Matrix4():null,perfNormal=T?new T.Matrix3():null,perfV=T?new T.Vector3():null,perfN=T?new T.Vector3():null;
+const perfCameraTarget=T?new T.Vector3():null;
+let lastHudTick=0,lastRoomHudTick=0,previousModal=false,frameBudget=0,frameSlow=0,frameFast=0,perfDirty=true;
+function batchMaterial(side){
+ if(!perfBatchMaterials.has(side))perfBatchMaterials.set(side,new T.MeshLambertMaterial({vertexColors:true,side}));
+ return perfBatchMaterials.get(side);
+}
+function batchOpaque(root,exclude=new Set(),cellSize=0){
+ root.updateMatrixWorld(true);
+ const inverse=new T.Matrix4().copy(root.matrixWorld).invert(),groups=new Map();
+ function visit(o){
+  if(exclude.has(o)||!o.visible)return;
+  if(o.isMesh){
+   const m=o.material,g=o.geometry;
+   if(m&&!Array.isArray(m)&&m.isMeshLambertMaterial&&!m.transparent&&!m.map&&!m.vertexColors&&m.opacity===1&&!m.wireframe&&m.emissive?.getHex()===0&&g?.attributes?.normal&&g.attributes.position&&g.drawRange.count===Infinity){
+    perfMatrix.multiplyMatrices(inverse,o.matrixWorld);
+    const cell=cellSize?Math.floor(perfMatrix.elements[12]/cellSize)+':'+Math.floor(perfMatrix.elements[14]/cellSize):'all';
+    const key=cell+':'+m.side;let a=groups.get(key);if(!a)groups.set(key,a=[]);a.push(o);
+   }
+  }
+  for(const child of o.children)visit(child);
+ }
+ visit(root);
+ for(const objects of groups.values()){
+  if(objects.length<2)continue;
+  let vc=0,ic=0;
+  for(const o of objects){const g=o.geometry;vc+=g.attributes.position.count;ic+=g.index?g.index.count:g.attributes.position.count;}
+  const pos=new Float32Array(vc*3),norm=new Float32Array(vc*3),color=new Float32Array(vc*3),idx=vc>65535?new Uint32Array(ic):new Uint16Array(ic);
+  let vo=0,io=0;
+  for(const o of objects){
+   const g=o.geometry,p=g.attributes.position,n=g.attributes.normal,c=o.material.color;
+   perfMatrix.multiplyMatrices(inverse,o.matrixWorld);perfNormal.getNormalMatrix(perfMatrix);
+   for(let j=0;j<p.count;j++){
+    perfV.fromBufferAttribute(p,j).applyMatrix4(perfMatrix);perfN.fromBufferAttribute(n,j).applyNormalMatrix(perfNormal);
+    const k=(vo+j)*3;pos[k]=perfV.x;pos[k+1]=perfV.y;pos[k+2]=perfV.z;norm[k]=perfN.x;norm[k+1]=perfN.y;norm[k+2]=perfN.z;color[k]=c.r;color[k+1]=c.g;color[k+2]=c.b;
+   }
+   if(g.index){for(let j=0;j<g.index.count;j++)idx[io++]=vo+g.index.getX(j);}else{for(let j=0;j<p.count;j++)idx[io++]=vo+j;}
+   vo+=p.count;
+  }
+  const g=new T.BufferGeometry();g.setAttribute('position',new T.BufferAttribute(pos,3));g.setAttribute('normal',new T.BufferAttribute(norm,3));g.setAttribute('color',new T.BufferAttribute(color,3));g.setIndex(new T.BufferAttribute(idx,1));g.computeBoundingSphere();
+  const batch=new T.Mesh(g,batchMaterial(objects[0].material.side));batch.name='StaticBatch';batch.matrixAutoUpdate=false;batch.updateMatrix();root.add(batch);
+  // Keep original CPU pick/animation references only for objects explicitly excluded above.
+  for(const o of objects){o.removeFromParent();o.geometry.dispose();o.material.dispose();}
+ }
+}
+function invisiblePicker(m){if(m?.material)m.material.visible=false;}
+function optimizeWorld(){
+ const skip=new Set([player,playerShadow,seaMesh,houseDoor,...clouds,...bobbing.map(x=>x.mesh),...seaFish.map(f=>f.g),...seaWaves.map(w=>w.mesh)]);
+ for(const token of letterTokens){
+  skip.add(token.topper);skip.add(token.ring);skip.add(token.badge);skip.add(token.flower);skip.add(token.pick);
+  const flower=token.flower,was=flower.visible;flower.visible=true;batchOpaque(flower);flower.visible=was;
+  invisiblePicker(token.pick);
+ }
+ for(const f of seaFish){batchOpaque(f.g,new Set([f.tail,f.hit]));invisiblePicker(f.hit);}
+ invisiblePicker(houseDoor);
+ batchOpaque(worldScene,skip,5.5);
+}
+function optimizeRoom(){
+ const skip=new Set(houseItems.map(it=>it.g));
+ for(const it of houseItems){
+  const m=it.g.userData;
+  batchOpaque(it.g,new Set([it.label,it.halo,m.door,m.screen,m.light,m.water,m.lid].filter(Boolean)));
+ }
+ for(const pick of housePickers)if(pick.material?.opacity===0)invisiblePicker(pick);
+ // Door frames and floors are static; exclude the complete door groups for their picking positions.
+ for(const pick of housePickers)if(pick.userData.item<=-10&&pick.parent)skip.add(pick.parent);
+ batchOpaque(houseScene,skip,0);
+}
+function setText(id,value){const e=$(id);if(e.textContent!==value)e.textContent=value;}
+function setHidden(id,value){const e=$(id);if(e.hidden!==value)e.hidden=value;}
+function setIcon(id,icon,label){const e=$(id);if(e.dataset.icon!==icon)e.dataset.icon=icon;if(e.getAttribute('aria-label')!==label)e.setAttribute('aria-label',label);}
+function updateSeaUI(){const icon=swimming?'🏝️':'🌊',text=swimming?'Lên bờ':'Ra biển';setText('seaShortcut',icon+' '+text);setIcon('seaShortcut',icon,text);setHidden('findFishButton',!swimming);}
+function drawScene(){if(mode==='world')renderer.render(worldScene,worldCamera);else if(mode==='house')renderer.render(houseScene,houseCamera);else renderer.render(lessonScene,lessonCamera);}
+
+// Short, contextual picture quizzes after meaningful actions.
+let adventureQuestion=null,adventureLocked=false,adventureMistakes=0,adventureLastKey='',quizRewardDelay=0;
+const QUEST_POOL=[
+ ['🐟','cá'],['🐻','gấu'],['🌼','bông hoa'],['🌳','cây'],['🏡','ngôi nhà'],['🌊','biển'],['🛟','phao'],['🏝️','hòn đảo'],['🦋','bướm'],['🐦','chim'],
+ ['🍎','quả táo'],['🍌','quả chuối'],['🧸','gấu bông'],['🛏️','giường'],['🛋️','sofa'],['🍳','bếp'],['🛁','bồn tắm'],['🎨','phòng học'],['💡','đèn'],['📚','sách'],['🚪','cửa'],['⚽','quả bóng'],['🔤','chữ cái']
+];
+function shuffled(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function question(prompt,correct,alternatives,clue,explain=''){
+ const options=[correct];for(const x of [...shuffled(alternatives.slice()),...shuffled(QUEST_POOL.slice())])if(!options.some(a=>a[0]===x[0])){options.push(x);if(options.length===3)break;}
+ return {prompt,answer:correct[0],options:shuffled(options),clue,explain:explain||'Đúng rồi! Đây là '+correct[1]+'.'};
+}
+function makeAdventureQuestion(kind,detail){
+ switch(kind){
+ case 'garden':return question('Con tìm bông hoa trong vườn nhé!', ['🌼','bông hoa'],[['🐟','cá'],['🧸','gấu bông']],'🌼');
+ case 'return':return question('Gấu vừa trở về đâu?', ['🏝️','hòn đảo'],[['🛁','phòng tắm'],['🌊','biển']],'🐻 🏝️');
+ case 'lesson':return question('Bé vừa học chữ. Mình dùng gì để viết?', ['✏️','bút chì'],[['🍎','quả táo'],['🐟','cá']],'✏️');
+ case 'swim':return question('Gấu cần gì để giúp nổi trên mặt nước?', ['🛟','phao'],[['📚','sách'],['👟','giày']],'🐻 🌊','Đúng rồi! Phao giúp Gấu nổi. Bé nhớ chỉ xuống nước cùng người lớn nhé.');
+ case 'shore':return question('Gấu đã lên bờ. Con tìm hòn đảo nhé!', ['🏝️','hòn đảo'],[['🌊','biển'],['🛏️','giường']],'🏝️');
+ case 'fish': {
+  const variants=[
+   ()=>question('Con nào sống dưới nước?', ['🐟','cá'],[['🐻','gấu'],['🐦','chim']],'🌊'),
+   ()=>question('Gấu vừa bắt được gì?', ['🐟','cá'],[['🦋','bướm'],['🍎','quả táo']],'🐻 🌊'),
+   ()=>question('Bắt cá xong, mình thả cá về đâu?', ['🌊','biển'],[['🏡','ngôi nhà'],['🛏️','giường']],'🐟','Đúng rồi! Mình thả cá về biển.')
+  ];return variants[(progress.adventureCount||0)%variants.length]();
+ }
+ case 'room':{
+  const r=ROOMS[detail];
+  const clues=[['📺','🛋️'],['🛏️','🧸'],['🍳','🍎'],['🛁','🪥'],['🎨','📚']];
+  return question('Gấu đang ở '+r[0].toLowerCase()+'. Con chọn hình của phòng này nhé!',[r[1],r[0]],ROOMS.filter((_,i)=>i!==detail).map(x=>[x[1],x[0]]),clues[detail].join(' '));
+ }
+ case 'object': {
+  const it=houseItems[detail];if(!it)return null;
+  const nearby=houseItems.filter((_,i)=>i!==detail).map(x=>[x.emoji,x.name]);
+  const uses={fridge:['Tủ lạnh dùng để giữ mát thức ăn. Con tìm tủ lạnh nhé!','🧊'],lamp:['Khi trời tối, mình bật đồ vật nào?', '💡'],bath:['Mình có thể tắm ở đâu?', '🛁'],brush:['Bé dùng gì để chải răng?', '🪥'],book:['Bé dùng gì để xem hình và đọc truyện?', '📖'],bed:['Khi buồn ngủ, Gấu nằm ở đâu?', '🛏️'],sink:['Mình rửa tay ở đâu?', '🚰']};
+  const pair=uses[it.kind];
+  return question(pair?pair[0]:'Bé vừa chạm vào '+it.name+'. Con tìm hình đó nhé!',[it.emoji,it.name],nearby,pair?pair[1]:it.emoji);
+ }
+ default:return null;
+ }
+}
+function replayAdventure(){if(adventureQuestion&&!adventureLocked)narrate(adventureQuestion.prompt);}
+function openAdventure(kind,detail){
+ if(currentModal()||adventureQuestion)return false;
+ const q=makeAdventureQuestion(kind,detail);if(!q)return false;
+ // State transitions and intentional interactions trigger quizzes; walking and utility buttons do not.
+ adventureQuestion=q;adventureLocked=false;adventureMistakes=0;
+ clearTimeout(toastTimer);$('toast').classList.remove('show');
+ keys.clear();joystickX=joystickY=0;stickPointer=null;$('joystickKnob').style.transform='translate(0,0)';
+ $('adventureClue').textContent=q.clue;$('adventureResult').textContent='❔';$('adventureContinue').hidden=true;
+ const opts=$('adventureOptions');opts.replaceChildren();
+ q.options.forEach(([emoji,name])=>{
+  const b=document.createElement('button');b.type='button';b.textContent=emoji;b.dataset.answer=emoji;b.setAttribute('aria-label',name);b.addEventListener('click',()=>answerAdventure(b,emoji));opts.append(b);
+ });
+ $('adventureQuestionText').textContent=q.prompt;
+ $('adventureOverlay').hidden=false;perfDirty=true;
+ chirp();replayAdventure();$('adventureReplay').focus({preventScroll:true});return true;
+}
+function answerAdventure(button,value){
+ if(!adventureQuestion||adventureLocked)return;
+ if(value===adventureQuestion.answer){
+  adventureLocked=true;button.classList.add('correct');$('adventureResult').textContent='🌟';$('adventureContinue').hidden=false;
+  for(const b of $('adventureOptions').children)b.disabled=true;
+  progress.adventureCount=Math.min(99999,(progress.adventureCount||0)+1);persist();setText('adventureCount',String(progress.adventureCount));chirp('win');narrate(adventureQuestion.explain);
+  $('adventureContinue').focus({preventScroll:true});
+ }else{
+  adventureMistakes++;button.classList.add('retry');$('adventureResult').textContent='💛';chirp('wrong');
+  narrate('Thử lại nhé! '+adventureQuestion.prompt);
+  if(adventureMistakes>=2)for(const b of $('adventureOptions').children)if(b.dataset.answer===adventureQuestion.answer)b.classList.add('hint');
+ }
+}
+function closeAdventure(){
+ if(!adventureQuestion)return;
+ adventureQuestion=null;adventureLocked=false;$('adventureOverlay').hidden=true;stopSpeech();perfDirty=true;
+}
 
 function buildWorld(){
  createSky();addIsland();addOcean();addFish();makeRainbow();makeAvatar();addLetterTokens();makeHouseExterior();buildHouseInterior();
@@ -1556,14 +1732,14 @@ function initRenderer(){
  renderer.toneMappingExposure=1.05;
  raycaster=new T.Raycaster();
  mouse=new T.Vector2();
- buildWorld();
+ buildWorld();optimizeWorld();
  buildLessonScene();
  resize();
 }
-function currentModal(){return !$('fishAlbum').hidden||!$('installOverlay').hidden||!$('welcome').hidden||!$('mapOverlay').hidden||!$('helpOverlay').hidden||!$('winOverlay').hidden||!$('dictationOverlay').hidden;}
+function currentModal(){return !$('adventureOverlay').hidden||!$('fishAlbum').hidden||!$('installOverlay').hidden||!$('welcome').hidden||!$('mapOverlay').hidden||!$('helpOverlay').hidden||!$('winOverlay').hidden||!$('dictationOverlay').hidden;}
 function setMode(next){
  if(mode!==next){clearTimeout(toastTimer);$('toast').classList.remove('show');}
- mode=next;document.body.dataset.mode=next;
+ mode=next;perfDirty=true;document.body.dataset.mode=next;
  if(next!=='house'){setRoomChallenge(null);$('roomGameButton').hidden=true;$('roomLessonButton').hidden=true;}
  $('roomNav').hidden=next!=='house';
  const garden=next==='world'||next==='house',listen=next==='listen',trace=next==='trace';
@@ -1643,21 +1819,16 @@ function nearestLetter(){
  return {index,dist};
 }
 function updateNearby(){
- const near=nearestLetter();
  if(swimming){
-  const fish=nearestFish();const close=fish.index!==null&&fish.dist<=FISH_RADIUS;
-  $('actionButton').hidden=!close;
-  if(close){$('actionText').textContent='BẮT CÁ';$('actionButton').dataset.icon='🐟';$('actionButton').setAttribute('aria-label','Bắt cá');}
-  $('worldTag').textContent=fishChase!==null?'🐟 Gấu đang đuổi theo cá!':close?'🐟 Bấm BẮT CÁ hoặc chạm vào cá':'🌊 Gấu đang bơi · chạm cá để bắt';
+  const fish=nearestFish(),close=fish.index!==null&&fish.dist<=FISH_RADIUS;
+  setHidden('actionButton',!close);
+  if(close){setText('actionText','BẮT CÁ');setIcon('actionButton','🐟','Bắt cá');}
   return;
  }
- const home=nearHome(),index=near.dist<=3.6&&!swimming?near.index:-1;
- actionIndex=index;
- $('actionButton').hidden=mode!=='world'||(!home&&index<0);
- if(home){$('actionText').textContent='VÀO NHÀ';$('actionButton').dataset.icon='🏡';$('actionButton').setAttribute('aria-label','Vào nhà');}
- else if(index>=0){$('actionText').textContent='CHỮ '+LETTERS[index][0];$('actionButton').dataset.icon=LETTERS[index][0];$('actionButton').setAttribute('aria-label','Học chữ '+LETTERS[index][0]);}
- if(autoTarget)return;
- $('worldTag').textContent=swimming?'🌊 Gấu đang bơi · hướng vào bờ để lên đảo':home?'🏡 Chạm VÀO NHÀ để khám phá':index>=0?'✨ Chạm HỌC CHỮ để luyện chữ '+LETTERS[index][0]:'🌼 Khám phá vườn, nhà Gấu và biển xanh';
+ const near=nearestLetter(),home=nearHome(),index=near.dist<=3.6?near.index:-1;
+ actionIndex=index;setHidden('actionButton',mode!=='world'||(!home&&index<0));
+ if(home){setText('actionText','VÀO NHÀ');setIcon('actionButton','🏡','Vào nhà');}
+ else if(index>=0){setText('actionText','CHỮ '+LETTERS[index][0]);setIcon('actionButton',LETTERS[index][0],'Học chữ '+LETTERS[index][0]);}
 }
 function tickWorld(dt,t){
  if(mode!=='world')return;
@@ -1717,14 +1888,13 @@ function tickWorld(dt,t){
   bearHead.rotation.z*=.91;
  }
  const wasSwimming=swimming;swimming=seaAt(player.position.x,player.position.z);
- if(wasSwimming!==swimming){if(swimming&&autoTarget)cameraYaw=Math.atan2(-player.position.x,-player.position.z);chirp('happy');toast(swimming?'🌊 Gấu xuống nước và bắt đầu bơi!':'🏝️ Gấu đã lên bờ!');}
+ if(wasSwimming!==swimming){if(swimming&&autoTarget)cameraYaw=Math.atan2(-player.position.x,-player.position.z);updateSeaUI();openAdventure(swimming?'swim':'shore');}
  player.position.y=smooth(player.position.y,swimming?SEA_Y-.66+Math.sin(t*3)*.10:0,dt*9);
  swimRing.visible=swimming;playerShadow.visible=!swimming;
- $('seaShortcut').textContent=swimming?'🏝️ Lên bờ':'🌊 Ra biển';$('seaShortcut').dataset.icon=swimming?'🏝️':'🌊';$('seaShortcut').setAttribute('aria-label',swimming?'Lên bờ':'Ra biển');
- $('findFishButton').hidden=!swimming;
+ if(wasSwimming!==swimming)updateSeaUI();
  arms.forEach((arm,i)=>{arm.rotation.x=swimming?Math.sin(t*5+i*Math.PI)*.8:0;arm.rotation.z=swimming?(i?-.68:.68):0});
  playerShadow.position.set(player.position.x,.08,player.position.z);
- const targetPosition=new T.Vector3(
+ const targetPosition=perfCameraTarget.set(
   player.position.x+Math.sin(cameraYaw)*(swimming?14:19),swimming?Math.max(17,cameraPitch):cameraPitch,
   player.position.z+Math.cos(cameraYaw)*(swimming?14:19));
  worldCamera.position.lerp(targetPosition,clamp(dt*4,0,1));
@@ -1740,7 +1910,7 @@ function tickWorld(dt,t){
   cloud.position.y+=Math.sin(t+cloud.userData.seed)*dt*.045;
  });
  bobbing.forEach(({mesh,base,phase})=>{mesh.position.y=base+Math.sin(t*1.4+phase)*.17;});
- updateNearby();
+ if(t-lastHudTick>.09){lastHudTick=t;updateNearby();}
 }
 
 
@@ -2058,7 +2228,7 @@ function createQuizChoices(){
   label.position.z=.075;group.add(label);
   const hit=new T.Mesh(new T.BoxGeometry(portrait?2.9:2.6,portrait?2.95:3.2,.65),
    new T.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:0,depthWrite:false}));
-  hit.position.z=.15;hit.userData.choice=wordMode?value:letter;hit.userData.index=i;group.add(hit);
+  hit.position.z=.15;hit.userData.choice=wordMode?value:letter;hit.userData.index=i;group.add(hit);invisiblePicker(hit);
   quizGroup.add(group);quizPickers.push(hit);
  });
 }
@@ -2073,7 +2243,7 @@ function layoutQuiz(){
 }
 function openLesson(i){
  if(i<0||i>=29)return;
- if(mode==='house')leaveHouse();
+ if(mode==='house')leaveHouse(false);
  stopMotion();
  stopListening();closeDictation();
  guideDemo=null;guideCanvasState=null;guideStep=0;guideCompletion=[];
@@ -2173,10 +2343,10 @@ function quitLesson(){
  clearTimeout(winTimer);tracePointer=null;currentStroke=null;quizPointer=null;
  $('winOverlay').hidden=true;
  boardMesh.visible=false;lessonFrame.visible=false;quizGroup.visible=false;
- setMode('world');updateNearby();
+ setMode('world');updateNearby();openAdventure('lesson');
 }
 function resize(){
- if(!renderer)return;
+ if(!renderer)return;perfDirty=true;
  renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,innerWidth<=650?1.25:1.75));
  renderer.setSize(innerWidth,innerHeight,false);
  worldCamera.aspect=innerWidth/innerHeight;
@@ -2257,6 +2427,7 @@ function pointerUp(e,cancel=false){
  }
 }
 function pressAction(){
+ if(currentModal())return;
  if(mode==='house'){const index=updateHouseHint();if(index!==-2)inspectHouseItem(index);return;}
  if(mode!=='world')return;
  if(swimming){const f=nearestFish();if(f.index!==null&&!catchFish(f.index))chaseFish(f.index);return;}
@@ -2313,38 +2484,37 @@ function beginPlay(){
  $('welcome').hidden=true;
  setMode('world');
  updateNearby();
- toast('🌈');narrate('Chào bé! Chạm vào chữ cái, ngôi nhà hoặc biển để chơi cùng Gấu nhé.');
+ openAdventure('garden');
 }
 function renderFrame(now){
  requestAnimationFrame(renderFrame);
- const framePeriod=innerWidth<=650?33:22;
- if(now-lastRendered<framePeriod)return;
- lastRendered=now;
- const t=now*.001,dt=clamp((now-lastTime)*.001||.016,0,.07);
- lastTime=now;animTime=t;
- if(mode==='world')tickWorld(dt,t);
- else if(mode==='house')tickHouse(dt,t);
- else{
-  if(mode==='trace'&&guideDemo)updateGuideDemo(dt);
-  for(const item of bobbing)if(item.lesson){
-   item.mesh.position.y=item.base+Math.sin(t*1.4+item.phase)*.14;
-   item.mesh.rotation.y+=dt*.2;
+ if(document.hidden){lastTime=now;return;}
+ const modal=currentModal();
+ if(modal&&previousModal&&!perfDirty){lastTime=now;return;}
+ const elapsed=now-lastRendered;
+ // Adapt only cadence, never changing resolution, anti-aliasing, or mesh detail.
+ if(!modal&&!perfDirty&&frameBudget&&elapsed<frameBudget-1.2)return;
+ const dt=clamp((now-lastTime)*.001||.016,0,.10),t=now*.001;
+ lastTime=now;lastRendered=now;animTime=t;
+ if(!modal){
+  if(!previousModal&&elapsed>42&&elapsed<180){frameSlow++;frameFast=0;}
+  else if(elapsed<39){frameFast++;frameSlow=Math.max(0,frameSlow-1);}
+  if(frameSlow>=12){frameBudget=1000/30;frameSlow=0;}
+  // Retry higher cadence after sustained stable rendering.
+  if(frameBudget&&frameFast>=150){frameBudget=0;frameFast=0;}
+  if(mode==='world')tickWorld(dt,t);
+  else if(mode==='house')tickHouse(dt,t);
+  else{
+   if(mode==='trace'&&guideDemo)updateGuideDemo(dt);
+   for(const item of bobbing)if(item.lesson){item.mesh.position.y=item.base+Math.sin(t*1.4+item.phase)*.14;item.mesh.rotation.y+=dt*.2;}
+   if(mode==='quiz'||mode==='word')quizGroup.children.forEach((group,i)=>{group.position.z=Math.sin(t*2+i)*.085;group.rotation.y=Math.sin(t*.8+i)*.035;});
   }
-  if(mode==='quiz'||mode==='word')quizGroup.children.forEach((group,i)=>{
-   group.position.z=Math.sin(t*2+i)*.085;
-   group.rotation.y=Math.sin(t*.8+i)*.035;
-  });
  }
- try{
-  if(mode==='world')renderer.render(worldScene,worldCamera);
-  else if(mode==='house')renderer.render(houseScene,houseCamera);
-  else renderer.render(lessonScene,lessonCamera);
- }catch(error){
-  // A lost WebGL context is handled by the browser's restoration hooks.
-  if(!window.__webglErrorLogged){window.__webglErrorLogged=true;console.warn('WebGL render error',error);}
- }
+ previousModal=currentModal();perfDirty=false;
+ try{drawScene();}catch(error){if(!window.__webglErrorLogged){window.__webglErrorLogged=true;console.warn('WebGL render error',error);}}
 }
 function setupControls(){
+ $('adventureReplay').addEventListener('click',replayAdventure);$('adventureContinue').addEventListener('click',closeAdventure);$('adventureSkip').addEventListener('click',closeAdventure);
  setupRooms();$('roomGameButton').addEventListener('click',startRoomChallenge);$('roomChallenge').addEventListener('click',replayRoomChallenge);$('roomLessonButton').addEventListener('click',()=>{const i=LETTERS.findIndex((_,n)=>!progress.best[n]);openLesson(i<0?0:i);});$('playButton').addEventListener('click',beginPlay);
  $('homeShortcut').addEventListener('click',headHome);
  $('seaShortcut').addEventListener('click',headSea);
@@ -2407,6 +2577,7 @@ function setupControls(){
  document.addEventListener('keydown',e=>{
   const key=e.key.toLowerCase();
   if(key==='escape'){
+   if(!$('adventureOverlay').hidden){closeAdventure();return;}
    if(!$('fishAlbum').hidden){fishAlbum(false);return;}
    if(!$('installOverlay').hidden){$('installOverlay').hidden=true;return;}
    if(!$('dictationOverlay').hidden){closeDictation();return;}
