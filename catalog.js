@@ -145,6 +145,28 @@ window.HTML_LAB_CATALOG = {
       "order": 0
     },
     {
+      "path": "orca.html",
+      "title": "Orca Desktop — Agent Runtime Lab",
+      "description": "Khám phá Orca Desktop, remote runtime, terminal daemon, PTY, CLI agents và orchestration qua mô phỏng tương tác.",
+      "category": "AI & Phần mềm",
+      "parent": "",
+      "groupTitle": "",
+      "groupDescription": "",
+      "linkTitle": "",
+      "tags": [
+        "Orca",
+        "AI Agent",
+        "CLI",
+        "PTY",
+        "Runtime",
+        "Orchestration"
+      ],
+      "icon": "🐋",
+      "theme": "violet",
+      "featured": false,
+      "order": 0
+    },
+    {
       "path": "paperclip.html",
       "title": "Paperclip — AI Agent Runtime Lab",
       "description": "Khám phá cách Paperclip điều phối AI agent, gọi Codex, Claude, Gemini, quản lý session, adapter, heartbeat và task checkout bằng mô phỏng tương tác.",

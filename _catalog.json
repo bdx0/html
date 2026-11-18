@@ -297,5 +297,10 @@
     "order": 1,
     "parent": "vuon-chu-cai.html",
     "linkTitle": "Nét vẽ — bảng vẽ & luyện viết"
+  },
+  "orca.html": {
+    "category": "AI & Phần mềm",
+    "theme": "violet",
+    "order": 0
   }
 }
