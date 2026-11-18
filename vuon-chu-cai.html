@@ -225,6 +225,10 @@ body[data-mode="house"] .explore-tools{top:calc(151px + env(safe-area-inset-top)
 .quest-count{min-width:58px;font-variant-numeric:tabular-nums}
 @media(max-width:420px){.hud-actions{gap:4px}.hud-pill.quest-count{padding:0 6px;min-width:35px}.quest-count span{font-size:12px}.quest-card{padding:13px;border-radius:27px}.quest-top button{width:48px;height:48px}#adventureSkip{width:35px;height:35px}}
 @media(max-height:530px){.quest-card{max-width:390px;padding:9px}.quest-top button{width:35px;height:35px;font-size:21px}#adventureClue{min-height:65px;font-size:50px;margin:7px 0}#adventureOptions button{max-height:85px;font-size:43px}#adventureContinue{height:45px;margin:10px 0 0;font-size:28px}}
+#adventureClue{white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word;padding:10px;max-width:100%;box-sizing:border-box}
+#adventureClue.counting{font-size:clamp(30px,8.2vw,45px);line-height:1.45;display:block;min-height:112px;overflow-wrap:anywhere}
+#adventureOptions button.school-answer{font-size:clamp(27px,8.3vw,43px);overflow-wrap:anywhere;font-weight:850;color:#554682}
+#gradeQuizButton{cursor:pointer}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 <script src="./assets/three.min.js"></script>
@@ -234,7 +238,7 @@ body[data-mode="house"] .explore-tools{top:calc(151px + env(safe-area-inset-top)
 <div id="shade"></div>
 <header class="hud">
   <div class="brand"><span class="logo">🌈</span><span class="brand-text"><strong>VƯỜN CHỮ CÁI 3D</strong><small>HÀNH TRÌNH CÙNG GẤU</small></span></div>
-  <div class="hud-actions"><div class="hud-pill" title="Tổng số sao"><span>⭐</span><span id="starTotal">0</span></div><div class="hud-pill quest-count" title="Câu đố đã giải" aria-label="Câu đố đã giải"><span>🧩</span><span id="adventureCount">0</span></div><button id="mapButton" class="hud-btn" title="Bản đồ chữ cái" aria-label="Mở bản đồ 29 chữ">🗺️</button><button id="soundButton" class="hud-btn" title="Âm thanh" aria-label="Bật hoặc tắt âm thanh" aria-pressed="true">🔊</button><button id="helpButton" class="hud-btn" title="Cách chơi" aria-label="Cách chơi">❔</button></div>
+  <div class="hud-actions"><div class="hud-pill" title="Tổng số sao"><span>⭐</span><span id="starTotal">0</span></div><button id="gradeQuizButton" type="button" class="hud-pill quest-count" title="Câu đố lớp 1" aria-label="Chơi câu đố lớp 1"><span>🧩</span><span id="adventureCount">0</span></button><button id="mapButton" class="hud-btn" title="Bản đồ chữ cái" aria-label="Mở bản đồ 29 chữ">🗺️</button><button id="soundButton" class="hud-btn" title="Âm thanh" aria-label="Bật hoặc tắt âm thanh" aria-pressed="true">🔊</button><button id="helpButton" class="hud-btn" title="Cách chơi" aria-label="Cách chơi">❔</button></div>
 </header>
 <div id="exploreTools" class="explore-tools" hidden>
  <button id="homeShortcut" type="button" data-icon="🏡" aria-label="Nhà Gấu">🏡 Nhà Gấu</button>
@@ -327,7 +331,7 @@ body[data-mode="house"] .explore-tools{top:calc(151px + env(safe-area-inset-top)
     <h2 id="helpTitle">🎮 Cách chơi</h2>
     <ol><li>Dùng các phím <b>W A S D / mũi tên</b> hoặc cần ảo để điều khiển Gấu Bông.</li><li>Chạm vào chữ nổi trong khu vườn, Gấu sẽ tự đi tới chữ đó. Có thể mở bản đồ 🗺️ để chọn nhanh.</li><li><b>Nghe chậm</b> rồi bấm 🎤 Bé đọc. Trình duyệt có nhận dạng tiếng nói sẽ nghe và trả lời; trên iPad có thể dùng nút 🎙️ của bàn phím để đọc và nhận phản hồi.</li><li><b>Tô chữ</b> trên bảng phép thuật, có thể tẩy và làm lại.</li><li><b>Tìm chữ</b> đúng trong 4 khối 3D, rồi <b>tìm đồ vật</b> tương ứng với từ vừa nghe.</li><li>Hoàn thành 4 thử thách để nhận 1–3 ⭐ và làm một bông hoa trong khu vườn nở rộ!</li></ol>
     <p>Bảng tập viết có ô ly, điểm đặt bút, mũi tên, tên từng nét và nút mô phỏng cách viết. Các nét vector được biên dựng để tham khảo mẫu chữ tiểu học Việt Nam; nên đối chiếu thêm với mẫu trường bé đang học. Nếu cấp quyền micro, dịch vụ nhận dạng của trình duyệt có thể xử lý âm thanh; game không tự lưu bản ghi âm. Phản hồi giọng nói chỉ dựa vào từ nhận dạng được, chưa đánh giá chính xác phát âm.</p>
-    <p>🏡 Vào nhà Gấu để khám phá đồ vật. 🌊 Đi xuống biển để bơi, chạm cá để Gấu đuổi bắt hoặc nhấn Bắt cá khi đến gần; cá được thả lại biển và ghi vào Sổ cá. ♫ Tắt/bật nhạc nền riêng. 🧩 Sau khi khám phá hoặc chuyển cảnh, bé nghe và chọn một trong ba hình để trả lời; có thể nghe lại hoặc bỏ qua.</p>
+    <p>🏡 Vào nhà Gấu để khám phá đồ vật. 🌊 Đi xuống biển để bơi, chạm cá để Gấu đuổi bắt hoặc nhấn Bắt cá khi đến gần; cá được thả lại biển và ghi vào Sổ cá. ♫ Tắt/bật nhạc nền riêng. 🧩 Câu đố lớp 1 xuất hiện thỉnh thoảng khi khám phá; bấm 🧩 để chơi thêm, nghe lại hoặc bỏ qua.</p>
  <div class="modal-actions"><button id="installButton" type="button" data-icon="📲" aria-label="Cài game">📲 Cài game</button><button id="helpClose" class="cta" type="button" data-icon="✓" aria-label="Đóng hướng dẫn">Đã hiểu, chơi thôi!</button></div>
   </section>
 </div>
@@ -625,7 +629,7 @@ const VOICE_SPEEDS=[
  {id:'medium',label:'🐇 Vừa',rate:.76,pause:650},
  {id:'fast',label:'🚀 Nhanh',rate:.92,pause:450}
 ];
-let progress={best:{},sound:true,speechSpeed:'slow',music:true,fish:{},rooms:{},adventureCount:0};
+let progress={best:{},sound:true,speechSpeed:'slow',music:true,fish:{},rooms:{},adventureCount:0,gradeQuestionIndex:0};
 let mode='world',level=0,traceScore=0,attempts=0,quizMistakes=0,wordMistakes=0,won=false;
 let quizSolved=false,wordSolved=false,previouslyLearned=false,speechToken=0,speechTimer=0,voiceWarning=false;
 let targetIndex=-1,actionIndex=-1,autoTarget=null;
@@ -664,6 +668,7 @@ function loadProgress(){
    if(typeof data.sound==='boolean')progress.sound=data.sound;
    if(typeof data.music==='boolean')progress.music=data.music;
    if(Number.isInteger(data.adventureCount)&&data.adventureCount>=0)progress.adventureCount=Math.min(99999,data.adventureCount);
+   if(Number.isSafeInteger(data.gradeQuestionIndex)&&data.gradeQuestionIndex>=0)progress.gradeQuestionIndex=data.gradeQuestionIndex%1000000;
    if(data.rooms&&typeof data.rooms==='object')for(let r=0;r<5;r++)for(let i=0;i<8;i++)if(data.rooms[r+':'+i]===true)progress.rooms[r+':'+i]=true;
    if(data.fish&&typeof data.fish==='object')for(let i=0;i<6;i++){const n=data.fish[i];if(Number.isInteger(n)&&n>0)progress.fish[i]=Math.min(99999,n);}
    if(VOICE_SPEEDS.some(item=>item.id===data.speechSpeed))progress.speechSpeed=data.speechSpeed;
@@ -1302,7 +1307,7 @@ function switchRoom(index,announce=true){
  houseScene.add(player,playerShadow);player.position.set(0,0,1.25);player.rotation.set(0,Math.PI,0);playerShadow.visible=true;playerShadow.position.set(0,.08,1.25);
  const aspect=innerWidth/innerHeight,mobile=aspect<.85,dist=mobile?Math.max(18,17/aspect):14.7;houseCamera.position.set(0,mobile?dist*.64:10.2,dist+.23);houseCamera.lookAt(0,1.25,.15);houseItems.forEach(it=>it.label.quaternion.copy(houseCamera.quaternion));
  roomGuide='';updateRoomUI();updateHouseHint();perfDirty=true;
- if(announce){openAdventure('room',index);}
+ if(announce&&!openAdventure('room',index)){toast(ROOMS[index][1]);narrate('Đây là '+ROOMS[index][0]+'. Bé chạm vào đồ vật để khám phá nhé.');}
 }
 function inspectHouseItem(index){
  if(index===-1){leaveHouse();return;}
@@ -1358,7 +1363,7 @@ function leaveHouse(ask=true){
  player.position.set(insideReturn?.x??HOUSE.doorX,0,insideReturn?.z??HOUSE.doorZ+1.4);
  cameraYaw=insideReturn?.yaw??0;cameraPitch=13.4;
  worldCamera.position.set(player.position.x+Math.sin(cameraYaw)*19,cameraPitch,player.position.z+Math.cos(cameraYaw)*19);
- setMode('world');updateSeaUI();updateNearby();if(ask!==false)openAdventure('return');
+ setMode('world');updateSeaUI();updateNearby();if(ask!==false){toast('🌼');narrate('Mình về vườn rồi!');}
 }
 function nearHome(){return Math.hypot(player.position.x-HOUSE.doorX,player.position.z-HOUSE.doorZ)<3.7;}
 function headHome(){if(mode!=='world')return;fishChase=null;if(nearHome()){enterHouse();return;}
@@ -1534,7 +1539,7 @@ function catchFish(i){
  const label=FISH_TYPES[f.type].name;
  toast('🐟 ✨');
  const ripple=new T.Mesh(new T.RingGeometry(.6,.84,30),new T.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.85,side:T.DoubleSide,depthWrite:false}));ripple.rotation.x=-Math.PI/2;ripple.position.set(f.g.position.x,SEA_Y+.12,f.g.position.z);worldScene.add(ripple);fishRipples.push({mesh:ripple,life:0});
- openAdventure('fish',f.type);return true;
+ if(!openAdventure('fish',f.type))narrate('Gấu bắt được '+label+'. Mình thả cá về biển nhé!');return true;
 }
 function findFish(){if(mode!=='world')return;const n=nearestFish();if(n.index!==null)chaseFish(n.index);else toast('🐟 Cá đang bơi trở lại, bé đợi một chút nhé!');}
 function tickFish(dt,t){
@@ -1626,58 +1631,103 @@ function setIcon(id,icon,label){const e=$(id);if(e.dataset.icon!==icon)e.dataset
 function updateSeaUI(){const icon=swimming?'🏝️':'🌊',text=swimming?'Lên bờ':'Ra biển';setText('seaShortcut',icon+' '+text);setIcon('seaShortcut',icon,text);setHidden('findFishButton',!swimming);}
 function drawScene(){if(mode==='world')renderer.render(worldScene,worldCamera);else if(mode==='house')renderer.render(houseScene,houseCamera);else renderer.render(lessonScene,lessonCamera);}
 
-// Short, contextual picture quizzes after meaningful actions.
-let adventureQuestion=null,adventureLocked=false,adventureMistakes=0,adventureLastKey='',quizRewardDelay=0;
-const QUEST_POOL=[
- ['🐟','cá'],['🐻','gấu'],['🌼','bông hoa'],['🌳','cây'],['🏡','ngôi nhà'],['🌊','biển'],['🛟','phao'],['🏝️','hòn đảo'],['🦋','bướm'],['🐦','chim'],
- ['🍎','quả táo'],['🍌','quả chuối'],['🧸','gấu bông'],['🛏️','giường'],['🛋️','sofa'],['🍳','bếp'],['🛁','bồn tắm'],['🎨','phòng học'],['💡','đèn'],['📚','sách'],['🚪','cửa'],['⚽','quả bóng'],['🔤','chữ cái']
-];
+// Grade-one practice is deliberately occasional. Time advances only during active discovery.
+let adventureQuestion=null,adventureLocked=false,adventureMistakes=0;
+let freePlaySeconds=0,discoveryActions=0,autoQuizShown=false,gradeRecent=[];
+const FIRST_QUIZ_SECONDS=75,REPEAT_QUIZ_SECONDS=120,FIRST_ACTIONS=3,REPEAT_ACTIONS=4;
+const eligibleDiscovery=new Set(['room','object','fish']);
 function shuffled(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
-function question(prompt,correct,alternatives,clue,explain=''){
- const options=[correct];for(const x of [...shuffled(alternatives.slice()),...shuffled(QUEST_POOL.slice())])if(!options.some(a=>a[0]===x[0])){options.push(x);if(options.length===3)break;}
- return {prompt,answer:correct[0],options:shuffled(options),clue,explain:explain||'Đúng rồi! Đây là '+correct[1]+'.'};
+const rand=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const pick=a=>a[rand(0,a.length-1)];
+function question(prompt,correct,alternatives,clue,explain,subject){
+ const options=[correct,...shuffled(alternatives.filter(x=>x[0]!==correct[0])).slice(0,2)];
+ return {prompt,answer:correct[0],options:shuffled(options),clue,explain,subject};
 }
+function numberQuestion(prompt,n,clue,explain,limit=20){
+ const wrong=shuffled(Array.from({length:limit+1},(_,i)=>i).filter(i=>i!==n&&Math.abs(i-n)<=3)).slice(0,2);
+ return question(prompt,[String(n),String(n)],wrong.map(i=>[String(i),String(i)]),clue,explain,'math');
+}
+const GRADE_PICTURES=[['🐟','cá'],['🐻','gấu'],['🌼','hoa'],['🌳','cây'],['🍎','táo'],['🍌','chuối'],['⚽','bóng'],['🦋','bướm'],['🐦','chim'],['📚','sách'],['✏️','bút'],['🐱','mèo'],['🐶','chó'],['🐔','gà'],['🦆','vịt'],['🍐','lê'],['🥕','cà rốt'],['🍇','nho']];
+const LETTER_PAIRS=[['🐟','cá','c'],['🐻','gấu','g'],['🌼','hoa','h'],['🍎','táo','t'],['⚽','bóng','b'],['📚','sách','s'],['🐱','mèo','m'],['🦆','vịt','v'],['🍐','lê','l'],['🐔','gà','g'],['🦋','bướm','b'],['✏️','bút','b']];
+const RHYME_PAIRS=[
+ ['ăng',['🌙','trăng'],[['🐟','cá'],['🐱','mèo']]],
+ ['ao',['⭐','sao'],[['🐔','gà'],['🐟','cá']]],
+ ['ong',['🐝','ong'],[['🐶','chó'],['🍎','táo']]],
+ ['a',['🐔','gà'],[['🐱','mèo'],['🦆','vịt']]],
+ ['eo',['🐱','mèo'],[['🐟','cá'],['🐔','gà']]],
+ ['ê',['🍐','lê'],[['🐟','cá'],['⚽','bóng']]]
+];
+const LIFE=[ 
+ ['Trước khi ăn, bé nên làm gì?',['🧼','rửa tay bằng xà phòng'],[['⚽','đá bóng'],['📺','xem tivi']],'🍽️','Đúng rồi! Rửa tay bằng xà phòng trước khi ăn.'],
+ ['Bé dùng gì để chải răng?',['🪥','bàn chải'],[['✏️','bút chì'],['🥄','thìa']],'😁','Đúng rồi! Bàn chải giúp giữ răng sạch.'],
+ ['Bộ phận nào giúp bé nhìn?',['👀','mắt'],[['👂','tai'],['👃','mũi']],'🐻','Đúng rồi! Mắt giúp bé nhìn.'],
+ ['Bộ phận nào giúp bé nghe?',['👂','tai'],[['👀','mắt'],['👃','mũi']],'🔔','Đúng rồi! Tai giúp bé nghe.'],
+ ['Con nào sống dưới nước?',['🐟','cá'],[['🐔','gà'],['🐱','mèo']],'🌊','Đúng rồi! Cá sống dưới nước.'],
+ ['Cây cần gì để sống và lớn lên?',['💧','nước'],[['🧸','gấu bông'],['🖍️','bút màu']],'🌱','Đúng rồi! Cây cần nước, ánh sáng và không khí.'],
+ ['Gặp đèn giao thông màu đỏ, bé phải chọn hành động nào?',['✋','dừng lại'],[['🏃','chạy qua'],['🚲','đi tiếp']],'🚦','Đúng rồi! Bé dừng lại khi đèn đỏ.'],
+ ['Trời mưa, vật nào giúp bé không bị ướt?',['☂️','ô'],[['🧸','gấu bông'],['📚','sách']],'🌧️','Đúng rồi! Ô giúp che mưa.'],
+ ['Rác nên bỏ vào đâu?',['🗑️','thùng rác'],[['🌊','biển'],['🛏️','giường']],'🍬','Đúng rồi! Bỏ rác vào thùng rác.'],
+ ['Bé dùng gì để viết bài ở trường?',['✏️','bút chì'],[['🥄','thìa'],['🪥','bàn chải']],'🏫','Đúng rồi! Bút chì dùng để viết.'],
+ ['Khi xuống nước, bé nên ở cùng ai?',['🧑','người lớn'],[['🧸','gấu bông'],['🐱','mèo']],'🌊','Đúng rồi! Bé chỉ xuống nước khi có người lớn giám sát.']
+];
+const SHAPES=[['●','hình tròn'],['■','hình vuông'],['▲','hình tam giác'],['▬','hình chữ nhật']];
+function makeMathQuestion(kind){
+ const pict=kind==='fish'?'🐟':kind==='object'||kind==='room'?'🍎':pick(['🌼','⚽','🍎','🐟']);
+ const name=GRADE_PICTURES.find(p=>p[0]===pict)?.[1]||'hình';
+ const type=rand(0,5);
+ if(type===0){const n=rand(1,10);return numberQuestion('Bé đếm xem có bao nhiêu '+name+'?',n,pict.repeat(n),'Đúng rồi! Có '+n+' '+name+'.',10);}
+ if(type===1){const a=rand(1,8),b=rand(1,10-a),n=a+b;return numberQuestion('Có '+a+' '+name+', thêm '+b+'. Có tất cả bao nhiêu?',n,pict.repeat(a)+' + '+pict.repeat(b),'Đúng rồi! '+a+' cộng '+b+' bằng '+n+'.',10);}
+ if(type===2){const a=rand(2,10),b=rand(1,a),n=a-b;return numberQuestion('Có '+a+' '+name+', bớt đi '+b+'. Còn lại bao nhiêu?',n,pict.repeat(a)+' − '+b,'Đúng rồi! '+a+' trừ '+b+' bằng '+n+'.',10);}
+ if(type===3){const a=rand(1,14),b=a+rand(1,5),c=b+1,largest=rand(0,1),n=largest?c:a;return question(largest?'Trong ba số, số nào lớn nhất?':'Trong ba số, số nào bé nhất?',[String(n),String(n)],[a,b,c].filter(v=>v!==n).map(v=>[String(v),String(v)]),'🔢','Đúng rồi! Số '+n+(largest?' lớn nhất.':' bé nhất.'),'math');}
+ if(type===4){const n=rand(1,19);return numberQuestion('Số nào đứng ngay sau số '+n+'?',n+1,n+' → ?','Đúng rồi! Sau '+n+' là '+(n+1)+'.',20);}
+ const a=pick(SHAPES);return question('Con chọn '+a[1]+' nhé!',a,SHAPES.filter(x=>x!==a),'🔷','Đúng rồi! Đây là '+a[1]+'.','math');
+}
+function makeVietnameseQuestion(){
+ const type=rand(0,2);
+ if(type===0){const [emoji,word,letter]=pick(LETTER_PAIRS);const wrong=shuffled(['a','ă','â','b','c','d','đ','e','ê','g','h','i','k','l','m','n','o','ô','ơ','p','q','r','s','t','u','ư','v','x','y'].filter(x=>x!==letter)).slice(0,2);return question('Tiếng '+word+' bắt đầu bằng chữ cái nào?',[letter,'chữ '+letter],wrong.map(v=>[v,'chữ '+v]),emoji,'Đúng rồi! Tiếng '+word+' bắt đầu bằng chữ '+letter+'.','vietnamese');}
+ if(type===1){const [v,answer,wrong]=pick(RHYME_PAIRS);return question('Hình nào có tên chứa vần '+v+'? '+[answer,...wrong].map(x=>x[1]).join(', ')+'.',answer,wrong,'👂 '+v,'Đúng rồi! Tiếng '+answer[1]+' có vần '+v+'.','vietnamese');}
+ const [emoji,word]=pick(GRADE_PICTURES.filter(x=>!x[1].includes(' ')));const wrong=shuffled(GRADE_PICTURES.filter(x=>x[1]!==word&&!x[1].includes(' '))).slice(0,2);
+ return question('Bé tìm tiếng '+word+' viết đúng nhé!',[word,word],wrong.map(x=>[x[1],x[1]]),emoji,'Đúng rồi! Đây là tiếng '+word+'.','vietnamese');
+}
+const SUBJECTS=['math','vietnamese','math','vietnamese','life'];
 function makeAdventureQuestion(kind,detail){
- switch(kind){
- case 'garden':return question('Con tìm bông hoa trong vườn nhé!', ['🌼','bông hoa'],[['🐟','cá'],['🧸','gấu bông']],'🌼');
- case 'return':return question('Gấu vừa trở về đâu?', ['🏝️','hòn đảo'],[['🛁','phòng tắm'],['🌊','biển']],'🐻 🏝️');
- case 'lesson':return question('Bé vừa học chữ. Mình dùng gì để viết?', ['✏️','bút chì'],[['🍎','quả táo'],['🐟','cá']],'✏️');
- case 'swim':return question('Gấu cần gì để giúp nổi trên mặt nước?', ['🛟','phao'],[['📚','sách'],['👟','giày']],'🐻 🌊','Đúng rồi! Phao giúp Gấu nổi. Bé nhớ chỉ xuống nước cùng người lớn nhé.');
- case 'shore':return question('Gấu đã lên bờ. Con tìm hòn đảo nhé!', ['🏝️','hòn đảo'],[['🌊','biển'],['🛏️','giường']],'🏝️');
- case 'fish': {
-  const variants=[
-   ()=>question('Con nào sống dưới nước?', ['🐟','cá'],[['🐻','gấu'],['🐦','chim']],'🌊'),
-   ()=>question('Gấu vừa bắt được gì?', ['🐟','cá'],[['🦋','bướm'],['🍎','quả táo']],'🐻 🌊'),
-   ()=>question('Bắt cá xong, mình thả cá về đâu?', ['🌊','biển'],[['🏡','ngôi nhà'],['🛏️','giường']],'🐟','Đúng rồi! Mình thả cá về biển.')
-  ];return variants[(progress.adventureCount||0)%variants.length]();
+ const subject=SUBJECTS[(progress.gradeQuestionIndex||0)%SUBJECTS.length];
+ let q;
+ for(let tries=0;tries<18;tries++){
+  if(subject==='math')q=makeMathQuestion(kind);
+  else if(subject==='vietnamese')q=makeVietnameseQuestion();
+  else{const [prompt,answer,wrong,clue,explain]=pick(LIFE);q=question(prompt,answer,wrong,clue,explain,'life');}
+  if(!gradeRecent.includes(q.prompt))break;
  }
- case 'room':{
-  const r=ROOMS[detail];
-  const clues=[['📺','🛋️'],['🛏️','🧸'],['🍳','🍎'],['🛁','🪥'],['🎨','📚']];
-  return question('Gấu đang ở '+r[0].toLowerCase()+'. Con chọn hình của phòng này nhé!',[r[1],r[0]],ROOMS.filter((_,i)=>i!==detail).map(x=>[x[1],x[0]]),clues[detail].join(' '));
- }
- case 'object': {
-  const it=houseItems[detail];if(!it)return null;
-  const nearby=houseItems.filter((_,i)=>i!==detail).map(x=>[x.emoji,x.name]);
-  const uses={fridge:['Tủ lạnh dùng để giữ mát thức ăn. Con tìm tủ lạnh nhé!','🧊'],lamp:['Khi trời tối, mình bật đồ vật nào?', '💡'],bath:['Mình có thể tắm ở đâu?', '🛁'],brush:['Bé dùng gì để chải răng?', '🪥'],book:['Bé dùng gì để xem hình và đọc truyện?', '📖'],bed:['Khi buồn ngủ, Gấu nằm ở đâu?', '🛏️'],sink:['Mình rửa tay ở đâu?', '🚰']};
-  const pair=uses[it.kind];
-  return question(pair?pair[0]:'Bé vừa chạm vào '+it.name+'. Con tìm hình đó nhé!',[it.emoji,it.name],nearby,pair?pair[1]:it.emoji);
- }
- default:return null;
- }
+ return q;
 }
+function tickDiscovery(dt){
+ if(exploring()&&!currentModal()&&!document.hidden)freePlaySeconds+=dt;
+}
+function shouldAskAdventure(kind,manual=false){
+ if(manual)return true;
+ if(!eligibleDiscovery.has(kind))return false;
+ discoveryActions++;
+ return freePlaySeconds>=(autoQuizShown?REPEAT_QUIZ_SECONDS:FIRST_QUIZ_SECONDS)&&discoveryActions>=(autoQuizShown?REPEAT_ACTIONS:FIRST_ACTIONS);
+}
+
 function replayAdventure(){if(adventureQuestion&&!adventureLocked)narrate(adventureQuestion.prompt);}
-function openAdventure(kind,detail){
- if(currentModal()||adventureQuestion)return false;
+function openAdventure(kind,detail,manual=false){
+ if(currentModal()||adventureQuestion||!exploring())return false;
+ if(!shouldAskAdventure(kind,manual))return false;
  const q=makeAdventureQuestion(kind,detail);if(!q)return false;
+ freePlaySeconds=0;discoveryActions=0;autoQuizShown=true;
+ gradeRecent.push(q.prompt);if(gradeRecent.length>8)gradeRecent.shift();
+ progress.gradeQuestionIndex=(progress.gradeQuestionIndex||0)+1;persist();
+ $('adventureClue').dataset.subject=q.subject;
  // State transitions and intentional interactions trigger quizzes; walking and utility buttons do not.
  adventureQuestion=q;adventureLocked=false;adventureMistakes=0;
  clearTimeout(toastTimer);$('toast').classList.remove('show');
  keys.clear();joystickX=joystickY=0;stickPointer=null;$('joystickKnob').style.transform='translate(0,0)';
- $('adventureClue').textContent=q.clue;$('adventureResult').textContent='❔';$('adventureContinue').hidden=true;
+ $('adventureClue').textContent=q.clue;$('adventureClue').classList.toggle('counting',q.subject==='math'&&q.clue.length>12);$('adventureResult').textContent=q.subject==='math'?'🔢':q.subject==='vietnamese'?'🔤':'🌱';$('adventureContinue').hidden=true;
  const opts=$('adventureOptions');opts.replaceChildren();
  q.options.forEach(([emoji,name])=>{
-  const b=document.createElement('button');b.type='button';b.textContent=emoji;b.dataset.answer=emoji;b.setAttribute('aria-label',name);b.addEventListener('click',()=>answerAdventure(b,emoji));opts.append(b);
+  const b=document.createElement('button');b.type='button';b.textContent=emoji;b.dataset.answer=emoji;if(/^[\p{L}\d]+$/u.test(emoji))b.classList.add('school-answer');b.setAttribute('aria-label',name);b.addEventListener('click',()=>answerAdventure(b,emoji));opts.append(b);
  });
  $('adventureQuestionText').textContent=q.prompt;
  $('adventureOverlay').hidden=false;perfDirty=true;
@@ -1739,7 +1789,7 @@ function initRenderer(){
 function currentModal(){return !$('adventureOverlay').hidden||!$('fishAlbum').hidden||!$('installOverlay').hidden||!$('welcome').hidden||!$('mapOverlay').hidden||!$('helpOverlay').hidden||!$('winOverlay').hidden||!$('dictationOverlay').hidden;}
 function setMode(next){
  if(mode!==next){clearTimeout(toastTimer);$('toast').classList.remove('show');}
- mode=next;perfDirty=true;document.body.dataset.mode=next;
+ mode=next;perfDirty=true;document.body.dataset.mode=next;setHidden('gradeQuizButton',!exploring());
  if(next!=='house'){setRoomChallenge(null);$('roomGameButton').hidden=true;$('roomLessonButton').hidden=true;}
  $('roomNav').hidden=next!=='house';
  const garden=next==='world'||next==='house',listen=next==='listen',trace=next==='trace';
@@ -1888,7 +1938,7 @@ function tickWorld(dt,t){
   bearHead.rotation.z*=.91;
  }
  const wasSwimming=swimming;swimming=seaAt(player.position.x,player.position.z);
- if(wasSwimming!==swimming){if(swimming&&autoTarget)cameraYaw=Math.atan2(-player.position.x,-player.position.z);updateSeaUI();openAdventure(swimming?'swim':'shore');}
+ if(wasSwimming!==swimming){if(swimming&&autoTarget)cameraYaw=Math.atan2(-player.position.x,-player.position.z);updateSeaUI();toast(swimming?'🌊':'🏝️');narrate(swimming?'Gấu đang bơi!':'Gấu đã lên bờ!');}
  player.position.y=smooth(player.position.y,swimming?SEA_Y-.66+Math.sin(t*3)*.10:0,dt*9);
  swimRing.visible=swimming;playerShadow.visible=!swimming;
  if(wasSwimming!==swimming)updateSeaUI();
@@ -2343,7 +2393,7 @@ function quitLesson(){
  clearTimeout(winTimer);tracePointer=null;currentStroke=null;quizPointer=null;
  $('winOverlay').hidden=true;
  boardMesh.visible=false;lessonFrame.visible=false;quizGroup.visible=false;
- setMode('world');updateNearby();openAdventure('lesson');
+ setMode('world');updateNearby();
 }
 function resize(){
  if(!renderer)return;perfDirty=true;
@@ -2484,7 +2534,7 @@ function beginPlay(){
  $('welcome').hidden=true;
  setMode('world');
  updateNearby();
- openAdventure('garden');
+ toast('🌈');narrate('Chào bé! Mình cùng khám phá khu vườn nhé.');
 }
 function renderFrame(now){
  requestAnimationFrame(renderFrame);
@@ -2497,6 +2547,7 @@ function renderFrame(now){
  const dt=clamp((now-lastTime)*.001||.016,0,.10),t=now*.001;
  lastTime=now;lastRendered=now;animTime=t;
  if(!modal){
+  tickDiscovery(previousModal?0:dt);
   if(!previousModal&&elapsed>42&&elapsed<180){frameSlow++;frameFast=0;}
   else if(elapsed<39){frameFast++;frameSlow=Math.max(0,frameSlow-1);}
   if(frameSlow>=12){frameBudget=1000/30;frameSlow=0;}
@@ -2514,6 +2565,7 @@ function renderFrame(now){
  try{drawScene();}catch(error){if(!window.__webglErrorLogged){window.__webglErrorLogged=true;console.warn('WebGL render error',error);}}
 }
 function setupControls(){
+ $('gradeQuizButton').addEventListener('click',()=>openAdventure('manual',null,true));
  $('adventureReplay').addEventListener('click',replayAdventure);$('adventureContinue').addEventListener('click',closeAdventure);$('adventureSkip').addEventListener('click',closeAdventure);
  setupRooms();$('roomGameButton').addEventListener('click',startRoomChallenge);$('roomChallenge').addEventListener('click',replayRoomChallenge);$('roomLessonButton').addEventListener('click',()=>{const i=LETTERS.findIndex((_,n)=>!progress.best[n]);openLesson(i<0?0:i);});$('playButton').addEventListener('click',beginPlay);
  $('homeShortcut').addEventListener('click',headHome);

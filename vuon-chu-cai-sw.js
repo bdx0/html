@@ -1,5 +1,5 @@
 'use strict';
-const CACHE='vuon-chu-cai-exploration-v4';
+const CACHE='vuon-chu-cai-exploration-v5';
 const url=p=>new URL(p,self.location.href).href;
 const GAME=url('./vuon-chu-cai.html');
 const ASSETS=[GAME,url('./assets/three.min.js'),url('./vuon-chu-cai.webmanifest'),url('./assets/vuon-chu-cai-192.png'),url('./assets/vuon-chu-cai-512.png')];
