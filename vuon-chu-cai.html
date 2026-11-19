@@ -239,6 +239,8 @@ body[data-mode="house"] .explore-tools{top:calc(151px + env(safe-area-inset-top)
 .fish-modal{max-height:86dvh;overflow:auto}
 @media(max-width:650px){.explore-tools{gap:5px}.explore-tools button{width:44px;height:44px;min-height:44px}#waterAlert{top:calc(65px + env(safe-area-inset-top));font-size:27px}}
 @media(max-height:620px){.explore-tools{display:grid;grid-template-columns:repeat(2,auto)}}
+#gardenShortcut{position:relative;font-size:22px}#cropCount{position:absolute;right:2px;bottom:2px;background:#fff2c5;border-radius:11px;min-width:16px;font-size:11px;font-weight:900;color:#806a3d}
+@media(max-height:760px){.explore-tools{gap:4px}.explore-tools button{height:40px;min-height:40px;width:40px}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 <script src="./assets/three.min.js"></script>
@@ -255,6 +257,7 @@ body[data-mode="house"] .explore-tools{top:calc(151px + env(safe-area-inset-top)
  <button id="seaShortcut" type="button" data-icon="🌊" aria-label="Ra biển">🌊 Ra biển</button>
  <button id="riverShortcut" type="button" data-icon="🏞️" aria-label="Ra sông">🏞️</button>
  <button id="farmShortcut" type="button" data-icon="🌾" aria-label="Đồng ruộng">🌾</button>
+ <button id="gardenShortcut" type="button" aria-label="Vườn gieo hạt" title="Vườn gieo hạt">🌱 <span id="cropCount">0</span></button>
  <button id="findFishButton" type="button" hidden data-icon="🐟" aria-label="Tìm cá">🐟 Tìm cá</button>
  <button id="fishAlbumButton" type="button">🐟 <span id="fishCount">0</span></button>
  <button id="roomGameButton" type="button" aria-label="Tìm đồ vật" title="Tìm đồ vật" hidden>🧩</button>
@@ -642,7 +645,7 @@ const VOICE_SPEEDS=[
  {id:'medium',label:'🐇 Vừa',rate:.76,pause:650},
  {id:'fast',label:'🚀 Nhanh',rate:.92,pause:450}
 ];
-let progress={best:{},sound:true,speechSpeed:'slow',music:true,fish:{},fishQuiz:{},fishLucky:{},rooms:{},adventureCount:0,gradeQuestionIndex:0};
+let progress={best:{},sound:true,speechSpeed:'slow',music:true,fish:{},fishQuiz:{},fishLucky:{},rooms:{},garden:{},harvestRice:0,harvestFlowers:0,adventureCount:0,gradeQuestionIndex:0};
 let mode='world',level=0,traceScore=0,attempts=0,quizMistakes=0,wordMistakes=0,won=false;
 let quizSolved=false,wordSolved=false,previouslyLearned=false,speechToken=0,speechTimer=0,voiceWarning=false;
 let targetIndex=-1,actionIndex=-1,autoTarget=null;
@@ -678,6 +681,8 @@ function loadProgress(){
  try{
   const data=JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}');
   if(data&&typeof data==='object'){
+   if(data.garden&&typeof data.garden==='object')for(let i=0;i<12;i++){const a=data.garden[i];if(a&&Number.isInteger(a.stage)&&a.stage>=1&&a.stage<=3)progress.garden[i]={stage:a.stage,at:Number.isFinite(a.at)?a.at:0};}
+   for(const k of ['harvestRice','harvestFlowers'])if(Number.isSafeInteger(data[k])&&data[k]>=0)progress[k]=data[k];
    if(typeof data.sound==='boolean')progress.sound=data.sound;
    if(typeof data.music==='boolean')progress.music=data.music;
    if(Number.isInteger(data.adventureCount)&&data.adventureCount>=0)progress.adventureCount=Math.min(99999,data.adventureCount);
@@ -700,7 +705,7 @@ function persist(){
 }
 function updateProgress(){
  $('starTotal').textContent=totals();setText('adventureCount',String(progress.adventureCount));
- updateFishAlbum();
+ updateFishAlbum();updateGardenUI();
  updateMusicButton();
  $('soundButton').textContent=progress.sound?'🔊':'🔇';
  $('soundButton').setAttribute('aria-pressed',String(progress.sound));
@@ -1131,12 +1136,12 @@ function addLetterTokens(){
 }
 // Exploration expansion: separate house scene and ocean, no external assets.
 const HOUSE={x:19,z:2,doorX:19,doorZ:5.75};
-const ISLAND_RADIUS=29.0,MAX_RADIUS=120,SEA_Y=-.56;
+const ISLAND_RADIUS=34.0,MAX_RADIUS=120,SEA_Y=-.56;
 let houseScene,houseCamera,houseDoor,housePickers=[],houseItems=[],visitedHouseItems=new Set(),seaMesh,seaWaves=[],swimRing,arms=[],swimming=false,insideReturn=null,houseTarget=null;
 let musicTimer=null,musicBus=null,musicStep=0,musicNext=0,musicContext=null,musicNodes=new Set();
 const exploring=()=>mode==='world'||mode==='house';
 // Expanded countryside: mainland, bridge, freshwater channel and open sea.
-const RIVER_BANK=-54,LAND_MIN=-82,LAND_MAX_Z=34,BRIDGE_Z=0,BRIDGE_HALF=2.3;
+const RIVER_BANK=-54,LAND_MIN=-88,LAND_MAX_Z=34,BRIDGE_Z=0,BRIDGE_HALF=2.3;
 const FARM_POINT={x:-66,z:13};
 let waterTime=null,predators=[],countryAnimals=[],countryPickers=[],dangerTime=0,dangerCooldown=0,dangerZone='',lastWaterRegion='';
 function landAt(x,z){
@@ -1156,21 +1161,21 @@ function safeBank(x,z){
  if(waterRegion(x,z)==='river'||x<-28){
   if(x<-41&&Math.abs(z)<36)return {x:-56,z:clamp(z,-31,31)};
  }
- const t=Math.atan2(z,x);return {x:Math.cos(t)*27,z:Math.sin(t)*27};
+ const t=Math.atan2(z,x);return {x:Math.cos(t)*32,z:Math.sin(t)*32};
 }
 function addOcean(){
  // A single GPU shader animates both surfaces; no per-wave CPU meshes.
  const geo=new T.PlaneGeometry(330,270,64,52);geo.rotateX(-Math.PI/2);
  waterTime={value:0};
- const material=new T.ShaderMaterial({uniforms:{uTime:waterTime},vertexShader:
- 'uniform float uTime; varying vec3 vWorld; void main(){ vec3 p=position; float river=(1.0-smoothstep(-28.0,-20.0,p.x))*(1.0-smoothstep(32.0,38.0,abs(p.z))); p.y+=mix(0.095,0.035,river)*(sin(p.x*1.05+p.z*.39-uTime*2.6)+.45*sin(p.z*1.9-p.x*.5-uTime*1.7)); vec4 w=modelMatrix*vec4(p,1.0); vWorld=w.xyz; gl_Position=projectionMatrix*viewMatrix*w; }',
+ const material=new T.ShaderMaterial({transparent:true,depthWrite:false,uniforms:{uTime:waterTime},vertexShader:
+ 'uniform float uTime; varying vec3 vWorld; void main(){vec3 p=position;float river=1.0-smoothstep(-30.,-24.,p.x); p.y+=mix(.12,.04,river)*(sin(p.x*.75+p.z*.54-uTime*1.9)+.42*sin(p.z*1.62-p.x*.40-uTime*1.3));vec4 w=modelMatrix*vec4(p,1.);vWorld=w.xyz;gl_Position=projectionMatrix*viewMatrix*w;}',
  fragmentShader:
- 'uniform float uTime; varying vec3 vWorld; void main(){ vec2 p=vWorld.xz; float river=(1.0-smoothstep(-29.0,-22.0,p.x))*(1.0-smoothstep(32.0,39.0,abs(p.y))); float q=sin(p.y*1.9+p.x*.57-uTime*3.2+sin(p.x*.9+uTime*.45)*1.3); float r=sin(p.x*1.7-p.y*.38+uTime*2.1); float crest=smoothstep(.78,.99,q)*smoothstep(-.4,.85,r); float little=smoothstep(.78,1.0,sin(p.x*3.7+p.y*2.4-uTime*2.9))*smoothstep(.12,.95,sin(p.y*4.4-p.x+uTime)); vec3 sea=mix(vec3(.20,.58,.82),vec3(.39,.78,.91),.5+.5*sin(p.x*.14+p.y*.22+uTime*.65)); vec3 fresh=mix(vec3(.22,.56,.49),vec3(.44,.76,.66),.5+.5*sin(p.y*.16-uTime*.9)); vec3 c=mix(sea,fresh,river); c=mix(c,vec3(.91,1.,.98),crest*mix(.67,.42,river)+little*.16); float foam=1.0-smoothstep(.12,1.1,abs(length(p)-29.2)); c=mix(c,vec3(.9,.99,.96),foam*(.45+.35*q)); float fog=smoothstep(45.,120.,length(cameraPosition-vWorld)); c=mix(c,vec3(.72,.91,.95),fog*.85); gl_FragColor=vec4(c,1.); }'
+ 'uniform float uTime; varying vec3 vWorld; void main(){vec2 p=vWorld.xz;float river=(1.-smoothstep(-30.,-24.,p.x))*(1.-smoothstep(32.,39.,abs(p.y)));float a=p.x*.75+p.y*.54-uTime*1.9;float b=p.y*1.62-p.x*.40-uTime*1.3;float d=p.x*2.7+p.y*1.9-uTime*2.7;vec3 n=normalize(vec3(-(.11*cos(a)-.035*cos(b)+.045*cos(d)),1.,-(.09*cos(a)+.11*cos(b)+.04*cos(d))));vec3 view=normalize(cameraPosition-vWorld);float fres=pow(1.-max(dot(n,view),0.),3.);vec3 light=normalize(vec3(-.45,.83,.32));float spec=pow(max(dot(n,normalize(light+view)),0.),52.);float bank=max(0.,min(abs(length(p)-34.),abs(p.x+54.)));float shallow=1.-smoothstep(0.,9.,bank);vec3 sea=mix(vec3(.075,.35,.57),vec3(.19,.69,.73),shallow);vec3 fresh=mix(vec3(.12,.38,.32),vec3(.40,.62,.48),shallow);vec3 c=mix(sea,fresh,river);c*=.94+.11*sin(a)+.06*sin(b);float waveGlint=smoothstep(.62,.97,sin(a+sin(b)*.45))*smoothstep(.0,.85,cos(d*.34));c+=vec3(.16,.22,.24)*waveGlint*(1.-river*.35);c=mix(c,vec3(.66,.82,.89),fres*.48);c+=vec3(.72,.69,.50)*spec*.48;float foam=(1.-smoothstep(.17,.85,abs(length(p)-34.45-.23*sin(p.x*.6+p.y*.8-uTime*1.7))))*smoothstep(-.6,.6,sin(p.y*.7+p.x*.9-uTime));c=mix(c,vec3(.91,.98,.95),foam*.68*(1.-river));float fog=smoothstep(45.,130.,length(cameraPosition-vWorld));c=mix(c,vec3(.72,.91,.95),fog*.84);gl_FragColor=vec4(c,mix(.67,.29,shallow)+fres*.10);}'
  });
- seaMesh=new T.Mesh(geo,material);seaMesh.position.y=SEA_Y;worldScene.add(seaMesh);
- worldScene.add(cylinder(30.3,29.1,.30,0xffdfa2,0,-.42,0,96));
+ seaMesh=new T.Mesh(geo,material);seaMesh.position.y=SEA_Y;seaMesh.renderOrder=2;worldScene.add(seaMesh);const bottom=new T.Mesh(new T.PlaneGeometry(330,270),mat(0x559991));bottom.rotation.x=-Math.PI/2;bottom.position.y=-3;worldScene.add(bottom);
+ worldScene.add(cylinder(34,35.2,.69,0xf0d3a1,0,-.35,0,96));
  // Mainland river bank with a raised wooden bridge, flush with walkable ground.
- worldScene.add(box(28,2,68,0xc4a282,-68,-1.19,0),box(28,.34,68,0x91dca7,-68,-.16,0),box(.8,.24,68,0xf2d5a1,-54.2,-.02,0));
+ worldScene.add(box(34,2,68,0xc4a282,-71,-1.19,0),box(34,.34,68,0x91dca7,-71,-.16,0),box(5,.10,68,0xeed2a2,-56.5,.018,0));
  worldScene.add(box(28,.28,4.6,0xc69865,-40,.02,0));
  for(let i=0;i<28;i++)worldScene.add(box(.91,.09,4.45, i%2?0xe8bd87:0xdcb181,-53.5+i,.195,0));
  for(let i=0;i<8;i++){const a=-1.35+i*2.7/7;const x=Math.cos(a)*39,z=Math.sin(a)*39;const b=new T.Group();b.position.set(x,SEA_Y,z);b.add(sphere(.42,0xffb05f,0,.22,0,1,.78,1),cylinder(.055,.055,.80,0xfff5dc,0,.58,0,8),sphere(.13,0xff777e,0,1,0));worldScene.add(b);bobbing.push({mesh:b,base:SEA_Y,phase:i});}
@@ -1212,8 +1217,74 @@ function addCountryAnimal(kind,name,emoji,x,z){
  const label=pictureMesh(emoji,1.05);label.position.y=kind==='buffalo'?2.6:2.2;g.add(label);label.userData.animal=countryAnimals.length;countryPickers.push(label);
  countryAnimals.push({g,hit,label,kind,name,emoji,x,z}); 
 }
+// Persistent mini gardening loop: sow, water, harvest. Growth is accelerated for play.
+const GROWTH_SECONDS=18, GROW_PLOTS=[];
+let growPickers=[],growVisuals=[],waterDrops=[],lastGrowTick=0;
+function gardenState(i){return progress.garden[i]||{stage:0,at:0};}
+function gardenSymbol(i){const a=gardenState(i);return a.stage===0?'🌱':a.stage===1?'💧':a.stage===2?'⏳':GROW_PLOTS[i].kind==='rice'?'🌾':'🌸';}
+function gardenName(i){return GROW_PLOTS[i].kind==='rice'?'lúa':'hoa';}
+function plotIcon(i){return pictureTexture(gardenSymbol(i));}
+function createGardenPlot(kind,x,z){
+ const i=GROW_PLOTS.length;GROW_PLOTS.push({kind,x,z});
+ const g=new T.Group();g.position.set(x,.08,z);worldScene.add(g);
+ g.add(box(3.15,.20,2.7,0x9a6c45,0,.10,0));
+ for(const dx of [-1.52,1.52])g.add(box(.14,.22,2.8,0xe3be8b,dx,.24));
+ for(const dz of [-1.32,1.32])g.add(box(3.02,.22,.14,0xe3be8b,0,.24,dz));
+ for(let j=-1;j<=1;j++)g.add(box(2.65,.05,.075,0xb08459,0,.22,j*.66));
+ const small=new T.Group(),large=new T.Group();g.add(small,large);
+ for(let j=0;j<5;j++){
+  const px=(j%3-1)*.77,pz=(Math.floor(j/3)-.5)*.92;
+  const a=new T.Mesh(new T.ConeGeometry(.14,.42,6),mat(0x85b84c));a.position.set(px,.43,pz);small.add(a);
+  if(kind==='rice'){
+   for(let k=-1;k<=1;k++){const m=new T.Mesh(new T.ConeGeometry(.105,1.05+Math.abs(k)*.10,6),mat(0x7ca344));m.position.set(px+k*.12,.78,pz);m.rotation.z=-k*.18;large.add(m);large.add(sphere(.12,0xe5bd59,px+k*.24,1.35,pz,.56,1.5,.6));}
+  }else{
+   large.add(cylinder(.035,.048,.77,0x75a85a,px,.62,pz,7));
+   for(let k=0;k<5;k++){const a=k*Math.PI*2/5;large.add(sphere(.165,[0xf2a3c0,0xf7d17a,0xd2a1ee][j%3],px+Math.cos(a)*.19,1.06+Math.sin(a)*.19,pz,1,1,.65));}
+   large.add(sphere(.13,0xffc05e,px,1.06,pz+.09));
+  }
+ }
+ const label=pictureMesh('🌱',.82);label.position.set(0,1.86,0);label.userData.plot=i;g.add(label);growPickers.push(label);
+ const hit=new T.Mesh(new T.BoxGeometry(3.1,1.5,2.7),new T.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));hit.position.y=.65;hit.userData.plot=i;g.add(hit);growPickers.push(hit);
+ batchOpaque(small);batchOpaque(large);batchOpaque(g,new Set([small,large,label,hit]));invisiblePicker(hit);
+ growVisuals.push({g,small,large,label,stage:-1});refreshPlot(i);
+}
+function buildGardens(){
+ for(let i=0;i<6;i++)createGardenPlot('rice',-80+(i%2)*3.7,-17+Math.floor(i/2)*3.3);
+ for(let i=0;i<6;i++)createGardenPlot('flower',-80+(i%2)*3.7,13+Math.floor(i/2)*3.3);
+}
+function refreshPlot(i){
+ const a=gardenState(i),v=growVisuals[i];if(!v)return;
+ v.small.visible=a.stage===1||a.stage===2;v.large.visible=a.stage===3;
+ if(v.stage!==a.stage){const old=v.label.material.map;v.label.material.map=plotIcon(i);if(old)old.dispose();v.stage=a.stage;}
+}
+function updateGardenUI(){setText('cropCount',String(progress.harvestRice+progress.harvestFlowers));}
+function interactPlot(i){
+ if(!GROW_PLOTS[i]||mode!=='world'||currentModal()||swimming)return;
+ const p=GROW_PLOTS[i],a=gardenState(i);
+ if(Math.hypot(player.position.x-p.x,player.position.z-p.z)>5){fishChase=null;autoTarget={x:p.x,z:p.z+2,index:-3,plot:i};return;}
+ if(a.stage===0){progress.garden[i]={stage:1,at:0};chirp();toast('🌱');narrate('Bé đã gieo hạt '+gardenName(i)+'. Bây giờ tưới nước nhé!');}
+ else if(a.stage===1){progress.garden[i]={stage:2,at:Date.now()};chirp();toast('💧');narrate('Bé tưới nước rồi. Hãy đợi cây lớn nhé!');}
+ else if(a.stage===2){toast('⏳');narrate('Cây đang lớn. Bé chờ thêm một chút nhé!');return;}
+ else{if(p.kind==='rice')progress.harvestRice++;else progress.harvestFlowers++;progress.garden[i]={stage:0,at:0};chirp('win');toast(p.kind==='rice'?'🌾 ✨':'🌸 ✨');narrate('Giỏi quá! Bé đã thu hoạch '+gardenName(i)+'.');}
+ persist();refreshPlot(i);updateGardenUI();
+}
+function tickGardens(t){
+ if(t-lastGrowTick>.4){lastGrowTick=t;
+  let changed=false;
+  for(let i=0;i<GROW_PLOTS.length;i++){const a=gardenState(i);if(a.stage===2&&Date.now()-a.at>=GROWTH_SECONDS*1000){progress.garden[i]={stage:3,at:0};refreshPlot(i);changed=true;}}
+  if(changed)persist();
+ }
+ for(const v of growVisuals)v.label.quaternion.copy(worldCamera.quaternion);
+}
+function nearestPlot(){let best=-1,d=4.3;for(let i=0;i<GROW_PLOTS.length;i++){const p=GROW_PLOTS[i],n=Math.hypot(player.position.x-p.x,player.position.z-p.z);if(n<d){d=n;best=i;}}return best;}
+function goGarden(){
+ if(mode!=='world')return;fishChase=null;
+ const target={x:-77,z:9,index:-1};const route=player.position.x<RIVER_BANK?[target]:[{x:-24,z:0},{x:-56,z:0},target];
+ const first=route.shift();autoTarget={...first,index:-1,waypoints:route};toast('🌱');narrate('Mình đến vườn gieo lúa, trồng hoa nhé!');
+}
+
 function buildCountry(){
- riceField(-65,-17);riceField(-65,18);
+ riceField(-65,-17);riceField(-65,18);buildGardens();
  for(let i=0;i<7;i++)makeTree(-79,-28+i*8,1.15+i%2*.2,i%3);
  for(let i=0;i<6;i++)makeTree(-56, -30+i*11, .9,i%3);
  for(let i=0;i<16;i++)flower(-76+(i%4)*1.1,-6+Math.floor(i/4)*2,.8);
@@ -1501,7 +1572,7 @@ function headSea(){
  if(mode!=='world')return;fishChase=null;
  const x=player.position.x,z=player.position.z;
  if(swimming){autoTarget={...safeBank(x,z),index:-1};toast('🏝️');narrate('Mình bơi về bờ nhé!');return;}
- const target={x:34,z:12,index:-1};const route=x<RIVER_BANK?[{x:-56,z:0},{x:-24,z:0},target]:[target];
+ const target={x:39,z:12,index:-1};const route=x<RIVER_BANK?[{x:-56,z:0},{x:-24,z:0},target]:[target];
  const first=route.shift();autoTarget={...first,index:-1,waypoints:route};toast('🌊');narrate('Mình ra biển nào!');
 }
 function tickHouse(dt,t){
@@ -1605,41 +1676,63 @@ function fishFin(points,color){
 function fishBand(z,radius,color){
  const m=new T.Mesh(new T.TorusGeometry(radius,.11,8,24),mat(color));m.position.z=z;m.scale.set(.76,1,1);return m;
 }
-function makeFish(type,i){
- const f=FISH_TYPES[type],g=new T.Group(),tail=new T.Group();
- if(f.kind==='ray'){
-  const body=sphere(.83,f.color,0,0,0,1.06,.25,1.05);g.add(body);
-  const wingL=fishFin([[0,.72],[-1.7,-.12],[0,-.85]],f.fin),wingR=fishFin([[0,.72],[1.7,-.12],[0,-.85]],f.fin);
-  g.add(wingL,wingR);tail.add(sphere(.15,f.fin,0,0,-1.12,.43,.43,5));g.add(tail);
+// Sculpted fish with tapered bodies, gills, curved fins and species colors.
+function fishBody(f){
+ const ray=f.kind==='ray',puff=f.kind==='puffer',long=f.kind==='snakehead'||f.kind==='catfish',tall=f.kind==='angel'||f.kind==='butterfly';
+ const length=ray?1.15:puff?.87:long?1.65:1.18, width=ray?1.04:puff?.60:.39, height=ray?.17:puff?.57:tall?.82:long?.38:.50;
+ const rings=24,sides=24,verts=[],colors=[],indices=[];
+ const base=new T.Color(f.color),fin=new T.Color(f.fin),mark=new T.Color(f.mark),belly=new T.Color(0xf2e8cd),col=new T.Color();
+ for(let j=0;j<=rings;j++){
+  const u=j/rings,z=(u*2-1)*length,profile=Math.pow(Math.max(.002,Math.sin(Math.PI*u)),puff?.46:.62)*(0.68+.42*u);
+  for(let k=0;k<=sides;k++){
+   const a=k/sides*Math.PI*2,x=Math.cos(a)*width*profile,y=Math.sin(a)*height*profile;
+   verts.push(x,y,z);col.copy(base).lerp(belly,Math.max(0,-Math.sin(a))*.68).lerp(mark,Math.max(0,Math.sin(a))*.22);
+   if(f.kind==='clown'&&(Math.abs(u-.38)<.07||Math.abs(u-.74)<.065))col.setHex(0xfff6e3);
+   if(f.kind==='angel'||f.kind==='perch'||f.kind==='snakehead')col.lerp(mark,Math.pow(Math.max(0,Math.cos(u*(f.kind==='angel'?22:31))),8)*.72);
+   if(f.kind==='blue')col.lerp(mark,Math.exp(-Math.pow((u-.43)*5,2))*Math.max(0,Math.sin(a)+.35)*.75);
+   if(f.kind==='butterfly'&&u>.73&&u<.86)col.lerp(mark,.9);
+   if(puff&&Math.sin(u*44+a*11)*Math.sin(u*28-a*14)>.72)col.lerp(mark,.72);
+   col.multiplyScalar(.96+.04*Math.cos(u*88+Math.cos(a)*21));colors.push(col.r,col.g,col.b);
+   if(j<rings&&k<sides){const n=j*(sides+1)+k;indices.push(n,n+sides+1,n+1,n+1,n+sides+1,n+sides+2);}
+  }
+ }
+ const geo=new T.BufferGeometry();geo.setAttribute('position',new T.Float32BufferAttribute(verts,3));geo.setAttribute('color',new T.Float32BufferAttribute(colors,3));geo.setIndex(indices);geo.computeVertexNormals();
+ return {mesh:new T.Mesh(geo,new T.MeshPhongMaterial({vertexColors:true,shininess:34,specular:0x819dab,side:T.DoubleSide})),length,width,height,ray};
+}
+function curvedFin(points,color){
+ const s=new T.Shape();s.moveTo(...points[0]);for(let i=1;i<points.length;i++)s.lineTo(...points[i]);s.closePath();
+ const g=new T.ShapeGeometry(s);return new T.Mesh(g,new T.MeshLambertMaterial({color,side:T.DoubleSide}));
+}
+function realisticFish(f,g,tail){
+ const b=fishBody(f);g.add(b.mesh);
+ if(b.ray){
+  for(const side of [-1,1]){const wing=fishFin([[0,.76],[side*1.50,.12],[side*1.83,-.3],[side*.62,-.82],[0,-.7]],f.fin);g.add(wing);}
+  const pts=[new T.Vector3(0,0,0),new T.Vector3(.08,0,-.65),new T.Vector3(.16,-.02,-1.45)];tail.add(new T.Mesh(new T.TubeGeometry(new T.CatmullRomCurve3(pts),14,.045,6,false),mat(f.mark)));tail.position.z=-.92;g.add(tail);
  }else{
-  const p=f.kind==='puffer',tall=f.kind==='butterfly'||f.kind==='angel';
-  g.add(sphere(.65,f.color,0,0,0,p?1.02:.65,p?1.0:tall?1.25:f.kind==='snakehead'?.58:.82,p?1.08:f.kind==='snakehead'?2.25:1.72));
-  tail.position.z=p?-.62:-1.0;
-  const tv=fishFin([[0,0],[-.52,-.77],[0,-.58],[.52,-.77]],f.fin);tail.add(tv);g.add(tail);
+  const t=curvedFin([[0,0],[.73,.49],[.49,.06],[.73,-.46],[0,-.27]],f.fin);
+  t.rotation.y=Math.PI/2;t.position.z=-.02;tail.position.z=-b.length*.84;tail.add(t);g.add(tail);
+  const top=curvedFin([[0,0],[.19,.48],[.53,.39],[.92,.04]],f.fin);top.rotation.y=-Math.PI/2;top.position.set(0,b.height*.64,-.60);g.add(top);
+  const bottom=curvedFin([[0,0],[.34,-.32],[.65,0]],f.fin);bottom.rotation.y=Math.PI/2;bottom.position.set(0,-b.height*.55,.12);g.add(bottom);
   for(const side of [-1,1]){
-   const fin=fishFin([[0,0],[side*.79,-.50],[side*.18,-.83]],f.fin);fin.position.set(side*.14,0,.17);g.add(fin);
-  }
-  if(f.kind==='clown'||f.kind==='angel'){
-   for(const z of [-.40,.30])g.add(fishBand(z,f.kind==='clown'?.49:.64,f.mark));
-  }else if(f.kind==='blue'||f.kind==='butterfly'){
-   for(const side of [-1,1])g.add(sphere(.25,f.mark,side*.36,.08,-.15,.20,.65,1.80));
-  }else if(f.kind==='perch'||f.kind==='snakehead'){
-   for(let j=0;j<4;j++){const mark=fishBand(-.65+j*.37,.40,f.mark);mark.scale.y=f.kind==='snakehead'?.67:1;g.add(mark);}
-  }else if(f.kind==='catfish'){
-   for(const side of [-1,1]){const pts=[new T.Vector3(side*.19,.1,.92),new T.Vector3(side*.62,.10,1.14),new T.Vector3(side*.87,.03,1.05)];g.add(new T.Mesh(new T.TubeGeometry(new T.CatmullRomCurve3(pts),8,.027,5,false),mat(0x4c5e70)));}
-  }else if(p){
-   for(let j=0;j<8;j++){const a=j*Math.PI/4;g.add(sphere(.073,f.mark,Math.cos(a)*.52,.38,Math.sin(a)*.52));}
+   const fin=fishFin([[0,.25],[side*.72,-.16],[side*.44,-.54],[0,-.29]],f.fin);fin.position.set(side*b.width*.66,-.13,.2);g.add(fin);
+   const eyez=b.length*.64,eyex=side*b.width*.76;
+   g.add(sphere(.10,0xeae0bd,eyex,.12,eyez,.72,1,1),sphere(.058,0x182d3c,eyex+side*.057,.13,eyez+.018,.67,1,1));
+   const pts=[new T.Vector3(side*b.width*.77,.24,b.length*.40),new T.Vector3(side*b.width*.96,.02,b.length*.30),new T.Vector3(side*b.width*.72,-.25,b.length*.36)];
+   g.add(new T.Mesh(new T.TubeGeometry(new T.CatmullRomCurve3(pts),8,.016,5,false),mat(f.mark)));
+   if(f.kind==='catfish'||f.kind==='carp'){const p=[new T.Vector3(side*.13,-.05,b.length*.92),new T.Vector3(side*.46,-.08,b.length*1.12),new T.Vector3(side*.73,-.13,b.length*.99)];g.add(new T.Mesh(new T.TubeGeometry(new T.CatmullRomCurve3(p),10,.023,6,false),mat(f.mark)));}
   }
  }
- for(const side of [-1,1]){
-  g.add(sphere(.105,0xfffaf5,side*(f.kind==='ray'?.31:.27),.38,.61),sphere(.062,0x26374e,side*(f.kind==='ray'?.31:.27),.44,.68));
- }
+ if(b.ray)for(const x of [-.27,.27])g.add(sphere(.075,0x364d58,x,.16,.58));
+}
+
+function makeFish(type,i){
+ const f=FISH_TYPES[type],g=new T.Group(),tail=new T.Group();realisticFish(f,g,tail);
  const hit=new T.Mesh(new T.SphereGeometry(1.55,10,8),new T.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
  hit.userData.fish=i;g.add(hit);worldScene.add(g);fishPickers.push(hit);
- const fresh=type>=6,a=fresh?i*1.91:-1.65+(i%24)*3.30/23,r=32+(i%4)*1.7;
+ const fresh=type>=6,a=fresh?i*1.91:-1.65+(i%24)*3.30/23,r=37+(i%4)*1.7;
  const obj={g,tail,type,hit,a,r,phase:i*1.37,cooldown:0,habitat:fresh?'river':'sea',needsQuiz:null};
  if(fresh)g.position.set(-49,SEA_Y+.22,(i%2?1:-1)*(6+i%12));
- else g.position.set(Math.cos(a)*r,SEA_Y+.28,Math.sin(a)*r);seaFish.push(obj);
+ else g.position.set(Math.cos(a)*r,SEA_Y-.10,Math.sin(a)*r);seaFish.push(obj);
 }
 function addFish(){for(let i=0;i<24;i++)makeFish(i%6,i);for(let i=24;i<40;i++)makeFish(6+(i-24)%4,i);}
 function fishCount(){return Object.values(progress.fish).reduce((a,b)=>a+b,0);}
@@ -1705,10 +1798,10 @@ function tickFish(dt,t){
    const z=(f.type%2?1:-1)*(7+Math.abs(Math.sin(f.a))*18);
    const east=-Math.sqrt(Math.max(0,ISLAND_RADIUS*ISLAND_RADIUS-z*z))-3.5;
    const x=(f.phase%2<1)?-49+Math.sin(f.a)*1.25:Math.min(-25,east)-Math.abs(Math.cos(f.a))*1.25;
-   f.g.position.set(x,SEA_Y+.19+Math.sin(t*1.6+f.phase)*.10,z);f.g.rotation.y=Math.cos(f.a)>=0?0:Math.PI;
+   f.g.position.set(x,SEA_Y-.09+Math.sin(t*1.6+f.phase)*.09,z);f.g.rotation.y=Math.cos(f.a)>=0?0:Math.PI;
   }else{
    const a=Math.sin(f.a*.6+f.phase)*1.55,r=f.r+Math.sin(t*.42+f.phase)*.72;
-   f.g.position.set(Math.cos(a)*r,SEA_Y+.19+Math.sin(t*1.6+f.phase)*.10,Math.sin(a)*r);
+   f.g.position.set(Math.cos(a)*r,SEA_Y-.09+Math.sin(t*1.6+f.phase)*.09,Math.sin(a)*r);
    f.g.rotation.y=Math.atan2(-Math.sin(a),Math.cos(a))+(Math.cos(f.a*.6+f.phase)<0?Math.PI:0);
   }
   f.tail.rotation.y=Math.sin(t*7+f.phase)*.43;
@@ -1766,7 +1859,7 @@ function batchOpaque(root,exclude=new Set(),cellSize=0){
 }
 function invisiblePicker(m){if(m?.material)m.material.visible=false;}
 function optimizeWorld(){
- const skip=new Set([player,playerShadow,seaMesh,houseDoor,...clouds,...bobbing.map(x=>x.mesh),...seaFish.map(f=>f.g),...seaWaves.map(w=>w.mesh),...countryAnimals.map(a=>a.g),...predators.map(a=>a.g)]);
+ const skip=new Set([player,playerShadow,seaMesh,houseDoor,...clouds,...bobbing.map(x=>x.mesh),...seaFish.map(f=>f.g),...seaWaves.map(w=>w.mesh),...countryAnimals.map(a=>a.g),...predators.map(a=>a.g),...growVisuals.map(a=>a.g)]);
  for(const token of letterTokens){
   skip.add(token.topper);skip.add(token.ring);skip.add(token.badge);skip.add(token.flower);skip.add(token.pick);
   const flower=token.flower,was=flower.visible;flower.visible=true;batchOpaque(flower);flower.visible=was;
@@ -1821,7 +1914,8 @@ const RHYME_PAIRS=[
  ['eo',['🐱','mèo'],[['🐟','cá'],['🐔','gà']]],
  ['ê',['🍐','lê'],[['🐟','cá'],['⚽','bóng']]]
 ];
-const LIFE=[ 
+const LIFE=[
+ ['Muốn hạt giống nảy mầm, bé cần tưới gì?',['💧','nước'],[['🧸','gấu bông'],['📚','sách']],'🌱','Đúng rồi! Hạt giống cần nước để nảy mầm.'],
  ['Trước khi ăn, bé nên làm gì?',['🧼','rửa tay bằng xà phòng'],[['⚽','đá bóng'],['📺','xem tivi']],'🍽️','Đúng rồi! Rửa tay bằng xà phòng trước khi ăn.'],
  ['Bé dùng gì để chải răng?',['🪥','bàn chải'],[['✏️','bút chì'],['🥄','thìa']],'😁','Đúng rồi! Bàn chải giúp giữ răng sạch.'],
  ['Bộ phận nào giúp bé nhìn?',['👀','mắt'],[['👂','tai'],['👃','mũi']],'🐻','Đúng rồi! Mắt giúp bé nhìn.'],
@@ -1898,6 +1992,15 @@ function openAdventure(kind,detail,manual=false){
  $('adventureOverlay').hidden=false;perfDirty=true;
  chirp();replayAdventure();$('adventureReplay').focus({preventScroll:true});return true;
 }
+function quizConsequence(){
+ return pendingFish!==null?'Nếu chưa trả lời đúng, cá sẽ bơi mất và bé không nhận được con cá này.':'Nếu chưa trả lời đúng, bé sẽ chưa nhận được điểm câu đố này.';
+}
+function loseQuizFish(){
+ if(pendingFish===null)return false;
+ const f=seaFish[pendingFish];pendingFish=null;
+ if(f){f.cooldown=7;f.g.visible=false;f.needsQuiz=null;}
+ return true;
+}
 function answerAdventure(button,value){
  if(!adventureQuestion||adventureLocked)return;
  if(value===adventureQuestion.answer){
@@ -1908,13 +2011,21 @@ function answerAdventure(button,value){
   $('adventureContinue').focus({preventScroll:true});
  }else{
   adventureMistakes++;button.classList.add('retry');$('adventureResult').textContent='💛';chirp('wrong');
-  narrate('Thử lại nhé! '+adventureQuestion.prompt);
-  if(adventureMistakes>=2)for(const b of $('adventureOptions').children)if(b.dataset.answer===adventureQuestion.answer)b.classList.add('hint');
+  if(adventureMistakes>=3){
+   const lost=loseQuizFish();adventureLocked=true;$('adventureResult').textContent=lost?'🐟 💨':'💛';$('adventureContinue').hidden=false;
+   for(const b of $('adventureOptions').children){b.disabled=true;if(b.dataset.answer===adventureQuestion.answer)b.classList.add('hint');}
+   const correct=adventureQuestion.options.find(x=>x[0]===adventureQuestion.answer)?.[1]||'';
+   narrate((lost?'Cá đã bơi mất rồi. Bé chưa nhận được cá này. ':'Bé chưa nhận được điểm câu đố này. ')+'Đáp án đúng là '+correct+'. Lần sau mình thử lại nhé!');
+  }else{
+   narrate(quizConsequence()+' Bé thử lại nhé! '+adventureQuestion.prompt);
+   if(adventureMistakes>=2)for(const b of $('adventureOptions').children)if(b.dataset.answer===adventureQuestion.answer)b.classList.add('hint');
+  }
  }
 }
 function closeAdventure(){
  if(!adventureQuestion)return;
- pendingFish=null;adventureQuestion=null;adventureLocked=false;$('adventureOverlay').hidden=true;stopSpeech();perfDirty=true;
+ const skipped=!adventureLocked,lost=skipped&&loseQuizFish();pendingFish=null;adventureQuestion=null;adventureLocked=false;$('adventureOverlay').hidden=true;stopSpeech();perfDirty=true;
+ if(skipped){toast(lost?'🐟 💨':'💛');narrate(lost?'Cá đã bơi mất vì bé chưa trả lời đúng. Bé có thể bắt con cá khác.':'Bé bỏ qua câu hỏi nên chưa nhận được điểm. Mình thử lại lần sau nhé!');}
 }
 
 function buildWorld(){
@@ -1962,7 +2073,7 @@ function setMode(next){
  const interior=next==='house';
  $('exploreTools').hidden=!garden;
  $('fishAlbumButton').hidden=interior;$('findFishButton').hidden=interior||!swimming;
- $('homeShortcut').hidden=interior;$('seaShortcut').hidden=interior;$('riverShortcut').hidden=interior;$('farmShortcut').hidden=interior;$('leaveHouseButton').hidden=!interior;if(next!=='world')setHidden('waterAlert',true);
+ $('homeShortcut').hidden=interior;$('seaShortcut').hidden=interior;$('riverShortcut').hidden=interior;$('farmShortcut').hidden=interior;$('gardenShortcut').hidden=interior;$('leaveHouseButton').hidden=!interior;if(next!=='world')setHidden('waterAlert',true);
  $('mapButton').hidden=interior;
  syncMusic();
  const quiz=next==='quiz',word=next==='word';
@@ -2041,6 +2152,7 @@ function updateNearby(){
   if(close){setText('actionText','BẮT CÁ');setIcon('actionButton','🐟','Bắt cá');}
   return;
  }
+ const plot=nearestPlot();if(plot>=0){setHidden('actionButton',false);setIcon('actionButton',gardenSymbol(plot),'Chăm cây '+gardenName(plot));return;}
  const near=nearestLetter(),home=nearHome(),index=near.dist<=3.6?near.index:-1;
  actionIndex=index;setHidden('actionButton',mode!=='world'||(!home&&index<0));
  if(home){setText('actionText','VÀO NHÀ');setIcon('actionButton','🏡','Vào nhà');}
@@ -2048,7 +2160,7 @@ function updateNearby(){
 }
 function tickWorld(dt,t){
  if(mode!=='world')return;
- tickOcean(t);tickFish(dt,t);tickCountry(dt,t);
+ tickOcean(t);tickFish(dt,t);tickCountry(dt,t);tickGardens(t);
  let dx=joystickX,dz=joystickY;
  if(keys.has('w')||keys.has('arrowup'))dz-=1;
  if(keys.has('s')||keys.has('arrowdown'))dz+=1;
@@ -2075,10 +2187,10 @@ function tickWorld(dt,t){
   dx=autoTarget.x-player.position.x;dz=autoTarget.z-player.position.z;
   const distance=Math.hypot(dx,dz);
   if(distance<.3){
-   const index=autoTarget.index;
+   const index=autoTarget.index,plot=autoTarget.plot;
    if(autoTarget.waypoints?.length){const waypoints=autoTarget.waypoints;autoTarget={...waypoints.shift(),index,waypoints};return;}
    autoTarget=null;
-   if(index===-2){enterHouse();return;}if(index>=0){openLesson(index);return;}dx=dz=0;
+   if(index===-3){interactPlot(plot);return;}if(index===-2){enterHouse();return;}if(index>=0){openLesson(index);return;}dx=dz=0;
    return;
   }
   dx/=distance;dz/=distance;
@@ -2621,6 +2733,7 @@ function pointerUp(e,cancel=false){
  if(cancel||drag.moved>10)return;
  if(mode==='house'){houseClick(e);return;}
  const ray=targetWorldPoint(e);
+ const plotHit=ray.intersectObjects(growPickers,false);if(plotHit.length&&!swimming){const i=plotHit[0].object.userData.plot;const p=GROW_PLOTS[i];if(Math.hypot(player.position.x-p.x,player.position.z-p.z)<16){interactPlot(i);return;}}
  const animalHit=ray.intersectObjects(countryPickers,false);if(animalHit.length&&!swimming){const a=countryAnimals[animalHit[0].object.userData.animal];if(a&&Math.hypot(a.g.position.x-player.position.x,a.g.position.z-player.position.z)<18){animalSpeak(animalHit[0].object.userData.animal);return;}}
  const fishHit=ray.intersectObjects(fishPickers.filter(m=>m.parent.visible),false);
  if(fishHit.length&&swimming&&seaFish[fishHit[0].object.userData.fish].habitat===waterRegion(player.position.x,player.position.z)){
@@ -2651,6 +2764,7 @@ function pressAction(){
  if(mode==='house'){const index=updateHouseHint();if(index!==-2)inspectHouseItem(index);return;}
  if(mode!=='world')return;
  if(swimming){const f=nearestFish();if(f.index!==null&&!catchFish(f.index))chaseFish(f.index);return;}
+ const plot=nearestPlot();if(plot>=0){interactPlot(plot);return;}
  if(nearHome()){enterHouse();return;}
  const near=nearestLetter();
  if(near.index>=0&&near.dist<=4.1)openLesson(near.index);
@@ -2739,7 +2853,7 @@ function setupControls(){
  $('adventureReplay').addEventListener('click',replayAdventure);$('adventureContinue').addEventListener('click',closeAdventure);$('adventureSkip').addEventListener('click',closeAdventure);
  setupRooms();$('roomGameButton').addEventListener('click',startRoomChallenge);$('roomChallenge').addEventListener('click',replayRoomChallenge);$('roomLessonButton').addEventListener('click',()=>{const i=LETTERS.findIndex((_,n)=>!progress.best[n]);openLesson(i<0?0:i);});$('playButton').addEventListener('click',beginPlay);
  $('homeShortcut').addEventListener('click',headHome);
- $('seaShortcut').addEventListener('click',headSea);$('riverShortcut').addEventListener('click',headRiver);$('farmShortcut').addEventListener('click',headCountry);
+ $('seaShortcut').addEventListener('click',headSea);$('riverShortcut').addEventListener('click',headRiver);$('farmShortcut').addEventListener('click',headCountry);$('gardenShortcut').addEventListener('click',goGarden);
  $('findFishButton').addEventListener('click',findFish);
  $('fishAlbumButton').addEventListener('click',()=>fishAlbum(true));
  $('fishAlbumClose').addEventListener('click',()=>fishAlbum(false));
