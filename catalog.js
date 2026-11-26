@@ -699,6 +699,21 @@ window.HTML_LAB_CATALOG = {
       "order": 6
     },
     {
+      "path": "app-market-research.html",
+      "title": "App Market Lab — Từ nhu cầu đến người dùng",
+      "description": "Nghiên cứu ý tưởng micro SaaS theo nhu cầu thực tế trên Reddit và kế hoạch kiểm chứng người dùng.",
+      "category": "Khác",
+      "parent": "",
+      "groupTitle": "",
+      "groupDescription": "",
+      "linkTitle": "",
+      "tags": [],
+      "icon": "✦",
+      "theme": "cyan",
+      "featured": false,
+      "order": 999
+    },
+    {
       "path": "fresh-sky-pastel.html",
       "title": "Fresh Sky Pastel — Design System & UI Lab",
       "description": "Design system tương tác: token, UI components, widgets, dashboard, listing, detail, layouts và responsive playground.",
