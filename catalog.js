@@ -699,6 +699,28 @@ window.HTML_LAB_CATALOG = {
       "order": 6
     },
     {
+      "path": "fresh-sky-pastel.html",
+      "title": "Fresh Sky Pastel — Design System & UI Lab",
+      "description": "Design system tương tác: token, UI components, widgets, dashboard, listing, detail, layouts và responsive playground.",
+      "category": "Thiết kế & Sáng tạo",
+      "parent": "",
+      "groupTitle": "",
+      "groupDescription": "",
+      "linkTitle": "",
+      "tags": [
+        "Design system",
+        "UI UX",
+        "Pastel",
+        "Dashboard",
+        "Components",
+        "Layout"
+      ],
+      "icon": "◈",
+      "theme": "cyan",
+      "featured": false,
+      "order": 999
+    },
+    {
       "path": "static-web-cloudflare-webrtc.html",
       "title": "Static Web, Cloudflare Tunnel & WebRTC",
       "description": "Cẩm nang kiến trúc static web, API, WebRTC, STUN/TURN, giới hạn Cloudflare Tunnel và phân phối video, file lớn.",
