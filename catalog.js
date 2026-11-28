@@ -736,6 +736,27 @@ window.HTML_LAB_CATALOG = {
       "order": 999
     },
     {
+      "path": "luopan.html",
+      "title": "La Kinh — La bàn phong thủy",
+      "description": "La Kinh Tam Hợp kỹ thuật số với Thiên Trì, Bát Quái, Tam Bàn 24 Sơn và cảm biến phương hướng điện thoại.",
+      "category": "Khoa học & Điện tử",
+      "parent": "",
+      "groupTitle": "",
+      "groupDescription": "",
+      "linkTitle": "",
+      "tags": [
+        "La Kinh",
+        "Phong thủy",
+        "La bàn",
+        "Cảm biến",
+        "Bát Quái"
+      ],
+      "icon": "🧭",
+      "theme": "cyan",
+      "featured": false,
+      "order": 999
+    },
+    {
       "path": "static-web-cloudflare-webrtc.html",
       "title": "Static Web, Cloudflare Tunnel & WebRTC",
       "description": "Cẩm nang kiến trúc static web, API, WebRTC, STUN/TURN, giới hạn Cloudflare Tunnel và phân phối video, file lớn.",
