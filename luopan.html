@@ -79,7 +79,7 @@ function ring(outer,inner,count,offset,fill,draw){circle(outer,fill);for(let i=0
 function chars(a,r,word,size,color="#382417"){const c=Array.from(word);c.forEach((ch,j)=>label(a,r+(c.length-1-2*j)*size*.43,ch,size,color))}
 circle(369,"#f3d89b");for(let i=0;i<360;i++){radial(i,i%10===0?352:i%5===0?359:364,369,i%10===0?1.2:.55);if(i%15===0)label(i,345,String(i),10,i%90===0?"#a01f1c":"#382417")}
 ring(338,330,120, -6,"#b02c25",(a,r,i)=>{if(i%5===0)radial(a,330,338,1.2,"#fff1c2")});
-ring(329,291,64,360/128,"#f6df9b",(a,r,i)=>{const x=hexes[i];chars(a,299,x.han,8);for(let j=0;j<6;j++){const y=400-323+j*3.6,solid=(x.bits>>(5-j))&1;svg("path",{d:solid?"M395 "+y+" h10":"M395 "+y+" h4 m2 0 h4",stroke:"#54331d","stroke-width":1.45,transform:"rotate("+a+" 400 400)"},rings)}});
+ring(329,291,64,360/128,"#f6df9b",(a,r,i)=>{const x=hexes[i];chars(a,299,x.han,8);for(let j=0;j<6;j++){const y=400-325+j*3,solid=(x.bits>>j)&1;svg("path",{d:solid?"M395 "+y+" h10":"M395 "+y+" h4 m2 0 h4",stroke:"#54331d","stroke-width":1.45,transform:"rotate("+a+" 400 400)"},rings)}});
 ring(290,265,24,0,"#eac077",(a,r,i)=>chars(a,r,terms[i],10));
 ring24(264,242,7.5,"#f6dda0");
 ring(241,216,60,-19.5,"#e9bc75",(a,r,i)=>chars(a,r,d60[i].han,9));
