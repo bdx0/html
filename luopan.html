@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>La Kinh — La bàn phong thủy</title>
-<meta name="description" content="La Kinh Tam Hợp kỹ thuật số với Thiên Trì, Bát Quái, Tam Bàn 24 Sơn và cảm biến phương hướng điện thoại.">
+<meta name="description" content="La Kinh tổng hợp với thước thủy bọt khí, Tam Bàn 24 Sơn, 72 Xuyên Sơn Long, 60 Thấu Địa Long, 64 quẻ và cảm biến điện thoại.">
 <meta name="catalog:category" content="Khoa học &amp; Điện tử">
 <meta name="catalog:tags" content="La Kinh,Phong thủy,La bàn,Cảm biến,Bát Quái">
 <meta name="catalog:icon" content="🧭">
@@ -14,14 +14,14 @@
 </style>
 </head>
 <body><main>
-<header><div><div class="kicker">羅經 · TAM HỢP</div><h1>La Kinh</h1></div><a href="./">← HTML Lab</a></header>
+<header><div><div class="kicker">羅經 · TAM HỢP / TAM NGUYÊN</div><h1>La Kinh</h1></div><a href="./">← HTML Lab</a></header>
 <section class="readout" aria-label="Phương vị"><div class="metric"><small>Phương vị</small><strong id="degrees">—</strong></div><div class="metric"><small>Hướng</small><strong id="direction">—</strong></div><div class="metric"><small>Địa bàn · Sơn</small><strong id="mountain">—</strong></div></section>
 <div class="board" id="board">
-<svg id="dial" viewBox="0 0 800 800" role="img" aria-label="La Kinh Tam Hợp với các vòng đồng tâm và chỉ đỏ">
+<svg id="dial" viewBox="0 0 800 800" role="img" aria-label="La Kinh tổng hợp với các vòng đồng tâm, chỉ đỏ và thước thủy">
 <defs><linearGradient id="wood" x2="1" y2="1"><stop stop-color="#9e6c35"/><stop offset=".52" stop-color="#5e391d"/><stop offset="1" stop-color="#9d6531"/></linearGradient><radialGradient id="brass"><stop stop-color="#f7df9c"/><stop offset=".78" stop-color="#e5bd71"/><stop offset="1" stop-color="#c89243"/></radialGradient><radialGradient id="well"><stop stop-color="#fbf4e4"/><stop offset="1" stop-color="#d4bd91"/></radialGradient></defs>
 <rect x="4" y="4" width="792" height="792" rx="14" fill="url(#wood)" stroke="#c18a49" stroke-width="3"/>
 <rect x="16" y="16" width="768" height="768" rx="9" fill="none" stroke="#e0b06d" stroke-opacity=".55"/>
-<g fill="#e7c68b" font-size="19" font-family="serif" text-anchor="middle"><text x="53" y="56">羅</text><text x="747" y="56">經</text><text x="53" y="758">天</text><text x="747" y="758">地</text></g>
+<g fill="#e7c68b" font-size="19" font-family="serif" text-anchor="middle"><text x="53" y="56">羅</text><text x="53" y="758">天</text><text x="747" y="758">地</text></g>
 <g id="disc" transform="rotate(0 400 400)">
 <circle cx="400" cy="400" r="375" fill="url(#brass)" stroke="#422414" stroke-width="5"/>
 <g id="rings"></g></g>
@@ -29,21 +29,21 @@
 <circle cx="400" cy="400" r="57" fill="none" stroke="#947446"/>
 <g id="needle" opacity=".35"><path d="M400 350 L390 400 L400 408 L410 400 Z" fill="#b32321" stroke="#6b201b"/><path d="M400 450 L390 400 L400 392 L410 400 Z" fill="#35332f" stroke="#1f1f1e"/><circle cx="400" cy="400" r="5" fill="#e2b66b" stroke="#554020"/></g>
 <g stroke="#e12925" stroke-width="2" opacity=".88" pointer-events="none"><path d="M10 400 H790 M400 10 V790"/></g>
-<path d="M388 8 H412 L400 29 Z" fill="#f24b32" stroke="#6d1810"/>
+<path d="M388 8 H412 L400 29 Z" fill="#f24b32" stroke="#6d1810"/><g id="level" transform="translate(740 60)"><title>Thước thủy tròn — bọt khí hướng về phía cao</title><circle r="39" fill="#30251a" stroke="#deb46e" stroke-width="3"/><circle r="34" fill="#bed99a" stroke="#556e36" stroke-width="2"/><circle r="10" fill="none" stroke="#3e5830" stroke-width="1.4"/><path d="M-31 0 H31 M0 -31 V31" stroke="#537242" stroke-width=".7"/><circle id="bubble" r="8" fill="#f9ffe9" stroke="#4a6834" stroke-width="1.5" opacity="0"/><text id="levelMark" x="0" y="53" text-anchor="middle" fill="#f8e8c5" font-size="12">—</text></g>
 </svg></div>
 <div class="controls"><button id="start" class="primary">Bật la bàn</button><button id="freeze" disabled>Giữ số đo</button><button id="zoom" aria-pressed="false">Phóng to</button><button id="demo" aria-pressed="false">Thử thủ công</button></div>
 <div id="status" class="status" role="status">Chưa có dữ liệu cảm biến. Bấm Bật la bàn và đặt điện thoại nằm ngang, màn hình hướng lên.</div>
-<div id="source" class="mode">Nguồn: chưa đo · Độ nghiêng: —</div>
-<div id="manual" class="manual" hidden><label for="angle">Góc thử nghiệm (không phải số đo thật)</label><input id="angle" type="range" min="0" max="359" step="1" value="0"></div>
+<div id="source" class="mode">Nguồn: chưa đo · Độ nghiêng: —</div><div id="levelText" class="mode" role="status">Thước thủy: chưa có dữ liệu.</div>
+<div id="manual" class="manual" hidden><label for="angle">Góc thử nghiệm (không phải số đo thật)</label><input id="angle" type="range" min="0" max="359" step="1" value="0"><label for="pitch">Nghiêng dọc giả lập</label><input id="pitch" type="range" min="-20" max="20" value="0"><label for="roll">Nghiêng ngang giả lập</label><input id="roll" type="range" min="-20" max="20" value="0"></div>
 <table aria-label="Đọc các vòng tại chỉ đỏ phía trên"><tbody>
 <tr><th>Tọa (hướng đối diện)</th><td id="sitting">—</td></tr>
 <tr><th>Tiên Thiên Bát Quái</th><td id="early">—</td></tr>
 <tr><th>Hậu Thiên Bát Quái</th><td id="late">—</td></tr>
 <tr><th>Nhân Bàn · Trung Châm (−7,5°)</th><td id="human">—</td></tr>
 <tr><th>Thiên Bàn · Phùng Châm (+7,5°)</th><td id="heaven">—</td></tr>
-<tr><th>Vạch 5° / 3°</th><td id="fine">—</td></tr>
+<tr><th>Tam Nguyên Long · Âm Dương</th><td id="yuan">—</td></tr><tr><th>Ngũ Hành 24 Sơn</th><td id="element">—</td></tr><tr><th>Tiết khí (phương vị cổ)</th><td id="term">—</td></tr><tr><th>72 Xuyên Sơn Long</th><td id="dragon72">—</td></tr><tr><th>60 Thấu Địa Long · bình phân</th><td id="dragon60">—</td></tr><tr><th>64 quẻ · Tiên Thiên viên đồ</th><td id="hexagram">—</td></tr><tr><th>Vạch 5° / 3°</th><td id="fine">—</td></tr>
 </tbody></table>
-<details><summary>Cách sử dụng và giới hạn</summary><p>Giữ điện thoại nằm ngang, theo chiều dọc màn hình. Cạnh trên điện thoại là hướng đo. Đĩa xoay theo phương hướng cảm biến, đầu đỏ của kim chỉ phương Bắc mà trình duyệt cung cấp; chỉ đỏ chữ thập cố định. Tránh nam châm, ốp có từ tính, vật kim loại lớn và thiết bị điện. Nếu số đo không ổn định, di chuyển điện thoại theo hình số 8 rồi đặt lại nằm ngang.</p><p>Bản Tam Hợp rút gọn: Tiên Thiên, Hậu Thiên, Địa–Nhân–Thiên Bàn và thang độ. Các vạch chia 72/120 chỉ là hình học 5°/3°, chưa gán chữ Xuyên Sơn Long hoặc Phân Kim theo truyền thống. Chưa có vòng 64 quẻ, 60 Can Chi hay 28 tú. Ba bàn dùng tâm Tý lần lượt 0°, −7,5° và +7,5°. Thiết kế không đưa ra kết luận cát hung.</p><p>Trên Safari dùng webkitCompassHeading nếu có; trình duyệt khác chỉ chấp nhận orientation tuyệt đối. Hướng tham chiếu có thể phụ thuộc hệ điều hành; không tự hiệu chỉnh Bắc từ/Bắc thật. Chế độ thủ công là minh họa, không dùng để đo. Cần HTTPS và thiết bị có cảm biến tương thích.</p><p>Nguồn đối chiếu: <a href="https://fengshui.info/learn/the-luopan/" target="_blank" rel="noopener">Luopan và 24 Sơn</a> · <a href="https://developer.mozilla.org/en-US/docs/Web/API/DeviceOrientationEvent" target="_blank" rel="noopener">DeviceOrientationEvent</a> · <a href="https://developer.apple.com/documentation/webkitjs/deviceorientationevent" target="_blank" rel="noopener">Apple WebKit</a>.</p></details>
+<details><summary>Cách sử dụng và giới hạn</summary><p>Giữ điện thoại nằm ngang, theo chiều dọc màn hình. Cạnh trên điện thoại là hướng đo. Đĩa xoay theo phương hướng cảm biến, đầu đỏ của kim chỉ phương Bắc mà trình duyệt cung cấp; chỉ đỏ chữ thập cố định. Tránh nam châm, ốp có từ tính, vật kim loại lớn và thiết bị điện. Nếu số đo không ổn định, di chuyển điện thoại theo hình số 8 rồi đặt lại nằm ngang.</p><p>Bản tổng hợp thực nghiệm gồm 13 vòng: Tiên Thiên, Hậu Thiên, Tam Nguyên Long, âm dương Tam Nguyên, ngũ hành 24 Sơn, Địa Bàn, 72 Xuyên Sơn, Nhân Bàn, 60 Thấu Địa bình phân, Thiên Bàn, 24 tiết khí, 64 quẻ Tiên Thiên viên đồ và thang độ; ngoài ra có thang hình học 120 vạch. Không phải bản sao của một La Kinh 36 tầng cụ thể. Xuyên Sơn đặt Mậu Tý ở tâm 0°, Thấu Địa chọn dị bản bình phân khởi Giáp Tý tại đầu Nhâm (337,5°); 64 quẻ đặt ranh Khôn–Phục ở Bắc, Càn–Cấu ở Nam. Tiết khí là phương vị biểu tượng cổ, không phải đo kinh độ Mặt Trời. Chưa gán Can Chi cho 120 Phân Kim và chưa có 28 Tú vì cần chọn bảng độ theo niên đại. Ba bàn dùng tâm Tý lần lượt 0°, −7,5° và +7,5°. Thiết kế không đưa ra kết luận cát hung.</p><p>Thước thủy sử dụng beta/gamma độc lập với hướng tuyệt đối, bọt khí dịch về cạnh cao và báo ngang khi độ nghiêng ≤ 1° (ngưỡng giao diện, không phải độ chính xác đã hiệu chuẩn). Chỉ dùng khi màn hình hướng lên; không đo khi úp máy. Trên Safari dùng webkitCompassHeading nếu có; trình duyệt khác chỉ chấp nhận orientation tuyệt đối. Hướng tham chiếu có thể phụ thuộc hệ điều hành; không tự hiệu chỉnh Bắc từ/Bắc thật. Chế độ thủ công là minh họa, không dùng để đo. Cần HTTPS và thiết bị có cảm biến tương thích.</p><p>Nguồn đối chiếu: <a href="https://fengshui.info/learn/the-luopan/" target="_blank" rel="noopener">Luopan và 24 Sơn</a> · <a href="https://qiankunyoushu.com/luopan" target="_blank" rel="noopener">12 tầng và 60 Long</a> · <a href="https://gaorenyoushu.github.io/XuanJiPaiPan/luopan.html" target="_blank" rel="noopener">72 Long</a> · <a href="https://zh.wikisource.org/zh-hans/%E5%9C%96%E6%9B%B8%E7%B7%A8_%28%E5%9B%9B%E5%BA%AB%E5%85%A8%E6%9B%B8%E6%9C%AC%29/%E5%8D%B7002" target="_blank" rel="noopener">Tiên Thiên viên đồ</a> · <a href="https://lhttjdr.github.io/calendar/docs/folk/xuankong" target="_blank" rel="noopener">Tam Nguyên</a> · <a href="https://www.ihchina.cn/Article/Index/detail?id=25586" target="_blank" rel="noopener">24 tiết khí</a> · <a href="https://developer.mozilla.org/en-US/docs/Web/API/DeviceOrientationEvent" target="_blank" rel="noopener">DeviceOrientationEvent</a> · <a href="https://developer.apple.com/documentation/webkitjs/deviceorientationevent" target="_blank" rel="noopener">Apple WebKit</a>.</p></details>
 <div class="foot">Mọi dữ liệu cảm biến được xử lý tại thiết bị; trang không gửi dữ liệu hoặc yêu cầu vị trí.</div>
 </main>
 <script>
@@ -60,23 +60,48 @@ const rings=$("rings");
 function circle(r,fill){svg("circle",{cx:400,cy:400,r,fill,stroke:"#674320","stroke-width":1.2},rings)}
 function radial(a,r1,r2,width=.8,color="#694323"){svg("line",{x1:400,y1:400-r1,x2:400,y2:400-r2,stroke:color,"stroke-width":width,transform:"rotate("+a+" 400 400)"},rings)}
 function label(a,r,txt,size,color="#382417"){svg("text",{x:400,y:400-r,fill:color,"font-size":size,"text-anchor":"middle","dominant-baseline":"central","font-family":"serif",transform:"rotate("+a+" 400 400)"},rings,txt)}
-function ring24(outer,inner,offset,fill){circle(outer,fill);for(let i=0;i<24;i++){radial(i*15+offset-7.5,inner,outer);label(i*15+offset,(inner+outer)/2,mountains[i],23,i%3===0?"#a01f1c":"#342419")} }
-circle(369,"#f3d89b");
-for(let i=0;i<360;i++){radial(i,i%10===0?348:i%5===0?355:361,369,i%10===0?1.4:.65);if(i%15===0)label(i,337,String(i),13,i%90===0?"#a01f1c":"#382417")}
-circle(326,"#a32b25");
-for(let i=0;i<120;i++)radial(i*3,313,326,i%5===0?1.5:.7,"#f7df9e");
-circle(312,"#f8e1a8");for(let i=0;i<72;i++)radial(i*5,298,312,i%3===0?1.5:.65);
-ring24(297,256,7.5,"#e6b96d");ring24(255,214,-7.5,"#f4dca0");ring24(213,169,0,"#e7bb73");
-circle(168,"#f4dda8");for(let i=0;i<8;i++){radial(i*45-22.5,122,168);label(i*45,151,late[i][1],30,"#33251b");label(i*45,128,late[i][0],15,"#8f211b")}
-circle(121,"#dfb76e");for(let i=0;i<8;i++){radial(i*45-22.5,66,121);label(i*45,102,early[i][1],25);label(i*45,81,early[i][0],14,"#8f211b")}
-let mode="idle",last=0,filtered=null,visual=null,held=false,accuracy=null,tilt=null,source="",permissionPending=false;
+function ring24(outer,inner,offset,fill){circle(outer,fill);for(let i=0;i<24;i++){radial(i*15+offset-7.5,inner,outer);label(i*15+offset,(inner+outer)/2,mountains[i],18,i%3===0?"#a01f1c":"#342419")} }
+const stems="甲乙丙丁戊己庚辛壬癸",branches="子丑寅卯辰巳午未申酉戌亥";
+const stemNames=["Giáp","Ất","Bính","Đinh","Mậu","Kỷ","Canh","Tân","Nhâm","Quý"],branchNames=["Tý","Sửu","Dần","Mão","Thìn","Tỵ","Ngọ","Mùi","Thân","Dậu","Tuất","Hợi"];
+const pairs=Array.from({length:60},(_,i)=>({han:stems[i%10]+branches[i%12],vi:stemNames[i%10]+" "+branchNames[i%12]}));
+const dragons=Array.from({length:12},(_,i)=>Array.from({length:5},(_,j)=>pairs[i+12*j]).concat({han:"正",vi:"Ô trống"})).flat();
+const d60=dragons.filter(x=>x.han!=="正");
+const yuanNames=["Thiên","Nhân","Địa"],yuanHan=["天","人","地"];
+const yin=i=> (Math.floor((i+1)/3)%2===0) ? i%3!==2 : i%3===2; // indices start at center of each group: four cardinal palaces alternate with diagonal
+// Earth element by mountain: stems/branches and four corner trigrams.
+const elements="水水土土木木木木土木火火火火土土金金金金土金水水".split("");
+const elementNames={水:"Thủy",木:"Mộc",火:"Hỏa",土:"Thổ",金:"Kim"};
+const terms="冬至 小寒 大寒 立春 雨水 驚蟄 春分 清明 穀雨 立夏 小滿 芒種 夏至 小暑 大暑 立秋 處暑 白露 秋分 寒露 霜降 立冬 小雪 大雪".split(" ");
+const termNames="Đông chí|Tiểu hàn|Đại hàn|Lập xuân|Vũ thủy|Kinh trập|Xuân phân|Thanh minh|Cốc vũ|Lập hạ|Tiểu mãn|Mang chủng|Hạ chí|Tiểu thử|Đại thử|Lập thu|Xử thử|Bạch lộ|Thu phân|Hàn lộ|Sương giáng|Lập đông|Tiểu tuyết|Đại tuyết".split("|");
+const hexMatrix=["乾 夬 大有 大壯 小畜 需 大畜 泰","履 兌 睽 歸妹 中孚 節 損 臨","同人 革 離 豐 家人 既濟 賁 明夷","無妄 隨 噬嗑 震 益 屯 頤 復","姤 大過 鼎 恆 巽 井 蠱 升","訟 困 未濟 解 渙 坎 蒙 師","遯 咸 旅 小過 漸 蹇 艮 謙","否 萃 晉 豫 觀 比 剝 坤"].map(x=>x.split(" "));
+const hexes=Array.from({length:64},(_,i)=>{const bits=i<32?32+i:63-i;return {bits,han:hexMatrix[7-(bits>>3)][7-(bits&7)]}});
+function ring(outer,inner,count,offset,fill,draw){circle(outer,fill);for(let i=0;i<count;i++){const a=i*360/count+offset;radial(a-180/count,inner,outer,.65);draw(a,(inner+outer)/2,i)}}
+function chars(a,r,word,size,color="#382417"){const c=Array.from(word);c.forEach((ch,j)=>label(a,r+(c.length-1-2*j)*size*.43,ch,size,color))}
+circle(369,"#f3d89b");for(let i=0;i<360;i++){radial(i,i%10===0?352:i%5===0?359:364,369,i%10===0?1.2:.55);if(i%15===0)label(i,345,String(i),10,i%90===0?"#a01f1c":"#382417")}
+ring(338,330,120, -6,"#b02c25",(a,r,i)=>{if(i%5===0)radial(a,330,338,1.2,"#fff1c2")});
+ring(329,291,64,360/128,"#f6df9b",(a,r,i)=>{const x=hexes[i];chars(a,299,x.han,8);for(let j=0;j<6;j++){const y=400-323+j*3.6,solid=(x.bits>>(5-j))&1;svg("path",{d:solid?"M395 "+y+" h10":"M395 "+y+" h4 m2 0 h4",stroke:"#54331d","stroke-width":1.45,transform:"rotate("+a+" 400 400)"},rings)}});
+ring(290,265,24,0,"#eac077",(a,r,i)=>chars(a,r,terms[i],10));
+ring24(264,242,7.5,"#f6dda0");
+ring(241,216,60,-19.5,"#e9bc75",(a,r,i)=>chars(a,r,d60[i].han,9));
+ring24(215,193,-7.5,"#f5dba0");
+ring(192,167,72,-10,"#e4b669",(a,r,i)=>chars(a,r,dragons[i].han,8,dragons[i].han==="正"?"#ac2420":"#382417"));
+ring24(166,144,0,"#f8dea5");
+ring(143,129,24,0,"#e8be78",(a,r,i)=>label(a,r,elements[i],11));
+ring(128,114,24,0,"#f7dfa8",(a,r,i)=>label(a,r,yin(i)?"陰":"陽",11,yin(i)?"#342419":"#a01f1c"));
+ring(113,100,24,0,"#e6b66e",(a,r,i)=>label(a,r,yuanHan[i%3],10));
+ring(99,81,8,0,"#f5dda1",(a,r,i)=>label(a,r,late[i][1],20));
+ring(80,66,8,0,"#e6b96d",(a,r,i)=>label(a,r,early[i][1],15));
+let levelLast=0;let mode="idle",last=0,filtered=null,visual=null,held=false,accuracy=null,tilt=null,source="",permissionPending=false;
 function status(msg,warn=false){$("status").textContent=msg;$("status").classList.toggle("warn",warn)}
-function clearReading(){for(const id of ["degrees","direction","mountain","sitting","early","late","human","heaven","fine"])$(id).textContent="—";$("needle").setAttribute("opacity",".35");$("freeze").disabled=true;}
-function paint(h){h=norm(h);const i=sector(h,24),d=sector(h,8),opp=norm(h+180);$("disc").setAttribute("transform","rotate("+(-h)+" 400 400)");$("needle").setAttribute("transform","rotate("+(-h)+" 400 400)");$("needle").setAttribute("opacity","1");$("degrees").textContent=h.toFixed(1).replace(/\.0$/,"")+"°";$("direction").textContent=dirs[d];$("mountain").textContent=names[i];$("sitting").textContent=opp.toFixed(1)+"° · "+names[sector(opp,24)];$("early").textContent=early[d][1]+" "+early[d][2];$("late").textContent=late[d][1]+" "+late[d][2];$("human").textContent=names[sector(h,24,-7.5)];$("heaven").textContent=names[sector(h,24,7.5)];$("fine").textContent=norm(Math.round(h/5)*5)+"° / "+norm(Math.round(h/3)*3)+"°"}
+function clearReading(){for(const id of ["degrees","direction","mountain","sitting","early","late","human","heaven","fine","yuan","element","term","dragon72","dragon60","hexagram"])$(id).textContent="—";$("needle").setAttribute("opacity",".35");$("freeze").disabled=true;}
+function paint(h){h=norm(h);const i=sector(h,24),d=sector(h,8),opp=norm(h+180);$("disc").setAttribute("transform","rotate("+(-h)+" 400 400)");$("needle").setAttribute("transform","rotate("+(-h)+" 400 400)");$("needle").setAttribute("opacity","1");$("degrees").textContent=h.toFixed(1).replace(/\.0$/,"")+"°";$("direction").textContent=dirs[d];$("mountain").textContent=names[i];$("sitting").textContent=opp.toFixed(1)+"° · "+names[sector(opp,24)];$("early").textContent=early[d][1]+" "+early[d][2];$("late").textContent=late[d][1]+" "+late[d][2];$("human").textContent=names[sector(h,24,-7.5)];$("heaven").textContent=names[sector(h,24,7.5)];$("fine").textContent=norm(Math.round(h/5)*5)+"° / "+norm(Math.round(h/3)*3)+"°";$("yuan").textContent=yuanNames[i%3]+" · "+(yin(i)?"Âm":"Dương");$("element").textContent=elementNames[elements[i]];$("term").textContent=termNames[i];$("dragon72").textContent=dragons[sector(h,72,-10)].vi;$("dragon60").textContent=d60[sector(h,60,-19.5)].vi;$("hexagram").textContent=hexes[sector(h,64,360/128)].han;}
 function portrait(){return matchMedia("(orientation: portrait)").matches}
 function diagnostics(){ $("source").textContent="Nguồn: "+(source||"chưa đo")+" · Độ nghiêng: "+(tilt===null?"—":tilt.toFixed(1)+"°")+(accuracy===null?"":" · Sai số báo cáo: ±"+accuracy.toFixed(0)+"°");}
+function levelClear(){ $("bubble").setAttribute("opacity","0");$("levelMark").textContent="—";$("levelText").textContent="Thước thủy: chưa có dữ liệu.";}
+function levelUpdate(beta,gamma){if(!Number.isFinite(beta)||!Number.isFinite(gamma))return;const b=beta*Math.PI/180,g=gamma*Math.PI/180,z=Math.cos(b)*Math.cos(g);levelLast=Date.now();if(z<=0||!portrait()){levelClear();$("levelText").textContent="Thước thủy: đặt màn hình hướng lên, theo chiều dọc.";return}const x=-Math.cos(b)*Math.sin(g),y=-Math.sin(b),t=Math.acos(Math.max(-1,Math.min(1,z)))*180/Math.PI,mag=Math.hypot(x,y),r=Math.min(24,t*3);$("bubble").setAttribute("cx",mag?r*x/mag:0);$("bubble").setAttribute("cy",mag?r*y/mag:0);$("bubble").setAttribute("opacity","1");$("bubble").setAttribute("fill",t<=1?"#f9ffe9":"#fff4b1");$("levelMark").textContent=t.toFixed(1)+"°";$("levelText").textContent=(mode==="manual"?"Thử bọt khí: ":"Thước thủy: ")+(t<=1?"Đã nằm ngang":"Điều chỉnh cho bọt khí vào tâm")+" · "+t.toFixed(1)+"°";}
 function onOrientation(e){
  if(mode!=="sensor")return;
+ levelUpdate(e.beta,e.gamma);
  let h=null,s="",a=null;
  if(Number.isFinite(e.webkitCompassHeading)&&e.webkitCompassHeading>=0){if(Number.isFinite(e.webkitCompassAccuracy)&&e.webkitCompassAccuracy<0)return;h=e.webkitCompassHeading;s="WebKit compass";a=Number.isFinite(e.webkitCompassAccuracy)?e.webkitCompassAccuracy:null}
  else if((e.absolute===true||e.type==="deviceorientationabsolute")&&Number.isFinite(e.alpha)){h=norm(360-e.alpha);s="Orientation tuyệt đối"}
@@ -89,7 +114,7 @@ function onOrientation(e){
  visual=filtered;paint(visual);$("freeze").disabled=false;status(a!==null&&a>10?"Đang đo · sai số báo cáo cao, thận trọng gần ranh giới 24 Sơn.":"Đang đo trực tiếp · giữ điện thoại nằm ngang.",a!==null&&a>10);
 }
 function detach(){window.removeEventListener("deviceorientationabsolute",onOrientation);window.removeEventListener("deviceorientation",onOrientation)}
-function reset(){detach();held=false;filtered=null;visual=null;last=0;source="";tilt=null;accuracy=null;$("freeze").textContent="Giữ số đo";clearReading();diagnostics()}
+function reset(){detach();levelLast=0;levelClear();held=false;filtered=null;visual=null;last=0;source="";tilt=null;accuracy=null;$("freeze").textContent="Giữ số đo";clearReading();diagnostics()}
 async function start(){
  if(permissionPending)return;reset();mode="idle";$("manual").hidden=true;$("demo").setAttribute("aria-pressed","false");
  if(!window.isSecureContext){status("Cần mở trang bằng HTTPS để truy cập cảm biến.",true);return}
@@ -101,8 +126,9 @@ async function start(){
 }
 $("start").addEventListener("click",start);
 $("freeze").addEventListener("click",()=>{if(mode!=="sensor"||visual===null)return;held=!held;$("freeze").textContent=held?"Tiếp tục đo":"Giữ số đo";if(held)status("Đã giữ số đo · không phải phương hướng hiện tại.");else{filtered=null;visual=null;clearReading();status("Đang chờ số đo mới…")}});
-$("demo").addEventListener("click",()=>{reset();mode="manual";$("manual").hidden=false;$("demo").setAttribute("aria-pressed","true");source="THỬ THỦ CÔNG";diagnostics();paint(Number($("angle").value));status("Chế độ thử thủ công · mọi góc là giá trị minh họa, không phải dữ liệu cảm biến.",true)});
+$("demo").addEventListener("click",()=>{reset();mode="manual";$("manual").hidden=false;$("demo").setAttribute("aria-pressed","true");source="THỬ THỦ CÔNG";diagnostics();paint(Number($("angle").value));levelUpdate(Number($("pitch").value),Number($("roll").value));status("Chế độ thử thủ công · mọi góc là giá trị minh họa, không phải dữ liệu cảm biến.",true)});
 $("angle").addEventListener("input",()=>{if(mode==="manual")paint(Number($("angle").value))});
+for(const id of ["pitch","roll"])$(id).addEventListener("input",()=>{if(mode==="manual")levelUpdate(Number($("pitch").value),Number($("roll").value))});
 $("zoom").addEventListener("click",()=>{const z=$("board").classList.toggle("zoom");$("zoom").setAttribute("aria-pressed",String(z));$("zoom").textContent=z?"Thu nhỏ":"Phóng to";if(z){$("board").scrollLeft=($("board").scrollWidth-$("board").clientWidth)/2}});
-setInterval(()=>{if(mode==="sensor"&&!held&&Date.now()-last>3000){clearReading();filtered=null;visual=null;status("Không nhận được phương hướng tuyệt đối. Kiểm tra quyền, từ kế và trình duyệt; hoặc thử thủ công.",true)}},1000);
+setInterval(()=>{if(mode==="sensor"&&Date.now()-levelLast>3000)levelClear();if(mode==="sensor"&&!held&&Date.now()-last>3000){clearReading();filtered=null;visual=null;status("Không nhận được phương hướng tuyệt đối. Kiểm tra quyền, từ kế và trình duyệt; hoặc thử thủ công.",true)}},1000);
 </script></body></html>
