@@ -738,7 +738,7 @@ window.HTML_LAB_CATALOG = {
     {
       "path": "luopan.html",
       "title": "La Kinh — La bàn phong thủy",
-      "description": "La Kinh Tam Hợp kỹ thuật số với Thiên Trì, Bát Quái, Tam Bàn 24 Sơn và cảm biến phương hướng điện thoại.",
+      "description": "La Kinh tổng hợp với thước thủy bọt khí, Tam Bàn 24 Sơn, 72 Xuyên Sơn Long, 60 Thấu Địa Long, 64 quẻ và cảm biến điện thoại.",
       "category": "Khoa học & Điện tử",
       "parent": "",
       "groupTitle": "",
